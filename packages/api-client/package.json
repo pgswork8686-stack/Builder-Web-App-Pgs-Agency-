@@ -1,0 +1,12 @@
+{
+  "name": "@pgs/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "build": "echo \"No build needed for api-client\"",
+    "lint": "echo \"No lint needed for api-client\"",
+    "typecheck": "tsc --noEmit index.ts --skipLibCheck",
+    "test": "echo \"No tests needed for api-client\""
+  }
+}

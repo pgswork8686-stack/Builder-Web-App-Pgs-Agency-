@@ -1,0 +1,15 @@
+{
+  "name": "@pgs/validation",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "scripts": {
+    "build": "echo \"No build needed for validation\"",
+    "lint": "echo \"No lint needed for validation\"",
+    "typecheck": "tsc --noEmit index.ts --skipLibCheck",
+    "test": "echo \"No tests needed for validation\""
+  }
+}

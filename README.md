@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PGS Hub
 
-## Getting Started
+PGS Hub là hệ thống quản trị và vận hành nội bộ dành riêng cho PGS Agency.
 
-First, run the development server:
+## Công nghệ sử dụng (Stack)
+- **Quản lý Monorepo**: `pnpm workspace`
+- **Frontend**: Next.js 16, React 19, Tailwind CSS v4, TypeScript
+- **Backend API**: NestJS 11, TypeScript
+- **Cơ sở dữ liệu & Authentication**: Supabase (PostgreSQL)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Cấu trúc thư mục (Monorepo Structure)
+- `apps/web`: Ứng dụng client-side Next.js.
+- `apps/api`: Ứng dụng backend API NestJS.
+- `packages/`: Các thư viện dùng chung (`types`, `validation`, `config`, `ui`, `api-client`).
+- `supabase/`: Thư mục chứa cấu hình Supabase Database Migrations và Policies.
+- `docs/`: Tài liệu hướng dẫn phát triển và tài liệu ngữ cảnh dự án.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Yêu cầu Môi trường (Prerequisites)
+- Node.js >= v20
+- pnpm >= v9
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Hướng dẫn cài đặt và chạy local (Local setup)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Cài đặt các gói phụ thuộc (từ root)**:
+   ```bash
+   pnpm install --ignore-scripts
+   ```
+2. **Cấu hình môi trường**:
+   Sao chép tệp `.env.example` thành `.env` ở thư mục gốc và bổ sung các khóa Supabase của bạn.
 
-## Learn More
+3. **Chạy các ứng dụng ở chế độ phát triển (Local Development)**:
+   - Chạy cả Web và API song song:
+     ```bash
+     pnpm dev
+     ```
+   - Chỉ chạy Web client (cổng 3000):
+     ```bash
+     pnpm dev:web
+     ```
+   - Chỉ chạy API backend (cổng 3001):
+     ```bash
+     pnpm dev:api
+     ```
 
-To learn more about Next.js, take a look at the following resources:
+## Lệnh kiểm tra chất lượng mã nguồn (Quality Commands)
+- **Lint mã nguồn**: `pnpm lint`
+- **Typecheck (TypeScript)**: `pnpm typecheck`
+- **Chạy kiểm thử (Test)**: `pnpm test`
+- **Build dự án**: `pnpm build`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Chiến lược phát triển nhánh (Branch strategy)
+- Nhánh chính: `main` (không commit trực tiếp).
+- Tạo nhánh phụ dạng `feat/feature-name` để phát triển tính năng và tạo Pull Request để merge vào nhánh chính.

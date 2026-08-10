@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --pgs-black: #070707;
+  --pgs-dark: #0E0E0F;
+  --pgs-card-dark: #151516;
+
+  --pgs-gold: #FFC400;
+  --pgs-gold-dark: #9A7216;
+  --pgs-gold-button: #CFA63E;
+
+  --pgs-cream: #FFF8E6;
+  --pgs-cream-light: #FFFBF0;
+
+  --pgs-text: #171717;
+  --pgs-muted: #606060;
+
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+body {
+  background-color: var(--pgs-black);
+  color: var(--pgs-cream);
+  font-family: var(--font-sans);
+}

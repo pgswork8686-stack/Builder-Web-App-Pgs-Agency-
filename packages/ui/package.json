@@ -1,0 +1,12 @@
+{
+  "name": "@pgs/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "build": "echo \"No build needed for ui\"",
+    "lint": "echo \"No lint needed for ui\"",
+    "typecheck": "tsc --noEmit index.ts --skipLibCheck",
+    "test": "echo \"No tests needed for ui\""
+  }
+}
