@@ -13,8 +13,8 @@ export default function Home() {
 
         <div className="w-full h-px bg-[#151516] my-2"></div>
 
-        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-[#151516] rounded-full border border-teal-500/20 text-xs text-teal-400">
-          <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-[#151516] rounded-full border border-[#FFC400]/20 text-xs text-[#FFC400]">
+          <span className="w-2 h-2 rounded-full bg-[#FFC400] animate-pulse"></span>
           Foundation đang hoạt động
         </div>
       </main>

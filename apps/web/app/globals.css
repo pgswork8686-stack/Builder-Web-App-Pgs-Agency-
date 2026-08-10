@@ -2,20 +2,22 @@
 
 :root {
   --pgs-black: #070707;
-  --pgs-dark: #0E0E0F;
+  --pgs-dark: #0e0e0f;
   --pgs-card-dark: #151516;
 
-  --pgs-gold: #FFC400;
-  --pgs-gold-dark: #9A7216;
-  --pgs-gold-button: #CFA63E;
+  --pgs-gold: #ffc400;
+  --pgs-gold-dark: #9a7216;
+  --pgs-gold-button: #cfa63e;
 
-  --pgs-cream: #FFF8E6;
-  --pgs-cream-light: #FFFBF0;
+  --pgs-cream: #fff8e6;
+  --pgs-cream-light: #fffbf0;
 
   --pgs-text: #171717;
   --pgs-muted: #606060;
 
-  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 body {

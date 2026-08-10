@@ -9,7 +9,12 @@
   "scripts": {
     "build": "echo \"No build needed for validation\"",
     "lint": "echo \"No lint needed for validation\"",
-    "typecheck": "tsc --noEmit index.ts --skipLibCheck",
-    "test": "echo \"No tests needed for validation\""
+    "lint:fix": "echo \"No lint:fix needed for validation\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vitest": "^1.3.1"
   }
 }

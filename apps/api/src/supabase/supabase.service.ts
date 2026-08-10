@@ -4,25 +4,17 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseService {
-  private clientInstance: SupabaseClient;
+  private clientInstance: SupabaseClient<any, any, any>;
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.supabaseUrl;
     const supabaseSecretKey = this.configService.supabaseSecretKey;
 
-    if (!supabaseUrl) {
-      console.warn('Supabase URL is not configured in ConfigService.');
-    }
-
-    // Backend clients typically use the service role key for system operations
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    this.clientInstance = createClient(
-      supabaseUrl || '',
-      supabaseSecretKey || '',
-    );
+    // Backend clients use the service role key for system operations
+    this.clientInstance = createClient(supabaseUrl, supabaseSecretKey);
   }
 
-  getClient(): SupabaseClient {
+  getClient(): SupabaseClient<any, any, any> {
     return this.clientInstance;
   }
 }

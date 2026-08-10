@@ -6,7 +6,8 @@
   "scripts": {
     "build": "echo \"No build needed for config\"",
     "lint": "echo \"No lint needed for config\"",
-    "typecheck": "tsc --noEmit index.ts --skipLibCheck",
+    "lint:fix": "echo \"No lint:fix needed for config\"",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"No tests needed for config\""
   }
 }

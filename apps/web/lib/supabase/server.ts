@@ -1,13 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl) {
-  console.warn('Supabase URL is not configured in server environment.');
+if (!supabaseUrl || !supabasePublishableKey) {
+  console.warn(
+    "Supabase URL or Publishable Key is not configured for Web Server.",
+  );
 }
 
+// Next.js server-side operations (SSR/Server Actions) only use publishable key + user session
 export const supabaseServer = createClient(
-  supabaseUrl || '',
-  supabaseServiceRoleKey || ''
+  supabaseUrl || "",
+  supabasePublishableKey || "",
 );

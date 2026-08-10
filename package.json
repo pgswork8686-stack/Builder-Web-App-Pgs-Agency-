@@ -8,8 +8,11 @@
     "dev:api": "pnpm --filter api start:dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
