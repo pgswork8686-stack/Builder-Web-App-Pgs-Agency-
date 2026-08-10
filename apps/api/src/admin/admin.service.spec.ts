@@ -17,6 +17,7 @@ describe('AdminService', () => {
       },
     },
     from: jest.fn(),
+    rpc: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -28,7 +29,7 @@ describe('AdminService', () => {
         {
           provide: SupabaseService,
           useValue: {
-            getClient: jest.fn().mockReturnValue(mockSupabaseClient),
+            getSystemClient: jest.fn().mockReturnValue(mockSupabaseClient),
           },
         },
       ],
@@ -38,13 +39,16 @@ describe('AdminService', () => {
   });
 
   describe('getPendingUsers', () => {
-    it('should return paginated pending users', async () => {
+    it('should return paginated pending users using canonical structure', async () => {
       const mockProfiles = [
         {
           id: 'u1',
+          email: 'u1@example.com',
           account_status: 'pending',
           role: null,
           full_name: 'User 1',
+          created_at: '2026-01-01',
+          updated_at: '2026-01-01',
         },
       ];
 
@@ -58,19 +62,14 @@ describe('AdminService', () => {
       const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
       mockSupabaseClient.from.mockReturnValue({ select: selectMock });
 
-      mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'u1@example.com' } },
-      });
+      const result = await service.getPendingUsers(1, 20);
 
-      const result = await service.getPendingUsers(1, 10);
-
-      expect(result.data).toHaveLength(1);
-      expect(result.data[0].email).toBe('u1@example.com');
-      expect(result.meta).toEqual({
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].email).toBe('u1@example.com');
+      expect(result.pagination).toEqual({
         page: 1,
-        limit: 10,
+        pageSize: 20,
         total: 1,
-        totalPages: 1,
       });
     });
   });
@@ -82,167 +81,79 @@ describe('AdminService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw NotFoundException if target user profile not found', async () => {
-      const maybeSingleMock = jest.fn().mockResolvedValue({
-        data: null,
+    it('should call approve_pending_account RPC and return success', async () => {
+      mockSupabaseClient.rpc.mockResolvedValue({
+        data: { role: 'employee', status: 'active' },
         error: null,
       });
-      const eqMock = jest
-        .fn()
-        .mockReturnValue({ maybeSingle: maybeSingleMock });
+
+      const singleMock = jest.fn().mockResolvedValue({
+        data: { id: 'u1', email: 'u1@test.com', full_name: 'Test' },
+        error: null,
+      });
+      const eqMock = jest.fn().mockReturnValue({ single: singleMock });
       const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
       mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+
+      const result = await service.approveUser('admin-1', 'u1', 'employee');
+
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('approve_pending_account', {
+        p_admin_user_id: 'admin-1',
+        p_target_user_id: 'u1',
+        p_role: 'employee',
+      });
+      expect(result.user.role).toBe('employee');
+      expect(result.user.account_status).toBe('active');
+    });
+
+    it('should map RPC code P0007 to NotFoundException', async () => {
+      mockSupabaseClient.rpc.mockResolvedValue({
+        data: null,
+        error: { code: 'P0007', message: 'Target profile not found' },
+      });
 
       await expect(
         service.approveUser('admin-1', 'u1', 'employee'),
       ).rejects.toThrow(NotFoundException);
     });
-
-    it('should throw ConflictException if target user status is not pending', async () => {
-      const maybeSingleMock = jest.fn().mockResolvedValue({
-        data: { id: 'u1', account_status: 'active' },
-        error: null,
-      });
-      const eqMock = jest
-        .fn()
-        .mockReturnValue({ maybeSingle: maybeSingleMock });
-      const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
-      mockSupabaseClient.from.mockReturnValue({ select: selectMock });
-
-      await expect(
-        service.approveUser('admin-1', 'u1', 'employee'),
-      ).rejects.toThrow(ConflictException);
-    });
-
-    it('should approve pending user and write event', async () => {
-      const maybeSingleMock = jest.fn().mockResolvedValue({
-        data: { id: 'u1', account_status: 'pending', role: null },
-        error: null,
-      });
-      const eqFetchMock = jest
-        .fn()
-        .mockReturnValue({ maybeSingle: maybeSingleMock });
-
-      const singleUpdateMock = jest.fn().mockResolvedValue({
-        data: {
-          id: 'u1',
-          role: 'employee',
-          account_status: 'active',
-          full_name: 'Test',
-          avatar_url: null,
-        },
-        error: null,
-      });
-      const selectUpdateMock = jest
-        .fn()
-        .mockReturnValue({ single: singleUpdateMock });
-      const eqUpdateMock = jest
-        .fn()
-        .mockReturnValue({ select: selectUpdateMock });
-      const updateMock = jest.fn().mockReturnValue({ eq: eqUpdateMock });
-      const insertEventMock = jest.fn().mockResolvedValue({ error: null });
-
-      mockSupabaseClient.from.mockImplementation((table: string) => {
-        if (table === 'profiles') {
-          return {
-            select: jest.fn().mockReturnValue({ eq: eqFetchMock }),
-            update: updateMock,
-          };
-        }
-        if (table === 'account_approval_events') {
-          return {
-            insert: insertEventMock,
-          };
-        }
-        return {};
-      });
-
-      mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'u1@test.com' } },
-      });
-
-      const result = await service.approveUser('admin-1', 'u1', 'employee');
-
-      expect(result.user.role).toBe('employee');
-      expect(result.user.account_status).toBe('active');
-      expect(insertEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          target_user_id: 'u1',
-          actor_id: 'admin-1',
-          action: 'approve',
-          new_role: 'employee',
-          new_status: 'active',
-        }),
-      );
-    });
   });
 
   describe('rejectUser', () => {
-    it('should reject pending user and write event', async () => {
-      const maybeSingleMock = jest.fn().mockResolvedValue({
-        data: { id: 'u1', account_status: 'pending', role: null },
+    it('should throw BadRequestException if reason is less than 3 chars', async () => {
+      await expect(
+        service.rejectUser('admin-1', 'u1', 'ab'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if reason is missing', async () => {
+      await expect(
+        service.rejectUser('admin-1', 'u1', ''),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should call reject_pending_account RPC and return success', async () => {
+      mockSupabaseClient.rpc.mockResolvedValue({
+        data: { role: null, status: 'rejected' },
         error: null,
       });
-      const eqFetchMock = jest
-        .fn()
-        .mockReturnValue({ maybeSingle: maybeSingleMock });
 
-      const singleUpdateMock = jest.fn().mockResolvedValue({
-        data: {
-          id: 'u1',
-          role: null,
-          account_status: 'rejected',
-          full_name: 'Test',
-          avatar_url: null,
-        },
+      const singleMock = jest.fn().mockResolvedValue({
+        data: { id: 'u1', email: 'u1@test.com', full_name: 'Test' },
         error: null,
       });
-      const selectUpdateMock = jest
-        .fn()
-        .mockReturnValue({ single: singleUpdateMock });
-      const eqUpdateMock = jest
-        .fn()
-        .mockReturnValue({ select: selectUpdateMock });
-      const updateMock = jest.fn().mockReturnValue({ eq: eqUpdateMock });
-      const insertEventMock = jest.fn().mockResolvedValue({ error: null });
+      const eqMock = jest.fn().mockReturnValue({ single: singleMock });
+      const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
+      mockSupabaseClient.from.mockReturnValue({ select: selectMock });
 
-      mockSupabaseClient.from.mockImplementation((table: string) => {
-        if (table === 'profiles') {
-          return {
-            select: jest.fn().mockReturnValue({ eq: eqFetchMock }),
-            update: updateMock,
-          };
-        }
-        if (table === 'account_approval_events') {
-          return {
-            insert: insertEventMock,
-          };
-        }
-        return {};
+      const result = await service.rejectUser('admin-1', 'u1', 'Invalid identity details provided');
+
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('reject_pending_account', {
+        p_admin_user_id: 'admin-1',
+        p_target_user_id: 'u1',
+        p_reason: 'Invalid identity details provided',
       });
-
-      mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'u1@test.com' } },
-      });
-
-      const result = await service.rejectUser(
-        'admin-1',
-        'u1',
-        'Invalid application',
-      );
-
       expect(result.user.role).toBeNull();
       expect(result.user.account_status).toBe('rejected');
-      expect(insertEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          target_user_id: 'u1',
-          actor_id: 'admin-1',
-          action: 'reject',
-          new_role: null,
-          new_status: 'rejected',
-          notes: 'Invalid application',
-        }),
-      );
     });
   });
 });

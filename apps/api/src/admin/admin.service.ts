@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -12,52 +13,43 @@ import { SupabaseService } from '../supabase/supabase.service';
 export class AdminService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async getPendingUsers(page: number = 1, limit: number = 10) {
+  async getPendingUsers(page: number = 1, pageSize: number = 20) {
     const pageNum = Math.max(1, page);
-    const limitNum = Math.min(100, Math.max(1, limit));
-    const offset = (pageNum - 1) * limitNum;
+    const sizeNum = Math.min(100, Math.max(1, pageSize));
+    const offset = (pageNum - 1) * sizeNum;
 
-    const client = this.supabaseService.getClient();
+    const client = this.supabaseService.getSystemClient();
 
     const { data, count, error } = await client
       .from('profiles')
       .select('*', { count: 'exact' })
       .eq('account_status', 'pending')
       .order('created_at', { ascending: false })
-      .range(offset, offset + limitNum - 1);
+      .range(offset, offset + sizeNum - 1);
 
     if (error) {
       throw new InternalServerErrorException(error.message);
     }
 
-    const items = await Promise.all(
-      (data || []).map(async (profile) => {
-        const { data: authUserData } = await client.auth.admin.getUserById(
-          profile.id,
-        );
-        return {
-          id: profile.id,
-          email: authUserData?.user?.email ?? null,
-          full_name: profile.full_name ?? null,
-          avatar_url: profile.avatar_url ?? null,
-          account_status: profile.account_status,
-          role: profile.role,
-          created_at: profile.created_at,
-          updated_at: profile.updated_at,
-        };
-      }),
-    );
+    const items = (data || []).map((profile) => ({
+      id: profile.id,
+      email: profile.email ?? null,
+      fullName: profile.full_name ?? null,
+      avatarUrl: profile.avatar_url ?? null,
+      accountStatus: profile.account_status,
+      role: profile.role,
+      createdAt: profile.created_at,
+      updatedAt: profile.updated_at,
+    }));
 
     const total = count ?? 0;
-    const totalPages = Math.ceil(total / limitNum) || 1;
 
     return {
-      data: items,
-      meta: {
+      items,
+      pagination: {
         page: pageNum,
-        limit: limitNum,
+        pageSize: sizeNum,
         total,
-        totalPages,
       },
     };
   }
@@ -65,7 +57,7 @@ export class AdminService {
   async approveUser(adminUserId: string, targetUserId: string, role: AppRole) {
     if (role === 'admin') {
       throw new BadRequestException(
-        'Cannot assign admin role through user approval endpoint',
+        'Cannot assign admin role through user approval workflow',
       );
     }
 
@@ -82,143 +74,101 @@ export class AdminService {
       );
     }
 
-    const client = this.supabaseService.getClient();
+    const client = this.supabaseService.getSystemClient();
 
-    const { data: profile, error: fetchError } = await client
+    // Call atomic RPC
+    const { data: rpcResult, error: rpcError } = await client.rpc(
+      'approve_pending_account',
+      {
+        p_admin_user_id: adminUserId,
+        p_target_user_id: targetUserId,
+        p_role: role,
+      },
+    );
+
+    if (rpcError) {
+      if (rpcError.code === 'P0005') {
+        throw new ForbiddenException(rpcError.message);
+      } else if (rpcError.code === 'P0006') {
+        throw new BadRequestException(rpcError.message);
+      } else if (rpcError.code === 'P0007') {
+        throw new NotFoundException(rpcError.message);
+      } else if (rpcError.code === 'P0008') {
+        throw new ConflictException(rpcError.message);
+      } else {
+        throw new InternalServerErrorException(rpcError.message);
+      }
+    }
+
+    // Retrieve target profile for response
+    const { data: profile } = await client
       .from('profiles')
       .select('*')
       .eq('id', targetUserId)
-      .maybeSingle();
-
-    if (fetchError) {
-      throw new InternalServerErrorException(fetchError.message);
-    }
-
-    if (!profile) {
-      throw new NotFoundException('Target user profile not found');
-    }
-
-    if (profile.account_status !== 'pending') {
-      throw new ConflictException('Only pending users can be approved');
-    }
-
-    const { data: updatedProfile, error: updateError } = await client
-      .from('profiles')
-      .update({
-        role: role,
-        account_status: 'active',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', targetUserId)
-      .select()
       .single();
-
-    if (updateError || !updatedProfile) {
-      throw new InternalServerErrorException(
-        updateError?.message || 'Failed to approve user',
-      );
-    }
-
-    const { error: eventError } = await client
-      .from('account_approval_events')
-      .insert({
-        target_user_id: targetUserId,
-        actor_id: adminUserId,
-        action: 'approve',
-        previous_status: 'pending',
-        new_status: 'active',
-        previous_role: null,
-        new_role: role,
-        notes: `Approved by admin (${adminUserId})`,
-      });
-
-    if (eventError) {
-      console.error('Failed to log approve approval event:', eventError);
-    }
-
-    const { data: authUserData } =
-      await client.auth.admin.getUserById(targetUserId);
 
     return {
       message: 'User approved successfully',
       user: {
-        id: updatedProfile.id,
-        email: authUserData?.user?.email ?? null,
-        role: updatedProfile.role,
-        account_status: updatedProfile.account_status,
-        full_name: updatedProfile.full_name,
-        avatar_url: updatedProfile.avatar_url,
+        id: targetUserId,
+        email: profile?.email ?? null,
+        role: rpcResult.role,
+        account_status: rpcResult.status,
+        full_name: profile?.full_name ?? null,
+        avatar_url: profile?.avatar_url ?? null,
       },
     };
   }
 
-  async rejectUser(adminUserId: string, targetUserId: string, reason?: string) {
-    const client = this.supabaseService.getClient();
-
-    const { data: profile, error: fetchError } = await client
-      .from('profiles')
-      .select('*')
-      .eq('id', targetUserId)
-      .maybeSingle();
-
-    if (fetchError) {
-      throw new InternalServerErrorException(fetchError.message);
-    }
-
-    if (!profile) {
-      throw new NotFoundException('Target user profile not found');
-    }
-
-    if (profile.account_status !== 'pending') {
-      throw new ConflictException('Only pending users can be rejected');
-    }
-
-    const { data: updatedProfile, error: updateError } = await client
-      .from('profiles')
-      .update({
-        role: null,
-        account_status: 'rejected',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', targetUserId)
-      .select()
-      .single();
-
-    if (updateError || !updatedProfile) {
-      throw new InternalServerErrorException(
-        updateError?.message || 'Failed to reject user',
+  async rejectUser(adminUserId: string, targetUserId: string, reason: string) {
+    if (!reason || reason.trim().length < 3 || reason.trim().length > 500) {
+      throw new BadRequestException(
+        'Rejection reason must be between 3 and 500 characters',
       );
     }
 
-    const { error: eventError } = await client
-      .from('account_approval_events')
-      .insert({
-        target_user_id: targetUserId,
-        actor_id: adminUserId,
-        action: 'reject',
-        previous_status: 'pending',
-        new_status: 'rejected',
-        previous_role: null,
-        new_role: null,
-        notes: reason || 'Rejected by admin',
-      });
+    const client = this.supabaseService.getSystemClient();
 
-    if (eventError) {
-      console.error('Failed to log reject approval event:', eventError);
+    // Call atomic RPC
+    const { data: rpcResult, error: rpcError } = await client.rpc(
+      'reject_pending_account',
+      {
+        p_admin_user_id: adminUserId,
+        p_target_user_id: targetUserId,
+        p_reason: reason.trim(),
+      },
+    );
+
+    if (rpcError) {
+      if (rpcError.code === 'P0005') {
+        throw new ForbiddenException(rpcError.message);
+      } else if (rpcError.code === 'P0007') {
+        throw new NotFoundException(rpcError.message);
+      } else if (rpcError.code === 'P0008') {
+        throw new ConflictException(rpcError.message);
+      } else if (rpcError.code === 'P0009') {
+        throw new BadRequestException(rpcError.message);
+      } else {
+        throw new InternalServerErrorException(rpcError.message);
+      }
     }
 
-    const { data: authUserData } =
-      await client.auth.admin.getUserById(targetUserId);
+    // Retrieve target profile for response
+    const { data: profile } = await client
+      .from('profiles')
+      .select('*')
+      .eq('id', targetUserId)
+      .single();
 
     return {
       message: 'User rejected successfully',
       user: {
-        id: updatedProfile.id,
-        email: authUserData?.user?.email ?? null,
-        role: updatedProfile.role,
-        account_status: updatedProfile.account_status,
-        full_name: updatedProfile.full_name,
-        avatar_url: updatedProfile.avatar_url,
+        id: targetUserId,
+        email: profile?.email ?? null,
+        role: rpcResult.role,
+        account_status: rpcResult.status,
+        full_name: profile?.full_name ?? null,
+        avatar_url: profile?.avatar_url ?? null,
       },
     };
   }

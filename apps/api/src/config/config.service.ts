@@ -14,18 +14,22 @@ export class ConfigService {
   }
 
   get webUrl(): string {
-    return this.get('WEB_URL');
+    return this.nestConfigService.getOrThrow<string>('WEB_URL');
   }
 
   get supabaseUrl(): string {
-    return this.get('SUPABASE_URL');
+    return this.nestConfigService.getOrThrow<string>('SUPABASE_URL');
+  }
+
+  get supabasePublishableKey(): string {
+    return this.nestConfigService.getOrThrow<string>('SUPABASE_PUBLISHABLE_KEY');
   }
 
   get supabaseSecretKey(): string {
-    return this.get('SUPABASE_SECRET_KEY');
+    return this.nestConfigService.getOrThrow<string>('SUPABASE_SECRET_KEY');
   }
 
   get initialAdminEmail(): string {
-    return this.get('INITIAL_ADMIN_EMAIL') || 'pgsword6868@gmail.com';
+    return this.nestConfigService.get<string>('INITIAL_ADMIN_EMAIL') || 'pgsword6868@gmail.com';
   }
 }

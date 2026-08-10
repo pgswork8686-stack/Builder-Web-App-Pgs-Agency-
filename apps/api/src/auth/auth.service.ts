@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   async getMe(userId: string) {
-    const client = this.supabaseService.getClient();
+    const client = this.supabaseService.getSystemClient();
 
     const { data: profile, error: profileError } = await client
       .from('profiles')
@@ -36,15 +36,37 @@ export class AuthService {
       throw new NotFoundException('User not found in authentication provider');
     }
 
+    const initialAdminEmail = this.configService.initialAdminEmail;
+    const isInitialEmail =
+      authUserData.user.email?.toLowerCase() === initialAdminEmail.toLowerCase();
+
+    let canBootstrapAdmin = false;
+    if (isInitialEmail && profile?.account_status === 'pending') {
+      const { data: existingAdmin } = await client
+        .from('profiles')
+        .select('id')
+        .eq('role', 'admin')
+        .eq('account_status', 'active')
+        .maybeSingle();
+      if (!existingAdmin) {
+        canBootstrapAdmin = true;
+      }
+    }
+
     return {
-      id: authUserData.user.id,
-      email: authUserData.user.email,
-      role: profile?.role ?? null,
-      account_status: profile?.account_status ?? 'pending',
-      full_name: profile?.full_name ?? null,
-      avatar_url: profile?.avatar_url ?? null,
-      created_at: profile?.created_at ?? authUserData.user.created_at,
-      updated_at: profile?.updated_at ?? authUserData.user.updated_at,
+      user: {
+        id: authUserData.user.id,
+        email: authUserData.user.email ?? null,
+        phone: authUserData.user.phone ?? null,
+        fullName: profile?.full_name ?? null,
+        avatarUrl: profile?.avatar_url ?? null,
+      },
+      account: {
+        status: profile?.account_status ?? 'pending',
+        role: profile?.role ?? null,
+        approvedAt: profile?.approved_at ?? null,
+      },
+      canBootstrapAdmin,
     };
   }
 
@@ -60,89 +82,52 @@ export class AuthService {
       );
     }
 
-    const client = this.supabaseService.getClient();
+    const client = this.supabaseService.getSystemClient();
 
-    // Check user's current profile status
-    const { data: profile, error: fetchError } = await client
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
+    // Verify email confirmation using Supabase Auth User record
+    const { data: authUserData, error: authError } =
+      await client.auth.admin.getUserById(user.authUserId);
 
-    if (fetchError) {
-      throw new InternalServerErrorException(fetchError.message);
+    if (authError || !authUserData?.user) {
+      throw new NotFoundException('User not found in auth provider');
     }
 
-    if (!profile) {
-      throw new NotFoundException('User profile not found');
-    }
-
-    if (profile.account_status !== 'pending') {
-      throw new ConflictException('Account is not in pending status');
-    }
-
-    // Check if an active admin already exists
-    const { data: existingAdmin, error: adminCheckError } = await client
-      .from('profiles')
-      .select('id')
-      .eq('role', 'admin')
-      .eq('account_status', 'active')
-      .maybeSingle();
-
-    if (adminCheckError) {
-      throw new InternalServerErrorException(adminCheckError.message);
-    }
-
-    if (existingAdmin) {
-      throw new ConflictException('An active admin account already exists');
-    }
-
-    // Perform status and role update
-    const { data: updatedProfile, error: updateError } = await client
-      .from('profiles')
-      .update({
-        role: 'admin',
-        account_status: 'active',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
-      .select()
-      .single();
-
-    if (updateError || !updatedProfile) {
-      throw new InternalServerErrorException(
-        updateError?.message || 'Failed to update user profile to admin',
+    // Spec check: email_verified check
+    if (!authUserData.user.email_confirmed_at) {
+      throw new ForbiddenException(
+        'Email must be verified before performing bootstrap',
       );
     }
 
-    // Log approval event
-    const { error: eventError } = await client
-      .from('account_approval_events')
-      .insert({
-        target_user_id: user.id,
-        actor_id: user.id,
-        action: 'bootstrap_admin',
-        previous_status: 'pending',
-        new_status: 'active',
-        previous_role: null,
-        new_role: 'admin',
-        notes: 'Initial admin account bootstrap execution',
-      });
+    // Call atomic database RPC function to ensure transactional integrity
+    const { data: rpcResult, error: rpcError } = await client.rpc(
+      'bootstrap_initial_admin',
+      {
+        p_admin_user_id: user.authUserId,
+        p_email: user.email,
+      },
+    );
 
-    if (eventError) {
-      // Log or throw if needed, but update succeeded
-      console.error('Failed to log bootstrap approval event:', eventError);
+    if (rpcError) {
+      // Map postgres custom exceptions to HTTP status codes
+      if (rpcError.code === 'P0001') {
+        throw new ForbiddenException(rpcError.message);
+      } else if (rpcError.code === 'P0002') {
+        throw new ConflictException(rpcError.message);
+      } else if (rpcError.code === 'P0004') {
+        throw new ConflictException(rpcError.message);
+      } else {
+        throw new InternalServerErrorException(rpcError.message);
+      }
     }
 
     return {
       message: 'Initial admin bootstrapped successfully',
       user: {
-        id: updatedProfile.id,
+        id: user.authUserId,
         email: user.email,
-        role: updatedProfile.role,
-        account_status: updatedProfile.account_status,
-        full_name: updatedProfile.full_name,
-        avatar_url: updatedProfile.avatar_url,
+        role: rpcResult.role,
+        account_status: rpcResult.status,
       },
     };
   }

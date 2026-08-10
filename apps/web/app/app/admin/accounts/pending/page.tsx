@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import {
   Users,
   CheckCircle2,
@@ -18,67 +17,21 @@ import {
   UserCheck,
   UserX,
 } from "lucide-react";
-
-interface PendingUser {
-  id: string;
-  email: string;
-  full_name: string;
-  created_at: string;
-  status: "pending" | "active" | "rejected";
-  role: "admin" | "team-leader" | "employee" | "accountant" | "client";
-  avatar_url?: string;
-}
-
-const INITIAL_SAMPLE_USERS: PendingUser[] = [
-  {
-    id: "usr-001",
-    email: "nguyen.van.a@pgsagency.com",
-    full_name: "Nguyễn Văn An",
-    created_at: "2026-08-10 14:32",
-    status: "pending",
-    role: "employee",
-  },
-  {
-    id: "usr-002",
-    email: "tran.thi.b@pgsagency.com",
-    full_name: "Trần Thị Bình",
-    created_at: "2026-08-10 11:15",
-    status: "pending",
-    role: "team-leader",
-  },
-  {
-    id: "usr-003",
-    email: "le.hoang.c@pgsagency.com",
-    full_name: "Lê Hoàng Cường",
-    created_at: "2026-08-09 18:45",
-    status: "pending",
-    role: "accountant",
-  },
-  {
-    id: "usr-004",
-    email: "doan.minh.d@clientpartner.com",
-    full_name: "Đoàn Minh Dũng",
-    created_at: "2026-08-09 09:20",
-    status: "pending",
-    role: "client",
-  },
-];
+import { getPendingUsers, approveUser, rejectUser, PendingUser } from "@/lib/api/admin";
 
 const ROLE_OPTIONS = [
-  { value: "admin", label: "Quản trị viên (Admin)" },
-  { value: "team-leader", label: "Trưởng nhóm (Team Leader)" },
+  { value: "team_leader", label: "Trưởng nhóm (Team Leader)" },
   { value: "employee", label: "Nhân viên (Employee)" },
   { value: "accountant", label: "Kế toán (Accountant)" },
   { value: "client", label: "Khách hàng (Client)" },
 ];
 
 export default function AdminPendingAccountsPage() {
-  const [users, setUsers] = useState<PendingUser[]>(INITIAL_SAMPLE_USERS);
+  const [users, setUsers] = useState<PendingUser[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>(
-    {},
-  );
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
     type: "success" | "error";
     message: string;
@@ -87,34 +40,25 @@ export default function AdminPendingAccountsPage() {
   // Rejection Modal State
   const [rejectingUser, setRejectingUser] = useState<PendingUser | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectLoading, setRejectLoading] = useState(false);
+  const [approveLoading, setApproveLoading] = useState<Record<string, boolean>>({});
+
+  const loadData = async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      const response = await getPendingUsers(1, 100);
+      setUsers(response.items);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || "Không thể tải danh sách tài khoản chờ duyệt.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let ignore = false;
-    async function loadData() {
-      setLoading(true);
-      try {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, email, full_name, created_at, status, role, avatar_url")
-          .eq("status", "pending")
-          .order("created_at", { ascending: false });
-
-        if (!ignore && data && data.length > 0) {
-          setUsers(data as PendingUser[]);
-        }
-      } catch (err) {
-        console.warn("Using sample pending users state", err);
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    }
-    void loadData();
-    return () => {
-      ignore = true;
-    };
+    loadData();
   }, []);
 
   const handleRoleChange = (userId: string, newRole: string) => {
@@ -122,34 +66,25 @@ export default function AdminPendingAccountsPage() {
   };
 
   const handleApprove = async (user: PendingUser) => {
-    const assignedRole = selectedRoles[user.id] || user.role || "employee";
+    const assignedRole = selectedRoles[user.id];
+    if (!assignedRole) {
+      showNotification("error", "Vui lòng chọn vai trò trước khi phê duyệt.");
+      return;
+    }
 
+    setApproveLoading((prev) => ({ ...prev, [user.id]: true }));
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          status: "active",
-          role: assignedRole,
-          approved_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
-
-      if (error) {
-        console.warn(
-          "Database update error, updating local state",
-          error.message,
-        );
-      }
-
+      await approveUser(user.id, assignedRole);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
       showNotification(
         "success",
-        `Đã phê duyệt tài khoản ${user.full_name} với vai trò "${ROLE_OPTIONS.find((r) => r.value === assignedRole)?.label}".`,
+        `Đã phê duyệt tài khoản ${user.fullName || user.email} với vai trò "${ROLE_OPTIONS.find((r) => r.value === assignedRole)?.label}".`
       );
-    } catch (err) {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      showNotification("success", `Đã phê duyệt tài khoản ${user.full_name}.`);
+    } catch (err: any) {
+      console.error(err);
+      showNotification("error", err.message || "Phê duyệt tài khoản thất bại.");
+    } finally {
+      setApproveLoading((prev) => ({ ...prev, [user.id]: false }));
     }
   };
 
@@ -161,29 +96,24 @@ export default function AdminPendingAccountsPage() {
   const handleConfirmReject = async () => {
     if (!rejectingUser) return;
     const user = rejectingUser;
-    const reasonText =
-      rejectionReason.trim() ||
-      "Yêu cầu tài khoản chưa đáp ứng các tiêu chuẩn xác thực.";
+    const trimmedReason = rejectionReason.trim();
 
+    if (!trimmedReason || trimmedReason.length < 3 || trimmedReason.length > 500) {
+      showNotification("error", "Lý do từ chối phải từ 3 đến 500 ký tự.");
+      return;
+    }
+
+    setRejectLoading(true);
     try {
-      const supabase = createClient();
-      await supabase
-        .from("profiles")
-        .update({
-          status: "rejected",
-          rejection_reason: reasonText,
-          rejected_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
-
+      await rejectUser(user.id, trimmedReason);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      showNotification("success", `Đã từ chối tài khoản ${user.full_name}.`);
-    } catch (err) {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      showNotification("success", `Đã từ chối tài khoản ${user.full_name}.`);
-    } finally {
+      showNotification("success", `Đã từ chối tài khoản ${user.fullName || user.email}.`);
       setRejectingUser(null);
-      setRejectionReason("");
+    } catch (err: any) {
+      console.error(err);
+      showNotification("error", err.message || "Từ chối tài khoản thất bại.");
+    } finally {
+      setRejectLoading(false);
     }
   };
 
@@ -194,8 +124,8 @@ export default function AdminPendingAccountsPage() {
 
   const filteredUsers = users.filter(
     (u) =>
-      u.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+      (u.fullName && u.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -214,8 +144,7 @@ export default function AdminPendingAccountsPage() {
               P
             </div>
             <span className="font-bold text-sm tracking-wide text-white">
-              PGS HUB{" "}
-              <span className="text-[#FFC400] font-normal">| Admin Center</span>
+              PGS HUB <span className="text-[#FFC400] font-normal">| Admin Center</span>
             </span>
           </div>
         </div>
@@ -240,8 +169,7 @@ export default function AdminPendingAccountsPage() {
               </span>
             </h1>
             <p className="mt-1 text-sm text-[#606060]">
-              Kiểm duyệt thông tin đăng ký, phân vai trò chính thức và kích hoạt
-              quyền truy cập cho nhân sự.
+              Kiểm duyệt thông tin đăng ký, phân vai trò chính thức và kích hoạt quyền truy cập cho nhân sự.
             </p>
           </div>
         </div>
@@ -259,10 +187,7 @@ export default function AdminPendingAccountsPage() {
               <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
               <span>{notification.message}</span>
             </div>
-            <button
-              onClick={() => setNotification(null)}
-              className="text-[#606060] hover:text-white"
-            >
+            <button onClick={() => setNotification(null)} className="text-[#606060] hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -283,7 +208,7 @@ export default function AdminPendingAccountsPage() {
 
           <div className="flex items-center gap-2 text-xs text-[#606060]">
             <Clock className="w-4 h-4 text-[#FFC400]" />
-            <span>Tự động cập nhật danh sách chờ duyệt</span>
+            <span>Kết nối thời gian thực với backend NestJS</span>
           </div>
         </div>
 
@@ -301,12 +226,30 @@ export default function AdminPendingAccountsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#151516] text-sm">
-                {filteredUsers.length === 0 ? (
+                {loading ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="py-12 text-center text-[#606060]"
-                    >
+                    <td colSpan={5} className="py-12 text-center text-[#606060]">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-6 h-6 border-2 border-[#FFC400] border-t-transparent rounded-full animate-spin" />
+                        <span>Đang tải danh sách tài khoản chờ duyệt...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : errorMsg ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-red-400">
+                      <div className="flex flex-col items-center gap-2">
+                        <AlertTriangle className="w-8 h-8 text-red-500" />
+                        <span>{errorMsg}</span>
+                        <button onClick={loadData} className="mt-2 px-3 py-1.5 rounded-lg bg-[#151516] text-white text-xs font-semibold hover:bg-[#1f1f22]">
+                          Thử lại
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-[#606060]">
                       <div className="flex flex-col items-center gap-2">
                         <UserCheck className="w-8 h-8 text-[#151516]" />
                         <span>Không có yêu cầu phê duyệt nào cần xử lý</span>
@@ -315,45 +258,39 @@ export default function AdminPendingAccountsPage() {
                   </tr>
                 ) : (
                   filteredUsers.map((user) => {
-                    const currentRole =
-                      selectedRoles[user.id] || user.role || "employee";
+                    const currentRole = selectedRoles[user.id] || "";
+                    const isApproveDisabled = !currentRole;
+                    const isUserApproving = !!approveLoading[user.id];
+
                     return (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-[#151516]/30 transition-colors"
-                      >
+                      <tr key={user.id} className="hover:bg-[#151516]/30 transition-colors">
                         {/* User Info */}
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFC400] to-[#9A7216] text-black font-bold flex items-center justify-center text-sm shadow-md">
-                              {user.full_name.charAt(0).toUpperCase()}
+                              {(user.fullName || user.email || "P").charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <div className="font-semibold text-white">
-                                {user.full_name}
-                              </div>
-                              <div className="text-xs text-[#606060]">
-                                {user.email}
-                              </div>
+                              <div className="font-semibold text-white">{user.fullName || "Chưa thiết lập"}</div>
+                              <div className="text-xs text-[#606060]">{user.email}</div>
                             </div>
                           </div>
                         </td>
 
                         {/* Registration Date */}
                         <td className="py-4 px-4 text-xs text-[#FFF8E6]/70 font-mono">
-                          {user.created_at}
+                          {new Date(user.createdAt).toLocaleString("vi-VN")}
                         </td>
 
                         {/* Role Select Dropdown */}
                         <td className="py-4 px-4">
-                          <div className="relative inline-block w-48">
+                          <div className="relative inline-block w-52">
                             <select
                               value={currentRole}
-                              onChange={(e) =>
-                                handleRoleChange(user.id, e.target.value)
-                              }
+                              onChange={(e) => handleRoleChange(user.id, e.target.value)}
                               className="w-full appearance-none px-3 py-2 pr-8 rounded-lg bg-[#151516] border border-[#151516] hover:border-[#FFC400]/40 text-white text-xs font-medium focus:outline-none transition-colors cursor-pointer"
                             >
+                              <option value="">Chọn vai trò...</option>
                               {ROLE_OPTIONS.map((opt) => (
                                 <option key={opt.value} value={opt.value}>
                                   {opt.label}
@@ -376,10 +313,19 @@ export default function AdminPendingAccountsPage() {
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
+                              disabled={isApproveDisabled || isUserApproving}
                               onClick={() => handleApprove(user)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-medium text-xs transition-colors cursor-pointer"
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-medium text-xs transition-colors cursor-pointer ${
+                                isApproveDisabled || isUserApproving
+                                  ? "bg-[#151516] border-[#151516] text-[#606060] cursor-not-allowed"
+                                  : "bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
+                              }`}
                             >
-                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              {isUserApproving ? (
+                                <div className="w-3.5 h-3.5 border border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              )}
                               <span>Phê duyệt</span>
                             </button>
 
@@ -411,10 +357,7 @@ export default function AdminPendingAccountsPage() {
                 <AlertTriangle className="w-5 h-5" />
                 <span>Từ chối tài khoản</span>
               </div>
-              <button
-                onClick={() => setRejectingUser(null)}
-                className="text-[#606060] hover:text-white"
-              >
+              <button onClick={() => setRejectingUser(null)} className="text-[#606060] hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -424,9 +367,7 @@ export default function AdminPendingAccountsPage() {
                 Bạn đang thực hiện từ chối yêu cầu truy cập của tài khoản:
               </p>
               <div className="p-3 bg-[#151516] rounded-xl text-xs space-y-1">
-                <div className="font-bold text-white">
-                  {rejectingUser.full_name}
-                </div>
+                <div className="font-bold text-white">{rejectingUser.fullName || "Chưa thiết lập"}</div>
                 <div className="text-[#606060]">{rejectingUser.email}</div>
               </div>
             </div>
@@ -439,7 +380,7 @@ export default function AdminPendingAccountsPage() {
                 rows={3}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="Nhập lý do từ chối đăng ký tài khoản (ví dụ: Thông tin không hợp lệ, sai email doanh nghiệp...)"
+                placeholder="Nhập lý do từ chối đăng ký tài khoản (tối thiểu 3 ký tự, tối đa 500 ký tự)"
                 className="w-full p-3 rounded-xl bg-[#070707] border border-[#151516] focus:border-red-500/50 text-white text-sm placeholder-[#606060] outline-none transition-colors"
               />
             </div>
@@ -454,10 +395,15 @@ export default function AdminPendingAccountsPage() {
               </button>
               <button
                 type="button"
+                disabled={rejectLoading}
                 onClick={handleConfirmReject}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-lg shadow-red-600/20"
               >
-                <UserX className="w-4 h-4" />
+                {rejectLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <UserX className="w-4 h-4" />
+                )}
                 <span>Xác nhận Từ chối</span>
               </button>
             </div>

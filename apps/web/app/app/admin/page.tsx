@@ -91,42 +91,44 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
 
-        {/* Stat Cards Skeleton */}
+        {/* Real workspace status cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
               <span className="text-xs font-semibold uppercase">
-                Tổng người dùng
+                Vai trò của bạn
               </span>
-              <Users className="w-4 h-4 text-[#FFC400]" />
+              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">24</div>
-            <div className="text-xs text-emerald-400">
-              +3 tài khoản tuần này
+            <div className="text-2xl font-extrabold text-white">Quản trị viên</div>
+            <div className="text-xs text-[#606060]">
+              Quyền quản trị toàn quyền hệ thống PGS Hub
             </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
               <span className="text-xs font-semibold uppercase">
-                Hệ thống vận hành
-              </span>
-              <Activity className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-3xl font-extrabold text-white">100%</div>
-            <div className="text-xs text-[#606060]">Hoạt động ổn định</div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Cấu hình bảo mật
+                Bảo mật & Xác thực
               </span>
               <Settings className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">Bật</div>
-            <div className="text-xs text-[#606060]">
-              Supabase SSR & OAuth 2.0
+            <div className="text-2xl font-extrabold text-white">Bật RLS & Guards</div>
+            <div className="text-xs text-emerald-400">
+              Supabase Auth SSR & NestJS API Guards
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
+            <div className="flex items-center justify-between text-[#606060]">
+              <span className="text-xs font-semibold uppercase">
+                Trạng thái hệ thống
+              </span>
+              <Activity className="w-4 h-4 text-[#FFC400]" />
+            </div>
+            <div className="text-2xl font-extrabold text-white">Hoạt động</div>
+            <div className="text-xs text-emerald-400">
+              API & Frontend đồng nhất thời gian thực
             </div>
           </div>
         </div>

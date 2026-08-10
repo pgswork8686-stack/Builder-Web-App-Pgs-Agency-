@@ -1,17 +1,22 @@
 import { Request } from 'express';
 
 export type AppRole =
-  'admin' | 'team_leader' | 'employee' | 'accountant' | 'client';
+  | 'admin'
+  | 'team_leader'
+  | 'employee'
+  | 'accountant'
+  | 'client';
 
 export type AccountStatus = 'pending' | 'active' | 'rejected';
 
 export interface RequestUser {
-  id: string;
-  email: string;
+  authUserId: string;
+  profileId: string;
+  email: string | null;
+  accountStatus: AccountStatus;
   role: AppRole | null;
-  account_status: AccountStatus;
-  full_name?: string | null;
-  avatar_url?: string | null;
+  fullName?: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface AuthenticatedRequest extends Request {

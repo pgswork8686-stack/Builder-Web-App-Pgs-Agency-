@@ -1,7 +1,9 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -44,7 +46,7 @@ export class AuthGuard implements CanActivate {
       );
     }
 
-    const client = this.supabaseService.getClient();
+    const client = this.supabaseService.getSystemClient();
     const { data: authData, error: authError } =
       await client.auth.getUser(token);
 
@@ -59,19 +61,30 @@ export class AuthGuard implements CanActivate {
 
     const user = authData.user;
 
-    const { data: profile } = await client
+    const { data: profile, error: profileError } = await client
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .maybeSingle();
 
+    if (profileError) {
+      throw new InternalServerErrorException(
+        `Database profile query error: ${profileError.message}`,
+      );
+    }
+
+    if (!profile) {
+      throw new ForbiddenException('ACCOUNT_PROFILE_MISSING');
+    }
+
     const requestUser: RequestUser = {
-      id: user.id,
-      email: user.email ?? '',
-      role: (profile?.role as AppRole) ?? null,
-      account_status: (profile?.account_status as AccountStatus) ?? 'pending',
-      full_name: profile?.full_name ?? null,
-      avatar_url: profile?.avatar_url ?? null,
+      authUserId: user.id,
+      profileId: profile.id,
+      email: user.email ?? null,
+      role: (profile.role as AppRole) ?? null,
+      accountStatus: (profile.account_status as AccountStatus) ?? 'pending',
+      fullName: profile.full_name ?? null,
+      avatarUrl: profile.avatar_url ?? null,
     };
 
     request.user = requestUser;

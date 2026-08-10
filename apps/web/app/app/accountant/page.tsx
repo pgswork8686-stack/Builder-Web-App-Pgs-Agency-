@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DollarSign, FileText, CreditCard, LogOut } from "lucide-react";
+import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,16 +22,13 @@ export default function AccountantDashboardPage() {
             P
           </div>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">
-              | Accountant Workspace
-            </span>
+            PGS HUB <span className="text-[#FFC400] font-normal">| Accountant Workspace</span>
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <DollarSign className="w-3.5 h-3.5" />
+            <UserCheck className="w-3.5 h-3.5" />
             <span>Kế toán (Accountant)</span>
           </div>
           <button
@@ -47,54 +44,39 @@ export default function AccountantDashboardPage() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
         <div className="border-b border-[#151516] pb-6">
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Bảng quản lý Tài chính & Kế toán
+            Góc làm việc Kế toán
           </h1>
           <p className="mt-1 text-sm text-[#606060]">
-            Theo dõi dòng tiền, duyệt hóa đơn chứng từ và báo cáo doanh thu tài
-            chính.
+            Quản lý tài chính, giao dịch hợp đồng, kiểm soát chi phí doanh nghiệp.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Doanh thu tháng
-              </span>
-              <DollarSign className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Vai trò của bạn</span>
+              <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">
-              1.250.000.000 ₫
-            </div>
-            <div className="text-xs text-emerald-400">
-              +12% so với tháng trước
-            </div>
+            <div className="text-2xl font-extrabold text-white">Kế toán viên</div>
+            <div className="text-xs text-[#606060]">Quyền quản lý dữ liệu tài chính & hóa đơn</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Hóa đơn chờ thanh toán
-              </span>
-              <FileText className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Trạng thái tài khoản</span>
+              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">9</div>
-            <div className="text-xs text-[#606060]">
-              Tổng trị giá 180.000.000 ₫
-            </div>
+            <div className="text-2xl font-extrabold text-white">Đang hoạt động</div>
+            <div className="text-xs text-emerald-400">Tài khoản đã được phê duyệt</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Đề nghị chi ngân sách
-              </span>
-              <CreditCard className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Cơ sở dữ liệu</span>
+              <Activity className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">3</div>
-            <div className="text-xs text-amber-400">
-              Đang chờ Kế toán trưởng duyệt
-            </div>
+            <div className="text-2xl font-extrabold text-white">Kết nối an toàn</div>
+            <div className="text-xs text-emerald-400">Bảo vệ SSL & RLS Enforced</div>
           </div>
         </div>
       </main>

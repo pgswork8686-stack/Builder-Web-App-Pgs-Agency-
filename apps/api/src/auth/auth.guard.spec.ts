@@ -1,4 +1,4 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -30,7 +30,7 @@ describe('AuthGuard', () => {
         {
           provide: SupabaseService,
           useValue: {
-            getClient: jest.fn().mockReturnValue(mockSupabaseClient),
+            getSystemClient: jest.fn().mockReturnValue(mockSupabaseClient),
           },
         },
       ],
@@ -118,12 +118,61 @@ describe('AuthGuard', () => {
 
     expect(result).toBe(true);
     expect(request.user).toEqual({
-      id: 'user-123',
+      authUserId: 'user-123',
+      profileId: 'user-123',
       email: 'test@example.com',
       role: 'employee',
-      account_status: 'active',
-      full_name: 'Test User',
-      avatar_url: null,
+      accountStatus: 'active',
+      fullName: 'Test User',
+      avatarUrl: null,
     });
+  });
+
+  it('should throw ForbiddenException if user profile is missing', async () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    const mockUser = { id: 'user-123', email: 'test@example.com' };
+
+    mockSupabaseClient.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const maybeSingleMock = jest.fn().mockResolvedValue({
+      data: null,
+      error: null,
+    });
+    const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
+    mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+
+    const context = createMockContext('Bearer valid_token');
+
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it('should throw InternalServerErrorException if database query fails', async () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    const mockUser = { id: 'user-123', email: 'test@example.com' };
+
+    mockSupabaseClient.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const maybeSingleMock = jest.fn().mockResolvedValue({
+      data: null,
+      error: new Error('DB connection fail'),
+    });
+    const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
+    mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+
+    const context = createMockContext('Bearer valid_token');
+
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      InternalServerErrorException,
+    );
   });
 });

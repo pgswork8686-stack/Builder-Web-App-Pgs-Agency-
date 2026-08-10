@@ -36,8 +36,8 @@ export default function SignUpPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setErrorMsg("Mật khẩu phải có tối thiểu 6 ký tự.");
+    if (password.length < 8) {
+      setErrorMsg("Mật khẩu phải có tối thiểu 8 ký tự.");
       return;
     }
 
@@ -61,10 +61,17 @@ export default function SignUpPage() {
         return;
       }
 
-      setSuccessMsg("Tạo tài khoản thành công! Đang chuyển hướng...");
-      setTimeout(() => {
-        router.push("/auth/resolve");
-      }, 1500);
+      if (data.session) {
+        setSuccessMsg("Đăng ký thành công! Đang chuyển hướng...");
+        setTimeout(() => {
+          router.push("/auth/resolve");
+        }, 1500);
+      } else {
+        setSuccessMsg(
+          "Đăng ký thành công! Vui lòng kiểm tra hộp thư email của bạn để xác nhận tài khoản trước khi đăng nhập."
+        );
+        setLoading(false);
+      }
     } catch (err: unknown) {
       setErrorMsg("Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
       setLoading(false);
@@ -222,7 +229,7 @@ export default function SignUpPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Tối thiểu 6 ký tự"
+                  placeholder="Tối thiểu 8 ký tự"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0E0E0F] border border-[#151516] focus:border-[#FFC400] text-white text-sm placeholder-[#606060] outline-none transition-colors"
                 />
               </div>

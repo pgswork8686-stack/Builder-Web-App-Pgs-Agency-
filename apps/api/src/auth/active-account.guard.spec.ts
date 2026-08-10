@@ -56,10 +56,11 @@ describe('ActiveAccountGuard', () => {
   it('should throw ForbiddenException(ACCOUNT_PENDING) for pending users', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const user: RequestUser = {
-      id: '1',
+      authUserId: '1',
+      profileId: '1',
       email: 'p@test.com',
       role: null,
-      account_status: 'pending',
+      accountStatus: 'pending',
     };
     const context = createMockContext(user);
 
@@ -71,10 +72,11 @@ describe('ActiveAccountGuard', () => {
   it('should throw ForbiddenException(ACCOUNT_REJECTED) for rejected users', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const user: RequestUser = {
-      id: '1',
+      authUserId: '1',
+      profileId: '1',
       email: 'r@test.com',
       role: null,
-      account_status: 'rejected',
+      accountStatus: 'rejected',
     };
     const context = createMockContext(user);
 
@@ -86,10 +88,11 @@ describe('ActiveAccountGuard', () => {
   it('should allow access for active users', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const user: RequestUser = {
-      id: '1',
+      authUserId: '1',
+      profileId: '1',
       email: 'a@test.com',
       role: 'employee',
-      account_status: 'active',
+      accountStatus: 'active',
     };
     const context = createMockContext(user);
 

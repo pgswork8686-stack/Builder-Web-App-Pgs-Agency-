@@ -30,15 +30,15 @@ export class ActiveAccountGuard implements CanActivate {
       throw new UnauthorizedException('User not authenticated');
     }
 
-    if (user.account_status === 'pending') {
+    if (user.accountStatus === 'pending') {
       throw new ForbiddenException('ACCOUNT_PENDING');
     }
 
-    if (user.account_status === 'rejected') {
+    if (user.accountStatus === 'rejected') {
       throw new ForbiddenException('ACCOUNT_REJECTED');
     }
 
-    if (user.account_status !== 'active') {
+    if (user.accountStatus !== 'active') {
       throw new ForbiddenException('ACCOUNT_INACTIVE');
     }
 

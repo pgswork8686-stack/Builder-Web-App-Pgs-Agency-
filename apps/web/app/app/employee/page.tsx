@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { UserCheck, CheckSquare, Calendar, LogOut } from "lucide-react";
+import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,10 +22,7 @@ export default function EmployeeDashboardPage() {
             P
           </div>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">
-              | Employee Workspace
-            </span>
+            PGS HUB <span className="text-[#FFC400] font-normal">| Employee Workspace</span>
           </span>
         </div>
 
@@ -50,43 +47,36 @@ export default function EmployeeDashboardPage() {
             Góc làm việc Nhân viên
           </h1>
           <p className="mt-1 text-sm text-[#606060]">
-            Theo dõi nhiệm vụ được giao, báo cáo tiến độ và lịch làm việc cá
-            nhân.
+            Theo dõi nhiệm vụ được giao, báo cáo tiến độ và lịch làm việc cá nhân.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Nhiệm vụ của tôi
-              </span>
-              <CheckSquare className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Vai trò của bạn</span>
+              <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">14</div>
-            <div className="text-xs text-[#606060]">4 nhiệm vụ ưu tiên cao</div>
+            <div className="text-2xl font-extrabold text-white">Nhân viên</div>
+            <div className="text-xs text-[#606060]">Quyền truy cập khu vực làm việc nhân viên</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Hoàn thành tháng này
-              </span>
-              <CheckSquare className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-semibold uppercase">Trạng thái tài khoản</span>
+              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">28</div>
-            <div className="text-xs text-emerald-400">Đạt 95% KPI đề ra</div>
+            <div className="text-2xl font-extrabold text-white">Đang hoạt động</div>
+            <div className="text-xs text-emerald-400">Tài khoản đã được Admin phê duyệt</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Lịch họp hôm nay
-              </span>
-              <Calendar className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Kết nối PGS Hub</span>
+              <Activity className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">2</div>
-            <div className="text-xs text-[#606060]">14:00 - Daily Standup</div>
+            <div className="text-2xl font-extrabold text-white">Trực tuyến</div>
+            <div className="text-xs text-emerald-400">Đã kết nối với NestJS API</div>
           </div>
         </div>
       </main>

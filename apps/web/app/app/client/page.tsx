@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Award, Briefcase, FileText, LogOut } from "lucide-react";
+import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,14 +22,13 @@ export default function ClientDashboardPage() {
             P
           </div>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">| Client Portal</span>
+            PGS HUB <span className="text-[#FFC400] font-normal">| Client Portal</span>
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <Award className="w-3.5 h-3.5" />
+            <UserCheck className="w-3.5 h-3.5" />
             <span>Khách hàng (Client)</span>
           </div>
           <button
@@ -48,49 +47,36 @@ export default function ClientDashboardPage() {
             Cổng thông tin Khách hàng
           </h1>
           <p className="mt-1 text-sm text-[#606060]">
-            Theo dõi tiến độ hợp đồng, báo cáo nghiệm thu và trao đổi với PGS
-            Agency.
+            Theo dõi chất lượng, bàn giao sản phẩm của dự án của bạn từ PGS Agency.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Hợp đồng hoạt động
-              </span>
-              <Briefcase className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Vai trò của bạn</span>
+              <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">2</div>
-            <div className="text-xs text-[#606060]">
-              Chiến dịch Marketing tổng thể
-            </div>
+            <div className="text-2xl font-extrabold text-white">Khách hàng</div>
+            <div className="text-xs text-[#606060]">Quyền xem thông tin bàn giao dự án của bạn</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Báo cáo nghiệm thu
-              </span>
-              <FileText className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Trạng thái tài khoản</span>
+              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">4</div>
-            <div className="text-xs text-emerald-400">
-              Đã cập nhật kỳ mới nhất
-            </div>
+            <div className="text-2xl font-extrabold text-white">Đang hoạt động</div>
+            <div className="text-xs text-emerald-400">Tài khoản đối tác được xác thực</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Chỉ số tăng trưởng
-              </span>
-              <Award className="w-4 h-4 text-[#FFC400]" />
+              <span className="text-xs font-semibold uppercase">Kết nối an toàn</span>
+              <Activity className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-3xl font-extrabold text-white">+145%</div>
-            <div className="text-xs text-[#606060]">
-              So với KPI mục tiêu đề ra
-            </div>
+            <div className="text-2xl font-extrabold text-white">Trực tuyến</div>
+            <div className="text-xs text-emerald-400">Bảo mật thông tin khách hàng tuyệt đối</div>
           </div>
         </div>
       </main>
