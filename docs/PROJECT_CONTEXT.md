@@ -125,6 +125,8 @@ PGS Agency cung cấp danh sách 15 dịch vụ chính thức:
 14. Marketing Tổng Thể
 15. PR Báo Chí & Truyền Thông
 
+Nguồn nội dung dịch vụ: https://pgsagency.vn/
+
 Hệ thống PGS Hub quản lý 2 khái niệm dịch vụ và gói giá riêng biệt:
 
 - **Dịch vụ đơn lẻ (`services`)**: Các dịch vụ chính thức nêu trên do PGS Agency cung cấp.

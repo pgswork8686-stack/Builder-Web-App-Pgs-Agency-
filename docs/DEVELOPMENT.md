@@ -133,3 +133,24 @@ Nếu không cho phép build, các package này sẽ không thể cài đặt na
 - Các package dùng chung (`packages/*`) chỉ khai báo script `typecheck` (chạy `tsc --noEmit` thật) và `test` (nếu có test thật).
 - Các script `build`, `lint`, `lint:fix` không được khai báo nếu package chưa có mã nguồn cần build/lint thật.
 - Root scripts sử dụng `pnpm -r --if-present` để bỏ qua package không khai báo script tương ứng, thay vì dùng `echo` giả mạo kết quả.
+
+---
+
+## 9. Test environment
+
+Toàn bộ API test được chạy với:
+
+```bash
+APP_ENV=test
+```
+
+Thông qua `cross-env` để hoạt động nhất quán trên Windows/Linux/CI.
+
+Test sử dụng:
+
+```bash
+apps/api/.env.test
+```
+
+Tệp này chỉ chứa fake credentials và không được sử dụng bởi development hoặc production.
+

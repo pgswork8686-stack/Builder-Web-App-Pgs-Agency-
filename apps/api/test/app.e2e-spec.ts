@@ -27,6 +27,12 @@ describe('HealthController (e2e)', () => {
       });
   });
 
+  it('should run under test environment (APP_ENV=test)', () => {
+    const configService = app.get(require('./../src/config/config.service').ConfigService);
+    expect(configService.get('APP_ENV')).toBe('test');
+    expect(process.env.APP_ENV).toBe('test');
+  });
+
   afterEach(async () => {
     await app.close();
   });
