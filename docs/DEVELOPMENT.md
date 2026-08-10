@@ -91,9 +91,25 @@ Toàn bộ các bước trên phải kết thúc thành công với mã thoát `
 
 ## 6. Cấu hình TypeScript: `skipLibCheck`
 
-- **`apps/web`**: `skipLibCheck: true` — Đây là cấu hình mặc định do Next.js khởi tạo. Cần giữ `true` vì các type definitions của Next.js, React DOM, và các thư viện liên quan có thể xung đột lẫn nhau khi kiểm tra đầy đủ. Mã nguồn ứng dụng vẫn được kiểm tra strict đầy đủ.
-- **`apps/api`**: `skipLibCheck: true` — NestJS sử dụng decorators (`emitDecoratorMetadata`, `experimentalDecorators`) kết hợp với các thư viện bên thứ ba (`@nestjs/*`, `reflect-metadata`) có type definitions phức tạp. `skipLibCheck: true` ngăn lỗi type từ `node_modules` mà không ảnh hưởng đến việc kiểm tra mã nguồn thực tế.
-- **`packages/*`**: `skipLibCheck: false` — Các package dùng chung không có dependency phức tạp, nên được kiểm tra đầy đủ.
+### skipLibCheck — Web
+
+- **Status**: `true`
+- **Reason**: Gặp lỗi xung đột type trong thư viện Next.js khi tắt skipLibCheck.
+- **Affected dependency**: `next`
+- **Version**: `16.3.0`
+- **Actual TypeScript errors observed**:
+  - `TS6200: Definitions of the following identifiers conflict with those in another file` liên quan tới `unstable_cache`, `revalidateTag`... trong các tệp `.next/types/cache-life.d.ts` và `.next/dev/types/cache-life.d.ts`.
+  - `TS2300: Duplicate identifier 'LayoutProps'` trong các tệp `.next/types/routes.d.ts` và `.next/dev/types/routes.d.ts`.
+  - `TS2304: Cannot find name 'URLPatternInput' | 'URLPatternOptions' | 'URLPattern'` trong `node_modules/next/dist/server/web/spec-extension/url-pattern.d.ts` do thiếu định nghĩa DOM tương thích.
+- **Application source strict mode**: `enabled` (`"strict": true` và `"allowJs": false` trong tsconfig.json).
+
+### skipLibCheck — API
+
+- **Status**: `false`
+- **Reason**: Thử nghiệm thực tế tắt `skipLibCheck` thành công mà không phát sinh bất kỳ lỗi biên dịch nào.
+- **Application source strict mode**: `enabled` (`"strict": true` cùng với các quy tắc strict nâng cao).
+
+- **`packages/*`**: `skipLibCheck: false` — Các package dùng chung không có dependency phức tạp, kiểm tra type strict hoàn chỉnh.
 
 ---
 

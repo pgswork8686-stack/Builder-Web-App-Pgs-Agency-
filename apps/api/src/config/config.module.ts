@@ -9,8 +9,9 @@ import { validateEnv } from './env.validation';
     NestConfigModule.forRoot({
       validate: validateEnv,
       isGlobal: true,
-      // Load environment files locally for development
-      envFilePath: ['.env', '.env.test'],
+      // Load environment files based on current environment
+      envFilePath: process.env.APP_ENV === 'test' ? '.env.test' : '.env',
+      ignoreEnvFile: process.env.APP_ENV === 'production',
     }),
   ],
   providers: [ConfigService],

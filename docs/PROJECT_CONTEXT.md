@@ -56,7 +56,7 @@ Hệ thống PGS Hub quy định chặt chẽ 5 vai trò (roles) người dùng 
 2. **Team Leader (Trưởng nhóm)**: Quản lý thành viên trong nhóm, phân công công việc, giám sát/theo dõi dự án thuộc phạm vi nhóm phụ trách, phê duyệt chấm công cho thành viên trong nhóm.
 3. **Employee (Nhân viên)**: Thực hiện công việc/nhiệm vụ được giao, chấm công cá nhân, xem dữ liệu thông tin cá nhân của chính mình.
 4. **Accountant (Kế toán)**: Quản lý khách hàng, hợp đồng, hóa đơn, thanh toán, các khoản thu/phải thu, thu chi, chi phí dự án, dữ liệu chấm công/bảng công đã được phê duyệt, và các báo cáo tài chính. (Lưu ý: Không quản lý lương trừ khi được quy định rõ).
-5. **Client (Khách hàng)**: Chỉ theo dõi các dự án, công việc (tasks) và sản phẩm bàn giao (deliverables) của chính mình thông qua Client Portal.
+5. **Client (Khách hàng)**: Chỉ theo dõi các dự án, công việc (tasks), và sản phẩm bàn giao (deliverables) được đánh dấu `client_visible` của chính mình thông qua Client Portal. Tuyệt đối không được xem các công việc và bình luận nội bộ.
 
 ---
 
@@ -105,13 +105,35 @@ Vai trò **Client** tuyệt đối không được phép xem hoặc tiếp cận
 
 ---
 
-## 10. DỊCH VỤ VÀ GÓI DỊCH VỤ PGS (SERVICES & SERVICE PACKAGES)
+## 10. DỊCH VỤ VÀ BẢNG GIÁ PGS (SERVICES & SERVICE PACKAGES)
 
-Hệ thống quản lý 2 khái niệm dịch vụ phân biệt rõ ràng:
+PGS Agency cung cấp danh sách 15 dịch vụ chính thức:
 
-- **Dịch vụ đơn lẻ (`services`)**: Các dịch vụ riêng lẻ do PGS Agency cung cấp.
-- **Gói dịch vụ (`service_packages`)**: Các gói hoặc combo kết hợp nhiều dịch vụ đơn lẻ.
-- **Quy tắc giá (Pricing)**: Tuyệt đối không hardcode giá dịch vụ/gói dịch vụ trong mã nguồn. Admin sẽ nhập giá trị dịch vụ/gói dịch vụ thủ công trực tiếp trên PGS Hub khi cấu hình hoặc khi tạo hợp đồng/dự án nhằm đảm bảo tính linh hoạt trong đàm phán thương mại.
+1. Thiết Kế Website
+2. Thiết Kế Landing Page
+3. Chăm Sóc Website
+4. SEO Tổng Thể
+5. SEO Nội Dung
+6. Thiết Kế Google Maps
+7. Google Ads
+8. Facebook Ads
+9. TikTok Ads
+10. Vận Hành Instagram
+11. Quản Lí Fanpage Chuyên Nghiệp
+12. Content Social
+13. Định Hướng Xây Kênh
+14. Marketing Tổng Thể
+15. PR Báo Chí & Truyền Thông
+
+Hệ thống PGS Hub quản lý 2 khái niệm dịch vụ và gói giá riêng biệt:
+
+- **Dịch vụ đơn lẻ (`services`)**: Các dịch vụ chính thức nêu trên do PGS Agency cung cấp.
+- **Gói dịch vụ (`service_packages`)**: Là các gói, mức giá hoặc phương án thương mại cụ thể của một dịch vụ đơn lẻ (ví dụ: Dịch vụ "SEO Tổng Thể" có các gói "Gói A", "Gói B", "Gói C"). Khái niệm này không phải là combo kết hợp nhiều dịch vụ đơn lẻ khác nhau (nếu cần combo nhiều dịch vụ sau này sẽ thiết kế một thực thể riêng).
+- **Quy tắc giá (Pricing)**:
+  - Không scrape giá từ website.
+  - Không seed giá dịch vụ.
+  - Không hardcode giá dịch vụ/gói dịch vụ trong source code.
+  - Admin tối cao sẽ nhập và quản lý bảng giá thủ công hoàn toàn trực tiếp trong PGS Hub để đảm bảo tính linh hoạt thương mại tối đa.
 
 ---
 
@@ -126,8 +148,8 @@ Hệ thống quản lý 2 khái niệm dịch vụ phân biệt rõ ràng:
 
 ## 12. QUẢN LÝ DỰ ÁN (PROJECT ARCHITECTURE)
 
-- Một dự án (Project) có thể chứa nhiều gói dịch vụ khác nhau.
-- Cấu trúc quan hệ thực thể phải hỗ trợ bảng trung gian (ví dụ: `project_services`) để liên kết một dự án với nhiều dịch vụ. Không áp đặt quy tắc cứng nhắc `1 project = 1 service`.
+- Một dự án (Project) có thể chứa nhiều dịch vụ đơn lẻ khác nhau (Project Multi-Service).
+- Cấu trúc quan hệ thực thể hỗ trợ bảng trung gian `project_services` để liên kết một dự án với nhiều dịch vụ. Không áp đặt quy tắc cứng nhắc `1 project = 1 service`. Khái niệm này hoàn toàn độc lập với `service_packages` (gói giá của dịch vụ).
 
 ---
 
@@ -176,7 +198,7 @@ Tuyệt đối không bao giờ được commit trực tiếp các khóa bí m�
 
 ---
 
-## 19. CÁC BUCKET LƯU TRỮ (STORAGE BUCKETS)
+## 18. CÁC BUCKET LƯU TRỮ (STORAGE BUCKETS)
 
 Danh sách các Supabase Storage Bucket được quy hoạch cho hệ thống:
 
@@ -194,7 +216,7 @@ _Lưu ý_: Các bucket này **KHÔNG được tạo ở Phase 0** mà sẽ đư�
 
 ---
 
-## 20. NGUỒN THÔNG TIN CHÍNH THỨC (SOURCE-OF-TRUTH PRIORITY)
+## 19. NGUỒN THÔNG TIN CHÍNH THỨC (SOURCE-OF-TRUTH PRIORITY)
 
 Khi có sự xung đột thông tin, thứ tự ưu tiên áp dụng như sau:
 
