@@ -2,6 +2,16 @@
 
 PGS Hub là nền tảng quản trị và vận hành PGS Agency, bao gồm hoạt động nội bộ và cổng dành cho khách hàng được phân quyền. Dự án được tổ chức dưới dạng Monorepo sử dụng `pnpm workspace` để quản lý các ứng dụng và thư viện dùng chung.
 
+## Tech Stack
+
+- **Next.js 16** (App Router) — Frontend
+- **React 19** — UI Library
+- **NestJS 11** — Backend REST API
+- **Tailwind CSS v4** — Styling
+- **TypeScript** — Type safety cho toàn bộ dự án
+- **Supabase** — Database (PostgreSQL), Auth, Storage, Realtime
+- **pnpm workspace** — Monorepo management
+
 ## Cấu trúc thư mục chính
 
 - `apps/web`: Ứng dụng Next.js (Frontend chính & Client Portal).

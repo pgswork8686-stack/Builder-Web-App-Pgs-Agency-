@@ -50,13 +50,13 @@ Hệ thống được thiết kế để chịu tải và mở rộng dài hạn
 
 ## 5. MÔ HÌNH PHÂN QUYỀN (5 ROLES)
 
-Hệ thống PGS Hub quy định chặt chẽ 5 vai trò (roles) người dùng:
+Hệ thống PGS Hub quy định chặt chẽ 5 vai trò (roles) người dùng với phạm vi thẩm quyền chi tiết:
 
-1. **Admin (Quản trị viên)**: Quyền hạn tối cao trên toàn hệ thống.
-2. **Team Leader (Trưởng nhóm)**: Quản lý thành viên, công việc và dự án thuộc phạm vi nhóm/phòng ban phụ trách.
-3. **Employee (Nhân viên)**: Thực hiện công việc được giao, chấm công, xem thông tin cá nhân.
-4. **Accountant (Kế toán)**: Quản lý thu chi, tài chính, bảng lương, chi phí và lợi nhuận.
-5. **Client (Khách hàng)**: Chỉ truy cập vào Client Portal để theo dõi các dự án và công việc của chính họ.
+1. **Admin (Quản trị viên)**: Quyền hạn tối cao trên toàn hệ thống, quản lý người dùng, phê duyệt tài khoản, cấu hình hệ thống và truy cập toàn bộ dữ liệu.
+2. **Team Leader (Trưởng nhóm)**: Quản lý thành viên trong nhóm, phân công công việc, giám sát/theo dõi dự án thuộc phạm vi nhóm phụ trách, phê duyệt chấm công cho thành viên trong nhóm.
+3. **Employee (Nhân viên)**: Thực hiện công việc/nhiệm vụ được giao, chấm công cá nhân, xem dữ liệu thông tin cá nhân của chính mình.
+4. **Accountant (Kế toán)**: Quản lý khách hàng, hợp đồng, hóa đơn, thanh toán, các khoản thu/phải thu, thu chi, chi phí dự án, dữ liệu chấm công/bảng công đã được phê duyệt, và các báo cáo tài chính. (Lưu ý: Không quản lý lương trừ khi được quy định rõ).
+5. **Client (Khách hàng)**: Chỉ theo dõi các dự án, công việc (tasks) và sản phẩm bàn giao (deliverables) của chính mình thông qua Client Portal.
 
 ---
 
@@ -105,10 +105,13 @@ Vai trò **Client** tuyệt đối không được phép xem hoặc tiếp cận
 
 ---
 
-## 10. DỊCH VỤ PGS (PGS SERVICES)
+## 10. DỊCH VỤ VÀ GÓI DỊCH VỤ PGS (SERVICES & SERVICE PACKAGES)
 
-- Hệ thống quản lý danh sách các gói dịch vụ mà PGS Agency cung cấp.
-- **Quy tắc tài chính**: Tuyệt đối không hardcode giá dịch vụ trong code. Khi tạo dự án hoặc hợp đồng, Admin hoặc người dùng được phân quyền sẽ nhập giá trị dịch vụ thủ công để đảm bảo tính linh hoạt trong đàm phán thương mại.
+Hệ thống quản lý 2 khái niệm dịch vụ phân biệt rõ ràng:
+
+- **Dịch vụ đơn lẻ (`services`)**: Các dịch vụ riêng lẻ do PGS Agency cung cấp.
+- **Gói dịch vụ (`service_packages`)**: Các gói hoặc combo kết hợp nhiều dịch vụ đơn lẻ.
+- **Quy tắc giá (Pricing)**: Tuyệt đối không hardcode giá dịch vụ/gói dịch vụ trong mã nguồn. Admin sẽ nhập giá trị dịch vụ/gói dịch vụ thủ công trực tiếp trên PGS Hub khi cấu hình hoặc khi tạo hợp đồng/dự án nhằm đảm bảo tính linh hoạt trong đàm phán thương mại.
 
 ---
 
@@ -128,7 +131,7 @@ Vai trò **Client** tuyệt đối không được phép xem hoặc tiếp cận
 
 ---
 
-## 13. CHẤM CÔNG VÀ CHỮ KÝ SỐ (ATTENDANCE & SECURITY)
+## 13. CHẤM CÔNG (ATTENDANCE)
 
 - Hệ thống chấm công hỗ trợ ghi nhận dữ liệu linh hoạt trong tương lai từ nhiều nguồn: Giao diện Web, Mobile App, Máy chấm công phần cứng, nhập file CSV, và điều chỉnh thủ công của Admin (Admin Adjustment).
 - **Quy tắc bảo mật**: Không bao giờ lưu trữ mẫu sinh trắc học trực tiếp (biometric template) trong cơ sở dữ liệu để bảo vệ quyền riêng tư của nhân viên.
@@ -144,12 +147,14 @@ Vai trò **Client** tuyệt đối không được phép xem hoặc tiếp cận
 
 ## 15. QUY TRÌNH PHÁT TRIỂN VÀ REVIEW (REVIEW WORKFLOW)
 
+- Quy trình kiểm định và hoàn thành Phase tuân thủ theo luồng:
+  `Antigravity DONE → Push → PR → ChatGPT external review PASS = Phase DONE`
 - Mọi thay đổi mã nguồn phải đi qua quy trình nghiêm ngặt:
   - Xây dựng và kiểm tra nội bộ qua Antigravity CLI build.
   - Push lên nhánh tính năng riêng trên GitHub (không code trực tiếp trên `main`).
   - Cập nhật cơ sở dữ liệu Supabase qua migration.
-  - Tạo Pull Request (PR) để tiến hành đánh giá tự động và kiểm thử qua ChatGPT Review.
-  - Phải vượt qua (PASS) toàn bộ chất lượng đầu vào mới được merge vào nhánh chính để chuyển sang Phase tiếp theo.
+  - Tạo Pull Request (PR) để tiến hành đánh giá bên ngoài qua ChatGPT Review.
+  - Phải đạt kết quả PASS ở bước ChatGPT external review mới được coi là hoàn thành Phase (Phase DONE) và merge vào nhánh chính.
 
 ---
 
@@ -171,7 +176,25 @@ Tuyệt đối không bao giờ được commit trực tiếp các khóa bí m�
 
 ---
 
-## 18. NGUỒN THÔNG TIN CHÍNH THỨC (SOURCE-OF-TRUTH PRIORITY)
+## 19. CÁC BUCKET LƯU TRỮ (STORAGE BUCKETS)
+
+Danh sách các Supabase Storage Bucket được quy hoạch cho hệ thống:
+
+- `avatars`: Lưu trữ ảnh đại diện của người dùng.
+- `client-files`: Tệp tin và tài liệu của khách hàng.
+- `project-files`: Tệp tin và tài liệu của dự án.
+- `deliverables`: Sản phẩm bàn giao cho khách hàng.
+- `contracts`: Tài liệu hợp đồng.
+- `invoices`: Hóa đơn chứng từ.
+- `attendance-evidence`: Minh chứng chấm công.
+- `ai-documents`: Tài liệu huấn luyện/tra cứu cho AI.
+- `demo-files`: Tệp tin dữ liệu mẫu/demo.
+
+_Lưu ý_: Các bucket này **KHÔNG được tạo ở Phase 0** mà sẽ được khởi tạo ở các giai đoạn sau khi có nhu cầu sử dụng thực tế.
+
+---
+
+## 20. NGUỒN THÔNG TIN CHÍNH THỨC (SOURCE-OF-TRUTH PRIORITY)
 
 Khi có sự xung đột thông tin, thứ tự ưu tiên áp dụng như sau:
 

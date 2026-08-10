@@ -4,10 +4,6 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "build": "echo \"No build needed for config\"",
-    "lint": "echo \"No lint needed for config\"",
-    "lint:fix": "echo \"No lint:fix needed for config\"",
-    "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests needed for config\""
+    "typecheck": "tsc --noEmit"
   }
 }

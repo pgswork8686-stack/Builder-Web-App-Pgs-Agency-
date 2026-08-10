@@ -86,3 +86,34 @@ Trước khi push mã nguồn hoặc mở PR, lập trình viên bắt buộc ph
    ```
 
 Toàn bộ các bước trên phải kết thúc thành công với mã thoát `0`. Việc sử dụng các phương pháp che giấu lỗi như `|| true` hoặc tắt strict checks là không được chấp nhận.
+
+---
+
+## 6. Cấu hình TypeScript: `skipLibCheck`
+
+- **`apps/web`**: `skipLibCheck: true` — Đây là cấu hình mặc định do Next.js khởi tạo. Cần giữ `true` vì các type definitions của Next.js, React DOM, và các thư viện liên quan có thể xung đột lẫn nhau khi kiểm tra đầy đủ. Mã nguồn ứng dụng vẫn được kiểm tra strict đầy đủ.
+- **`apps/api`**: `skipLibCheck: true` — NestJS sử dụng decorators (`emitDecoratorMetadata`, `experimentalDecorators`) kết hợp với các thư viện bên thứ ba (`@nestjs/*`, `reflect-metadata`) có type definitions phức tạp. `skipLibCheck: true` ngăn lỗi type từ `node_modules` mà không ảnh hưởng đến việc kiểm tra mã nguồn thực tế.
+- **`packages/*`**: `skipLibCheck: false` — Các package dùng chung không có dependency phức tạp, nên được kiểm tra đầy đủ.
+
+---
+
+## 7. Cấu hình `allowBuilds` trong `pnpm-workspace.yaml`
+
+Hai package sau được phép chạy lifecycle build scripts:
+
+- **`esbuild`**: Yêu cầu native binary build. Được sử dụng bởi:
+  - NestJS CLI (`@nestjs/cli`) → Webpack → `terser-webpack-plugin` → `esbuild`
+  - Vite (bundler cho Vitest trong `apps/web` và `packages/validation`) → `esbuild`
+  - `ts-jest` (test runner cho `apps/api`) → `esbuild`
+- **`sharp`**: Yêu cầu native binary build. Được sử dụng bởi:
+  - Next.js (`next`) → Image Optimization → `sharp`
+
+Nếu không cho phép build, các package này sẽ không thể cài đặt native binaries và sẽ gây lỗi runtime.
+
+---
+
+## 8. Ghi chú về Package Scripts
+
+- Các package dùng chung (`packages/*`) chỉ khai báo script `typecheck` (chạy `tsc --noEmit` thật) và `test` (nếu có test thật).
+- Các script `build`, `lint`, `lint:fix` không được khai báo nếu package chưa có mã nguồn cần build/lint thật.
+- Root scripts sử dụng `pnpm -r --if-present` để bỏ qua package không khai báo script tương ứng, thay vì dùng `echo` giả mạo kết quả.

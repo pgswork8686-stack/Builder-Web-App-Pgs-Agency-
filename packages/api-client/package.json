@@ -4,10 +4,6 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "build": "echo \"No build needed for api-client\"",
-    "lint": "echo \"No lint needed for api-client\"",
-    "lint:fix": "echo \"No lint:fix needed for api-client\"",
-    "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests needed for api-client\""
+    "typecheck": "tsc --noEmit"
   }
 }

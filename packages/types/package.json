@@ -4,10 +4,6 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "build": "echo \"No build needed for types\"",
-    "lint": "echo \"No lint needed for types\"",
-    "lint:fix": "echo \"No lint:fix needed for types\"",
-    "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests needed for types\""
+    "typecheck": "tsc --noEmit"
   }
 }

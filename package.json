@@ -1,16 +1,17 @@
 {
   "name": "pgs-hub-monorepo",
   "version": "1.0.0",
+  "packageManager": "pnpm@11.20.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel dev",
+    "dev": "pnpm --parallel --filter web --filter api run dev",
     "dev:web": "pnpm --filter web dev",
     "dev:api": "pnpm --filter api start:dev",
-    "build": "pnpm -r build",
-    "lint": "pnpm -r lint",
-    "lint:fix": "pnpm -r lint:fix",
+    "build": "pnpm -r --if-present build",
+    "lint": "pnpm -r --if-present lint",
+    "lint:fix": "pnpm -r --if-present lint:fix",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --if-present test",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },

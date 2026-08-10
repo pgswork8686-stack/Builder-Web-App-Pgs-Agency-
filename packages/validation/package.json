@@ -7,9 +7,6 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "build": "echo \"No build needed for validation\"",
-    "lint": "echo \"No lint needed for validation\"",
-    "lint:fix": "echo \"No lint:fix needed for validation\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
