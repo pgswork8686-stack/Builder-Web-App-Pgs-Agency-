@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import { ConfigService } from './../src/config/config.service';
 
 describe('HealthController (e2e)', () => {
   let app: INestApplication<App>;
@@ -28,7 +29,7 @@ describe('HealthController (e2e)', () => {
   });
 
   it('should run under test environment (APP_ENV=test)', () => {
-    const configService = app.get(require('./../src/config/config.service').ConfigService);
+    const configService = app.get(ConfigService);
     expect(configService.get('APP_ENV')).toBe('test');
     expect(process.env.APP_ENV).toBe('test');
   });

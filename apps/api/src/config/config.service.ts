@@ -24,4 +24,8 @@ export class ConfigService {
   get supabaseSecretKey(): string {
     return this.get('SUPABASE_SECRET_KEY');
   }
+
+  get initialAdminEmail(): string {
+    return this.get('INITIAL_ADMIN_EMAIL') || 'pgsword6868@gmail.com';
+  }
 }
