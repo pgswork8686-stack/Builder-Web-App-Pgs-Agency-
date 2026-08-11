@@ -60,7 +60,6 @@ export const UpdateTaskSchema = z
     assigneeUserId: z.string().uuid().nullable().optional(),
     startDate: DateSchema.nullable().optional(),
     dueDate: DateSchema.nullable().optional(),
-    sortOrder: z.number().int().min(0).optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

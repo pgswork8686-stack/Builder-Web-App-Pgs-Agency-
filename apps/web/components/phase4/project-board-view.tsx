@@ -1,0 +1,489 @@
+"use client";
+
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCorners,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { GripVertical, Search } from "lucide-react";
+import { projectsApi, type Project } from "@/lib/api/projects";
+import { tasksApi, type TaskPriority } from "@/lib/api/tasks";
+import {
+  workspaceApi,
+  type BoardStatus,
+  type BoardTask,
+  type ProjectBoard,
+} from "@/lib/api/workspace";
+import {
+  ProjectWorkspaceRealtimeProvider,
+  useProjectWorkspaceRealtime,
+} from "./project-workspace-realtime-provider";
+import { WorkspaceHeader, type WorkspaceMode } from "./workspace-header";
+
+const columns: {
+  status: BoardStatus;
+  label: string;
+  key: keyof ProjectBoard;
+}[] = [
+  { status: "todo", label: "Cần làm", key: "todo" },
+  { status: "in_progress", label: "Đang thực hiện", key: "inProgress" },
+  { status: "review", label: "Đang duyệt", key: "review" },
+  { status: "done", label: "Hoàn thành", key: "done" },
+];
+
+export function ProjectBoardView({ mode }: { mode: WorkspaceMode }) {
+  const { projectId } = useParams<{ projectId: string }>();
+  return (
+    <ProjectWorkspaceRealtimeProvider projectId={projectId}>
+      <ProjectBoardContent mode={mode} projectId={projectId} />
+    </ProjectWorkspaceRealtimeProvider>
+  );
+}
+
+function ProjectBoardContent({
+  mode,
+  projectId,
+}: {
+  mode: WorkspaceMode;
+  projectId: string;
+}) {
+  const { revision } = useProjectWorkspaceRealtime();
+  const [project, setProject] = useState<Project | null>(null);
+  const [board, setBoard] = useState<ProjectBoard | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState({
+    q: "",
+    priority: "" as "" | TaskPriority,
+    assigneeUserId: "",
+    status: "" as "" | BoardStatus,
+  });
+
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const [projectData, boardData] = await Promise.all([
+        mode === "admin"
+          ? projectsApi.getAdminProject(projectId)
+          : projectsApi.getInternalProject(projectId),
+        workspaceApi.board(projectId, {
+          q: filters.q || undefined,
+          priority: filters.priority || undefined,
+          assigneeUserId: filters.assigneeUserId || undefined,
+          status: filters.status || undefined,
+        }),
+      ]);
+      setProject(projectData);
+      setBoard(boardData);
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Không thể tải Kanban.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, mode, projectId]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [load, revision]);
+
+  const allTasks = useMemo(
+    () =>
+      board
+        ? [...board.todo, ...board.inProgress, ...board.review, ...board.done]
+        : [],
+    [board],
+  );
+  const assignees = useMemo(() => {
+    const values = new Map<string, string>();
+    allTasks.forEach((task) => {
+      if (task.assignee?.id) {
+        values.set(
+          task.assignee.id,
+          task.assignee.full_name || task.assignee.email || "Thành viên",
+        );
+      }
+    });
+    return [...values.entries()];
+  }, [allTasks]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 180, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const optimisticMove = (
+    current: ProjectBoard,
+    taskId: string,
+    targetStatus: BoardStatus,
+    beforeTaskId: string | null,
+  ) => {
+    const task = allTasks.find((item) => item.id === taskId);
+    if (!task) return current;
+    const next: ProjectBoard = {
+      ...current,
+      todo: current.todo.filter((item) => item.id !== taskId),
+      inProgress: current.inProgress.filter((item) => item.id !== taskId),
+      review: current.review.filter((item) => item.id !== taskId),
+      done: current.done.filter((item) => item.id !== taskId),
+    };
+    const targetColumn = columns.find(
+      (column) => column.status === targetStatus,
+    );
+    if (!targetColumn) return current;
+    const target = next[targetColumn.key] as BoardTask[];
+    const moved = { ...task, status: targetStatus };
+    const inserted: BoardTask[] = [];
+    let didInsert = false;
+    target.forEach((item) => {
+      if (!didInsert && item.id === beforeTaskId) {
+        inserted.push(moved);
+        didInsert = true;
+      }
+      inserted.push(item);
+    });
+    if (!didInsert) inserted.push(moved);
+    return { ...next, [targetColumn.key]: inserted };
+  };
+
+  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!board?.canReorder || !over || saving) return;
+    const taskId = String(active.id).replace("task:", "");
+    const targetStatus = over.data.current?.status as BoardStatus | undefined;
+    if (!targetStatus) return;
+    const overTaskId = over.data.current?.taskId as string | undefined;
+    const beforeTaskId =
+      overTaskId && overTaskId !== taskId ? overTaskId : null;
+    const previous = board;
+    setBoard(optimisticMove(board, taskId, targetStatus, beforeTaskId));
+    setSaving(true);
+    setError(null);
+    try {
+      await workspaceApi.moveTask(projectId, taskId, {
+        status: targetStatus,
+        beforeTaskId,
+        afterTaskId: null,
+      });
+      await load();
+    } catch (caught) {
+      setBoard(previous);
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Không thể di chuyển công việc.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateStatus = async (task: BoardTask, status: BoardStatus) => {
+    setSaving(true);
+    setError(null);
+    try {
+      await tasksApi.update(projectId, task.id, { status });
+      await load();
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Không thể cập nhật trạng thái.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
+
+  return (
+    <main className="min-h-screen bg-[#070707] px-4 py-7 text-[#FFF8E6] lg:px-8">
+      <div className="mx-auto max-w-[1600px] space-y-6">
+        <WorkspaceHeader
+          mode={mode}
+          projectId={projectId}
+          projectName={project?.name}
+          projectCode={project?.projectCode}
+          active="board"
+        />
+
+        <section className="grid gap-3 rounded-2xl border border-zinc-800 bg-[#0E0E0F] p-4 md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
+          <label className="relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-600" />
+            <input
+              value={filters.q}
+              onChange={(event) =>
+                setFilters({ ...filters, q: event.target.value })
+              }
+              placeholder="Tìm theo tên công việc"
+              aria-label="Tìm công việc"
+              className="w-full rounded-xl border border-zinc-800 bg-black py-2 pl-9 pr-3 text-sm"
+            />
+          </label>
+          <select
+            value={filters.priority}
+            onChange={(event) =>
+              setFilters({
+                ...filters,
+                priority: event.target.value as "" | TaskPriority,
+              })
+            }
+            aria-label="Lọc mức ưu tiên"
+            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+          >
+            <option value="">Mọi ưu tiên</option>
+            {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
+              (value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ),
+            )}
+          </select>
+          <select
+            value={filters.assigneeUserId}
+            onChange={(event) =>
+              setFilters({ ...filters, assigneeUserId: event.target.value })
+            }
+            aria-label="Lọc người phụ trách"
+            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+          >
+            <option value="">Mọi người phụ trách</option>
+            {assignees.map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.status}
+            onChange={(event) =>
+              setFilters({
+                ...filters,
+                status: event.target.value as "" | BoardStatus,
+              })
+            }
+            aria-label="Lọc trạng thái"
+            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+          >
+            <option value="">Mọi trạng thái</option>
+            {columns.map((column) => (
+              <option key={column.status} value={column.status}>
+                {column.label}
+              </option>
+            ))}
+          </select>
+        </section>
+
+        {error && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+        {board?.truncated && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+            Dự án có {board.total} công việc đang hoạt động. Kanban hiển thị{" "}
+            {board.limit} công việc đầu tiên; hãy dùng bộ lọc để thu hẹp.
+          </div>
+        )}
+        {!board?.canReorder && board && (
+          <p className="text-sm text-zinc-500">
+            Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
+            chỉ dành cho Admin và quản lý dự án.
+          </p>
+        )}
+
+        {loading && !board ? (
+          <div className="rounded-2xl border border-zinc-800 p-8 text-zinc-500">
+            Đang tải Kanban…
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex min-w-full gap-4 overflow-x-auto pb-4">
+              {columns.map((column) => (
+                <BoardColumn
+                  key={column.status}
+                  status={column.status}
+                  label={column.label}
+                  tasks={(board?.[column.key] as BoardTask[] | undefined) ?? []}
+                  canReorder={board?.canReorder ?? false}
+                  taskHref={(taskId) => `${base}/${projectId}/tasks/${taskId}`}
+                  saving={saving}
+                  onStatus={updateStatus}
+                />
+              ))}
+            </div>
+          </DndContext>
+        )}
+      </div>
+    </main>
+  );
+}
+
+function BoardColumn({
+  status,
+  label,
+  tasks,
+  canReorder,
+  taskHref,
+  saving,
+  onStatus,
+}: {
+  status: BoardStatus;
+  label: string;
+  tasks: BoardTask[];
+  canReorder: boolean;
+  taskHref: (taskId: string) => string;
+  saving: boolean;
+  onStatus: (task: BoardTask, status: BoardStatus) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `column:${status}`,
+    data: { status },
+  });
+  return (
+    <section
+      ref={setNodeRef}
+      className={`w-[310px] shrink-0 rounded-2xl border p-3 ${isOver ? "border-[#FFC400] bg-[#FFC400]/5" : "border-zinc-800 bg-[#0E0E0F]"}`}
+    >
+      <div className="mb-3 flex items-center justify-between px-1">
+        <h2 className="font-bold text-white">{label}</h2>
+        <span className="rounded-full bg-zinc-900 px-2 py-1 text-xs text-zinc-500">
+          {tasks.length}
+        </span>
+      </div>
+      <SortableContext
+        items={tasks.map((task) => `task:${task.id}`)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="min-h-24 space-y-3">
+          {tasks.map((task) => (
+            <BoardCard
+              key={task.id}
+              task={task}
+              canReorder={canReorder}
+              href={taskHref(task.id)}
+              saving={saving}
+              onStatus={onStatus}
+            />
+          ))}
+          {tasks.length === 0 && (
+            <p className="rounded-xl border border-dashed border-zinc-800 p-6 text-center text-xs text-zinc-600">
+              Chưa có công việc
+            </p>
+          )}
+        </div>
+      </SortableContext>
+    </section>
+  );
+}
+
+function BoardCard({
+  task,
+  canReorder,
+  href,
+  saving,
+  onStatus,
+}: {
+  task: BoardTask;
+  canReorder: boolean;
+  href: string;
+  saving: boolean;
+  onStatus: (task: BoardTask, status: BoardStatus) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: `task:${task.id}`,
+    disabled: !canReorder,
+    data: { taskId: task.id, status: task.status },
+  });
+  return (
+    <article
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`rounded-xl border border-zinc-800 bg-black p-3 ${isDragging ? "opacity-50" : ""}`}
+    >
+      <div className="flex gap-2">
+        {canReorder && (
+          <button
+            type="button"
+            aria-label={`Kéo để sắp xếp ${task.title}`}
+            className="mt-0.5 cursor-grab text-zinc-600 active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+        )}
+        <div className="min-w-0 flex-1">
+          <Link
+            href={href}
+            className="font-semibold text-white hover:text-[#FFC400]"
+          >
+            {task.title}
+          </Link>
+          <p className="mt-1 truncate text-xs text-zinc-500">
+            {task.assignee?.full_name || task.assignee?.email || "Chưa giao"}
+          </p>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-2 text-xs">
+        <span className="rounded-full bg-zinc-900 px-2 py-1 text-zinc-400">
+          {task.priority}
+        </span>
+        <span className="text-zinc-600">{task.due_date || "Chưa có hạn"}</span>
+      </div>
+      {task.canUpdateStatus && (
+        <select
+          value={task.status}
+          disabled={saving}
+          onChange={(event) =>
+            onStatus(task, event.target.value as BoardStatus)
+          }
+          aria-label={`Đổi trạng thái ${task.title}`}
+          className="mt-3 w-full rounded-lg border border-zinc-800 bg-[#0E0E0F] px-2 py-1.5 text-xs"
+        >
+          {columns.map((column) => (
+            <option key={column.status} value={column.status}>
+              {column.label}
+            </option>
+          ))}
+        </select>
+      )}
+    </article>
+  );
+}

@@ -2,6 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import type { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
 import { TasksService } from './tasks.service';
+import type { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 const PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 const OTHER_PROJECT_ID = '22222222-2222-4222-8222-222222222222';
@@ -66,12 +67,17 @@ function taskRow(overrides: Record<string, unknown> = {}) {
 describe('TasksService', () => {
   let service: TasksService;
   let client: { from: jest.Mock };
+  let realtime: { emitProjectEvent: jest.Mock };
 
   beforeEach(() => {
     client = { from: jest.fn() };
-    service = new TasksService({
-      getSystemClient: () => client,
-    } as unknown as SupabaseService);
+    realtime = { emitProjectEvent: jest.fn() };
+    service = new TasksService(
+      {
+        getSystemClient: () => client,
+      } as unknown as SupabaseService,
+      realtime as unknown as WorkspaceRealtimeGateway,
+    );
   });
 
   it('creates a task for an admin', async () => {
@@ -79,6 +85,39 @@ describe('TasksService', () => {
       .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))
       .mockReturnValueOnce(
         queryResult({ data: taskRow(), error: null }, 'single'),
+      );
+
+    await expect(
+      service.createTask(
+        PROJECT_ID,
+        {
+          title: 'Task',
+          status: 'todo',
+          priority: 'medium',
+          sortOrder: 0,
+        },
+        user('admin'),
+      ),
+    ).resolves.toMatchObject({ id: TASK_ID });
+    expect(realtime.emitProjectEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'task.created', entityId: TASK_ID }),
+    );
+  });
+
+  it('does not roll back a created task when realtime broadcast fails', async () => {
+    realtime.emitProjectEvent.mockImplementationOnce(() => {
+      throw new Error('socket unavailable');
+    });
+    client.from
+      .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))
+      .mockReturnValueOnce(
+        queryResult(
+          {
+            data: taskRow({ updated_at: '2026-08-11T10:00:00.000Z' }),
+            error: null,
+          },
+          'single',
+        ),
       );
 
     await expect(

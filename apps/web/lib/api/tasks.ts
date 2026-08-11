@@ -15,6 +15,8 @@ export interface ProjectTask {
   priority: TaskPriority;
   assignee_user_id?: string | null;
   assignee?: { id: string; full_name?: string; email?: string } | null;
+  reporter_user_id?: string | null;
+  reporter?: { id: string; full_name?: string; email?: string } | null;
   start_date?: string | null;
   due_date?: string | null;
   completed_at?: string | null;

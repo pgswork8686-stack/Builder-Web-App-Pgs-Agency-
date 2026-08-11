@@ -10,6 +10,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { ServicesModule } from './services/services.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { TasksModule } from './tasks/tasks.module';
+import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TasksModule } from './tasks/tasks.module';
     ClientsModule,
     ProjectsModule,
     ServicesModule,
+    WorkspaceModule,
     TasksModule,
   ],
 })

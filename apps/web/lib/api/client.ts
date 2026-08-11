@@ -1,7 +1,15 @@
 import { createClient } from "../supabase/client";
 
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
+
+export async function getAccessToken(): Promise<string | null> {
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
+}
 
 export class ApiError extends Error {
   constructor(
@@ -18,11 +26,7 @@ export async function request<T = any>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const supabase = createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const token = session?.access_token;
+  const token = await getAccessToken();
 
   const headers = new Headers(options.headers);
   if (!(options.body instanceof FormData)) {

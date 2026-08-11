@@ -5,7 +5,10 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   ArrowLeft,
+  CalendarDays,
   CheckCircle2,
+  FolderOpen,
+  LayoutDashboard,
   Layers3,
   ListTodo,
   Users,
@@ -259,6 +262,41 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
             {error}
           </div>
+        )}
+
+        {mode !== "client" && (
+          <section className="grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                href: `${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/board`,
+                label: "Kanban",
+                description: "Thực thi và sắp xếp công việc",
+                icon: LayoutDashboard,
+              },
+              {
+                href: `${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/calendar`,
+                label: "Lịch công việc",
+                description: "Theo dõi ngày bắt đầu và đến hạn",
+                icon: CalendarDays,
+              },
+              {
+                href: `${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/files`,
+                label: "Tệp dự án",
+                description: "Tệp riêng tư và tệp đính kèm",
+                icon: FolderOpen,
+              },
+            ].map(({ href, label, description, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="rounded-2xl border border-zinc-800 bg-[#0E0E0F] p-4 transition hover:border-[#FFC400]/50"
+              >
+                <Icon className="h-5 w-5 text-[#FFC400]" />
+                <p className="mt-3 font-bold text-white">{label}</p>
+                <p className="mt-1 text-xs text-zinc-500">{description}</p>
+              </Link>
+            ))}
+          </section>
         )}
 
         <nav className="flex gap-2 overflow-x-auto border-b border-zinc-800">

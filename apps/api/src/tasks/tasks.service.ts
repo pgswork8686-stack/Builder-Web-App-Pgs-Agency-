@@ -5,16 +5,21 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
 import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
+import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly realtime?: WorkspaceRealtimeGateway,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
@@ -23,6 +28,28 @@ export class TasksService {
   private databaseFailure(code: string, message: string, error: any): never {
     this.logger.error(`${code}: ${error?.message ?? 'unknown database error'}`);
     throw new InternalServerErrorException({ code, message });
+  }
+
+  private emit(
+    projectId: string,
+    entityId: string,
+    event: 'task.created' | 'task.updated',
+    updatedAt: string,
+    changes?: Record<string, unknown>,
+  ): void {
+    try {
+      this.realtime?.emitProjectEvent({
+        projectId,
+        entityId,
+        event,
+        updatedAt,
+        changes,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Realtime task broadcast failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   private async requireProject(projectId: string) {
@@ -310,6 +337,9 @@ export class TasksService {
       .select()
       .single();
     if (error) this.mapWriteError(error);
+    this.emit(projectId, data.id, 'task.created', data.updated_at, {
+      status: data.status,
+    });
     return data;
   }
 
@@ -362,8 +392,6 @@ export class TasksService {
       payload.assignee_user_id = dto.assigneeUserId;
     if (dto.startDate !== undefined) payload.start_date = dto.startDate;
     if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
-    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
-
     const { data, error } = await this.client
       .from('tasks')
       .update(payload)
@@ -371,6 +399,9 @@ export class TasksService {
       .select()
       .single();
     if (error) this.mapWriteError(error);
+    this.emit(projectId, taskId, 'task.updated', data.updated_at, {
+      status: data.status,
+    });
     return data;
   }
 }
