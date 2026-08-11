@@ -153,4 +153,3 @@ apps/api/.env.test
 ```
 
 Tệp này chỉ chứa fake credentials và không được sử dụng bởi development hoặc production.
-

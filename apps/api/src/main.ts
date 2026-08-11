@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
@@ -18,6 +20,6 @@ async function bootstrap() {
 
   const port = configService.port;
   await app.listen(port);
-  console.log(`PGS Hub API is running on: http://localhost:${port}/api/v1`);
+  logger.log(`PGS Hub API started on port ${port}`);
 }
 void bootstrap();
