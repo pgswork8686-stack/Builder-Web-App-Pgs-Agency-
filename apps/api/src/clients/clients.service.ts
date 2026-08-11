@@ -244,6 +244,7 @@ export class ClientsService {
         title: m.title ?? null,
         isPrimary: m.is_primary,
         createdAt: m.created_at,
+        updatedAt: m.updated_at ?? null,
       };
     });
   }
@@ -325,8 +326,10 @@ export class ClientsService {
       {
         p_company_id: companyId,
         p_membership_id: membershipId,
-        p_title: dto.title?.trim() || null,
-        p_is_primary: !!dto.isPrimary,
+        p_title: dto.title?.trim() ?? null,
+        p_title_provided: dto.title !== undefined,
+        p_is_primary: dto.isPrimary ?? false,
+        p_is_primary_provided: dto.isPrimary !== undefined,
       },
     );
 

@@ -54,8 +54,17 @@ export class PeopleController {
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
   ) {
+    if (query && query.length > 100) {
+      throw new BadRequestException('Từ khóa tìm kiếm tối đa 100 ký tự.');
+    }
     const pageNum = page ? parseInt(page, 10) : 1;
     const sizeNum = pageSize ? parseInt(pageSize, 10) : 20;
+    if (isNaN(pageNum) || pageNum < 1) {
+      throw new BadRequestException('Tham số page không hợp lệ.');
+    }
+    if (isNaN(sizeNum) || sizeNum < 1) {
+      throw new BadRequestException('Tham số pageSize không hợp lệ.');
+    }
 
     return this.peopleService.getPeopleDirectory({
       query,

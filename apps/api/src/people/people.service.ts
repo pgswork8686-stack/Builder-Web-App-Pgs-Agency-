@@ -216,15 +216,23 @@ export class PeopleService {
       });
     }
 
-    // Validate team belongs to department
-    if (dto.teamId && dto.departmentId) {
+    // Validate team/department consistency
+    if (dto.teamId) {
       const { data: team } = await client
         .from('teams')
-        .select('department_id')
+        .select('id, department_id')
         .eq('id', dto.teamId)
         .maybeSingle();
 
-      if (team && team.department_id !== dto.departmentId) {
+      if (!team) {
+        throw new BadRequestException({
+          code: 'TEAM_NOT_FOUND',
+          message: 'Đội nhóm được chỉ định không tồn tại.',
+        });
+      }
+
+      // If departmentId supplied, it must match the team's department
+      if (dto.departmentId && team.department_id !== dto.departmentId) {
         throw new BadRequestException({
           code: 'INVALID_TEAM_DEPARTMENT',
           message: 'Đội nhóm được chọn không thuộc phòng ban đã chỉ định.',
@@ -284,22 +292,31 @@ export class PeopleService {
       });
     }
 
-    const deptId =
-      dto.departmentId !== undefined
-        ? dto.departmentId
-        : current.employeeProfile.departmentId;
     const teamId =
       dto.teamId !== undefined ? dto.teamId : current.employeeProfile.teamId;
 
-    // Validate team belongs to department
-    if (teamId && deptId) {
+    // Validate team/department consistency using effective values
+    if (teamId) {
       const { data: team } = await client
         .from('teams')
-        .select('department_id')
+        .select('id, department_id')
         .eq('id', teamId)
         .maybeSingle();
 
-      if (team && team.department_id !== deptId) {
+      if (!team) {
+        throw new BadRequestException({
+          code: 'TEAM_NOT_FOUND',
+          message: 'Đội nhóm được chỉ định không tồn tại.',
+        });
+      }
+
+      // Effective deptId after update — if caller provides departmentId use it, else use current
+      const effectiveDeptId =
+        dto.departmentId !== undefined
+          ? dto.departmentId
+          : current.employeeProfile.departmentId;
+
+      if (effectiveDeptId && team.department_id !== effectiveDeptId) {
         throw new BadRequestException({
           code: 'INVALID_TEAM_DEPARTMENT',
           message: 'Đội nhóm được chọn không thuộc phòng ban đã chỉ định.',
