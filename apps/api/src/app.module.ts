@@ -6,7 +6,10 @@ import { ConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
 import { OrganizationModule } from './organization/organization.module';
 import { PeopleModule } from './people/people.module';
+import { ProjectsModule } from './projects/projects.module';
+import { ServicesModule } from './services/services.module';
 import { SupabaseModule } from './supabase/supabase.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { SupabaseModule } from './supabase/supabase.module';
     OrganizationModule,
     PeopleModule,
     ClientsModule,
+    ProjectsModule,
+    ServicesModule,
+    TasksModule,
   ],
 })
 export class AppModule {}
