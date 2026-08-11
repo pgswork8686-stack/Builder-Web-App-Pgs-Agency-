@@ -17,8 +17,8 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { AdminService } from './admin.service';
-import { ApproveUserDto, ApproveUserSchema } from './dto/approve-user.dto';
-import { RejectUserDto, RejectUserSchema } from './dto/reject-user.dto';
+import { ApproveUserSchema } from './dto/approve-user.dto';
+import { RejectUserSchema } from './dto/reject-user.dto';
 
 @Controller('admin/users')
 @UseGuards(AuthGuard, ActiveAccountGuard, RolesGuard)
@@ -35,11 +35,15 @@ export class AdminController {
     const sizeNum = pageSize ? parseInt(pageSize, 10) : 20;
 
     if (isNaN(pageNum) || pageNum < 1) {
-      throw new BadRequestException('Query parameter "page" must be a positive integer >= 1');
+      throw new BadRequestException(
+        'Query parameter "page" must be a positive integer >= 1',
+      );
     }
 
     if (isNaN(sizeNum) || sizeNum < 1 || sizeNum > 100) {
-      throw new BadRequestException('Query parameter "pageSize" must be an integer between 1 and 100');
+      throw new BadRequestException(
+        'Query parameter "pageSize" must be an integer between 1 and 100',
+      );
     }
 
     return this.adminService.getPendingUsers(pageNum, sizeNum);
@@ -74,6 +78,10 @@ export class AdminController {
         result.error.errors.map((e) => e.message).join(', '),
       );
     }
-    return this.adminService.rejectUser(adminUserId, userId, result.data.reason);
+    return this.adminService.rejectUser(
+      adminUserId,
+      userId,
+      result.data.reason,
+    );
   }
 }

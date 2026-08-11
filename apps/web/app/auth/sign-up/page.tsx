@@ -68,7 +68,7 @@ export default function SignUpPage() {
         }, 1500);
       } else {
         setSuccessMsg(
-          "Đăng ký thành công! Vui lòng kiểm tra hộp thư email của bạn để xác nhận tài khoản trước khi đăng nhập."
+          "Đăng ký thành công! Vui lòng kiểm tra hộp thư email của bạn để xác nhận tài khoản trước khi đăng nhập.",
         );
         setLoading(false);
       }

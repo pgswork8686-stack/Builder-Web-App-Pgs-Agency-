@@ -59,8 +59,12 @@ describe('ActiveAccountGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'p@test.com',
+      phone: null,
       role: null,
       accountStatus: 'pending',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 
@@ -75,8 +79,12 @@ describe('ActiveAccountGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'r@test.com',
+      phone: null,
       role: null,
       accountStatus: 'rejected',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 
@@ -91,8 +99,12 @@ describe('ActiveAccountGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'a@test.com',
+      phone: null,
       role: 'employee',
       accountStatus: 'active',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 

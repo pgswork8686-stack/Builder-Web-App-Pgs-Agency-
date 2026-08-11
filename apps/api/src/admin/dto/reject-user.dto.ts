@@ -12,4 +12,3 @@ export const RejectUserSchema = z.object({
 export class RejectUserDto {
   reason!: string;
 }
-

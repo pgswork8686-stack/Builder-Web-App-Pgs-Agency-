@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseService } from '../supabase/supabase.service';
 import { AdminService } from './admin.service';
@@ -77,7 +73,7 @@ describe('AdminService', () => {
   describe('approveUser', () => {
     it('should throw BadRequestException if role is admin', async () => {
       await expect(
-        service.approveUser('admin-1', 'u1', 'admin' as any),
+        service.approveUser('admin-1', 'u1', 'admin'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -97,11 +93,14 @@ describe('AdminService', () => {
 
       const result = await service.approveUser('admin-1', 'u1', 'employee');
 
-      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('approve_pending_account', {
-        p_admin_user_id: 'admin-1',
-        p_target_user_id: 'u1',
-        p_role: 'employee',
-      });
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'approve_pending_account',
+        {
+          p_admin_user_id: 'admin-1',
+          p_target_user_id: 'u1',
+          p_role: 'employee',
+        },
+      );
       expect(result.user.role).toBe('employee');
       expect(result.user.account_status).toBe('active');
     });
@@ -120,15 +119,15 @@ describe('AdminService', () => {
 
   describe('rejectUser', () => {
     it('should throw BadRequestException if reason is less than 3 chars', async () => {
-      await expect(
-        service.rejectUser('admin-1', 'u1', 'ab'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.rejectUser('admin-1', 'u1', 'ab')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException if reason is missing', async () => {
-      await expect(
-        service.rejectUser('admin-1', 'u1', ''),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.rejectUser('admin-1', 'u1', '')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should call reject_pending_account RPC and return success', async () => {
@@ -145,13 +144,20 @@ describe('AdminService', () => {
       const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
       mockSupabaseClient.from.mockReturnValue({ select: selectMock });
 
-      const result = await service.rejectUser('admin-1', 'u1', 'Invalid identity details provided');
+      const result = await service.rejectUser(
+        'admin-1',
+        'u1',
+        'Invalid identity details provided',
+      );
 
-      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('reject_pending_account', {
-        p_admin_user_id: 'admin-1',
-        p_target_user_id: 'u1',
-        p_reason: 'Invalid identity details provided',
-      });
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'reject_pending_account',
+        {
+          p_admin_user_id: 'admin-1',
+          p_target_user_id: 'u1',
+          p_reason: 'Invalid identity details provided',
+        },
+      );
       expect(result.user.role).toBeNull();
       expect(result.user.account_status).toBe('rejected');
     });

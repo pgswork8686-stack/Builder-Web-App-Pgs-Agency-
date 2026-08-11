@@ -96,7 +96,9 @@ export class AdminService {
     );
 
     if (rpcError) {
-      this.logger.error(`Approve user failed: ${rpcError.message} (${rpcError.code})`);
+      this.logger.error(
+        `Approve user failed: ${rpcError.message} (${rpcError.code})`,
+      );
       if (rpcError.code === 'P0005') {
         throw new ForbiddenException({
           code: 'ADMIN_PERMISSION_REQUIRED',
@@ -166,7 +168,9 @@ export class AdminService {
     );
 
     if (rpcError) {
-      this.logger.error(`Reject user failed: ${rpcError.message} (${rpcError.code})`);
+      this.logger.error(
+        `Reject user failed: ${rpcError.message} (${rpcError.code})`,
+      );
       if (rpcError.code === 'P0005') {
         throw new ForbiddenException({
           code: 'ADMIN_PERMISSION_REQUIRED',

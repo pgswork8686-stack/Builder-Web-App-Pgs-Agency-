@@ -1,4 +1,4 @@
-import { request } from './client';
+import { request } from "./client";
 
 export interface UserPayload {
   id: string;
@@ -9,8 +9,8 @@ export interface UserPayload {
 }
 
 export interface AccountPayload {
-  status: 'pending' | 'active' | 'rejected';
-  role: 'admin' | 'team_leader' | 'employee' | 'accountant' | 'client' | null;
+  status: "pending" | "active" | "rejected";
+  role: "admin" | "team_leader" | "employee" | "accountant" | "client" | null;
   approvedAt: string | null;
 }
 
@@ -21,11 +21,11 @@ export interface AuthMeResponse {
 }
 
 export async function getMe(): Promise<AuthMeResponse> {
-  return request<AuthMeResponse>('/auth/me');
+  return request<AuthMeResponse>("/auth/me");
 }
 
 export async function bootstrapAdmin(): Promise<any> {
-  return request<any>('/auth/bootstrap-admin', {
-    method: 'POST',
+  return request<any>("/auth/bootstrap-admin", {
+    method: "POST",
   });
 }
