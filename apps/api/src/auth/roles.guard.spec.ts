@@ -59,8 +59,12 @@ describe('RolesGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'admin@test.com',
+      phone: null,
       role: 'admin',
       accountStatus: 'pending',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 
@@ -75,8 +79,12 @@ describe('RolesGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'emp@test.com',
+      phone: null,
       role: 'employee',
       accountStatus: 'active',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 
@@ -91,8 +99,12 @@ describe('RolesGuard', () => {
       authUserId: '1',
       profileId: '1',
       email: 'admin@test.com',
+      phone: null,
       role: 'admin',
       accountStatus: 'active',
+      fullName: null,
+      avatarUrl: null,
+      approvedAt: null,
     };
     const context = createMockContext(user);
 

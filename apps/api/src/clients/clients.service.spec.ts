@@ -45,6 +45,29 @@ describe('ClientsService', () => {
   });
 
   describe('createMembership', () => {
+    it('should throw NotFoundException if RPC returns CLIENT_COMPANY_NOT_FOUND', async () => {
+      mockSupabaseClient.from.mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest
+          .fn()
+          .mockResolvedValue({ data: { id: 'c1' }, error: null }),
+      }));
+
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'CLIENT_COMPANY_NOT_FOUND', code: 'P0005' },
+      });
+
+      await expect(
+        service.createMembership(
+          'c1',
+          { userId: 'user-emp-1', isPrimary: true },
+          'admin-u1',
+        ),
+      ).rejects.toThrow(NotFoundException);
+    });
+
     it('should throw BadRequestException if RPC returns USER_NOT_A_CLIENT', async () => {
       mockSupabaseClient.from.mockImplementation(() => ({
         select: jest.fn().mockReturnThis(),
@@ -149,7 +172,7 @@ describe('ClientsService', () => {
   });
 
   describe('updateMembership', () => {
-    it('should pass _provided flags correctly to RPC (only isPrimary provided)', async () => {
+    it('should pass _provided flags correctly: only isPrimary provided', async () => {
       mockSupabaseClient.from.mockImplementation(() => ({
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
@@ -178,7 +201,7 @@ describe('ClientsService', () => {
       );
     });
 
-    it('should pass _provided flags correctly to RPC (only title provided)', async () => {
+    it('should pass _provided flags correctly: only title provided', async () => {
       mockSupabaseClient.from.mockImplementation(() => ({
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
@@ -203,6 +226,64 @@ describe('ClientsService', () => {
           p_title_provided: true,
           p_is_primary: false,
           p_is_primary_provided: false,
+        },
+      );
+    });
+
+    it('should pass _provided flags correctly: title=null (explicit clear)', async () => {
+      mockSupabaseClient.from.mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest
+          .fn()
+          .mockResolvedValue({ data: { id: 'c1' }, error: null }),
+      }));
+
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: { id: 'm1' },
+        error: null,
+      });
+
+      await service.updateMembership('c1', 'm1', { title: null });
+
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'update_client_membership_atomic',
+        {
+          p_company_id: 'c1',
+          p_membership_id: 'm1',
+          p_title: null,
+          p_title_provided: true,
+          p_is_primary: false,
+          p_is_primary_provided: false,
+        },
+      );
+    });
+
+    it('should pass _provided flags correctly: isPrimary=false', async () => {
+      mockSupabaseClient.from.mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest
+          .fn()
+          .mockResolvedValue({ data: { id: 'c1' }, error: null }),
+      }));
+
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: { id: 'm1' },
+        error: null,
+      });
+
+      await service.updateMembership('c1', 'm1', { isPrimary: false });
+
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'update_client_membership_atomic',
+        {
+          p_company_id: 'c1',
+          p_membership_id: 'm1',
+          p_title: null,
+          p_title_provided: false,
+          p_is_primary: false,
+          p_is_primary_provided: true,
         },
       );
     });

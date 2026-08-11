@@ -10,6 +10,7 @@ import {
   BadRequestException,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { z } from 'zod';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -20,6 +21,51 @@ import {
   UpdateEmploymentSchema,
 } from './dto/employment.dto';
 import { PeopleService } from './people.service';
+
+// ---------------------------------------------------------------------------
+// Zod schema for GET /admin/people query params
+// ---------------------------------------------------------------------------
+const PeopleDirectoryQuerySchema = z.object({
+  q: z
+    .string()
+    .trim()
+    .max(100, 'Từ khóa tìm kiếm tối đa 100 ký tự.')
+    .optional(),
+  role: z
+    .enum(['admin', 'team_leader', 'employee', 'accountant', 'client'], {
+      errorMap: () => ({
+        message:
+          'role không hợp lệ. Các giá trị cho phép: admin, team_leader, employee, accountant, client.',
+      }),
+    })
+    .optional(),
+  departmentId: z
+    .string()
+    .uuid('departmentId phải là định dạng UUID hợp lệ.')
+    .optional(),
+  teamId: z.string().uuid('teamId phải là định dạng UUID hợp lệ.').optional(),
+  employmentStatus: z
+    .enum(['probation', 'active', 'on_leave', 'terminated'], {
+      errorMap: () => ({
+        message:
+          'employmentStatus không hợp lệ. Các giá trị cho phép: probation, active, on_leave, terminated.',
+      }),
+    })
+    .optional(),
+  page: z.coerce
+    .number({ invalid_type_error: 'Tham số page không hợp lệ.' })
+    .int('page phải là số nguyên.')
+    .min(1, 'page phải từ 1.')
+    .default(1),
+  pageSize: z.coerce
+    .number({ invalid_type_error: 'Tham số pageSize không hợp lệ.' })
+    .int('pageSize phải là số nguyên.')
+    .min(1, 'pageSize phải từ 1.')
+    .max(100, 'pageSize tối đa 100.')
+    .default(20),
+});
+
+// ---------------------------------------------------------------------------
 
 @Controller()
 @UseGuards(AuthGuard, ActiveAccountGuard, RolesGuard)
@@ -45,35 +91,23 @@ export class PeopleController {
   // --- ADMIN DIRECTORY ---
   @Get('admin/people')
   @Roles('admin')
-  async getPeopleDirectory(
-    @Query('q') query?: string,
-    @Query('role') role?: string,
-    @Query('departmentId') departmentId?: string,
-    @Query('teamId') teamId?: string,
-    @Query('employmentStatus') employmentStatus?: string,
-    @Query('page') page?: string,
-    @Query('pageSize') pageSize?: string,
-  ) {
-    if (query && query.length > 100) {
-      throw new BadRequestException('Từ khóa tìm kiếm tối đa 100 ký tự.');
+  async getPeopleDirectory(@Query() rawQuery: Record<string, string>) {
+    const parsed = PeopleDirectoryQuerySchema.safeParse(rawQuery);
+    if (!parsed.success) {
+      throw new BadRequestException(
+        parsed.error.errors.map((e) => e.message).join(', '),
+      );
     }
-    const pageNum = page ? parseInt(page, 10) : 1;
-    const sizeNum = pageSize ? parseInt(pageSize, 10) : 20;
-    if (isNaN(pageNum) || pageNum < 1) {
-      throw new BadRequestException('Tham số page không hợp lệ.');
-    }
-    if (isNaN(sizeNum) || sizeNum < 1) {
-      throw new BadRequestException('Tham số pageSize không hợp lệ.');
-    }
-
+    const { q, role, departmentId, teamId, employmentStatus, page, pageSize } =
+      parsed.data;
     return this.peopleService.getPeopleDirectory({
-      query,
+      query: q,
       role,
       departmentId,
       teamId,
       employmentStatus,
-      page: pageNum,
-      pageSize: sizeNum,
+      page,
+      pageSize,
     });
   }
 

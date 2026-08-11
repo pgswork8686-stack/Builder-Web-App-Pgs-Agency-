@@ -52,9 +52,14 @@ export class PeopleService {
       });
     }
 
-    const total =
-      data && data.length > 0 ? parseInt(data[0].total_count, 10) : 0;
-    const items = (data || []).map((row: any) => ({
+    // RPC returns JSONB: { items: [...], total: N }
+    const rpcData = data ?? {};
+    const rows = Array.isArray(rpcData.items) ? rpcData.items : [];
+    const total = Number.isFinite(Number(rpcData.total))
+      ? Number(rpcData.total)
+      : 0;
+
+    const items = rows.map((row: any) => ({
       id: row.id,
       email: row.email || null,
       phone: row.phone || null,
@@ -225,14 +230,21 @@ export class PeopleService {
         .maybeSingle();
 
       if (!team) {
-        throw new BadRequestException({
+        throw new NotFoundException({
           code: 'TEAM_NOT_FOUND',
-          message: 'Đội nhóm được chỉ định không tồn tại.',
+          message: 'Không tìm thấy đội nhóm được chọn.',
         });
       }
 
-      // If departmentId supplied, it must match the team's department
-      if (dto.departmentId && team.department_id !== dto.departmentId) {
+      // departmentId is REQUIRED when assigning a team
+      if (!dto.departmentId) {
+        throw new BadRequestException({
+          code: 'INVALID_TEAM_DEPARTMENT',
+          message: 'Phải chọn phòng ban phù hợp khi gán đội nhóm.',
+        });
+      }
+
+      if (team.department_id !== dto.departmentId) {
         throw new BadRequestException({
           code: 'INVALID_TEAM_DEPARTMENT',
           message: 'Đội nhóm được chọn không thuộc phòng ban đã chỉ định.',
@@ -292,31 +304,38 @@ export class PeopleService {
       });
     }
 
-    const teamId =
+    const effectiveTeamId =
       dto.teamId !== undefined ? dto.teamId : current.employeeProfile.teamId;
+    const effectiveDepartmentId =
+      dto.departmentId !== undefined
+        ? dto.departmentId
+        : current.employeeProfile.departmentId;
 
     // Validate team/department consistency using effective values
-    if (teamId) {
-      const { data: team } = await client
-        .from('teams')
-        .select('id, department_id')
-        .eq('id', teamId)
-        .maybeSingle();
-
-      if (!team) {
+    if (effectiveTeamId) {
+      // Cannot have a team without a department
+      if (!effectiveDepartmentId) {
         throw new BadRequestException({
-          code: 'TEAM_NOT_FOUND',
-          message: 'Đội nhóm được chỉ định không tồn tại.',
+          code: 'INVALID_TEAM_DEPARTMENT',
+          message:
+            'Không thể xóa phòng ban trong khi đội nhóm vẫn còn được gán. Hãy đồng thời xóa cả đội nhóm.',
         });
       }
 
-      // Effective deptId after update — if caller provides departmentId use it, else use current
-      const effectiveDeptId =
-        dto.departmentId !== undefined
-          ? dto.departmentId
-          : current.employeeProfile.departmentId;
+      const { data: team } = await client
+        .from('teams')
+        .select('id, department_id')
+        .eq('id', effectiveTeamId)
+        .maybeSingle();
 
-      if (effectiveDeptId && team.department_id !== effectiveDeptId) {
+      if (!team) {
+        throw new NotFoundException({
+          code: 'TEAM_NOT_FOUND',
+          message: 'Không tìm thấy đội nhóm được chọn.',
+        });
+      }
+
+      if (team.department_id !== effectiveDepartmentId) {
         throw new BadRequestException({
           code: 'INVALID_TEAM_DEPARTMENT',
           message: 'Đội nhóm được chọn không thuộc phòng ban đã chỉ định.',

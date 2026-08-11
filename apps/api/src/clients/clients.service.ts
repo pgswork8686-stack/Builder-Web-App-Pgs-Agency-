@@ -265,7 +265,7 @@ export class ClientsService {
         p_company_id: companyId,
         p_user_id: dto.userId,
         p_title: dto.title?.trim() || null,
-        p_is_primary: !!dto.isPrimary,
+        p_is_primary: dto.isPrimary ?? false,
         p_created_by: adminUserId,
       },
     );
@@ -273,6 +273,12 @@ export class ClientsService {
     if (error) {
       this.logger.error(`Failed to create membership: ${error.message}`);
 
+      if (error.message.includes('CLIENT_COMPANY_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'CLIENT_COMPANY_NOT_FOUND',
+          message: 'Không tìm thấy công ty khách hàng được yêu cầu.',
+        });
+      }
       if (error.message.includes('USER_NOT_FOUND')) {
         throw new NotFoundException({
           code: 'USER_NOT_FOUND',
@@ -326,7 +332,7 @@ export class ClientsService {
       {
         p_company_id: companyId,
         p_membership_id: membershipId,
-        p_title: dto.title?.trim() ?? null,
+        p_title: dto.title?.trim() || null,
         p_title_provided: dto.title !== undefined,
         p_is_primary: dto.isPrimary ?? false,
         p_is_primary_provided: dto.isPrimary !== undefined,

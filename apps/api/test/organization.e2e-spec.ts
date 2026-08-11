@@ -11,6 +11,17 @@ const EMP_UUID = '66666666-6666-6666-6666-666666666666';
 const COMPANY_UUID = '11111111-1111-1111-1111-111111111111';
 const MEMBER_UUID = '33333333-3333-3333-3333-333333333333';
 
+function makeAdminProfile(id = ADMIN_UUID) {
+  return {
+    data: { id, role: 'admin', account_status: 'active' },
+    error: null,
+  };
+}
+
+function makeCompanyData(id = COMPANY_UUID) {
+  return { data: { id, code: 'C1', name: 'Comp 1' }, error: null };
+}
+
 describe('Organization & Client API (e2e)', () => {
   let app: INestApplication;
   let mockSupabaseClient: any;
@@ -71,31 +82,27 @@ describe('Organization & Client API (e2e)', () => {
     await app.close();
   });
 
-  // --- ROUTING DOUBLE PREFIX VERIFICATION ---
-  it('GET /api/v1/admin/people - must resolve correctly (no double prefix)', async () => {
+  // ----------------------------------------------------------------
+  // ROUTING VERIFICATION
+  // ----------------------------------------------------------------
+
+  it('GET /api/v1/admin/people - resolves correctly (no double prefix)', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
         };
       }
       return {};
     });
 
     mockSupabaseClient.rpc.mockResolvedValue({
-      data: [
-        {
-          id: EMP_UUID,
-          total_count: '1',
-          role: 'employee',
-          account_status: 'active',
-        },
-      ],
+      data: {
+        items: [{ id: EMP_UUID, role: 'employee', account_status: 'active' }],
+        total: 1,
+      },
       error: null,
     });
 
@@ -105,14 +112,18 @@ describe('Organization & Client API (e2e)', () => {
       .expect(200);
   });
 
-  it('GET /api/v1/client/me/companies - must resolve correctly', async () => {
+  it('GET /api/v1/client/me/companies - resolves correctly', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: CLIENT_UUID, role: 'client', account_status: 'active' },
+            data: {
+              id: CLIENT_UUID,
+              role: 'client',
+              account_status: 'active',
+            },
             error: null,
           }),
         };
@@ -120,10 +131,19 @@ describe('Organization & Client API (e2e)', () => {
       if (table === 'client_memberships') {
         return {
           select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          order: jest.fn().mockResolvedValue({
+          eq: jest.fn().mockResolvedValue({
             data: [
-              { id: 'm1', client_company_id: COMPANY_UUID, is_primary: true },
+              {
+                client_company: {
+                  id: COMPANY_UUID,
+                  code: 'C1',
+                  name: 'Comp 1',
+                  status: 'active',
+                },
+                title: 'Director',
+                is_primary: true,
+                created_at: '2026-08-11T00:00:00.000Z',
+              },
             ],
             error: null,
           }),
@@ -132,13 +152,19 @@ describe('Organization & Client API (e2e)', () => {
       return {};
     });
 
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .get('/api/v1/client/me/companies')
       .set('Authorization', 'Bearer fake-token')
       .expect(200);
+
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0]).toMatchObject({
+      id: COMPANY_UUID,
+      isPrimary: true,
+    });
   });
 
-  it('GET /api/v1/team/members - must resolve correctly', async () => {
+  it('GET /api/v1/team/members - resolves correctly', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
@@ -189,7 +215,10 @@ describe('Organization & Client API (e2e)', () => {
       .expect(200);
   });
 
-  // --- RBAC TESTS ---
+  // ----------------------------------------------------------------
+  // RBAC
+  // ----------------------------------------------------------------
+
   it('RBAC - Only admin can access admin departments', async () => {
     const roles = ['employee', 'team_leader', 'client', 'accountant'];
     for (const r of roles) {
@@ -259,33 +288,35 @@ describe('Organization & Client API (e2e)', () => {
     }
   });
 
-  // --- PEOPLE DIRECTORY DB RPC PARAMS PASSING ---
-  it('People Directory - passes filters and pagination to DB RPC correctly', async () => {
+  // ----------------------------------------------------------------
+  // PEOPLE DIRECTORY — JSONB RPC PARAMS + RESPONSE
+  // ----------------------------------------------------------------
+
+  it('People Directory - passes filters correctly and parses JSONB items', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
         };
       }
       return {};
     });
 
     mockSupabaseClient.rpc.mockResolvedValue({
-      data: [
-        {
-          id: EMP_UUID,
-          email: 'test@example.com',
-          role: 'employee',
-          account_status: 'active',
-          employee_code: 'PGS02',
-          total_count: '1',
-        },
-      ],
+      data: {
+        items: [
+          {
+            id: EMP_UUID,
+            email: 'test@example.com',
+            role: 'employee',
+            account_status: 'active',
+            employee_code: 'PGS02',
+          },
+        ],
+        total: 1,
+      },
       error: null,
     });
 
@@ -311,22 +342,135 @@ describe('Organization & Client API (e2e)', () => {
     expect(res.body.items[0].employeeProfile.employeeCode).toBe('PGS02');
   });
 
-  // --- FIX ROUND 2: query validation ---
-  it('People Directory - rejects q param longer than 100 chars with 400', async () => {
+  // ----------------------------------------------------------------
+  // PEOPLE DIRECTORY — EMPTY PAGE TOTAL (Fix Round 3)
+  // ----------------------------------------------------------------
+
+  it('People Directory - empty page still returns correct total', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
         };
       }
       return {};
     });
 
+    // RPC returns empty items but total=38 (offset beyond data)
+    mockSupabaseClient.rpc.mockResolvedValue({
+      data: { items: [], total: 38 },
+      error: null,
+    });
+
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/admin/people?page=100&pageSize=20')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(200);
+
+    expect(res.body.items).toEqual([]);
+    expect(res.body.total).toBe(38);
+    expect(res.body.page).toBe(100);
+    expect(res.body.pageSize).toBe(20);
+    expect(res.body.totalPages).toBe(2);
+  });
+
+  // ----------------------------------------------------------------
+  // PEOPLE DIRECTORY — QUERY VALIDATION (Zod schema)
+  // ----------------------------------------------------------------
+
+  const adminSetup = () => {
+    mockSupabaseClient.from.mockImplementation((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
+        };
+      }
+      return {};
+    });
+  };
+
+  it('Query validation - role=super_admin → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?role=super_admin')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - employmentStatus=working → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?employmentStatus=working')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - departmentId=abc → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?departmentId=abc')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - teamId=123 → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?teamId=123')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - page=0 → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?page=0')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - page=x → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?page=x')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - pageSize=101 → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?pageSize=101')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - pageSize=20abc → 400', async () => {
+    adminSetup();
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?pageSize=20abc')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(400);
+  });
+
+  it('Query validation - pageSize=100 → allowed (200)', async () => {
+    adminSetup();
+    mockSupabaseClient.rpc.mockResolvedValue({
+      data: { items: [], total: 0 },
+      error: null,
+    });
+    await request(app.getHttpServer())
+      .get('/api/v1/admin/people?pageSize=100')
+      .set('Authorization', 'Bearer fake-token')
+      .expect(200);
+  });
+
+  it('Query validation - q > 100 chars → 400', async () => {
+    adminSetup();
     const longQuery = 'a'.repeat(101);
     await request(app.getHttpServer())
       .get(`/api/v1/admin/people?q=${longQuery}`)
@@ -334,43 +478,12 @@ describe('Organization & Client API (e2e)', () => {
       .expect(400);
   });
 
-  it('People Directory - rejects invalid page param with 400', async () => {
-    mockSupabaseClient.from.mockImplementation((table: string) => {
-      if (table === 'profiles') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
-        };
-      }
-      return {};
-    });
+  // ----------------------------------------------------------------
+  // PATCH {} → 400
+  // ----------------------------------------------------------------
 
-    await request(app.getHttpServer())
-      .get('/api/v1/admin/people?page=abc')
-      .set('Authorization', 'Bearer fake-token')
-      .expect(400);
-  });
-
-  // --- FIX ROUND 2: PATCH {} -> 400 ---
-  it('PATCH membership with empty body {} returns 400', async () => {
-    mockSupabaseClient.from.mockImplementation((table: string) => {
-      if (table === 'profiles') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
-        };
-      }
-      return {};
-    });
-
+  it('PATCH membership with empty body {} → 400', async () => {
+    adminSetup();
     await request(app.getHttpServer())
       .patch(`/api/v1/admin/clients/${COMPANY_UUID}/members/${MEMBER_UUID}`)
       .send({})
@@ -378,21 +491,8 @@ describe('Organization & Client API (e2e)', () => {
       .expect(400);
   });
 
-  it('PATCH company with empty body {} returns 400', async () => {
-    mockSupabaseClient.from.mockImplementation((table: string) => {
-      if (table === 'profiles') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
-        };
-      }
-      return {};
-    });
-
+  it('PATCH company with empty body {} → 400', async () => {
+    adminSetup();
     await request(app.getHttpServer())
       .patch(`/api/v1/admin/clients/${COMPANY_UUID}`)
       .send({})
@@ -400,27 +500,24 @@ describe('Organization & Client API (e2e)', () => {
       .expect(400);
   });
 
-  // --- FIX ROUND 2: partial PATCH semantics _provided flags ---
-  it('PATCH membership - only isPrimary provided, calls RPC with correct _provided flags', async () => {
+  // ----------------------------------------------------------------
+  // PARTIAL PATCH semantics — _provided flags
+  // ----------------------------------------------------------------
+
+  it('PATCH membership - only isPrimary provided → p_is_primary_provided=true, p_title_provided=false', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
         };
       }
       if (table === 'client_companies') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: COMPANY_UUID, code: 'C1', name: 'Comp 1' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeCompanyData()),
         };
       }
       return {};
@@ -450,65 +547,102 @@ describe('Organization & Client API (e2e)', () => {
     );
   });
 
-  // --- CLIENT MEMBERSHIP ATOMIC RPC CALLS & SANITIZATION ---
-  it('Client Membership - calls atomic RPC and sanitizes error correctly', async () => {
+  it('PATCH membership - only title provided → p_title_provided=true, p_is_primary_provided=false', async () => {
     mockSupabaseClient.from.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: ADMIN_UUID, role: 'admin', account_status: 'active' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
         };
       }
       if (table === 'client_companies') {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: COMPANY_UUID, code: 'C1', name: 'Comp 1' },
-            error: null,
-          }),
+          maybeSingle: jest.fn().mockResolvedValue(makeCompanyData()),
         };
       }
       return {};
     });
 
-    // 1. Success membership creation
+    mockSupabaseClient.rpc.mockResolvedValueOnce({
+      data: { id: MEMBER_UUID },
+      error: null,
+    });
+
+    await request(app.getHttpServer())
+      .patch(`/api/v1/admin/clients/${COMPANY_UUID}/members/${MEMBER_UUID}`)
+      .send({ title: 'Giám đốc' })
+      .set('Authorization', 'Bearer fake-token')
+      .expect(200);
+
+    expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+      'update_client_membership_atomic',
+      {
+        p_company_id: COMPANY_UUID,
+        p_membership_id: MEMBER_UUID,
+        p_title: 'Giám đốc',
+        p_title_provided: true,
+        p_is_primary: false,
+        p_is_primary_provided: false,
+      },
+    );
+  });
+
+  // ----------------------------------------------------------------
+  // CLIENT MEMBERSHIP — RPC errors
+  // ----------------------------------------------------------------
+
+  it('Membership POST - sanitizes all RPC error types', async () => {
+    mockSupabaseClient.from.mockImplementation((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue(makeAdminProfile()),
+        };
+      }
+      if (table === 'client_companies') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue(makeCompanyData()),
+        };
+      }
+      return {};
+    });
+
+    // Success
     mockSupabaseClient.rpc.mockResolvedValueOnce({
       data: { id: 'm1', is_primary: true },
       error: null,
     });
-
     await request(app.getHttpServer())
       .post(`/api/v1/admin/clients/${COMPANY_UUID}/members`)
       .send({ userId: CLIENT_UUID, title: 'Director', isPrimary: true })
       .set('Authorization', 'Bearer fake-token')
       .expect(201);
 
-    // 2. Error handling: USER_NOT_A_CLIENT throws BadRequestException (400)
+    // USER_NOT_A_CLIENT → 400
     mockSupabaseClient.rpc.mockResolvedValueOnce({
       data: null,
       error: { message: 'USER_NOT_A_CLIENT', code: 'P0003' },
     });
-
     await request(app.getHttpServer())
       .post(`/api/v1/admin/clients/${COMPANY_UUID}/members`)
-      .send({ userId: CLIENT_UUID, title: 'Director', isPrimary: true })
+      .send({ userId: CLIENT_UUID, isPrimary: true })
       .set('Authorization', 'Bearer fake-token')
       .expect(400);
 
-    // 3. Error handling: MEMBERSHIP_DUPLICATE throws ConflictException (409)
+    // MEMBERSHIP_DUPLICATE → 409
     mockSupabaseClient.rpc.mockResolvedValueOnce({
       data: null,
       error: { message: 'MEMBERSHIP_DUPLICATE', code: '23505' },
     });
-
     await request(app.getHttpServer())
       .post(`/api/v1/admin/clients/${COMPANY_UUID}/members`)
-      .send({ userId: CLIENT_UUID, title: 'Director', isPrimary: true })
+      .send({ userId: CLIENT_UUID, isPrimary: true })
       .set('Authorization', 'Bearer fake-token')
       .expect(409);
   });
