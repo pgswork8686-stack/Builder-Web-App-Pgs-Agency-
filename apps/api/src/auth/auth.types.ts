@@ -13,10 +13,12 @@ export interface RequestUser {
   authUserId: string;
   profileId: string;
   email: string | null;
+  phone: string | null;
   accountStatus: AccountStatus;
   role: AppRole | null;
-  fullName?: string | null;
-  avatarUrl?: string | null;
+  fullName: string | null;
+  avatarUrl: string | null;
+  approvedAt: string | null;
 }
 
 export interface AuthenticatedRequest extends Request {

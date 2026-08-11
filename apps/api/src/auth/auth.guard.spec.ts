@@ -103,6 +103,7 @@ describe('AuthGuard', () => {
       account_status: 'active',
       full_name: 'Test User',
       avatar_url: null,
+      approved_at: '2026-01-02',
     };
 
     mockSupabaseClient.auth.getUser.mockResolvedValue({
@@ -130,10 +131,12 @@ describe('AuthGuard', () => {
       authUserId: 'user-123',
       profileId: 'user-123',
       email: 'test@example.com',
+      phone: null,
       role: 'employee',
       accountStatus: 'active',
       fullName: 'Test User',
       avatarUrl: null,
+      approvedAt: '2026-01-02',
     });
   });
 

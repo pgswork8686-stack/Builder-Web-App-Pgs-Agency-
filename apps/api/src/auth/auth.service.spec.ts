@@ -44,31 +44,19 @@ describe('AuthService', () => {
 
   describe('getMe', () => {
     it('should return user profile and auth info', async () => {
-      const mockProfile = {
-        id: 'u1',
+      const user: RequestUser = {
+        authUserId: 'u1',
+        profileId: 'u1',
+        email: 'john@example.com',
+        phone: null,
         role: 'employee',
-        account_status: 'active',
-        full_name: 'John Doe',
-        avatar_url: null,
-        created_at: '2026-01-01',
-        updated_at: '2026-01-01',
-        approved_at: '2026-01-02',
+        accountStatus: 'active',
+        fullName: 'John Doe',
+        avatarUrl: null,
+        approvedAt: '2026-01-02',
       };
 
-      const maybeSingleMock = jest.fn().mockResolvedValue({
-        data: mockProfile,
-        error: null,
-      });
-      const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
-      const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
-      mockSupabaseClient.from.mockReturnValue({ select: selectMock });
-
-      mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'john@example.com' } },
-        error: null,
-      });
-
-      const result = await service.getMe('u1');
+      const result = await service.getMe(user);
 
       expect(result).toEqual({
         user: {
@@ -94,8 +82,12 @@ describe('AuthService', () => {
         authUserId: 'u1',
         profileId: 'u1',
         email: 'other@example.com',
+        phone: null,
         role: null,
         accountStatus: 'pending',
+        fullName: null,
+        avatarUrl: null,
+        approvedAt: null,
       };
 
       await expect(service.bootstrapAdmin(user)).rejects.toThrow(
@@ -108,8 +100,12 @@ describe('AuthService', () => {
         authUserId: 'u1',
         profileId: 'u1',
         email: 'pgsword6868@gmail.com',
+        phone: null,
         role: null,
         accountStatus: 'pending',
+        fullName: null,
+        avatarUrl: null,
+        approvedAt: null,
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
@@ -127,8 +123,12 @@ describe('AuthService', () => {
         authUserId: 'u1',
         profileId: 'u1',
         email: 'pgsword6868@gmail.com',
+        phone: null,
         role: null,
         accountStatus: 'pending',
+        fullName: null,
+        avatarUrl: null,
+        approvedAt: null,
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
@@ -145,7 +145,6 @@ describe('AuthService', () => {
 
       expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('bootstrap_initial_admin', {
         p_admin_user_id: 'u1',
-        p_email: 'pgsword6868@gmail.com',
       });
       expect(result.user.role).toBe('admin');
       expect(result.user.account_status).toBe('active');
@@ -156,8 +155,12 @@ describe('AuthService', () => {
         authUserId: 'u1',
         profileId: 'u1',
         email: 'pgsword6868@gmail.com',
+        phone: null,
         role: null,
         accountStatus: 'pending',
+        fullName: null,
+        avatarUrl: null,
+        approvedAt: null,
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({

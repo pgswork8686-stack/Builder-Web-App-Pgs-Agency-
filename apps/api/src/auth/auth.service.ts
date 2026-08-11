@@ -19,40 +19,15 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getMe(userId: string) {
+  async getMe(user: RequestUser) {
     const client = this.supabaseService.getSystemClient();
-
-    const { data: profile, error: profileError } = await client
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (profileError) {
-      this.logger.error(`Failed to lookup profile for ${userId}: ${profileError.message}`);
-      throw new InternalServerErrorException({
-        code: 'PROFILE_LOOKUP_FAILED',
-        message: 'Không thể truy vấn thông tin tài khoản lúc này.',
-      });
-    }
-
-    const { data: authUserData, error: authError } =
-      await client.auth.admin.getUserById(userId);
-
-    if (authError || !authUserData?.user) {
-      this.logger.error(`Failed to get auth user for ${userId}: ${authError?.message}`);
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: 'Không tìm thấy thông tin xác thực của tài khoản.',
-      });
-    }
 
     const initialAdminEmail = this.configService.initialAdminEmail;
     const isInitialEmail =
-      authUserData.user.email?.toLowerCase() === initialAdminEmail.toLowerCase();
+      user.email?.toLowerCase() === initialAdminEmail.toLowerCase();
 
     let canBootstrapAdmin = false;
-    if (isInitialEmail && profile?.account_status === 'pending') {
+    if (isInitialEmail && user.accountStatus === 'pending') {
       const { data: existingAdmin } = await client
         .from('profiles')
         .select('id')
@@ -66,16 +41,16 @@ export class AuthService {
 
     return {
       user: {
-        id: authUserData.user.id,
-        email: authUserData.user.email ?? null,
-        phone: authUserData.user.phone ?? null,
-        fullName: profile?.full_name ?? null,
-        avatarUrl: profile?.avatar_url ?? null,
+        id: user.authUserId,
+        email: user.email,
+        phone: user.phone,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
       },
       account: {
-        status: profile?.account_status ?? 'pending',
-        role: profile?.role ?? null,
-        approvedAt: profile?.approved_at ?? null,
+        status: user.accountStatus,
+        role: user.role,
+        approvedAt: user.approvedAt,
       },
       canBootstrapAdmin,
     };
@@ -121,7 +96,6 @@ export class AuthService {
       'bootstrap_initial_admin',
       {
         p_admin_user_id: user.authUserId,
-        p_email: user.email,
       },
     );
 

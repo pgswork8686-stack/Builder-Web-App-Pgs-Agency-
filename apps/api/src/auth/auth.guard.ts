@@ -93,10 +93,12 @@ export class AuthGuard implements CanActivate {
       authUserId: user.id,
       profileId: profile.id,
       email: user.email ?? null,
+      phone: user.phone ?? null,
       role: (profile.role as AppRole) ?? null,
       accountStatus: status,
       fullName: profile.full_name ?? null,
       avatarUrl: profile.avatar_url ?? null,
+      approvedAt: profile.approved_at ?? null,
     };
 
     request.user = requestUser;
