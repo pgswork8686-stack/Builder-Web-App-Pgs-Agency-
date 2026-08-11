@@ -5,12 +5,15 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { AppRole } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async getPendingUsers(page: number = 1, pageSize: number = 20) {
@@ -28,7 +31,11 @@ export class AdminService {
       .range(offset, offset + sizeNum - 1);
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      this.logger.error(`Failed to get pending users: ${error.message}`);
+      throw new InternalServerErrorException({
+        code: 'PENDING_USERS_LOOKUP_FAILED',
+        message: 'Không thể truy vấn danh sách tài khoản chờ duyệt.',
+      });
     }
 
     const items = (data || []).map((profile) => ({
@@ -56,9 +63,10 @@ export class AdminService {
 
   async approveUser(adminUserId: string, targetUserId: string, role: AppRole) {
     if (role === 'admin') {
-      throw new BadRequestException(
-        'Cannot assign admin role through user approval workflow',
-      );
+      throw new BadRequestException({
+        code: 'ADMIN_ROLE_ASSIGNMENT_FORBIDDEN',
+        message: 'Cannot assign admin role through user approval workflow',
+      });
     }
 
     const allowedRoles: AppRole[] = [
@@ -69,9 +77,10 @@ export class AdminService {
     ];
 
     if (!allowedRoles.includes(role)) {
-      throw new BadRequestException(
-        `Invalid role. Must be one of: ${allowedRoles.join(', ')}`,
-      );
+      throw new BadRequestException({
+        code: 'INVALID_ROLE_ASSIGNMENT',
+        message: `Invalid role. Must be one of: ${allowedRoles.join(', ')}`,
+      });
     }
 
     const client = this.supabaseService.getSystemClient();
@@ -87,16 +96,32 @@ export class AdminService {
     );
 
     if (rpcError) {
+      this.logger.error(`Approve user failed: ${rpcError.message} (${rpcError.code})`);
       if (rpcError.code === 'P0005') {
-        throw new ForbiddenException(rpcError.message);
+        throw new ForbiddenException({
+          code: 'ADMIN_PERMISSION_REQUIRED',
+          message: 'Bạn không có quyền thực hiện thao tác này.',
+        });
       } else if (rpcError.code === 'P0006') {
-        throw new BadRequestException(rpcError.message);
+        throw new BadRequestException({
+          code: 'ADMIN_ROLE_ASSIGNMENT_FORBIDDEN',
+          message: 'Không cho phép phê duyệt quyền Admin qua route này.',
+        });
       } else if (rpcError.code === 'P0007') {
-        throw new NotFoundException(rpcError.message);
+        throw new NotFoundException({
+          code: 'ACCOUNT_NOT_FOUND',
+          message: 'Không tìm thấy tài khoản đích.',
+        });
       } else if (rpcError.code === 'P0008') {
-        throw new ConflictException(rpcError.message);
+        throw new ConflictException({
+          code: 'ACCOUNT_NOT_PENDING',
+          message: 'Tài khoản không ở trạng thái chờ duyệt.',
+        });
       } else {
-        throw new InternalServerErrorException(rpcError.message);
+        throw new InternalServerErrorException({
+          code: 'ACCOUNT_OPERATION_FAILED',
+          message: 'Thao tác phê duyệt thất bại.',
+        });
       }
     }
 
@@ -122,9 +147,10 @@ export class AdminService {
 
   async rejectUser(adminUserId: string, targetUserId: string, reason: string) {
     if (!reason || reason.trim().length < 3 || reason.trim().length > 500) {
-      throw new BadRequestException(
-        'Rejection reason must be between 3 and 500 characters',
-      );
+      throw new BadRequestException({
+        code: 'INVALID_REJECTION_REASON',
+        message: 'Rejection reason must be between 3 and 500 characters',
+      });
     }
 
     const client = this.supabaseService.getSystemClient();
@@ -140,16 +166,32 @@ export class AdminService {
     );
 
     if (rpcError) {
+      this.logger.error(`Reject user failed: ${rpcError.message} (${rpcError.code})`);
       if (rpcError.code === 'P0005') {
-        throw new ForbiddenException(rpcError.message);
+        throw new ForbiddenException({
+          code: 'ADMIN_PERMISSION_REQUIRED',
+          message: 'Bạn không có quyền thực hiện thao tác này.',
+        });
       } else if (rpcError.code === 'P0007') {
-        throw new NotFoundException(rpcError.message);
+        throw new NotFoundException({
+          code: 'ACCOUNT_NOT_FOUND',
+          message: 'Không tìm thấy tài khoản đích.',
+        });
       } else if (rpcError.code === 'P0008') {
-        throw new ConflictException(rpcError.message);
+        throw new ConflictException({
+          code: 'ACCOUNT_NOT_PENDING',
+          message: 'Tài khoản không ở trạng thái chờ duyệt.',
+        });
       } else if (rpcError.code === 'P0009') {
-        throw new BadRequestException(rpcError.message);
+        throw new BadRequestException({
+          code: 'INVALID_REJECTION_REASON',
+          message: 'Lý do từ chối không hợp lệ.',
+        });
       } else {
-        throw new InternalServerErrorException(rpcError.message);
+        throw new InternalServerErrorException({
+          code: 'ACCOUNT_OPERATION_FAILED',
+          message: 'Thao tác từ chối thất bại.',
+        });
       }
     }
 

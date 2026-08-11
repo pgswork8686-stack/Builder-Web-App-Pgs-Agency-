@@ -3,14 +3,16 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(private nestConfigService: NestConfigService) {}
+  constructor(
+    private readonly nestConfigService: NestConfigService,
+  ) {}
 
-  get(key: string): string {
-    return this.nestConfigService.get<string>(key) || '';
+  get appEnv(): string {
+    return this.nestConfigService.getOrThrow<string>('APP_ENV');
   }
 
   get port(): number {
-    return this.nestConfigService.get<number>('PORT') || 3001;
+    return this.nestConfigService.getOrThrow<number>('PORT');
   }
 
   get webUrl(): string {
@@ -22,14 +24,20 @@ export class ConfigService {
   }
 
   get supabasePublishableKey(): string {
-    return this.nestConfigService.getOrThrow<string>('SUPABASE_PUBLISHABLE_KEY');
+    return this.nestConfigService.getOrThrow<string>(
+      'SUPABASE_PUBLISHABLE_KEY',
+    );
   }
 
   get supabaseSecretKey(): string {
-    return this.nestConfigService.getOrThrow<string>('SUPABASE_SECRET_KEY');
+    return this.nestConfigService.getOrThrow<string>(
+      'SUPABASE_SECRET_KEY',
+    );
   }
 
   get initialAdminEmail(): string {
-    return this.nestConfigService.get<string>('INITIAL_ADMIN_EMAIL') || 'pgsword6868@gmail.com';
+    return this.nestConfigService.getOrThrow<string>(
+      'INITIAL_ADMIN_EMAIL',
+    );
   }
 }

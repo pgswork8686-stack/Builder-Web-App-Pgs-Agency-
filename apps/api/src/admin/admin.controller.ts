@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   BadRequestException,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { AuthGuard } from '../auth/auth.guard';
@@ -47,8 +48,8 @@ export class AdminController {
   @Post(':userId/approve')
   @HttpCode(HttpStatus.OK)
   async approveUser(
-    @Param('userId') userId: string,
-    @Body() body: any,
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
     @CurrentUser('authUserId') adminUserId: string,
   ) {
     const result = ApproveUserSchema.safeParse(body);
@@ -63,8 +64,8 @@ export class AdminController {
   @Post(':userId/reject')
   @HttpCode(HttpStatus.OK)
   async rejectUser(
-    @Param('userId') userId: string,
-    @Body() body: any,
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
     @CurrentUser('authUserId') adminUserId: string,
   ) {
     const result = RejectUserSchema.safeParse(body);

@@ -7,11 +7,16 @@ import { AuthGuard } from './auth.guard';
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let reflector: Reflector;
+  let supabaseService: SupabaseService;
 
   const mockSupabaseClient = {
     auth: {
       getUser: jest.fn(),
     },
+    from: jest.fn(),
+  };
+
+  const mockUserClient = {
     from: jest.fn(),
   };
 
@@ -31,6 +36,7 @@ describe('AuthGuard', () => {
           provide: SupabaseService,
           useValue: {
             getSystemClient: jest.fn().mockReturnValue(mockSupabaseClient),
+            createUserClient: jest.fn().mockReturnValue(mockUserClient),
           },
         },
       ],
@@ -38,6 +44,7 @@ describe('AuthGuard', () => {
 
     guard = module.get<AuthGuard>(AuthGuard);
     reflector = module.get<Reflector>(Reflector);
+    supabaseService = module.get<SupabaseService>(SupabaseService);
   });
 
   const createMockContext = (authHeader?: string): ExecutionContext => {
@@ -109,7 +116,7 @@ describe('AuthGuard', () => {
     });
     const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
     const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
-    mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+    mockUserClient.from.mockReturnValue({ select: selectMock });
 
     const context = createMockContext('Bearer valid_token');
     const request = context.switchToHttp().getRequest();
@@ -117,6 +124,8 @@ describe('AuthGuard', () => {
     const result = await guard.canActivate(context);
 
     expect(result).toBe(true);
+    expect(supabaseService.createUserClient).toHaveBeenCalledWith('valid_token');
+    expect(supabaseService.getSystemClient).toHaveBeenCalled();
     expect(request.user).toEqual({
       authUserId: 'user-123',
       profileId: 'user-123',
@@ -143,7 +152,7 @@ describe('AuthGuard', () => {
     });
     const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
     const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
-    mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+    mockUserClient.from.mockReturnValue({ select: selectMock });
 
     const context = createMockContext('Bearer valid_token');
 
@@ -152,7 +161,38 @@ describe('AuthGuard', () => {
     );
   });
 
-  it('should throw InternalServerErrorException if database query fails', async () => {
+  it('should throw ForbiddenException if user status is invalid', async () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    const mockUser = { id: 'user-123', email: 'test@example.com' };
+    const mockProfile = {
+      id: 'user-123',
+      role: 'employee',
+      account_status: 'invalid_status_here',
+      full_name: 'Test User',
+      avatar_url: null,
+    };
+
+    mockSupabaseClient.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const maybeSingleMock = jest.fn().mockResolvedValue({
+      data: mockProfile,
+      error: null,
+    });
+    const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
+    mockUserClient.from.mockReturnValue({ select: selectMock });
+
+    const context = createMockContext('Bearer valid_token');
+
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      new ForbiddenException('ACCOUNT_STATE_INVALID'),
+    );
+  });
+
+  it('should throw sanitized InternalServerErrorException if database query fails', async () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const mockUser = { id: 'user-123', email: 'test@example.com' };
 
@@ -163,16 +203,26 @@ describe('AuthGuard', () => {
 
     const maybeSingleMock = jest.fn().mockResolvedValue({
       data: null,
-      error: new Error('DB connection fail'),
+      error: new Error('relation "profiles" does not exist'),
     });
     const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
     const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
-    mockSupabaseClient.from.mockReturnValue({ select: selectMock });
+    mockUserClient.from.mockReturnValue({ select: selectMock });
 
     const context = createMockContext('Bearer valid_token');
 
     await expect(guard.canActivate(context)).rejects.toThrow(
       InternalServerErrorException,
     );
+
+    try {
+      await guard.canActivate(context);
+    } catch (err: any) {
+      expect(err.getResponse()).toEqual({
+        code: 'PROFILE_LOOKUP_FAILED',
+        message: 'Không thể kiểm tra thông tin tài khoản lúc này.',
+      });
+      expect(err.message).not.toContain('relation "profiles" does not exist');
+    }
   });
 });

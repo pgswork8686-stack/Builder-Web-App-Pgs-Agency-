@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -11,6 +12,8 @@ import { RequestUser } from './auth.types';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly configService: ConfigService,
@@ -26,14 +29,22 @@ export class AuthService {
       .maybeSingle();
 
     if (profileError) {
-      throw new InternalServerErrorException(profileError.message);
+      this.logger.error(`Failed to lookup profile for ${userId}: ${profileError.message}`);
+      throw new InternalServerErrorException({
+        code: 'PROFILE_LOOKUP_FAILED',
+        message: 'Không thể truy vấn thông tin tài khoản lúc này.',
+      });
     }
 
     const { data: authUserData, error: authError } =
       await client.auth.admin.getUserById(userId);
 
     if (authError || !authUserData?.user) {
-      throw new NotFoundException('User not found in authentication provider');
+      this.logger.error(`Failed to get auth user for ${userId}: ${authError?.message}`);
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Không tìm thấy thông tin xác thực của tài khoản.',
+      });
     }
 
     const initialAdminEmail = this.configService.initialAdminEmail;
@@ -77,9 +88,10 @@ export class AuthService {
       !user.email ||
       user.email.trim().toLowerCase() !== initialAdminEmail.trim().toLowerCase()
     ) {
-      throw new ForbiddenException(
-        'Only designated initial admin email can perform bootstrap',
-      );
+      throw new ForbiddenException({
+        code: 'INITIAL_ADMIN_NOT_ALLOWED',
+        message: 'Only designated initial admin email can perform bootstrap',
+      });
     }
 
     const client = this.supabaseService.getSystemClient();
@@ -89,14 +101,19 @@ export class AuthService {
       await client.auth.admin.getUserById(user.authUserId);
 
     if (authError || !authUserData?.user) {
-      throw new NotFoundException('User not found in auth provider');
+      this.logger.error(`Failed to verify auth user in bootstrap: ${authError?.message}`);
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found in auth provider',
+      });
     }
 
     // Spec check: email_verified check
     if (!authUserData.user.email_confirmed_at) {
-      throw new ForbiddenException(
-        'Email must be verified before performing bootstrap',
-      );
+      throw new ForbiddenException({
+        code: 'EMAIL_NOT_CONFIRMED',
+        message: 'Email must be verified before performing bootstrap',
+      });
     }
 
     // Call atomic database RPC function to ensure transactional integrity
@@ -109,15 +126,28 @@ export class AuthService {
     );
 
     if (rpcError) {
+      this.logger.error(`Bootstrap admin failed: ${rpcError.message} (${rpcError.code})`);
       // Map postgres custom exceptions to HTTP status codes
       if (rpcError.code === 'P0001') {
-        throw new ForbiddenException(rpcError.message);
+        throw new ForbiddenException({
+          code: 'INITIAL_ADMIN_NOT_ALLOWED',
+          message: 'Tài khoản email này không được chỉ định làm Admin.',
+        });
       } else if (rpcError.code === 'P0002') {
-        throw new ConflictException(rpcError.message);
+        throw new ConflictException({
+          code: 'ADMIN_ALREADY_EXISTS',
+          message: 'Admin hệ thống đã tồn tại.',
+        });
       } else if (rpcError.code === 'P0004') {
-        throw new ConflictException(rpcError.message);
+        throw new ConflictException({
+          code: 'ACCOUNT_NOT_PENDING',
+          message: 'Tài khoản không ở trạng thái chờ duyệt.',
+        });
       } else {
-        throw new InternalServerErrorException(rpcError.message);
+        throw new InternalServerErrorException({
+          code: 'ACCOUNT_OPERATION_FAILED',
+          message: 'Thao tác bootstrap admin thất bại.',
+        });
       }
     }
 

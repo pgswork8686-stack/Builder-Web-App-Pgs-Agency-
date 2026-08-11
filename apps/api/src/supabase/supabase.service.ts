@@ -49,10 +49,4 @@ export class SupabaseService {
     });
   }
 
-  /**
-   * Deprecated getClient compatibility helper
-   */
-  getClient(): SupabaseClient<any, any, any> {
-    return this.systemClientInstance;
-  }
 }

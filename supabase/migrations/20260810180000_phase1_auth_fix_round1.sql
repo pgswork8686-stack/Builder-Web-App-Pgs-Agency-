@@ -1,4 +1,4 @@
-﻿-- Migration: 20260810180000_phase1_auth_fix_round1.sql
+-- Migration: 20260810180000_phase1_auth_fix_round1.sql
 -- Description: Implement complete profiles schema, lifecycle check constraints, atomic operations (bootstrap, approve, reject), backfill scripts, and RLS/RBAC hardening.
 
 -- 1. Upgrade public.profiles schema
@@ -29,7 +29,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS 
+AS $$
 DECLARE
   v_full_name TEXT;
   v_avatar_url TEXT;
@@ -83,10 +83,10 @@ BEGIN
 
   RETURN NEW;
 END;
-;
+$$;
 
 -- 4. Backfill existing auth.users to public.profiles mapping fields correctly
-DO 
+DO $$
 DECLARE
   r RECORD;
   v_full_name TEXT;
@@ -138,7 +138,8 @@ BEGIN
       full_name = COALESCE(profiles.full_name, EXCLUDED.full_name),
       avatar_url = COALESCE(profiles.avatar_url, EXCLUDED.avatar_url);
   END LOOP;
-END ;
+END;
+$$;
 
 -- 5. Atomic PostgreSQL RPC/functions for elevated operations
 -- A. bootstrap_initial_admin
@@ -150,7 +151,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS 
+AS $$
 DECLARE
   v_admin_count INT;
   v_profile RECORD;
@@ -216,7 +217,7 @@ BEGIN
     'status', 'active'
   );
 END;
-;
+$$;
 
 -- B. approve_pending_account
 CREATE OR REPLACE FUNCTION public.approve_pending_account(
@@ -228,7 +229,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS 
+AS $$
 DECLARE
   v_is_admin BOOLEAN;
   v_profile RECORD;
@@ -297,7 +298,7 @@ BEGIN
     'status', 'active'
   );
 END;
-;
+$$;
 
 -- C. reject_pending_account
 CREATE OR REPLACE FUNCTION public.reject_pending_account(
@@ -309,7 +310,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS 
+AS $$
 DECLARE
   v_is_admin BOOLEAN;
   v_profile RECORD;
@@ -378,7 +379,7 @@ BEGIN
     'status', 'rejected'
   );
 END;
-;
+$$;
 
 -- 6. Revoke direct execute permissions from public and non-elevated roles
 REVOKE EXECUTE ON FUNCTION public.bootstrap_initial_admin(UUID, TEXT) FROM PUBLIC, anon, authenticated;
@@ -409,7 +410,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS 
+AS $$
 BEGIN
   IF (OLD.role IS DISTINCT FROM NEW.role) OR
      (OLD.account_status IS DISTINCT FROM NEW.account_status) OR
@@ -428,4 +429,4 @@ BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-;
+$$;

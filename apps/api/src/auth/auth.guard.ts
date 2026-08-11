@@ -5,6 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -13,6 +14,8 @@ import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
   constructor(
     private readonly reflector: Reflector,
     private readonly supabaseService: SupabaseService,
@@ -61,20 +64,29 @@ export class AuthGuard implements CanActivate {
 
     const user = authData.user;
 
-    const { data: profile, error: profileError } = await client
+    // Use user-scoped client with RLS to query own profile
+    const userClient = this.supabaseService.createUserClient(token);
+    const { data: profile, error: profileError } = await userClient
       .from('profiles')
-      .select('*')
+      .select('id,email,full_name,avatar_url,role,account_status,approved_at')
       .eq('id', user.id)
       .maybeSingle();
 
     if (profileError) {
-      throw new InternalServerErrorException(
-        `Database profile query error: ${profileError.message}`,
-      );
+      this.logger.error(`Database profile query error: ${profileError.message}`);
+      throw new InternalServerErrorException({
+        code: 'PROFILE_LOOKUP_FAILED',
+        message: 'Không thể kiểm tra thông tin tài khoản lúc này.',
+      });
     }
 
     if (!profile) {
       throw new ForbiddenException('ACCOUNT_PROFILE_MISSING');
+    }
+
+    const status = profile.account_status as AccountStatus;
+    if (!status || !['pending', 'active', 'rejected'].includes(status)) {
+      throw new ForbiddenException('ACCOUNT_STATE_INVALID');
     }
 
     const requestUser: RequestUser = {
@@ -82,7 +94,7 @@ export class AuthGuard implements CanActivate {
       profileId: profile.id,
       email: user.email ?? null,
       role: (profile.role as AppRole) ?? null,
-      accountStatus: (profile.account_status as AccountStatus) ?? 'pending',
+      accountStatus: status,
       fullName: profile.full_name ?? null,
       avatarUrl: profile.avatar_url ?? null,
     };

@@ -91,8 +91,8 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
 
-        {/* Real workspace status cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Real workspace claims */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
               <span className="text-xs font-semibold uppercase">
@@ -102,33 +102,20 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-2xl font-extrabold text-white">Quản trị viên</div>
             <div className="text-xs text-[#606060]">
-              Quyền quản trị toàn quyền hệ thống PGS Hub
+              Bạn sở hữu quyền quản trị toàn bộ cấu hình hệ thống và dữ liệu.
             </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
               <span className="text-xs font-semibold uppercase">
-                Bảo mật & Xác thực
+                Quyền hạn phê duyệt
               </span>
-              <Settings className="w-4 h-4 text-[#FFC400]" />
+              <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Bật RLS & Guards</div>
-            <div className="text-xs text-emerald-400">
-              Supabase Auth SSR & NestJS API Guards
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Trạng thái hệ thống
-              </span>
-              <Activity className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">Hoạt động</div>
-            <div className="text-xs text-emerald-400">
-              API & Frontend đồng nhất thời gian thực
+            <div className="text-2xl font-extrabold text-white">Quản lý tài khoản chờ duyệt</div>
+            <div className="text-xs text-[#606060]">
+              Xét duyệt danh tính và phân quyền vai trò cho nhân sự mới đăng ký.
             </div>
           </div>
         </div>
