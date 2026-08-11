@@ -28,12 +28,23 @@ export class AuthService {
 
     let canBootstrapAdmin = false;
     if (isInitialEmail && user.accountStatus === 'pending') {
-      const { data: existingAdmin } = await client
+      const { data: existingAdmin, error: adminLookupError } = await client
         .from('profiles')
         .select('id')
         .eq('role', 'admin')
         .eq('account_status', 'active')
         .maybeSingle();
+
+      if (adminLookupError) {
+        this.logger.error(
+          `Failed to determine existing admin: ${adminLookupError.message}`,
+        );
+        throw new InternalServerErrorException({
+          code: 'ADMIN_STATE_LOOKUP_FAILED',
+          message: 'Không thể kiểm tra trạng thái quản trị hệ thống lúc này.',
+        });
+      }
+
       if (!existingAdmin) {
         canBootstrapAdmin = true;
       }

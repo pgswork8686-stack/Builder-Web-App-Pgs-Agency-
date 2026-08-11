@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '../config/config.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -7,19 +7,24 @@ import { RequestUser } from './auth.types';
 
 describe('AuthService', () => {
   let service: AuthService;
-
-  const mockSupabaseClient = {
-    auth: {
-      admin: {
-        getUserById: jest.fn(),
-      },
-    },
-    from: jest.fn(),
-    rpc: jest.fn(),
-  };
+  let mockSupabaseClient: any;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+
+    mockSupabaseClient = {
+      auth: {
+        admin: {
+          getUserById: jest.fn(),
+        },
+      },
+      from: jest.fn().mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+      })),
+      rpc: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -72,6 +77,42 @@ describe('AuthService', () => {
           approvedAt: '2026-01-02',
         },
         canBootstrapAdmin: false,
+      });
+    });
+
+    it('should throw InternalServerErrorException and fail-closed if global admin check fails', async () => {
+      const user: RequestUser = {
+        authUserId: 'u1',
+        profileId: 'u1',
+        email: 'pgsword6868@gmail.com',
+        phone: null,
+        role: null,
+        accountStatus: 'pending',
+        fullName: 'Initial Admin Spec',
+        avatarUrl: null,
+        approvedAt: null,
+      };
+
+      mockSupabaseClient.from.mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({
+          data: null,
+          error: new Error('Postgres connection pool exhausted'),
+        }),
+      }));
+
+      let thrownError: any;
+      try {
+        await service.getMe(user);
+      } catch (err) {
+        thrownError = err;
+      }
+
+      expect(thrownError).toBeInstanceOf(InternalServerErrorException);
+      expect(thrownError.getResponse()).toEqual({
+        code: 'ADMIN_STATE_LOOKUP_FAILED',
+        message: 'Không thể kiểm tra trạng thái quản trị hệ thống lúc này.',
       });
     });
   });
