@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 export default function AuthResolvePage() {
   const router = useRouter();
   const [statusText, setStatusText] = useState(
-    "Đang xác thực thông tin tài khoản..."
+    "Đang xác thực thông tin tài khoản...",
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -56,7 +56,9 @@ export default function AuthResolvePage() {
           if (targetRoute) {
             router.replace(targetRoute);
           } else {
-            setErrorMsg("Tài khoản của bạn đã được kích hoạt nhưng chưa được chỉ định vai trò hợp lệ. Vui lòng liên hệ Admin.");
+            setErrorMsg(
+              "Tài khoản của bạn đã được kích hoạt nhưng chưa được chỉ định vai trò hợp lệ. Vui lòng liên hệ Admin.",
+            );
           }
           return;
         }
@@ -81,7 +83,9 @@ export default function AuthResolvePage() {
             <button
               onClick={() => {
                 const supabase = createClient();
-                supabase.auth.signOut().then(() => router.replace("/auth/login"));
+                supabase.auth
+                  .signOut()
+                  .then(() => router.replace("/auth/login"));
               }}
               className="mt-4 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors"
             >

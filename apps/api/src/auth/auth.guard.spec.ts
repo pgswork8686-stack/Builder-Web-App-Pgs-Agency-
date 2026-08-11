@@ -1,4 +1,9 @@
-import { ExecutionContext, UnauthorizedException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -125,7 +130,11 @@ describe('AuthGuard', () => {
     const result = await guard.canActivate(context);
 
     expect(result).toBe(true);
-    expect(supabaseService.createUserClient).toHaveBeenCalledWith('valid_token');
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(supabaseService.createUserClient).toHaveBeenCalledWith(
+      'valid_token',
+    );
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(supabaseService.getSystemClient).toHaveBeenCalled();
     expect(request.user).toEqual({
       authUserId: 'user-123',

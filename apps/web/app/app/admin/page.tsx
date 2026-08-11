@@ -100,7 +100,9 @@ export default function AdminDashboardPage() {
               </span>
               <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Quản trị viên</div>
+            <div className="text-2xl font-extrabold text-white">
+              Quản trị viên
+            </div>
             <div className="text-xs text-[#606060]">
               Bạn sở hữu quyền quản trị toàn bộ cấu hình hệ thống và dữ liệu.
             </div>
@@ -113,7 +115,9 @@ export default function AdminDashboardPage() {
               </span>
               <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Quản lý tài khoản chờ duyệt</div>
+            <div className="text-2xl font-extrabold text-white">
+              Quản lý tài khoản chờ duyệt
+            </div>
             <div className="text-xs text-[#606060]">
               Xét duyệt danh tính và phân quyền vai trò cho nhân sự mới đăng ký.
             </div>

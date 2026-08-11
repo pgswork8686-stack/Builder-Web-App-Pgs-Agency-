@@ -1,11 +1,7 @@
 import { Request } from 'express';
 
 export type AppRole =
-  | 'admin'
-  | 'team_leader'
-  | 'employee'
-  | 'accountant'
-  | 'client';
+  'admin' | 'team_leader' | 'employee' | 'accountant' | 'client';
 
 export type AccountStatus = 'pending' | 'active' | 'rejected';
 

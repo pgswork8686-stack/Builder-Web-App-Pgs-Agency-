@@ -73,7 +73,9 @@ export class AuthGuard implements CanActivate {
       .maybeSingle();
 
     if (profileError) {
-      this.logger.error(`Database profile query error: ${profileError.message}`);
+      this.logger.error(
+        `Database profile query error: ${profileError.message}`,
+      );
       throw new InternalServerErrorException({
         code: 'PROFILE_LOOKUP_FAILED',
         message: 'Không thể kiểm tra thông tin tài khoản lúc này.',

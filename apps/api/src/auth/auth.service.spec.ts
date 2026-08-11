@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '../config/config.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -150,7 +154,13 @@ describe('AuthService', () => {
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'pgsword6868@gmail.com', email_confirmed_at: null } },
+        data: {
+          user: {
+            id: 'u1',
+            email: 'pgsword6868@gmail.com',
+            email_confirmed_at: null,
+          },
+        },
         error: null,
       });
 
@@ -173,7 +183,13 @@ describe('AuthService', () => {
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'pgsword6868@gmail.com', email_confirmed_at: '2026-01-01' } },
+        data: {
+          user: {
+            id: 'u1',
+            email: 'pgsword6868@gmail.com',
+            email_confirmed_at: '2026-01-01',
+          },
+        },
         error: null,
       });
 
@@ -184,9 +200,12 @@ describe('AuthService', () => {
 
       const result = await service.bootstrapAdmin(user);
 
-      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('bootstrap_initial_admin', {
-        p_admin_user_id: 'u1',
-      });
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'bootstrap_initial_admin',
+        {
+          p_admin_user_id: 'u1',
+        },
+      );
       expect(result.user.role).toBe('admin');
       expect(result.user.account_status).toBe('active');
     });
@@ -205,16 +224,27 @@ describe('AuthService', () => {
       };
 
       mockSupabaseClient.auth.admin.getUserById.mockResolvedValue({
-        data: { user: { id: 'u1', email: 'pgsword6868@gmail.com', email_confirmed_at: '2026-01-01' } },
+        data: {
+          user: {
+            id: 'u1',
+            email: 'pgsword6868@gmail.com',
+            email_confirmed_at: '2026-01-01',
+          },
+        },
         error: null,
       });
 
       mockSupabaseClient.rpc.mockResolvedValue({
         data: null,
-        error: { code: 'P0002', message: 'System already has bootstrapped admin' },
+        error: {
+          code: 'P0002',
+          message: 'System already has bootstrapped admin',
+        },
       });
 
-      await expect(service.bootstrapAdmin(user)).rejects.toThrow(ConflictException);
+      await expect(service.bootstrapAdmin(user)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 });

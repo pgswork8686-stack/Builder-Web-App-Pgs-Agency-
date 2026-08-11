@@ -87,7 +87,9 @@ export class AuthService {
       await client.auth.admin.getUserById(user.authUserId);
 
     if (authError || !authUserData?.user) {
-      this.logger.error(`Failed to verify auth user in bootstrap: ${authError?.message}`);
+      this.logger.error(
+        `Failed to verify auth user in bootstrap: ${authError?.message}`,
+      );
       throw new NotFoundException({
         code: 'USER_NOT_FOUND',
         message: 'User not found in auth provider',
@@ -111,7 +113,9 @@ export class AuthService {
     );
 
     if (rpcError) {
-      this.logger.error(`Bootstrap admin failed: ${rpcError.message} (${rpcError.code})`);
+      this.logger.error(
+        `Bootstrap admin failed: ${rpcError.message} (${rpcError.code})`,
+      );
       // Map postgres custom exceptions to HTTP status codes
       if (rpcError.code === 'P0001') {
         throw new ForbiddenException({

@@ -22,7 +22,8 @@ export default function ClientDashboardPage() {
             P
           </div>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB <span className="text-[#FFC400] font-normal">| Client Portal</span>
+            PGS HUB{" "}
+            <span className="text-[#FFC400] font-normal">| Client Portal</span>
           </span>
         </div>
 
@@ -47,36 +48,51 @@ export default function ClientDashboardPage() {
             Cổng thông tin Khách hàng
           </h1>
           <p className="mt-1 text-sm text-[#606060]">
-            Theo dõi chất lượng, bàn giao sản phẩm của dự án của bạn từ PGS Agency.
+            Theo dõi chất lượng, bàn giao sản phẩm của dự án của bạn từ PGS
+            Agency.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Vai trò của bạn</span>
+              <span className="text-xs font-semibold uppercase">
+                Vai trò của bạn
+              </span>
               <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
             <div className="text-2xl font-extrabold text-white">Khách hàng</div>
-            <div className="text-xs text-[#606060]">Quyền xem thông tin bàn giao dự án của bạn</div>
+            <div className="text-xs text-[#606060]">
+              Quyền xem thông tin bàn giao dự án của bạn
+            </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Trạng thái tài khoản</span>
+              <span className="text-xs font-semibold uppercase">
+                Trạng thái tài khoản
+              </span>
               <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Đang hoạt động</div>
-            <div className="text-xs text-emerald-400">Tài khoản đối tác được xác thực</div>
+            <div className="text-2xl font-extrabold text-white">
+              Đang hoạt động
+            </div>
+            <div className="text-xs text-emerald-400">
+              Tài khoản đối tác được xác thực
+            </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Kết nối an toàn</span>
+              <span className="text-xs font-semibold uppercase">
+                Kết nối an toàn
+              </span>
               <Activity className="w-4 h-4 text-[#FFC400]" />
             </div>
             <div className="text-2xl font-extrabold text-white">Trực tuyến</div>
-            <div className="text-xs text-emerald-400">Bảo mật thông tin khách hàng tuyệt đối</div>
+            <div className="text-xs text-emerald-400">
+              Bảo mật thông tin khách hàng tuyệt đối
+            </div>
           </div>
         </div>
       </main>

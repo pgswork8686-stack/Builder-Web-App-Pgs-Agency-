@@ -3,9 +3,7 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(
-    private readonly nestConfigService: NestConfigService,
-  ) {}
+  constructor(private readonly nestConfigService: NestConfigService) {}
 
   get appEnv(): string {
     return this.nestConfigService.getOrThrow<string>('APP_ENV');
@@ -30,14 +28,10 @@ export class ConfigService {
   }
 
   get supabaseSecretKey(): string {
-    return this.nestConfigService.getOrThrow<string>(
-      'SUPABASE_SECRET_KEY',
-    );
+    return this.nestConfigService.getOrThrow<string>('SUPABASE_SECRET_KEY');
   }
 
   get initialAdminEmail(): string {
-    return this.nestConfigService.getOrThrow<string>(
-      'INITIAL_ADMIN_EMAIL',
-    );
+    return this.nestConfigService.getOrThrow<string>('INITIAL_ADMIN_EMAIL');
   }
 }

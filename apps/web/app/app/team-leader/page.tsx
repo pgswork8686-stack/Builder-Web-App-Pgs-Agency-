@@ -22,7 +22,10 @@ export default function TeamLeaderDashboardPage() {
             P
           </div>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB <span className="text-[#FFC400] font-normal">| Team Leader Workspace</span>
+            PGS HUB{" "}
+            <span className="text-[#FFC400] font-normal">
+              | Team Leader Workspace
+            </span>
           </span>
         </div>
 
@@ -47,36 +50,55 @@ export default function TeamLeaderDashboardPage() {
             Góc làm việc Trưởng nhóm
           </h1>
           <p className="mt-1 text-sm text-[#606060]">
-            Quản lý đội ngũ nhân sự, giao nhiệm vụ và kiểm soát chất lượng dự án.
+            Quản lý đội ngũ nhân sự, giao nhiệm vụ và kiểm soát chất lượng dự
+            án.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Vai trò của bạn</span>
+              <span className="text-xs font-semibold uppercase">
+                Vai trò của bạn
+              </span>
               <UserCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Trưởng nhóm</div>
-            <div className="text-xs text-[#606060]">Quyền quản lý nhân sự & dự án của nhóm</div>
+            <div className="text-2xl font-extrabold text-white">
+              Trưởng nhóm
+            </div>
+            <div className="text-xs text-[#606060]">
+              Quyền quản lý nhân sự & dự án của nhóm
+            </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Trạng thái tài khoản</span>
+              <span className="text-xs font-semibold uppercase">
+                Trạng thái tài khoản
+              </span>
               <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Đang hoạt động</div>
-            <div className="text-xs text-emerald-400">Tài khoản đã được phê duyệt</div>
+            <div className="text-2xl font-extrabold text-white">
+              Đang hoạt động
+            </div>
+            <div className="text-xs text-emerald-400">
+              Tài khoản đã được phê duyệt
+            </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
             <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">Môi trường</span>
+              <span className="text-xs font-semibold uppercase">
+                Môi trường
+              </span>
               <Activity className="w-4 h-4 text-[#FFC400]" />
             </div>
-            <div className="text-2xl font-extrabold text-white">Bật an toàn</div>
-            <div className="text-xs text-emerald-400">Không có cảnh báo bảo mật</div>
+            <div className="text-2xl font-extrabold text-white">
+              Bật an toàn
+            </div>
+            <div className="text-xs text-emerald-400">
+              Không có cảnh báo bảo mật
+            </div>
           </div>
         </div>
       </main>
