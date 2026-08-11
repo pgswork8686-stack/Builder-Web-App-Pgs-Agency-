@@ -30,14 +30,14 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   // --- CLIENT OWN COMPANY SCOPE ---
-  @Get('api/v1/client/me/companies')
+  @Get('client/me/companies')
   @Roles('client')
   async getMyCompanies(@CurrentUser('authUserId') userId: string) {
     return this.clientsService.getClientOwnCompanies(userId);
   }
 
   // --- ADMIN CLIENT COMPANIES ---
-  @Get('api/v1/admin/clients')
+  @Get('admin/clients')
   @Roles('admin')
   async getClientCompanies(
     @Query('q') query?: string,
@@ -55,7 +55,7 @@ export class ClientsController {
     });
   }
 
-  @Get('api/v1/admin/clients/:clientId')
+  @Get('admin/clients/:clientId')
   @Roles('admin')
   async getClientCompanyById(
     @Param('clientId', ParseUUIDPipe) clientId: string,
@@ -63,7 +63,7 @@ export class ClientsController {
     return this.clientsService.getClientCompanyById(clientId);
   }
 
-  @Post('api/v1/admin/clients')
+  @Post('admin/clients')
   @Roles('admin')
   async createClientCompany(
     @Body() body: unknown,
@@ -78,7 +78,7 @@ export class ClientsController {
     return this.clientsService.createClientCompany(result.data, adminUserId);
   }
 
-  @Patch('api/v1/admin/clients/:clientId')
+  @Patch('admin/clients/:clientId')
   @Roles('admin')
   async updateClientCompany(
     @Param('clientId', ParseUUIDPipe) clientId: string,
@@ -99,13 +99,13 @@ export class ClientsController {
   }
 
   // --- ADMIN CLIENT MEMBERSHIPS ---
-  @Get('api/v1/admin/clients/:clientId/members')
+  @Get('admin/clients/:clientId/members')
   @Roles('admin')
   async getMemberships(@Param('clientId', ParseUUIDPipe) clientId: string) {
     return this.clientsService.getMemberships(clientId);
   }
 
-  @Post('api/v1/admin/clients/:clientId/members')
+  @Post('admin/clients/:clientId/members')
   @Roles('admin')
   async createMembership(
     @Param('clientId', ParseUUIDPipe) clientId: string,
@@ -125,7 +125,7 @@ export class ClientsController {
     );
   }
 
-  @Patch('api/v1/admin/clients/:clientId/members/:membershipId')
+  @Patch('admin/clients/:clientId/members/:membershipId')
   @Roles('admin')
   async updateMembership(
     @Param('clientId', ParseUUIDPipe) clientId: string,
@@ -145,7 +145,7 @@ export class ClientsController {
     );
   }
 
-  @Delete('api/v1/admin/clients/:clientId/members/:membershipId')
+  @Delete('admin/clients/:clientId/members/:membershipId')
   @Roles('admin')
   async deleteMembership(
     @Param('clientId', ParseUUIDPipe) clientId: string,

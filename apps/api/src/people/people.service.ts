@@ -32,98 +32,56 @@ export class PeopleService {
 
     const client = this.supabaseService.getSystemClient();
 
-    // Query profiles left-joined with employee_profiles
-    let dbQuery = client
-      .from('profiles')
-      .select(
-        '*, employee_profile:employee_profiles(*, department:departments(name), team:teams(name))',
-        { count: 'exact' },
-      );
-
-    if (filters.role) {
-      dbQuery = dbQuery.eq('role', filters.role);
-    }
-    if (filters.query) {
-      const q = filters.query.trim();
-      // Search profile email/full_name OR employee_code
-      dbQuery = dbQuery.or(`email.ilike.%${q}%,full_name.ilike.%${q}%`);
-    }
-
-    const { data: profiles, error } = await dbQuery.order('created_at', {
-      ascending: false,
+    const { data, error } = await client.rpc('search_people_directory', {
+      p_query: filters.query?.trim() || null,
+      p_role: filters.role || null,
+      p_department_id: filters.departmentId || null,
+      p_team_id: filters.teamId || null,
+      p_employment_status: filters.employmentStatus || null,
+      p_offset: offset,
+      p_limit: sizeNum,
     });
 
     if (error) {
-      this.logger.error(`Failed to get profiles directory: ${error.message}`);
+      this.logger.error(
+        `Failed to get profiles directory via RPC: ${error.message}`,
+      );
       throw new InternalServerErrorException({
         code: 'PEOPLE_LOOKUP_FAILED',
         message: 'Không thể truy vấn danh bạ nhân sự.',
       });
     }
 
-    // Filters on nested employee_profiles fields
-    let filtered = (profiles || []).map((p) => {
-      const emp = p.employee_profile;
-      return {
-        id: p.id,
-        email: p.email ?? null,
-        phone: p.phone ?? null,
-        fullName: p.full_name ?? null,
-        avatarUrl: p.avatar_url ?? null,
-        role: p.role,
-        accountStatus: p.account_status,
-        employeeProfile: emp
-          ? {
-              employeeCode: emp.employee_code,
-              departmentId: emp.department_id,
-              departmentName: emp.department?.name ?? null,
-              teamId: emp.team_id,
-              teamName: emp.team?.name ?? null,
-              jobTitle: emp.job_title ?? null,
-              reportsToUserId: emp.reports_to_user_id ?? null,
-              employmentStatus: emp.employment_status,
-              joinedDate: emp.joined_date ?? null,
-              leftDate: emp.left_date ?? null,
-            }
-          : null,
-      };
-    });
+    const total =
+      data && data.length > 0 ? parseInt(data[0].total_count, 10) : 0;
+    const items = (data || []).map((row: any) => ({
+      id: row.id,
+      email: row.email || null,
+      phone: row.phone || null,
+      fullName: row.full_name || null,
+      avatarUrl: row.avatar_url || null,
+      role: row.role,
+      accountStatus: row.account_status,
+      employeeProfile: row.employee_code
+        ? {
+            employeeCode: row.employee_code,
+            departmentId: row.department_id || null,
+            departmentName: row.department_name || null,
+            teamId: row.team_id || null,
+            teamName: row.team_name || null,
+            jobTitle: row.job_title || null,
+            reportsToUserId: row.reports_to_user_id || null,
+            employmentStatus: row.employment_status,
+            joinedDate: row.joined_date || null,
+            leftDate: row.left_date || null,
+          }
+        : null,
+    }));
 
-    if (filters.departmentId) {
-      filtered = filtered.filter(
-        (item) => item.employeeProfile?.departmentId === filters.departmentId,
-      );
-    }
-    if (filters.teamId) {
-      filtered = filtered.filter(
-        (item) => item.employeeProfile?.teamId === filters.teamId,
-      );
-    }
-    if (filters.employmentStatus) {
-      filtered = filtered.filter(
-        (item) =>
-          item.employeeProfile?.employmentStatus === filters.employmentStatus,
-      );
-    }
-    if (filters.query) {
-      // additional check in employee code for query since JSON nested query in PostgREST is verbose
-      const q = filters.query.trim().toLowerCase();
-      filtered = filtered.filter((item) => {
-        const hasEmail = item.email?.toLowerCase().includes(q);
-        const hasName = item.fullName?.toLowerCase().includes(q);
-        const hasCode = item.employeeProfile?.employeeCode
-          ?.toLowerCase()
-          .includes(q);
-        return hasEmail || hasName || hasCode;
-      });
-    }
-
-    const total = filtered.length;
-    const paginated = filtered.slice(offset, offset + sizeNum);
     const totalPages = Math.ceil(total / sizeNum);
 
     return {
-      items: paginated,
+      items,
       page: pageNum,
       pageSize: sizeNum,
       total,

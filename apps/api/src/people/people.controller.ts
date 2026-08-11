@@ -15,7 +15,6 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
-import { RequestUser } from '../auth/auth.types';
 import {
   CreateEmploymentSchema,
   UpdateEmploymentSchema,
@@ -28,7 +27,7 @@ export class PeopleController {
   constructor(private readonly peopleService: PeopleService) {}
 
   // --- OWN ORGANIZATION SCOPE ---
-  @Get('api/v1/me/organization')
+  @Get('me/organization')
   async getMeOrganization(@CurrentUser() user: any) {
     return this.peopleService.getOwnOrganizationContext(
       user.authUserId,
@@ -37,14 +36,14 @@ export class PeopleController {
   }
 
   // --- TEAM LEADER SCOPE ---
-  @Get('api/v1/team/members')
+  @Get('team/members')
   @Roles('team_leader')
   async getTeamMembers(@CurrentUser('authUserId') leaderUserId: string) {
     return this.peopleService.getTeamMembersForLeader(leaderUserId);
   }
 
   // --- ADMIN DIRECTORY ---
-  @Get('api/v1/admin/people')
+  @Get('admin/people')
   @Roles('admin')
   async getPeopleDirectory(
     @Query('q') query?: string,
@@ -69,13 +68,13 @@ export class PeopleController {
     });
   }
 
-  @Get('api/v1/admin/people/:userId')
+  @Get('admin/people/:userId')
   @Roles('admin')
   async getPersonByUserId(@Param('userId', ParseUUIDPipe) userId: string) {
     return this.peopleService.getPersonByUserId(userId);
   }
 
-  @Post('api/v1/admin/people/:userId/employment')
+  @Post('admin/people/:userId/employment')
   @Roles('admin')
   async createEmployment(
     @Param('userId', ParseUUIDPipe) userId: string,
@@ -95,7 +94,7 @@ export class PeopleController {
     );
   }
 
-  @Patch('api/v1/admin/people/:userId/employment')
+  @Patch('admin/people/:userId/employment')
   @Roles('admin')
   async updateEmployment(
     @Param('userId', ParseUUIDPipe) userId: string,

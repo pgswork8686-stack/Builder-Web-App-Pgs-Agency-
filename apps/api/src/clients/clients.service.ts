@@ -258,84 +258,49 @@ export class ClientsService {
 
     const client = this.supabaseService.getSystemClient();
 
-    // Verify user profile exists
-    const { data: profile } = await client
-      .from('profiles')
-      .select('role, account_status')
-      .eq('id', dto.userId)
-      .maybeSingle();
-
-    if (!profile) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: 'Không tìm thấy tài khoản người dùng.',
-      });
-    }
-
-    // Role check: Only client roles allowed in memberships
-    if (profile.role !== 'client') {
-      throw new BadRequestException({
-        code: 'INVALID_CLIENT_MEMBER_ROLE',
-        message:
-          'Chỉ tài khoản có vai trò Khách hàng (client) mới được liên kết vào công ty khách hàng.',
-      });
-    }
-
-    // Status check
-    if (profile.account_status !== 'active') {
-      throw new BadRequestException({
-        code: 'USER_NOT_ACTIVE',
-        message: 'Chỉ được phép liên kết tài khoản đã hoạt động.',
-      });
-    }
-
-    // Check duplicate membership
-    const { data: dup } = await client
-      .from('client_memberships')
-      .select('id')
-      .eq('client_company_id', companyId)
-      .eq('user_id', dto.userId)
-      .maybeSingle();
-
-    if (dup) {
-      throw new ConflictException({
-        code: 'CLIENT_MEMBERSHIP_ALREADY_EXISTS',
-        message: 'Tài khoản này đã được liên kết với công ty khách hàng này.',
-      });
-    }
-
-    // Atomic transaction simulation for primary key: if isPrimary=true, set all other memberships of this user to is_primary=false
-    if (dto.isPrimary) {
-      const { error: resetError } = await client
-        .from('client_memberships')
-        .update({ is_primary: false })
-        .eq('user_id', dto.userId);
-
-      if (resetError) {
-        this.logger.error(
-          `Failed to reset primary memberships: ${resetError.message}`,
-        );
-        throw new InternalServerErrorException({
-          code: 'CLIENT_PRIMARY_RESET_FAILED',
-          message: 'Không thể cập nhật cấu hình tài khoản chính lúc này.',
-        });
-      }
-    }
-
-    const { data, error } = await client
-      .from('client_memberships')
-      .insert({
-        client_company_id: companyId,
-        user_id: dto.userId,
-        title: dto.title?.trim() || null,
-        is_primary: dto.isPrimary,
-        created_by: adminUserId,
-      })
-      .select()
-      .single();
+    const { data, error } = await client.rpc(
+      'create_client_membership_atomic',
+      {
+        p_company_id: companyId,
+        p_user_id: dto.userId,
+        p_title: dto.title?.trim() || null,
+        p_is_primary: !!dto.isPrimary,
+        p_created_by: adminUserId,
+      },
+    );
 
     if (error) {
       this.logger.error(`Failed to create membership: ${error.message}`);
+
+      if (error.message.includes('USER_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'USER_NOT_FOUND',
+          message: 'Không tìm thấy tài khoản người dùng.',
+        });
+      }
+      if (error.message.includes('USER_NOT_A_CLIENT')) {
+        throw new BadRequestException({
+          code: 'INVALID_CLIENT_MEMBER_ROLE',
+          message:
+            'Chỉ tài khoản có vai trò Khách hàng (client) mới được liên kết vào công ty khách hàng.',
+        });
+      }
+      if (error.message.includes('USER_NOT_ACTIVE')) {
+        throw new BadRequestException({
+          code: 'USER_NOT_ACTIVE',
+          message: 'Chỉ được phép liên kết tài khoản đã hoạt động.',
+        });
+      }
+      if (
+        error.message.includes('MEMBERSHIP_DUPLICATE') ||
+        error.code === '23505'
+      ) {
+        throw new ConflictException({
+          code: 'CLIENT_MEMBERSHIP_ALREADY_EXISTS',
+          message: 'Tài khoản này đã được liên kết với công ty khách hàng này.',
+        });
+      }
+
       throw new InternalServerErrorException({
         code: 'CLIENT_MEMBERSHIP_CREATE_FAILED',
         message: 'Không thể tạo liên kết tài khoản khách hàng.',
@@ -355,53 +320,26 @@ export class ClientsService {
 
     const client = this.supabaseService.getSystemClient();
 
-    // Verify membership exists
-    const { data: membership } = await client
-      .from('client_memberships')
-      .select('id, user_id')
-      .eq('id', membershipId)
-      .eq('client_company_id', companyId)
-      .maybeSingle();
-
-    if (!membership) {
-      throw new NotFoundException({
-        code: 'CLIENT_MEMBERSHIP_NOT_FOUND',
-        message: 'Không tìm thấy liên kết tài khoản được yêu cầu.',
-      });
-    }
-
-    // Atomic simulation for primary key update
-    if (dto.isPrimary) {
-      const { error: resetError } = await client
-        .from('client_memberships')
-        .update({ is_primary: false })
-        .eq('user_id', membership.user_id);
-
-      if (resetError) {
-        this.logger.error(
-          `Failed to reset primary memberships on update: ${resetError.message}`,
-        );
-        throw new InternalServerErrorException({
-          code: 'CLIENT_PRIMARY_RESET_FAILED',
-          message: 'Không thể đặt lại liên kết công ty chính.',
-        });
-      }
-    }
-
-    const updatePayload: any = {};
-    if (dto.title !== undefined)
-      updatePayload.title = dto.title?.trim() || null;
-    if (dto.isPrimary !== undefined) updatePayload.is_primary = dto.isPrimary;
-
-    const { data, error } = await client
-      .from('client_memberships')
-      .update(updatePayload)
-      .eq('id', membershipId)
-      .select()
-      .single();
+    const { data, error } = await client.rpc(
+      'update_client_membership_atomic',
+      {
+        p_company_id: companyId,
+        p_membership_id: membershipId,
+        p_title: dto.title?.trim() || null,
+        p_is_primary: !!dto.isPrimary,
+      },
+    );
 
     if (error) {
       this.logger.error(`Failed to update membership: ${error.message}`);
+
+      if (error.message.includes('MEMBERSHIP_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'CLIENT_MEMBERSHIP_NOT_FOUND',
+          message: 'Không tìm thấy liên kết tài khoản được yêu cầu.',
+        });
+      }
+
       throw new InternalServerErrorException({
         code: 'CLIENT_MEMBERSHIP_UPDATE_FAILED',
         message: 'Không thể cập nhật liên kết tài khoản.',
