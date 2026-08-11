@@ -182,6 +182,15 @@ BEGIN
       RAISE EXCEPTION 'PRIMARY_PROJECT_MANAGER_MEMBERSHIP_REQUIRED'
         USING ERRCODE = 'P3008';
     END IF;
+    IF EXISTS (
+      SELECT 1
+      FROM public.tasks t
+      WHERE t.project_id = OLD.project_id
+        AND t.assignee_user_id = OLD.user_id
+    ) THEN
+      RAISE EXCEPTION 'PROJECT_MEMBER_HAS_ASSIGNED_TASKS'
+        USING ERRCODE = 'P3014';
+    END IF;
     RETURN OLD;
   END IF;
 
@@ -332,15 +341,27 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_parent_project_id UUID;
+  v_assignee_role public.app_role;
+  v_assignee_status public.account_status;
 BEGIN
-  IF NEW.assignee_user_id IS NOT NULL
-     AND NOT EXISTS (
-       SELECT 1 FROM public.project_memberships pm
-       WHERE pm.project_id = NEW.project_id
-         AND pm.user_id = NEW.assignee_user_id
-     ) THEN
-    RAISE EXCEPTION 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER'
-      USING ERRCODE = 'P3010';
+  IF NEW.assignee_user_id IS NOT NULL THEN
+    SELECT profile.role, profile.account_status
+    INTO v_assignee_role, v_assignee_status
+    FROM public.project_memberships pm
+    JOIN public.profiles profile ON profile.id = pm.user_id
+    WHERE pm.project_id = NEW.project_id
+      AND pm.user_id = NEW.assignee_user_id;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER'
+        USING ERRCODE = 'P3010';
+    END IF;
+
+    IF v_assignee_role = 'client'
+       OR v_assignee_status IS DISTINCT FROM 'active' THEN
+      RAISE EXCEPTION 'TASK_ASSIGNEE_INVALID_USER'
+        USING ERRCODE = 'P3015';
+    END IF;
   END IF;
 
   IF NEW.parent_task_id IS NOT NULL THEN

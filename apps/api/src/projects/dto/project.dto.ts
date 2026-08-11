@@ -54,6 +54,19 @@ const validateDateRange = (
   }
 };
 
+const validateProjectServiceDateRange = (
+  value: { startedAt?: string | null; endedAt?: string | null },
+  context: z.RefinementCtx,
+) => {
+  if (value.startedAt && value.endedAt && value.endedAt < value.startedAt) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'INVALID_PROJECT_SERVICE_DATE_RANGE',
+      path: ['endedAt'],
+    });
+  }
+};
+
 export const CreateProjectSchema = z
   .object({
     projectCode: z
@@ -140,7 +153,8 @@ export const CreateProjectServiceSchema = z
     startedAt: z.string().datetime({ offset: true }).nullable().optional(),
     endedAt: z.string().datetime({ offset: true }).nullable().optional(),
   })
-  .strict();
+  .strict()
+  .superRefine(validateProjectServiceDateRange);
 
 export type CreateProjectServiceDto = z.infer<
   typeof CreateProjectServiceSchema
@@ -156,7 +170,8 @@ export const UpdateProjectServiceSchema = z
   .strict()
   .refine((value) => Object.keys(value).length > 0, {
     message: 'PATCH_EMPTY',
-  });
+  })
+  .superRefine(validateProjectServiceDateRange);
 
 export type UpdateProjectServiceDto = z.infer<
   typeof UpdateProjectServiceSchema

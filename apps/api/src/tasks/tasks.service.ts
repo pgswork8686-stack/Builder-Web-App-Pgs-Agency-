@@ -107,7 +107,9 @@ export class TasksService {
   private async validateAssignee(projectId: string, userId: string) {
     const { data, error } = await this.client
       .from('project_memberships')
-      .select('id')
+      .select(
+        'id, profile:profiles!project_memberships_user_id_fkey(role,account_status)',
+      )
       .eq('project_id', projectId)
       .eq('user_id', userId)
       .maybeSingle();
@@ -122,6 +124,20 @@ export class TasksService {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
         message: 'Người nhận việc phải là thành viên của dự án.',
+      });
+    }
+
+    const profile = Array.isArray(data.profile)
+      ? data.profile[0]
+      : data.profile;
+    if (
+      !profile ||
+      profile.role === 'client' ||
+      profile.account_status !== 'active'
+    ) {
+      throw new BadRequestException({
+        code: 'TASK_ASSIGNEE_INVALID_USER',
+        message: 'Người nhận việc phải là thành viên nội bộ đang hoạt động.',
       });
     }
   }
@@ -169,6 +185,12 @@ export class TasksService {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
         message: 'Người nhận việc phải là thành viên dự án.',
+      });
+    }
+    if (message.includes('TASK_ASSIGNEE_INVALID_USER')) {
+      throw new BadRequestException({
+        code: 'TASK_ASSIGNEE_INVALID_USER',
+        message: 'Người nhận việc phải là thành viên nội bộ đang hoạt động.',
       });
     }
     if (message.includes('PARENT_TASK_NOT_FOUND')) {

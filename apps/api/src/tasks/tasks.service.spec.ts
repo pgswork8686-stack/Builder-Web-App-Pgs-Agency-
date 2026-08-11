@@ -194,7 +194,14 @@ describe('TasksService', () => {
   it('allows an assignee who is a project member', async () => {
     client.from
       .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))
-      .mockReturnValueOnce(queryResult({ data: { id: 'member' } }))
+      .mockReturnValueOnce(
+        queryResult({
+          data: {
+            id: 'member',
+            profile: { role: 'employee', account_status: 'active' },
+          },
+        }),
+      )
       .mockReturnValueOnce(
         queryResult({ data: taskRow(), error: null }, 'single'),
       );
@@ -212,6 +219,31 @@ describe('TasksService', () => {
         user('admin'),
       ),
     ).resolves.toMatchObject({ assignee_user_id: ASSIGNEE_ID });
+  });
+
+  it.each([
+    ['client', { role: 'client', account_status: 'active' }],
+    ['inactive employee', { role: 'employee', account_status: 'pending' }],
+  ])('rejects %s as a task assignee', async (_label, profile) => {
+    client.from
+      .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))
+      .mockReturnValueOnce(queryResult({ data: { id: 'member', profile } }));
+
+    await expect(
+      service.createTask(
+        PROJECT_ID,
+        {
+          title: 'Task',
+          status: 'todo',
+          priority: 'medium',
+          sortOrder: 0,
+          assigneeUserId: ASSIGNEE_ID,
+        },
+        user('admin'),
+      ),
+    ).rejects.toMatchObject({
+      response: { code: 'TASK_ASSIGNEE_INVALID_USER' },
+    });
   });
 
   it('allows a parent task from the same project', async () => {

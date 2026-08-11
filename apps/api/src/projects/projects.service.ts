@@ -216,6 +216,13 @@ export class ProjectsService {
         message: 'Không thể thay đổi thành viên quản lý dự án chính.',
       });
     }
+    if (message.includes('PROJECT_MEMBER_HAS_ASSIGNED_TASKS')) {
+      throw new ConflictException({
+        code: 'PROJECT_MEMBER_HAS_ASSIGNED_TASKS',
+        message:
+          'Không thể xóa thành viên đang được giao công việc trong dự án.',
+      });
+    }
     this.databaseFailure(
       'PROJECT_MEMBER_WRITE_FAILED',
       'Không thể lưu thành viên dự án lúc này.',
@@ -573,6 +580,29 @@ export class ProjectsService {
         message: 'Không thể xóa quản lý dự án chính khỏi thành viên.',
       });
     }
+
+    const { data: assignedTasks, error: assignedTasksError } = await this.client
+      .from('tasks')
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('assignee_user_id', membership.user_id)
+      .limit(1);
+
+    if (assignedTasksError) {
+      this.databaseFailure(
+        'PROJECT_MEMBER_TASK_LOOKUP_FAILED',
+        'Không thể kiểm tra công việc đang giao cho thành viên.',
+        assignedTasksError,
+      );
+    }
+    if ((assignedTasks ?? []).length > 0) {
+      throw new ConflictException({
+        code: 'PROJECT_MEMBER_HAS_ASSIGNED_TASKS',
+        message:
+          'Không thể xóa thành viên đang được giao công việc trong dự án.',
+      });
+    }
+
     const { error } = await this.client
       .from('project_memberships')
       .delete()
@@ -628,6 +658,12 @@ export class ProjectsService {
   ) {
     await this.getProjectRow(projectId);
     await this.requireService(dto.serviceId);
+    if (dto.startedAt && dto.endedAt && dto.endedAt < dto.startedAt) {
+      throw new BadRequestException({
+        code: 'INVALID_PROJECT_SERVICE_DATE_RANGE',
+        message: 'Ngày kết thúc dịch vụ không được trước ngày bắt đầu.',
+      });
+    }
     const { data, error } = await this.client
       .from('project_services')
       .insert({

@@ -8,7 +8,7 @@ const USER_ID = '33333333-3333-4333-8333-333333333333';
 
 function queryResult(
   result: { data?: unknown; count?: number | null; error?: unknown },
-  terminal: 'maybeSingle' | 'single' | 'range' | 'eq' = 'maybeSingle',
+  terminal: 'maybeSingle' | 'single' | 'range' | 'eq' | 'limit' = 'maybeSingle',
 ) {
   const query: Record<string, jest.Mock> = {};
   for (const method of [
@@ -18,6 +18,7 @@ function queryResult(
     'in',
     'order',
     'range',
+    'limit',
     'insert',
     'update',
     'delete',
@@ -303,6 +304,45 @@ describe('ProjectsService', () => {
     await expect(
       service.deleteMembership(PROJECT_ID, USER_ID),
     ).rejects.toMatchObject({ response: { code: 'PROJECT_MEMBER_NOT_FOUND' } });
+  });
+
+  it('rejects removing a member who still has assigned tasks', async () => {
+    const membershipId = '66666666-6666-4666-8666-666666666666';
+    client.from
+      .mockReturnValueOnce(queryResult({ data: projectRow() }))
+      .mockReturnValueOnce(
+        queryResult({ data: { id: membershipId, user_id: USER_ID } }),
+      )
+      .mockReturnValueOnce(
+        queryResult({ data: [{ id: 'assigned-task' }], error: null }, 'limit'),
+      );
+
+    await expect(
+      service.deleteMembership(PROJECT_ID, membershipId),
+    ).rejects.toMatchObject({
+      response: { code: 'PROJECT_MEMBER_HAS_ASSIGNED_TASKS' },
+    });
+  });
+
+  it('rejects an invalid project service date range before DB insert', async () => {
+    client.from
+      .mockReturnValueOnce(queryResult({ data: projectRow() }))
+      .mockReturnValueOnce(queryResult({ data: { id: 'service-id' } }));
+
+    await expect(
+      service.createProjectService(
+        PROJECT_ID,
+        {
+          serviceId: 'service-id',
+          status: 'planned',
+          startedAt: '2026-08-12T00:00:00.000Z',
+          endedAt: '2026-08-11T00:00:00.000Z',
+        },
+        USER_ID,
+      ),
+    ).rejects.toMatchObject({
+      response: { code: 'INVALID_PROJECT_SERVICE_DATE_RANGE' },
+    });
   });
 
   it('assigns a catalog service and maps duplicate assignments to 409', async () => {
