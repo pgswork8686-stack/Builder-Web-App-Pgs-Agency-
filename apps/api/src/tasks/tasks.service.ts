@@ -209,10 +209,7 @@ export class TasksService {
   private mapWriteError(error: any): never {
     const message = error?.message ?? '';
     const code = error?.code ?? '';
-    if (
-      message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER') ||
-      code === 'P4033'
-    ) {
+    if (message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER')) {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
         message: 'Người nhận việc phải là thành viên dự án.',

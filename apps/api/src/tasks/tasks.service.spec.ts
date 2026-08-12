@@ -661,5 +661,86 @@ describe('TasksService', () => {
         response: { code: 'INVALID_TASK_DATE_RANGE' },
       });
     });
+
+    it('maps TASK_ASSIGNEE_INVALID_USER correctly when code is P4033', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'tasks') return queryResult({ data: taskRow() });
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'TASK_ASSIGNEE_INVALID_USER', code: 'P4033' },
+      });
+
+      await expect(
+        service.updateTask(
+          PROJECT_ID,
+          TASK_ID,
+          { status: 'done' },
+          user('team_leader'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'TASK_ASSIGNEE_INVALID_USER' },
+      });
+    });
+
+    it('maps TASK_ORDERING_RPC_REQUIRED correctly when code is P4033 to TASK_WRITE_FAILED', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'tasks') return queryResult({ data: taskRow() });
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'TASK_ORDERING_RPC_REQUIRED', code: 'P4033' },
+      });
+
+      await expect(
+        service.updateTask(
+          PROJECT_ID,
+          TASK_ID,
+          { status: 'done' },
+          user('team_leader'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'TASK_WRITE_FAILED' },
+      });
+    });
+
+    it('maps TASK_ASSIGNEE_NOT_PROJECT_MEMBER correctly', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'tasks') return queryResult({ data: taskRow() });
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER' },
+      });
+
+      await expect(
+        service.updateTask(
+          PROJECT_ID,
+          TASK_ID,
+          { status: 'done' },
+          user('team_leader'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER' },
+      });
+    });
   });
 });
