@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AdminModule } from './admin/admin.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule } from './clients/clients.module';
 import { ConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
+import { LeaveModule } from './leave/leave.module';
 import { OrganizationModule } from './organization/organization.module';
 import { PeopleModule } from './people/people.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -26,6 +28,9 @@ import { WorkspaceModule } from './workspace/workspace.module';
     ServicesModule,
     WorkspaceModule,
     TasksModule,
+    AttendanceModule,
+    LeaveModule,
   ],
 })
 export class AppModule {}
+
