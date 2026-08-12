@@ -380,37 +380,32 @@ export class TasksService {
       });
     }
 
-    const payload: Record<string, unknown> = { updated_by: user.profileId };
-    if (dto.parentTaskId !== undefined)
-      payload.parent_task_id = dto.parentTaskId;
-    if (dto.title !== undefined) payload.title = dto.title;
-    if (dto.description !== undefined)
-      payload.description = dto.description ?? null;
-    if (dto.priority !== undefined) payload.priority = dto.priority;
-    if (dto.assigneeUserId !== undefined)
-      payload.assignee_user_id = dto.assigneeUserId;
-    if (dto.startDate !== undefined) payload.start_date = dto.startDate;
-    if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
     let data: Record<string, any> | null = null;
-    if (Object.keys(payload).length > 1) {
-      const { data: updated, error } = await this.client
-        .from('tasks')
-        .update(payload)
-        .eq('id', taskId)
-        .select()
-        .single();
-      if (error) this.mapWriteError(error);
-      data = updated as Record<string, any>;
-    }
 
     if (dto.status !== undefined) {
+      // CASE B: status is provided, perform single atomic RPC update
       const { data: statusData, error } = await this.client.rpc(
-        'phase4_change_task_status',
+        'phase4_update_task_atomic',
         {
-          p_task_id: taskId,
           p_project_id: projectId,
-          p_target_status: dto.status,
+          p_task_id: taskId,
           p_actor_user_id: user.profileId,
+          p_set_parent_task: dto.parentTaskId !== undefined,
+          p_parent_task_id: dto.parentTaskId ?? null,
+          p_set_title: dto.title !== undefined,
+          p_title: dto.title ?? null,
+          p_set_description: dto.description !== undefined,
+          p_description: dto.description ?? null,
+          p_set_status: true,
+          p_status: dto.status,
+          p_set_priority: dto.priority !== undefined,
+          p_priority: dto.priority ?? null,
+          p_set_assignee: dto.assigneeUserId !== undefined,
+          p_assignee_user_id: dto.assigneeUserId ?? null,
+          p_set_start_date: dto.startDate !== undefined,
+          p_start_date: dto.startDate ?? null,
+          p_set_due_date: dto.dueDate !== undefined,
+          p_due_date: dto.dueDate ?? null,
         },
       );
       if (error) this.mapWriteError(error);
@@ -418,6 +413,32 @@ export class TasksService {
         string,
         any
       > | null;
+    } else {
+      // CASE A: status is NOT provided, perform normal tasks table update
+      const payload: Record<string, unknown> = { updated_by: user.profileId };
+      if (dto.parentTaskId !== undefined)
+        payload.parent_task_id = dto.parentTaskId;
+      if (dto.title !== undefined) payload.title = dto.title;
+      if (dto.description !== undefined)
+        payload.description = dto.description ?? null;
+      if (dto.priority !== undefined) payload.priority = dto.priority;
+      if (dto.assigneeUserId !== undefined)
+        payload.assignee_user_id = dto.assigneeUserId;
+      if (dto.startDate !== undefined) payload.start_date = dto.startDate;
+      if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
+
+      if (Object.keys(payload).length > 1) {
+        const { data: updated, error } = await this.client
+          .from('tasks')
+          .update(payload)
+          .eq('id', taskId)
+          .select()
+          .single();
+        if (error) this.mapWriteError(error);
+        data = updated as Record<string, any>;
+      } else {
+        data = existing;
+      }
     }
 
     if (!data) {

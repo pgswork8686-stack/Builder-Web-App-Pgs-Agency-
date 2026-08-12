@@ -405,11 +405,26 @@ describe('TasksService', () => {
         user('employee'),
       ),
     ).resolves.toMatchObject({ status: 'done' });
-    expect(client.rpc).toHaveBeenCalledWith('phase4_change_task_status', {
-      p_task_id: TASK_ID,
+    expect(client.rpc).toHaveBeenCalledWith('phase4_update_task_atomic', {
       p_project_id: PROJECT_ID,
-      p_target_status: 'done',
+      p_task_id: TASK_ID,
       p_actor_user_id: USER_ID,
+      p_set_parent_task: false,
+      p_parent_task_id: null,
+      p_set_title: false,
+      p_title: null,
+      p_set_description: false,
+      p_description: null,
+      p_set_status: true,
+      p_status: 'done',
+      p_set_priority: false,
+      p_priority: null,
+      p_set_assignee: false,
+      p_assignee_user_id: null,
+      p_set_start_date: false,
+      p_start_date: null,
+      p_set_due_date: false,
+      p_due_date: null,
     });
 
     client.from.mockReset();
@@ -428,5 +443,86 @@ describe('TasksService', () => {
         user('employee'),
       ),
     ).rejects.toMatchObject({ response: { code: 'TASK_ACCESS_DENIED' } });
+  });
+
+  describe('Atomic Task Updates', () => {
+    it('calls the atomic RPC instead of a normal tasks table update for mixed PATCH (title + status)', async () => {
+      const updateSpy = jest.fn();
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects') {
+          return queryResult({ data: { id: PROJECT_ID } });
+        }
+        if (table === 'project_memberships') {
+          return queryResult({ data: { project_role: 'project_manager' } });
+        }
+        if (table === 'tasks') {
+          const q = queryResult({ data: taskRow() });
+          q.update = updateSpy.mockReturnValue(q);
+          return q;
+        }
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: taskRow({ title: 'New Title', status: 'review' }),
+        error: null,
+      });
+
+      const res = await service.updateTask(
+        PROJECT_ID,
+        TASK_ID,
+        { title: 'New Title', status: 'review' },
+        user('team_leader'),
+      );
+
+      expect(res).toMatchObject({ title: 'New Title', status: 'review' });
+      expect(client.rpc).toHaveBeenCalledWith(
+        'phase4_update_task_atomic',
+        expect.objectContaining({
+          p_project_id: PROJECT_ID,
+          p_task_id: TASK_ID,
+          p_set_title: true,
+          p_title: 'New Title',
+          p_set_status: true,
+          p_status: 'review',
+        }),
+      );
+
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('proves that if mixed RPC fails, no normal update has been executed', async () => {
+      const updateSpy = jest.fn();
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects') {
+          return queryResult({ data: { id: PROJECT_ID } });
+        }
+        if (table === 'project_memberships') {
+          return queryResult({ data: { project_role: 'project_manager' } });
+        }
+        if (table === 'tasks') {
+          const q = queryResult({ data: taskRow() });
+          q.update = updateSpy.mockReturnValue(q);
+          return q;
+        }
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Some RPC error' },
+      });
+
+      await expect(
+        service.updateTask(
+          PROJECT_ID,
+          TASK_ID,
+          { title: 'New Title', status: 'review' },
+          user('team_leader'),
+        ),
+      ).rejects.toThrow();
+
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
   });
 });
