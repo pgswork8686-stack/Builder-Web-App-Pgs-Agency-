@@ -129,11 +129,23 @@ describe('CommentsService', () => {
   });
 
   it('keeps internal viewers read-only', async () => {
-    access.requireProjectAccess.mockResolvedValueOnce({
+    access.requireProjectAccess.mockResolvedValue({
       isAdmin: false,
       isManager: false,
       projectRole: 'viewer',
     });
+
+    const list = queryResult(
+      { data: [comment()], count: 1, error: null },
+      'range',
+    );
+    from.mockReturnValueOnce(list);
+    await expect(
+      service.list(PROJECT_ID, TASK_ID, { page: 1, pageSize: 20 }, user()),
+    ).resolves.toMatchObject({
+      items: [expect.objectContaining({ canEdit: false, canDelete: false })],
+    });
+
     await expect(
       service.create(
         PROJECT_ID,
@@ -141,7 +153,25 @@ describe('CommentsService', () => {
         { content: 'Không được phép' },
         user(),
       ),
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    ).rejects.toMatchObject({
+      response: { code: 'COMMENT_ACCESS_DENIED' },
+    });
+
+    await expect(
+      service.update(
+        PROJECT_ID,
+        TASK_ID,
+        COMMENT_ID,
+        { content: 'Không được phép' },
+        user(),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'COMMENT_EDIT_DENIED' } });
+
+    await expect(
+      service.remove(PROJECT_ID, TASK_ID, COMMENT_ID, user()),
+    ).rejects.toMatchObject({ response: { code: 'COMMENT_DELETE_DENIED' } });
+
+    expect(from).toHaveBeenCalledTimes(1);
   });
 
   it('allows editing own comment and denies editing another member comment', async () => {

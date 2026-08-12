@@ -53,6 +53,8 @@ function file(overrides: Record<string, unknown> = {}) {
     original_name: 'file.pdf',
     mime_type: 'application/pdf',
     size_bytes: 100,
+    delete_status: 'active',
+    delete_requested_at: null,
     created_at: '2026-08-11T10:00:00.000Z',
     updated_at: '2026-08-11T10:00:00.000Z',
     ...overrides,
@@ -64,7 +66,15 @@ function queryResult(
   terminal: 'single' | 'maybeSingle' | 'range' | 'then',
 ) {
   const chain: Record<string, any> = {};
-  for (const method of ['select', 'eq', 'ilike', 'order', 'insert', 'delete']) {
+  for (const method of [
+    'select',
+    'eq',
+    'ilike',
+    'order',
+    'insert',
+    'update',
+    'delete',
+  ]) {
     chain[method] = jest.fn(() => chain);
   }
   chain.single = jest.fn(() => chain);
@@ -172,20 +182,51 @@ describe('FilesService', () => {
     expect(result.path).not.toContain('..');
   });
 
-  it('denies viewers, clients/non-members and cross-project task uploads', async () => {
-    access.requireProjectAccess.mockResolvedValueOnce({
+  it('keeps viewers read-only for list, download, upload and historical files', async () => {
+    access.requireProjectAccess.mockResolvedValue({
       isAdmin: false,
       isManager: false,
       projectRole: 'viewer',
     });
+
+    const listQuery = queryResult(
+      { data: [file()], count: 1, error: null },
+      'range',
+    );
+    from.mockReturnValueOnce(listQuery);
+    await expect(
+      service.list(PROJECT_ID, { page: 1, pageSize: 20 }, user()),
+    ).resolves.toMatchObject({
+      items: [expect.objectContaining({ canDelete: false })],
+    });
+    expect(listQuery.eq).toHaveBeenCalledWith('delete_status', 'active');
+
+    from.mockReturnValueOnce(
+      queryResult({ data: file(), error: null }, 'maybeSingle'),
+    );
+    storageApi.createSignedUrl.mockResolvedValueOnce({
+      data: { signedUrl: 'https://storage.example/download' },
+      error: null,
+    });
+    await expect(
+      service.download(PROJECT_ID, FILE_ID, user()),
+    ).resolves.toMatchObject({ expiresIn: 120 });
+
     await expect(
       service.createUploadRequest(
         PROJECT_ID,
         { fileName: 'file.pdf', mimeType: 'application/pdf', sizeBytes: 100 },
         user(),
       ),
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    ).rejects.toMatchObject({ response: { code: 'FILE_ACCESS_DENIED' } });
 
+    await expect(
+      service.remove(PROJECT_ID, FILE_ID, user()),
+    ).rejects.toMatchObject({ response: { code: 'FILE_ACCESS_DENIED' } });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('denies clients/non-members and cross-project task uploads', async () => {
     access.requireProjectAccess.mockRejectedValueOnce(
       new ForbiddenException({ code: 'FILE_ACCESS_DENIED' }),
     );
@@ -266,6 +307,28 @@ describe('FilesService', () => {
     );
   });
 
+  it('returns a completed expired upload session idempotently', async () => {
+    from.mockReturnValueOnce(
+      queryResult(
+        {
+          data: session({
+            completed_at: '2026-08-11T10:00:00.000Z',
+            expires_at: new Date(Date.now() - 1000).toISOString(),
+          }),
+          error: null,
+        },
+        'maybeSingle',
+      ),
+    );
+    rpc.mockResolvedValueOnce({ data: file(), error: null });
+
+    await expect(
+      service.finalize(PROJECT_ID, { uploadSessionId: SESSION_ID }, user()),
+    ).resolves.toMatchObject({ id: FILE_ID });
+    expect(storageApi.list).not.toHaveBeenCalled();
+    expect(realtime.emitProjectEvent).not.toHaveBeenCalled();
+  });
+
   it('returns a short-lived signed download URL for a valid file', async () => {
     from.mockReturnValueOnce(
       queryResult({ data: file(), error: null }, 'maybeSingle'),
@@ -280,6 +343,26 @@ describe('FilesService', () => {
       signedUrl: 'https://storage.example/download',
       expiresIn: 120,
     });
+  });
+
+  it('does not issue download URLs for recoverable deleting files', async () => {
+    from.mockReturnValueOnce(
+      queryResult(
+        {
+          data: file({
+            delete_status: 'deleting',
+            delete_requested_at: '2026-08-12T00:00:00.000Z',
+          }),
+          error: null,
+        },
+        'maybeSingle',
+      ),
+    );
+
+    await expect(
+      service.download(PROJECT_ID, FILE_ID, user()),
+    ).rejects.toMatchObject({ response: { code: 'FILE_NOT_FOUND' } });
+    expect(storageApi.createSignedUrl).not.toHaveBeenCalled();
   });
 
   it('denies an unrelated project file and another member deletion', async () => {
@@ -306,31 +389,130 @@ describe('FilesService', () => {
   });
 
   it('allows uploader and project manager deletion', async () => {
-    from
-      .mockReturnValueOnce(
-        queryResult({ data: file(), error: null }, 'maybeSingle'),
-      )
-      .mockReturnValueOnce(queryResult({ error: null }, 'then'));
+    from.mockReturnValueOnce(
+      queryResult({ data: file(), error: null }, 'maybeSingle'),
+    );
+    rpc
+      .mockResolvedValueOnce({
+        data: file({
+          delete_status: 'deleting',
+          delete_requested_at: '2026-08-12T00:00:00.000Z',
+        }),
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: true, error: null });
     await expect(service.remove(PROJECT_ID, FILE_ID, user())).resolves.toEqual({
       success: true,
     });
 
     from.mockReset();
+    rpc.mockReset();
     access.requireProjectAccess.mockResolvedValueOnce({
       isAdmin: false,
       isManager: true,
       projectRole: 'project_manager',
     });
-    from
-      .mockReturnValueOnce(
-        queryResult(
-          { data: file({ uploaded_by: OTHER_USER_ID }), error: null },
-          'maybeSingle',
-        ),
-      )
-      .mockReturnValueOnce(queryResult({ error: null }, 'then'));
+    from.mockReturnValueOnce(
+      queryResult(
+        { data: file({ uploaded_by: OTHER_USER_ID }), error: null },
+        'maybeSingle',
+      ),
+    );
+    rpc
+      .mockResolvedValueOnce({
+        data: file({
+          uploaded_by: OTHER_USER_ID,
+          delete_status: 'deleting',
+          delete_requested_at: '2026-08-12T00:00:00.000Z',
+        }),
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: true, error: null });
     await expect(service.remove(PROJECT_ID, FILE_ID, user())).resolves.toEqual({
       success: true,
     });
+  });
+
+  it('restores active metadata when Storage deletion fails', async () => {
+    from.mockReturnValueOnce(
+      queryResult({ data: file(), error: null }, 'maybeSingle'),
+    );
+    rpc
+      .mockResolvedValueOnce({
+        data: file({
+          delete_status: 'deleting',
+          delete_requested_at: '2026-08-12T00:00:00.000Z',
+        }),
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: true, error: null });
+    storageApi.remove.mockResolvedValueOnce({
+      error: { message: 'storage unavailable' },
+    });
+
+    await expect(
+      service.remove(PROJECT_ID, FILE_ID, user()),
+    ).rejects.toMatchObject({ response: { code: 'FILE_DELETE_FAILED' } });
+    expect(rpc).toHaveBeenNthCalledWith(
+      2,
+      'phase4_restore_project_file_delete',
+      { p_file_id: FILE_ID },
+    );
+  });
+
+  it('leaves a recoverable deleting row when DB finalization fails', async () => {
+    from.mockReturnValueOnce(
+      queryResult({ data: file(), error: null }, 'maybeSingle'),
+    );
+    rpc
+      .mockResolvedValueOnce({
+        data: file({
+          delete_status: 'deleting',
+          delete_requested_at: '2026-08-12T00:00:00.000Z',
+        }),
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: null,
+        error: { message: 'database unavailable' },
+      });
+
+    await expect(
+      service.remove(PROJECT_ID, FILE_ID, user()),
+    ).rejects.toMatchObject({ response: { code: 'FILE_DELETE_FAILED' } });
+    expect(rpc).not.toHaveBeenCalledWith(
+      'phase4_restore_project_file_delete',
+      expect.anything(),
+    );
+  });
+
+  it('safely retries a file already in deleting state', async () => {
+    const deleting = file({
+      delete_status: 'deleting',
+      delete_requested_at: '2026-08-12T00:00:00.000Z',
+    });
+    from.mockReturnValueOnce(
+      queryResult({ data: deleting, error: null }, 'maybeSingle'),
+    );
+    rpc
+      .mockResolvedValueOnce({ data: deleting, error: null })
+      .mockResolvedValueOnce({ data: true, error: null });
+    storageApi.remove.mockResolvedValueOnce({
+      error: {
+        message: 'object does not exist',
+        code: 'NoSuchKey',
+        status: 404,
+        statusCode: '404',
+      },
+    });
+
+    await expect(service.remove(PROJECT_ID, FILE_ID, user())).resolves.toEqual({
+      success: true,
+    });
+    expect(rpc).toHaveBeenNthCalledWith(
+      2,
+      'phase4_finalize_project_file_delete',
+      { p_file_id: FILE_ID },
+    );
   });
 });

@@ -386,19 +386,47 @@ export class TasksService {
     if (dto.title !== undefined) payload.title = dto.title;
     if (dto.description !== undefined)
       payload.description = dto.description ?? null;
-    if (dto.status !== undefined) payload.status = dto.status;
     if (dto.priority !== undefined) payload.priority = dto.priority;
     if (dto.assigneeUserId !== undefined)
       payload.assignee_user_id = dto.assigneeUserId;
     if (dto.startDate !== undefined) payload.start_date = dto.startDate;
     if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
-    const { data, error } = await this.client
-      .from('tasks')
-      .update(payload)
-      .eq('id', taskId)
-      .select()
-      .single();
-    if (error) this.mapWriteError(error);
+    let data: Record<string, any> | null = null;
+    if (Object.keys(payload).length > 1) {
+      const { data: updated, error } = await this.client
+        .from('tasks')
+        .update(payload)
+        .eq('id', taskId)
+        .select()
+        .single();
+      if (error) this.mapWriteError(error);
+      data = updated as Record<string, any>;
+    }
+
+    if (dto.status !== undefined) {
+      const { data: statusData, error } = await this.client.rpc(
+        'phase4_change_task_status',
+        {
+          p_task_id: taskId,
+          p_project_id: projectId,
+          p_target_status: dto.status,
+          p_actor_user_id: user.profileId,
+        },
+      );
+      if (error) this.mapWriteError(error);
+      data = (Array.isArray(statusData) ? statusData[0] : statusData) as Record<
+        string,
+        any
+      > | null;
+    }
+
+    if (!data) {
+      this.databaseFailure(
+        'TASK_WRITE_FAILED',
+        'Không thể lưu công việc lúc này.',
+        new Error('Task mutation returned no row'),
+      );
+    }
     this.emit(projectId, taskId, 'task.updated', data.updated_at, {
       status: data.status,
     });

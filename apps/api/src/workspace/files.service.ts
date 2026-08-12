@@ -175,6 +175,8 @@ export class FilesService {
     access: WorkspaceProjectAccess,
     user: RequestUser,
   ) {
+    const active = row.delete_status === 'active';
+    const readOnly = access.projectRole === 'viewer';
     return {
       id: row.id,
       projectId: row.project_id,
@@ -188,7 +190,10 @@ export class FilesService {
       fileCategory: row.file_category ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      canDelete: access.isManager || row.uploaded_by === user.profileId,
+      canDelete:
+        active &&
+        !readOnly &&
+        (access.isManager || row.uploaded_by === user.profileId),
     };
   }
 
@@ -197,6 +202,20 @@ export class FilesService {
       .from(FILE_BUCKET)
       .remove([path]);
     if (error) this.logger.error(`Storage cleanup failed: ${error.message}`);
+  }
+
+  private isMissingStorageObject(error: unknown): boolean {
+    if (!error || typeof error !== 'object') return false;
+    const candidate = error as {
+      code?: unknown;
+      status?: unknown;
+      statusCode?: unknown;
+    };
+    return (
+      candidate.code === 'NoSuchKey' ||
+      candidate.status === 404 ||
+      candidate.statusCode === '404'
+    );
   }
 
   async list(
@@ -222,6 +241,7 @@ export class FilesService {
         { count: 'exact' },
       );
     query = query.eq('project_id', projectId);
+    query = query.eq('delete_status', 'active');
     if (effectiveTaskId) query = query.eq('task_id', effectiveTaskId);
     if (filters.mimeType) query = query.eq('mime_type', filters.mimeType);
     if (filters.q) query = query.ilike('original_name', `%${filters.q}%`);
@@ -342,14 +362,12 @@ export class FilesService {
         message: 'Không tìm thấy phiên tải tệp.',
       });
     }
-    if (new Date(data.expires_at).getTime() <= Date.now()) {
-      if (!data.completed_at) {
-        await this.bestEffortRemove(data.storage_path);
-        await this.client
-          .from('file_upload_sessions')
-          .delete()
-          .eq('id', data.id);
-      }
+    if (
+      !data.completed_at &&
+      new Date(data.expires_at).getTime() <= Date.now()
+    ) {
+      await this.bestEffortRemove(data.storage_path);
+      await this.client.from('file_upload_sessions').delete().eq('id', data.id);
       throw new ForbiddenException({
         code: 'FILE_UPLOAD_SESSION_EXPIRED',
         message: 'Phiên tải tệp đã hết hạn.',
@@ -425,7 +443,10 @@ export class FilesService {
         'FILE_ACCESS_DENIED',
       );
     }
-    await this.verifyStorageObject(session);
+    const alreadyCompleted = Boolean(session.completed_at);
+    if (!alreadyCompleted) {
+      await this.verifyStorageObject(session);
+    }
 
     const { data, error } = await this.client.rpc(
       'phase4_finalize_project_file',
@@ -433,7 +454,7 @@ export class FilesService {
     );
     let finalized = Array.isArray(data) ? data[0] : data;
     if (error || !finalized) {
-      const { data: existing } = await this.client
+      const { data: existing, error: existingError } = await this.client
         .from('project_files')
         .select('*')
         .eq('storage_path', session.storage_path)
@@ -441,7 +462,9 @@ export class FilesService {
       if (existing) {
         finalized = existing;
       } else {
-        await this.bestEffortRemove(session.storage_path);
+        if (!alreadyCompleted) {
+          await this.bestEffortRemove(session.storage_path);
+        }
         const errorMessage = String(error?.message ?? 'FILE_FINALIZE_INVALID');
         if (errorMessage.includes('FILE_UPLOAD_SESSION_EXPIRED')) {
           throw new ForbiddenException({
@@ -452,18 +475,27 @@ export class FilesService {
         this.databaseFailure(
           'FILE_FINALIZE_INVALID',
           'Không thể hoàn tất tải tệp lúc này.',
-          error,
+          error ?? existingError,
         );
       }
     }
 
-    this.emit({
-      projectId,
-      entityId: finalized.id,
-      event: 'file.created',
-      updatedAt: finalized.updated_at,
-      changes: { taskId: finalized.task_id ?? null },
-    });
+    if (finalized.delete_status !== 'active') {
+      throw new NotFoundException({
+        code: 'FILE_NOT_FOUND',
+        message: 'Không tìm thấy tệp.',
+      });
+    }
+
+    if (!alreadyCompleted) {
+      this.emit({
+        projectId,
+        entityId: finalized.id,
+        event: 'file.created',
+        updatedAt: finalized.updated_at,
+        changes: { taskId: finalized.task_id ?? null },
+      });
+    }
     return this.mapFile(finalized, access, user);
   }
 
@@ -500,6 +532,12 @@ export class FilesService {
         message: 'Tệp không thuộc dự án được yêu cầu.',
       });
     }
+    if (file.delete_status !== 'active') {
+      throw new NotFoundException({
+        code: 'FILE_NOT_FOUND',
+        message: 'Không tìm thấy tệp.',
+      });
+    }
     if (file.task_id) {
       await this.accessService.requireTask(
         projectId,
@@ -526,6 +564,12 @@ export class FilesService {
 
   async remove(projectId: string, fileId: string, user: RequestUser) {
     const access = await this.requireFileAccess(projectId, user);
+    if (access.projectRole === 'viewer') {
+      throw new ForbiddenException({
+        code: 'FILE_ACCESS_DENIED',
+        message: 'Người xem chỉ có quyền đọc tệp.',
+      });
+    }
     const file = await this.getFile(fileId);
     if (file.project_id !== projectId) {
       throw new ForbiddenException({
@@ -540,20 +584,48 @@ export class FilesService {
       });
     }
 
+    const { data: markedData, error: markError } = await this.client.rpc(
+      'phase4_request_project_file_delete',
+      { p_file_id: fileId },
+    );
+    const marked = Array.isArray(markedData) ? markedData[0] : markedData;
+    if (markError || !marked) {
+      this.databaseFailure(
+        'FILE_DELETE_FAILED',
+        'Không thể bắt đầu xóa tệp.',
+        markError,
+      );
+    }
+
     const { error: storageError } = await this.client.storage
       .from(FILE_BUCKET)
-      .remove([file.storage_path]);
-    if (storageError) {
+      .remove([marked.storage_path]);
+    if (storageError && !this.isMissingStorageObject(storageError)) {
       this.logger.error(`Storage delete failed: ${storageError.message}`);
+      const { error: restoreError } = await this.client.rpc(
+        'phase4_restore_project_file_delete',
+        { p_file_id: fileId },
+      );
+      if (restoreError) {
+        this.logger.error(
+          `File delete state restore failed: ${restoreError.message}`,
+        );
+      }
       throw new InternalServerErrorException({
         code: 'FILE_DELETE_FAILED',
         message: 'Không thể xóa tệp khỏi kho lưu trữ.',
       });
     }
-    const { error: databaseError } = await this.client
-      .from('project_files')
-      .delete()
-      .eq('id', fileId);
+    if (storageError) {
+      this.logger.warn(
+        `Storage object was already absent during delete retry: ${marked.storage_path}`,
+      );
+    }
+
+    const { error: databaseError } = await this.client.rpc(
+      'phase4_finalize_project_file_delete',
+      { p_file_id: fileId },
+    );
     if (databaseError) {
       this.databaseFailure(
         'FILE_DELETE_FAILED',
@@ -566,7 +638,7 @@ export class FilesService {
       entityId: fileId,
       event: 'file.deleted',
       updatedAt: new Date().toISOString(),
-      changes: { taskId: file.task_id ?? null },
+      changes: { taskId: marked.task_id ?? null },
     });
     return { success: true };
   }

@@ -66,11 +66,11 @@ function taskRow(overrides: Record<string, unknown> = {}) {
 
 describe('TasksService', () => {
   let service: TasksService;
-  let client: { from: jest.Mock };
+  let client: { from: jest.Mock; rpc: jest.Mock };
   let realtime: { emitProjectEvent: jest.Mock };
 
   beforeEach(() => {
-    client = { from: jest.fn() };
+    client = { from: jest.fn(), rpc: jest.fn() };
     realtime = { emitProjectEvent: jest.fn() };
     service = new TasksService(
       {
@@ -391,13 +391,11 @@ describe('TasksService', () => {
       .mockReturnValueOnce(queryResult({ data: { project_role: 'member' } }))
       .mockReturnValueOnce(
         queryResult({ data: taskRow({ assignee_user_id: USER_ID }) }),
-      )
-      .mockReturnValueOnce(
-        queryResult(
-          { data: taskRow({ assignee_user_id: USER_ID, status: 'done' }) },
-          'single',
-        ),
       );
+    client.rpc.mockResolvedValueOnce({
+      data: taskRow({ assignee_user_id: USER_ID, status: 'done' }),
+      error: null,
+    });
 
     await expect(
       service.updateTask(
@@ -407,6 +405,12 @@ describe('TasksService', () => {
         user('employee'),
       ),
     ).resolves.toMatchObject({ status: 'done' });
+    expect(client.rpc).toHaveBeenCalledWith('phase4_change_task_status', {
+      p_task_id: TASK_ID,
+      p_project_id: PROJECT_ID,
+      p_target_status: 'done',
+      p_actor_user_id: USER_ID,
+    });
 
     client.from.mockReset();
     client.from

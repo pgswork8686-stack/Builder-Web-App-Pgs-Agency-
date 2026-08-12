@@ -82,6 +82,7 @@ export class CommentsService {
     user: RequestUser,
   ) {
     const own = comment.author_user_id === user.profileId;
+    const readOnly = access.projectRole === 'viewer';
     return {
       id: comment.id,
       taskId: comment.task_id,
@@ -91,8 +92,8 @@ export class CommentsService {
       editedAt: comment.edited_at ?? null,
       createdAt: comment.created_at,
       updatedAt: comment.updated_at,
-      canEdit: access.isAdmin || own,
-      canDelete: access.isManager || own,
+      canEdit: !readOnly && (access.isAdmin || own),
+      canDelete: !readOnly && (access.isManager || own),
     };
   }
 
@@ -206,6 +207,12 @@ export class CommentsService {
     user: RequestUser,
   ) {
     const access = await this.accessAndTask(projectId, taskId, user);
+    if (access.projectRole === 'viewer') {
+      throw new ForbiddenException({
+        code: 'COMMENT_EDIT_DENIED',
+        message: 'Người xem chỉ có quyền đọc bình luận.',
+      });
+    }
     const existing = await this.getComment(commentId);
     if (existing.task_id !== taskId) {
       throw new ForbiddenException({
@@ -252,6 +259,12 @@ export class CommentsService {
     user: RequestUser,
   ) {
     const access = await this.accessAndTask(projectId, taskId, user);
+    if (access.projectRole === 'viewer') {
+      throw new ForbiddenException({
+        code: 'COMMENT_DELETE_DENIED',
+        message: 'Người xem chỉ có quyền đọc bình luận.',
+      });
+    }
     const existing = await this.getComment(commentId);
     if (existing.task_id !== taskId) {
       throw new ForbiddenException({
