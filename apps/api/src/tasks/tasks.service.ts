@@ -208,7 +208,11 @@ export class TasksService {
 
   private mapWriteError(error: any): never {
     const message = error?.message ?? '';
-    if (message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER')) {
+    const code = error?.code ?? '';
+    if (
+      message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER') ||
+      code === 'P4033'
+    ) {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
         message: 'Người nhận việc phải là thành viên dự án.',
@@ -220,22 +224,47 @@ export class TasksService {
         message: 'Người nhận việc phải là thành viên nội bộ đang hoạt động.',
       });
     }
-    if (message.includes('PARENT_TASK_NOT_FOUND')) {
+    if (message.includes('PARENT_TASK_NOT_FOUND') || code === 'P4034') {
       throw new BadRequestException({
         code: 'PARENT_TASK_NOT_FOUND',
         message: 'Không tìm thấy công việc cha.',
       });
     }
-    if (message.includes('INVALID_PARENT_TASK_PROJECT')) {
+    if (message.includes('INVALID_PARENT_TASK_PROJECT') || code === 'P4036') {
       throw new BadRequestException({
         code: 'INVALID_PARENT_TASK_PROJECT',
         message: 'Công việc cha phải thuộc cùng dự án.',
       });
     }
-    if (message.includes('TASK_SELF_PARENT_DENIED')) {
+    if (message.includes('TASK_SELF_PARENT_DENIED') || code === 'P4035') {
       throw new BadRequestException({
         code: 'TASK_SELF_PARENT_DENIED',
         message: 'Công việc không thể là cha của chính nó.',
+      });
+    }
+    if (message.includes('INVALID_TASK_DATE_RANGE') || code === 'P4037') {
+      throw new BadRequestException({
+        code: 'INVALID_TASK_DATE_RANGE',
+        message: 'Ngày hết hạn không được trước ngày bắt đầu.',
+      });
+    }
+    if (message.includes('TASK_NOT_FOUND') || code === 'P4030') {
+      throw new NotFoundException({
+        code: 'TASK_NOT_FOUND',
+        message: 'Không tìm thấy công việc.',
+      });
+    }
+    if (message.includes('TASK_PROJECT_CHANGED') || code === 'P4031') {
+      // Safe error mapping: do not reveal task cross-project existence
+      throw new NotFoundException({
+        code: 'TASK_NOT_FOUND',
+        message: 'Không tìm thấy công việc.',
+      });
+    }
+    if (message.includes('TASK_ORDERING_RPC_REQUIRED')) {
+      throw new InternalServerErrorException({
+        code: 'TASK_WRITE_FAILED',
+        message: 'Yêu cầu cập nhật vị trí Kanban không hợp lệ.',
       });
     }
     this.databaseFailure(
@@ -350,6 +379,12 @@ export class TasksService {
     user: RequestUser,
   ) {
     const access = await this.getAccess(projectId, user);
+    if (!access.isAdmin && access.projectRole === 'viewer') {
+      throw new ForbiddenException({
+        code: 'TASK_ACCESS_DENIED',
+        message: 'Người xem chỉ có quyền đọc công việc.',
+      });
+    }
     const existing = await this.getTaskRow(projectId, taskId);
     const manager = access.isAdmin || access.projectRole === 'project_manager';
     if (!manager) {
