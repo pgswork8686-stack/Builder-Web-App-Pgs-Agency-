@@ -501,9 +501,17 @@ export class LeaveService {
       );
     }
 
-    const isAdmin = user.role === 'admin';
     const isLeader = user.role === 'team_leader';
-    const isEmployee = user.role === 'employee';
+    // accountant and employee both get self-only visibility — no HR-wide access
+    const isSelfOnly = user.role === 'employee' || user.role === 'accountant';
+
+    // client is denied by enforceInternalUser; double-guard here for clarity
+    if (user.role === 'client') {
+      throw new ForbiddenException({
+        code: 'LEAVE_ACCESS_DENIED',
+        message: 'Bạn không có quyền xem lịch nghỉ phép.',
+      });
+    }
 
     let dbQuery = this.client
       .from('leave_requests')
@@ -515,7 +523,7 @@ export class LeaveService {
       .gte('end_date', from);
 
     if (isLeader) {
-      // Fetch leader's team
+      // Leader sees own team only
       const { data: team } = await this.client
         .from('teams')
         .select('id')
@@ -524,10 +532,11 @@ export class LeaveService {
 
       const teamId = team?.id || '00000000-0000-0000-0000-000000000000';
       dbQuery = dbQuery.eq('profile.employee_profile.team_id', teamId);
-    } else if (isEmployee) {
-      // Self-only visibility
+    } else if (isSelfOnly) {
+      // employee and accountant: self only
       dbQuery = dbQuery.eq('user_id', user.profileId);
     }
+    // isAdmin: no additional filter → organization-wide
 
     const { data, error } = await dbQuery;
 

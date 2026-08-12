@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -13,11 +12,12 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequestUser } from '../auth/auth.types';
+import type { RequestUser } from '../auth/auth.types';
 import { AttendanceService } from './attendance.service';
 import {
   CheckInSchema,
   CheckOutSchema,
+  AttendanceSignedUploadSchema,
   AttendanceQuerySchema,
   AttendanceAdjustmentSchema,
 } from './dto/attendance.dto';
@@ -28,7 +28,7 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post('check-in')
-  async checkIn(@Body() body: unknown, @CurrentUser() user: any) {
+  async checkIn(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = CheckInSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(
@@ -39,7 +39,7 @@ export class AttendanceController {
   }
 
   @Post('check-out')
-  async checkOut(@Body() body: unknown, @CurrentUser() user: any) {
+  async checkOut(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = CheckOutSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(
@@ -50,7 +50,10 @@ export class AttendanceController {
   }
 
   @Get('me')
-  async getMyHistory(@Query() rawQuery: unknown, @CurrentUser() user: any) {
+  async getMyHistory(
+    @Query() rawQuery: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
     const result = AttendanceQuerySchema.safeParse(rawQuery);
     if (!result.success) {
       throw new BadRequestException(
@@ -61,7 +64,10 @@ export class AttendanceController {
   }
 
   @Get('directory')
-  async getDirectory(@Query() rawQuery: unknown, @CurrentUser() user: any) {
+  async getDirectory(
+    @Query() rawQuery: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
     const result = AttendanceQuerySchema.safeParse(rawQuery);
     if (!result.success) {
       throw new BadRequestException(
@@ -75,7 +81,7 @@ export class AttendanceController {
   async adjustRecord(
     @Param('id') recordId: string,
     @Body() body: unknown,
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
   ) {
     const result = AttendanceAdjustmentSchema.safeParse(body);
     if (!result.success) {
@@ -87,24 +93,25 @@ export class AttendanceController {
   }
 
   @Get('summary')
-  async getSummary(@CurrentUser() user: any) {
+  async getSummary(@CurrentUser() user: RequestUser) {
     return this.attendanceService.getSummary(user);
   }
 
   @Post('signed-upload')
   async getPhotoUploadSignature(
-    @Body('fileName') fileName: string,
-    @Body('mimeType') mimeType: string,
-    @Body('fileSize') fileSize: number,
-    @CurrentUser() user: any,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
   ) {
-    if (!fileName || !mimeType || fileSize === undefined || fileSize === null) {
-      throw new BadRequestException('fileName, mimeType và fileSize là bắt buộc.');
+    const result = AttendanceSignedUploadSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((error) => error.message).join(', '),
+      );
     }
     return this.attendanceService.getPhotoUploadSignature(
-      fileName,
-      mimeType,
-      fileSize,
+      result.data.fileName,
+      result.data.mimeType,
+      result.data.fileSize,
       user,
     );
   }

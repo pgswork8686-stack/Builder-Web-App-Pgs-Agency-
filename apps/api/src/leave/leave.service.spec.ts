@@ -236,4 +236,108 @@ describe('LeaveService', () => {
       );
     });
   });
+
+  // =========================================================
+  // Phase 5 Fix Round 3 — Calendar RBAC Tests (T12–T16)
+  // =========================================================
+
+  describe('getCalendar RBAC (Fix Round 3)', () => {
+    function makeQueryChain() {
+      const chain: any = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        lte: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+      };
+      // Make it awaitable by the service
+      chain.then = jest.fn((res: any) =>
+        Promise.resolve({ data: [], error: null }).then(res),
+      );
+      return chain;
+    }
+
+    function mockSupabaseForCalendar(
+      queryChain: any,
+      teamData?: { id: string },
+    ) {
+      const teamQuery: any = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({
+          data: teamData ?? null,
+          error: null,
+        }),
+      };
+      const mockFrom = jest.fn((table: string) => {
+        if (table === 'teams') return teamQuery;
+        return queryChain;
+      });
+      jest
+        .spyOn((service as any).supabaseService, 'getSystemClient')
+        .mockReturnValue({ from: mockFrom, rpc: jest.fn() } as any);
+      return { queryChain, teamQuery };
+    }
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('T12: accountant calendar scopes to self (eq user_id)', async () => {
+      const queryChain = makeQueryChain();
+      mockSupabaseForCalendar(queryChain);
+
+      await service.getCalendar('2026-08-01', '2026-08-31', {
+        ...user('employee'),
+        role: 'accountant',
+      });
+
+      const eqCalls = queryChain.eq.mock.calls;
+      expect(
+        eqCalls.some((c: any[]) => c[0] === 'user_id' && c[1] === USER_ID),
+      ).toBe(true);
+    });
+
+    it('T13: employee calendar scopes to self (eq user_id)', async () => {
+      const queryChain = makeQueryChain();
+      mockSupabaseForCalendar(queryChain);
+
+      await service.getCalendar('2026-08-01', '2026-08-31', user('employee'));
+
+      const eqCalls = queryChain.eq.mock.calls;
+      expect(
+        eqCalls.some((c: any[]) => c[0] === 'user_id' && c[1] === USER_ID),
+      ).toBe(true);
+    });
+
+    it('T14: team_leader calendar scopes to own team (not user_id)', async () => {
+      const queryChain = makeQueryChain();
+      mockSupabaseForCalendar(queryChain, { id: 'team-uuid-1234' });
+
+      await service.getCalendar(
+        '2026-08-01',
+        '2026-08-31',
+        user('team_leader'),
+      );
+
+      // user_id eq must NOT be applied for a leader
+      const eqCalls = queryChain.eq.mock.calls;
+      expect(eqCalls.some((c: any[]) => c[0] === 'user_id')).toBe(false);
+    });
+
+    it('T15: admin calendar has no user_id filter (org-wide)', async () => {
+      const queryChain = makeQueryChain();
+      mockSupabaseForCalendar(queryChain);
+
+      await service.getCalendar('2026-08-01', '2026-08-31', user('admin'));
+
+      const eqCalls = queryChain.eq.mock.calls;
+      expect(eqCalls.some((c: any[]) => c[0] === 'user_id')).toBe(false);
+    });
+
+    it('T16: client is denied from calendar', async () => {
+      await expect(
+        service.getCalendar('2026-08-01', '2026-08-31', user('client')),
+      ).rejects.toThrow();
+    });
+  });
 });

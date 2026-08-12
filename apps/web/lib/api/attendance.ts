@@ -103,6 +103,7 @@ export const attendanceApi = {
   getPhotoUploadSignature: (
     fileName: string,
     mimeType: string,
+    fileSize: number,
   ): Promise<{
     photoUploadSessionId: string;
     signedUrl: string;
@@ -111,7 +112,7 @@ export const attendanceApi = {
   }> => {
     return request("/attendance/signed-upload", {
       method: "POST",
-      body: JSON.stringify({ fileName, mimeType }),
+      body: JSON.stringify({ fileName, mimeType, fileSize }),
     });
   },
 

@@ -32,6 +32,18 @@ export const CheckOutSchema = z
 
 export type CheckOutDto = z.infer<typeof CheckOutSchema>;
 
+export const AttendanceSignedUploadSchema = z
+  .object({
+    fileName: z.string().trim().min(1).max(255),
+    mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+    fileSize: z
+      .number()
+      .int()
+      .min(1)
+      .max(5 * 1024 * 1024),
+  })
+  .strict();
+
 export const AttendanceQuerySchema = z.object({
   from: z
     .string()

@@ -197,34 +197,62 @@ export class AttendanceService {
       });
     }
 
-    // Verify object size and bucket in storage metadata
+    if (session.storage_bucket !== 'attendance-evidence') {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_MISMATCH',
+        message: 'Bucket lưu trữ ảnh không khớp với phiên đăng ký.',
+      });
+    }
+
+    // Verify the exact object bound to this upload session.
+    const pathParts = String(session.expected_path).split('/');
+    const expectedName = pathParts.pop();
+    const folder = pathParts.join('/');
+
+    if (!expectedName) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_MISMATCH',
+        message: 'Đường dẫn ảnh trong phiên đăng ký không hợp lệ.',
+      });
+    }
+
     const supabaseAdmin = this.supabaseService.getSystemClient();
     const { data: listData, error: listError } = await supabaseAdmin.storage
-      .from('attendance-evidence')
-      .list(session.expected_path.split('/').slice(0, -1).join('/'), {
-        search: session.expected_path.split('/').pop(),
-      });
+      .from(session.storage_bucket)
+      .list(folder, { search: expectedName });
 
-    if (listError || !listData || listData.length === 0) {
+    const storageObj = listData?.find(
+      (item: any) => item.name === expectedName,
+    );
+    if (listError || !storageObj) {
       throw new BadRequestException({
         code: 'ATTENDANCE_PHOTO_NOT_FOUND',
         message: 'Không tìm thấy tệp ảnh tải lên trong Storage.',
       });
     }
 
-    const storageObj = listData[0];
-    if (storageObj.metadata?.size !== undefined && storageObj.metadata.size > 5242880) {
+    const actualMime = storageObj.metadata?.mimetype ?? null;
+    const actualSize =
+      storageObj.metadata?.size === undefined ||
+      storageObj.metadata?.size === null
+        ? null
+        : Number(storageObj.metadata.size);
+
+    if (actualMime !== session.expected_mime) {
       throw new BadRequestException({
-        code: 'ATTENDANCE_PHOTO_TOO_LARGE',
-        message: 'Ảnh đã tải lên vượt quá kích thước giới hạn 5 MB.',
+        code: 'ATTENDANCE_PHOTO_MISMATCH',
+        message: 'Định dạng tệp ảnh không khớp với phiên đăng ký.',
       });
     }
 
-    const mime = storageObj.metadata?.mimetype;
-    if (mime && !['image/jpeg', 'image/png', 'image/webp'].includes(mime)) {
+    if (
+      actualSize === null ||
+      !Number.isFinite(actualSize) ||
+      actualSize !== Number(session.expected_size)
+    ) {
       throw new BadRequestException({
-        code: 'ATTENDANCE_PHOTO_INVALID_MIME',
-        message: 'Định dạng tệp ảnh tải lên không hợp lệ.',
+        code: 'ATTENDANCE_PHOTO_MISMATCH',
+        message: 'Kích thước tệp ảnh không khớp với phiên đăng ký.',
       });
     }
 
@@ -258,8 +286,9 @@ export class AttendanceService {
       });
     }
 
-    // Verify photo session and load secure path
-    const securePhotoPath = await this.verifyPhotoUploadSession(
+    // Verify photo session (validates ownership, expiry, MIME/size exact binding)
+    // DB derives the photo path internally from the session — no path returned needed here
+    await this.verifyPhotoUploadSession(
       dto.photoUploadSessionId,
       user.profileId,
     );
@@ -273,7 +302,7 @@ export class AttendanceService {
       settings,
     );
 
-    // Call check-in RPC function
+    // Call check-in RPC function — p_photo_path removed; DB derives path from session
     const { data, error } = await this.client.rpc(
       'phase5_check_in_attendance',
       {
@@ -283,7 +312,6 @@ export class AttendanceService {
         p_latitude: dto.latitude ?? null,
         p_longitude: dto.longitude ?? null,
         p_accuracy_meters: dto.accuracyMeters ?? null,
-        p_photo_path: securePhotoPath ?? null,
         p_note: dto.note ?? null,
         p_status: status,
         p_late_minutes: lateMinutes,
@@ -362,8 +390,9 @@ export class AttendanceService {
       });
     }
 
-    // Verify photo session and load secure path
-    const securePhotoPath = await this.verifyPhotoUploadSession(
+    // Verify photo session (validates ownership, expiry, MIME/size exact binding)
+    // DB derives the photo path internally from the session — no path returned needed here
+    await this.verifyPhotoUploadSession(
       dto.photoUploadSessionId,
       user.profileId,
     );
@@ -371,7 +400,7 @@ export class AttendanceService {
     const { status, lateMinutes, earlyLeaveMinutes, workMinutes } =
       this.calculateAttendanceMetrics(checkInTime, checkOutTime, settings);
 
-    // Call atomic checkout RPC
+    // Call atomic checkout RPC — p_photo_path removed; DB derives path from session
     const { data, error } = await this.client.rpc(
       'phase5_check_out_attendance',
       {
@@ -381,7 +410,6 @@ export class AttendanceService {
         p_latitude: dto.latitude ?? null,
         p_longitude: dto.longitude ?? null,
         p_accuracy_meters: dto.accuracyMeters ?? null,
-        p_photo_path: securePhotoPath ?? null,
         p_note: dto.note ?? null,
         p_status: status,
         p_late_minutes: lateMinutes,
@@ -640,12 +668,20 @@ export class AttendanceService {
     const setStatus = dto.status !== undefined;
 
     const finalCheckIn = setCheckIn
-      ? (dto.checkInAt ? new Date(dto.checkInAt) : null)
-      : (record.check_in_at ? new Date(record.check_in_at) : null);
+      ? dto.checkInAt
+        ? new Date(dto.checkInAt)
+        : null
+      : record.check_in_at
+        ? new Date(record.check_in_at)
+        : null;
 
     const finalCheckOut = setCheckOut
-      ? (dto.checkOutAt ? new Date(dto.checkOutAt) : null)
-      : (record.check_out_at ? new Date(record.check_out_at) : null);
+      ? dto.checkOutAt
+        ? new Date(dto.checkOutAt)
+        : null
+      : record.check_out_at
+        ? new Date(record.check_out_at)
+        : null;
 
     if (finalCheckIn && finalCheckOut && finalCheckOut < finalCheckIn) {
       throw new BadRequestException({
@@ -657,9 +693,7 @@ export class AttendanceService {
     const { status, lateMinutes, earlyLeaveMinutes, workMinutes } =
       this.calculateAttendanceMetrics(finalCheckIn, finalCheckOut, settings);
 
-    const finalStatus = setStatus
-      ? dto.status
-      : (record.status || status);
+    const finalStatus = setStatus ? dto.status : record.status || status;
 
     // Call atomic adjustment RPC with omission check flags
     const { data, error } = await this.client.rpc(
@@ -787,7 +821,8 @@ export class AttendanceService {
     if (fileSize <= 0 || fileSize > 5242880) {
       throw new BadRequestException({
         code: 'ATTENDANCE_PHOTO_TOO_LARGE',
-        message: 'Kích thước tệp tải lên phải lớn hơn 0 và không vượt quá 5 MB.',
+        message:
+          'Kích thước tệp tải lên phải lớn hơn 0 và không vượt quá 5 MB.',
       });
     }
 
@@ -795,7 +830,8 @@ export class AttendanceService {
     if (!allowedMimes.includes(mimeType)) {
       throw new BadRequestException({
         code: 'ATTENDANCE_PHOTO_INVALID_MIME',
-        message: 'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
+        message:
+          'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
       });
     }
 
@@ -803,7 +839,12 @@ export class AttendanceService {
     const [year, month] = todayStr.split('-');
 
     // Safe extension from MIME
-    const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType === 'image/webp' ? 'webp' : 'png';
+    const extension =
+      mimeType === 'image/jpeg'
+        ? 'jpg'
+        : mimeType === 'image/webp'
+          ? 'webp'
+          : 'png';
 
     // Generate secure upload path using crypto.randomUUID() without raw user file name prefixes
     const fileId = crypto.randomUUID();

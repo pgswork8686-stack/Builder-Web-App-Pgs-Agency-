@@ -104,11 +104,21 @@ describe('Attendance & Leave Management API (e2e)', () => {
         return {};
       });
 
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: { id: RECORD_ID },
+        error: null,
+      });
+
       await request(app.getHttpServer())
         .post('/api/v1/attendance/check-in')
         .send({ note: 'E2E checkin' })
         .set('Authorization', 'Bearer fake-token')
         .expect(201);
+
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'phase5_check_in_attendance',
+        expect.not.objectContaining({ p_photo_path: expect.anything() }),
+      );
     });
 
     it('GET /api/v1/attendance/me - list own attendance history', async () => {

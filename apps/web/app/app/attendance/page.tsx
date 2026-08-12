@@ -114,14 +114,32 @@ export default function EmployeeAttendancePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Frontend pre-validation (backend is authoritative)
+    const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedMimes.includes(file.type)) {
+      setFeedback({
+        type: "error",
+        message: "Chỉ chấp nhận ảnh jpeg, png hoặc webp.",
+      });
+      return;
+    }
+    if (file.size <= 0 || file.size > 5 * 1024 * 1024) {
+      setFeedback({
+        type: "error",
+        message: "Kích thước ảnh phải lớn hơn 0 và không vượt quá 5 MB.",
+      });
+      return;
+    }
+
     try {
       setUploadingPhoto(true);
       setFeedback(null);
 
-      // Generate upload signature from Nest API
+      // Generate upload signature from Nest API (sends fileSize for server-side binding)
       const sig = await attendanceApi.getPhotoUploadSignature(
         file.name,
         file.type,
+        file.size,
       );
       setPhotoSessionId(sig.photoUploadSessionId);
 
