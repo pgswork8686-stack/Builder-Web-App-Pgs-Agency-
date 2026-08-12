@@ -5,16 +5,21 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
 import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
+import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly realtime?: WorkspaceRealtimeGateway,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
@@ -23,6 +28,28 @@ export class TasksService {
   private databaseFailure(code: string, message: string, error: any): never {
     this.logger.error(`${code}: ${error?.message ?? 'unknown database error'}`);
     throw new InternalServerErrorException({ code, message });
+  }
+
+  private emit(
+    projectId: string,
+    entityId: string,
+    event: 'task.created' | 'task.updated',
+    updatedAt: string,
+    changes?: Record<string, unknown>,
+  ): void {
+    try {
+      this.realtime?.emitProjectEvent({
+        projectId,
+        entityId,
+        event,
+        updatedAt,
+        changes,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Realtime task broadcast failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   private async requireProject(projectId: string) {
@@ -181,6 +208,7 @@ export class TasksService {
 
   private mapWriteError(error: any): never {
     const message = error?.message ?? '';
+    const code = error?.code ?? '';
     if (message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER')) {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
@@ -193,22 +221,47 @@ export class TasksService {
         message: 'Người nhận việc phải là thành viên nội bộ đang hoạt động.',
       });
     }
-    if (message.includes('PARENT_TASK_NOT_FOUND')) {
+    if (message.includes('PARENT_TASK_NOT_FOUND') || code === 'P4034') {
       throw new BadRequestException({
         code: 'PARENT_TASK_NOT_FOUND',
         message: 'Không tìm thấy công việc cha.',
       });
     }
-    if (message.includes('INVALID_PARENT_TASK_PROJECT')) {
+    if (message.includes('INVALID_PARENT_TASK_PROJECT') || code === 'P4036') {
       throw new BadRequestException({
         code: 'INVALID_PARENT_TASK_PROJECT',
         message: 'Công việc cha phải thuộc cùng dự án.',
       });
     }
-    if (message.includes('TASK_SELF_PARENT_DENIED')) {
+    if (message.includes('TASK_SELF_PARENT_DENIED') || code === 'P4035') {
       throw new BadRequestException({
         code: 'TASK_SELF_PARENT_DENIED',
         message: 'Công việc không thể là cha của chính nó.',
+      });
+    }
+    if (message.includes('INVALID_TASK_DATE_RANGE') || code === 'P4037') {
+      throw new BadRequestException({
+        code: 'INVALID_TASK_DATE_RANGE',
+        message: 'Ngày hết hạn không được trước ngày bắt đầu.',
+      });
+    }
+    if (message.includes('TASK_NOT_FOUND') || code === 'P4030') {
+      throw new NotFoundException({
+        code: 'TASK_NOT_FOUND',
+        message: 'Không tìm thấy công việc.',
+      });
+    }
+    if (message.includes('TASK_PROJECT_CHANGED') || code === 'P4031') {
+      // Safe error mapping: do not reveal task cross-project existence
+      throw new NotFoundException({
+        code: 'TASK_NOT_FOUND',
+        message: 'Không tìm thấy công việc.',
+      });
+    }
+    if (message.includes('TASK_ORDERING_RPC_REQUIRED')) {
+      throw new InternalServerErrorException({
+        code: 'TASK_WRITE_FAILED',
+        message: 'Yêu cầu cập nhật vị trí Kanban không hợp lệ.',
       });
     }
     this.databaseFailure(
@@ -310,6 +363,9 @@ export class TasksService {
       .select()
       .single();
     if (error) this.mapWriteError(error);
+    this.emit(projectId, data.id, 'task.created', data.updated_at, {
+      status: data.status,
+    });
     return data;
   }
 
@@ -320,6 +376,12 @@ export class TasksService {
     user: RequestUser,
   ) {
     const access = await this.getAccess(projectId, user);
+    if (!access.isAdmin && access.projectRole === 'viewer') {
+      throw new ForbiddenException({
+        code: 'TASK_ACCESS_DENIED',
+        message: 'Người xem chỉ có quyền đọc công việc.',
+      });
+    }
     const existing = await this.getTaskRow(projectId, taskId);
     const manager = access.isAdmin || access.projectRole === 'project_manager';
     if (!manager) {
@@ -350,27 +412,77 @@ export class TasksService {
       });
     }
 
-    const payload: Record<string, unknown> = { updated_by: user.profileId };
-    if (dto.parentTaskId !== undefined)
-      payload.parent_task_id = dto.parentTaskId;
-    if (dto.title !== undefined) payload.title = dto.title;
-    if (dto.description !== undefined)
-      payload.description = dto.description ?? null;
-    if (dto.status !== undefined) payload.status = dto.status;
-    if (dto.priority !== undefined) payload.priority = dto.priority;
-    if (dto.assigneeUserId !== undefined)
-      payload.assignee_user_id = dto.assigneeUserId;
-    if (dto.startDate !== undefined) payload.start_date = dto.startDate;
-    if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
-    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+    let data: Record<string, any> | null = null;
 
-    const { data, error } = await this.client
-      .from('tasks')
-      .update(payload)
-      .eq('id', taskId)
-      .select()
-      .single();
-    if (error) this.mapWriteError(error);
+    if (dto.status !== undefined) {
+      // CASE B: status is provided, perform single atomic RPC update
+      const { data: statusData, error } = await this.client.rpc(
+        'phase4_update_task_atomic',
+        {
+          p_project_id: projectId,
+          p_task_id: taskId,
+          p_actor_user_id: user.profileId,
+          p_set_parent_task: dto.parentTaskId !== undefined,
+          p_parent_task_id: dto.parentTaskId ?? null,
+          p_set_title: dto.title !== undefined,
+          p_title: dto.title ?? null,
+          p_set_description: dto.description !== undefined,
+          p_description: dto.description ?? null,
+          p_set_status: true,
+          p_status: dto.status,
+          p_set_priority: dto.priority !== undefined,
+          p_priority: dto.priority ?? null,
+          p_set_assignee: dto.assigneeUserId !== undefined,
+          p_assignee_user_id: dto.assigneeUserId ?? null,
+          p_set_start_date: dto.startDate !== undefined,
+          p_start_date: dto.startDate ?? null,
+          p_set_due_date: dto.dueDate !== undefined,
+          p_due_date: dto.dueDate ?? null,
+        },
+      );
+      if (error) this.mapWriteError(error);
+      data = (Array.isArray(statusData) ? statusData[0] : statusData) as Record<
+        string,
+        any
+      > | null;
+    } else {
+      // CASE A: status is NOT provided, perform normal tasks table update
+      const payload: Record<string, unknown> = { updated_by: user.profileId };
+      if (dto.parentTaskId !== undefined)
+        payload.parent_task_id = dto.parentTaskId;
+      if (dto.title !== undefined) payload.title = dto.title;
+      if (dto.description !== undefined)
+        payload.description = dto.description ?? null;
+      if (dto.priority !== undefined) payload.priority = dto.priority;
+      if (dto.assigneeUserId !== undefined)
+        payload.assignee_user_id = dto.assigneeUserId;
+      if (dto.startDate !== undefined) payload.start_date = dto.startDate;
+      if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
+
+      if (Object.keys(payload).length > 1) {
+        const { data: updated, error } = await this.client
+          .from('tasks')
+          .update(payload)
+          .eq('id', taskId)
+          .select()
+          .single();
+        if (error) this.mapWriteError(error);
+        data = updated as Record<string, any>;
+      } else {
+        data = existing;
+      }
+    }
+
+    if (!data) {
+      this.databaseFailure(
+        'TASK_WRITE_FAILED',
+        'Không thể lưu công việc lúc này.',
+        new Error('Task mutation returned no row'),
+      );
+    }
+    this.emit(projectId, taskId, 'task.updated', data.updated_at, {
+      status: data.status,
+    });
     return data;
   }
 }
