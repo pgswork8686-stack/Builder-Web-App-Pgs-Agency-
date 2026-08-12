@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -12,6 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { RequestUser } from '../auth/auth.types';
 import { AttendanceService } from './attendance.service';
 import {
   CheckInSchema,
@@ -93,14 +95,16 @@ export class AttendanceController {
   async getPhotoUploadSignature(
     @Body('fileName') fileName: string,
     @Body('mimeType') mimeType: string,
+    @Body('fileSize') fileSize: number,
     @CurrentUser() user: any,
   ) {
-    if (!fileName || !mimeType) {
-      throw new BadRequestException('fileName và mimeType là bắt buộc.');
+    if (!fileName || !mimeType || fileSize === undefined || fileSize === null) {
+      throw new BadRequestException('fileName, mimeType và fileSize là bắt buộc.');
     }
     return this.attendanceService.getPhotoUploadSignature(
       fileName,
       mimeType,
+      fileSize,
       user,
     );
   }

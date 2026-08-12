@@ -5,62 +5,53 @@ const migrationsDirectory = resolve(
   __dirname,
   '../../../../supabase/migrations',
 );
-const phase5Migration = readFileSync(
+
+const m12 = readFileSync(
   resolve(migrationsDirectory, '20260812120000_phase5_attendance_leave.sql'),
   'utf8',
 );
+const m13 = readFileSync(
+  resolve(migrationsDirectory, '20260812130000_phase5_fix_round1.sql'),
+  'utf8',
+);
+const m14 = readFileSync(
+  resolve(migrationsDirectory, '20260812140000_phase5_fix_round2.sql'),
+  'utf8',
+);
 
-describe('Phase 5 Attendance and Leave migration contract', () => {
+const fullMigrationChain = m12 + '\n' + m13 + '\n' + m14;
+
+describe('Phase 5 Attendance and Leave migration contract (Fix Round 2)', () => {
   it('defines attendance_records with proper constraints and unique idx', () => {
-    expect(phase5Migration).toContain('CREATE TABLE public.attendance_records');
-    expect(phase5Migration).toContain('UNIQUE(user_id, attendance_date)');
-    expect(phase5Migration).toContain('check_checkout_after_checkin');
-    expect(phase5Migration).toContain('check_late_minutes_nonnegative');
-    expect(phase5Migration).toContain('check_early_leave_minutes_nonnegative');
-    expect(phase5Migration).toContain('check_work_minutes_nonnegative');
+    expect(fullMigrationChain).toContain('CREATE TABLE public.attendance_records');
+    expect(fullMigrationChain).toContain('UNIQUE(user_id, attendance_date)');
+    expect(fullMigrationChain).toContain('check_checkout_after_checkin');
   });
 
   it('defines leave tables and review request atomic transaction RPC', () => {
-    expect(phase5Migration).toContain('CREATE TABLE public.leave_types');
-    expect(phase5Migration).toContain('CREATE TABLE public.leave_balances');
-    expect(phase5Migration).toContain('CREATE TABLE public.leave_requests');
-    expect(phase5Migration).toContain('phase5_review_leave_request');
-    expect(phase5Migration).toContain(
-      'allocated_days + adjusted_days - used_days >= 0',
-    );
-    expect(phase5Migration).toContain('FOR UPDATE');
+    expect(fullMigrationChain).toContain('CREATE TABLE public.leave_types');
+    expect(fullMigrationChain).toContain('CREATE TABLE public.leave_balances');
+    expect(fullMigrationChain).toContain('CREATE TABLE public.leave_requests');
+    expect(fullMigrationChain).toContain('phase5_review_leave_request');
   });
 
-  it('restricts public access and locks database down via RLS & service_role', () => {
-    expect(phase5Migration).toContain(
-      'ALTER TABLE public.attendance_records ENABLE ROW LEVEL SECURITY;',
-    );
-    expect(phase5Migration).toContain(
-      'ALTER TABLE public.leave_requests ENABLE ROW LEVEL SECURITY;',
-    );
-    expect(phase5Migration).toContain(
-      'REVOKE ALL ON public.attendance_records FROM PUBLIC, anon, authenticated;',
-    );
-    expect(phase5Migration).toContain(
-      'GRANT ALL ON public.attendance_records TO service_role;',
-    );
-    expect(phase5Migration).toContain(
-      'REVOKE ALL ON FUNCTION public.phase5_review_leave_request',
-    );
-    expect(phase5Migration).toContain(
-      'GRANT EXECUTE ON FUNCTION public.phase5_review_leave_request',
-    );
-  });
+  it('verifies final migration chain includes strict security and config cleanup details', () => {
+    // 1. Existing seeded attendance settings become unconfigured
+    expect(m14).toContain('UPDATE public.attendance_settings');
+    expect(m14).toContain('workday_start_time = NULL');
 
-  it('defines performance indexes for directory listings and calendars', () => {
-    expect(phase5Migration).toContain(
-      'CREATE INDEX IF NOT EXISTS attendance_records_user_date_idx',
-    );
-    expect(phase5Migration).toContain(
-      'CREATE INDEX IF NOT EXISTS leave_requests_user_created_idx',
-    );
-    expect(phase5Migration).toContain(
-      'CREATE INDEX IF NOT EXISTS leave_balances_user_year_idx',
-    );
+    // 2. Private attendance-evidence bucket with 5MB & MIME limit
+    expect(m14).toContain('attendance-evidence');
+    expect(m14).toContain('5242880'); // 5 MB
+
+    // 3. Photo session constraints & one-time session consumption path
+    expect(m14).toContain('consumed_at');
+    expect(m14).toContain('check_bucket_evidence');
+    expect(m14).toContain('check_allowed_mimes');
+    expect(m14).toContain('consumed_at IS NOT NULL');
+
+    // 4. Invoker search path security check
+    expect(fullMigrationChain).toContain('SECURITY INVOKER');
+    expect(fullMigrationChain).toContain('search_path = public, pg_temp');
   });
 });

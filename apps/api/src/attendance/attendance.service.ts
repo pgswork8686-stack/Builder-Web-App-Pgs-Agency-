@@ -190,16 +190,48 @@ export class AttendanceService {
       });
     }
 
-    // Mark session as completed
-    await this.client
-      .from('attendance_photo_upload_sessions')
-      .update({ completed_at: new Date().toISOString() })
-      .eq('id', sessionId);
+    if (session.consumed_at) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_SESSION_REUSED',
+        message: 'Phiên tải ảnh đã được sử dụng.',
+      });
+    }
+
+    // Verify object size and bucket in storage metadata
+    const supabaseAdmin = this.supabaseService.getSystemClient();
+    const { data: listData, error: listError } = await supabaseAdmin.storage
+      .from('attendance-evidence')
+      .list(session.expected_path.split('/').slice(0, -1).join('/'), {
+        search: session.expected_path.split('/').pop(),
+      });
+
+    if (listError || !listData || listData.length === 0) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_NOT_FOUND',
+        message: 'Không tìm thấy tệp ảnh tải lên trong Storage.',
+      });
+    }
+
+    const storageObj = listData[0];
+    if (storageObj.metadata?.size !== undefined && storageObj.metadata.size > 5242880) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_TOO_LARGE',
+        message: 'Ảnh đã tải lên vượt quá kích thước giới hạn 5 MB.',
+      });
+    }
+
+    const mime = storageObj.metadata?.mimetype;
+    if (mime && !['image/jpeg', 'image/png', 'image/webp'].includes(mime)) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_INVALID_MIME',
+        message: 'Định dạng tệp ảnh tải lên không hợp lệ.',
+      });
+    }
 
     return session.expected_path;
   }
 
-  // Check In API implementation
+  // Check In API implementation using atomic DB RPC
   async checkIn(dto: CheckInDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
@@ -241,32 +273,39 @@ export class AttendanceService {
       settings,
     );
 
-    // Insert with check constraints and unique constraint to prevent race condition double check-ins
-    const { data, error } = await this.client
-      .from('attendance_records')
-      .insert({
-        user_id: user.profileId,
-        attendance_date: todayStr,
-        check_in_at: checkInTime.toISOString(),
-        check_in_latitude: dto.latitude ?? null,
-        check_in_longitude: dto.longitude ?? null,
-        check_in_accuracy_meters: dto.accuracyMeters ?? null,
-        check_in_photo_path: securePhotoPath ?? null,
-        check_in_note: dto.note ?? null,
-        status,
-        late_minutes: lateMinutes,
-        source: 'web',
-        created_by: user.authUserId,
-        updated_by: user.authUserId,
-      })
-      .select()
-      .maybeSingle();
+    // Call check-in RPC function
+    const { data, error } = await this.client.rpc(
+      'phase5_check_in_attendance',
+      {
+        p_user_id: user.profileId,
+        p_attendance_date: todayStr,
+        p_check_in_at: checkInTime.toISOString(),
+        p_latitude: dto.latitude ?? null,
+        p_longitude: dto.longitude ?? null,
+        p_accuracy_meters: dto.accuracyMeters ?? null,
+        p_photo_path: securePhotoPath ?? null,
+        p_note: dto.note ?? null,
+        p_status: status,
+        p_late_minutes: lateMinutes,
+        p_source: 'web',
+        p_created_by: user.profileId,
+        p_updated_by: user.profileId,
+        p_photo_session_id: dto.photoUploadSessionId ?? null,
+      },
+    );
 
     if (error) {
-      if (error.code === '23505') {
+      const msg = error.message;
+      if (error.code === '23505' || msg.includes('duplicate key')) {
         throw new BadRequestException({
           code: 'ATTENDANCE_ALREADY_CHECKED_IN',
           message: 'Bạn đã thực hiện check-in cho ngày hôm nay rồi.',
+        });
+      }
+      if (msg.includes('ATTENDANCE_PHOTO_SESSION_REUSED')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_PHOTO_SESSION_REUSED',
+          message: 'Phiên tải ảnh đã được sử dụng.',
         });
       }
       throw new InternalServerErrorException({
@@ -278,7 +317,7 @@ export class AttendanceService {
     return data;
   }
 
-  // Check Out API implementation using atomic DB RPC (Blocker 5)
+  // Check Out API implementation using atomic DB RPC
   async checkOut(dto: CheckOutDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
@@ -348,6 +387,7 @@ export class AttendanceService {
         p_late_minutes: lateMinutes,
         p_early_leave_minutes: earlyLeaveMinutes,
         p_work_minutes: workMinutes,
+        p_photo_session_id: dto.photoUploadSessionId ?? null,
       },
     );
 
@@ -369,6 +409,12 @@ export class AttendanceService {
         throw new BadRequestException({
           code: 'ATTENDANCE_INVALID_TIME_RANGE',
           message: 'Thời gian check-out phải sau thời gian check-in.',
+        });
+      }
+      if (msg.includes('ATTENDANCE_PHOTO_SESSION_REUSED')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_PHOTO_SESSION_REUSED',
+          message: 'Phiên tải ảnh đã được sử dụng.',
         });
       }
       throw new InternalServerErrorException({
@@ -589,10 +635,19 @@ export class AttendanceService {
 
     const settings = await this.getSettings();
 
-    const checkInAt = dto.checkInAt ? new Date(dto.checkInAt) : null;
-    const checkOutAt = dto.checkOutAt ? new Date(dto.checkOutAt) : null;
+    const setCheckIn = dto.checkInAt !== undefined;
+    const setCheckOut = dto.checkOutAt !== undefined;
+    const setStatus = dto.status !== undefined;
 
-    if (checkInAt && checkOutAt && checkOutAt < checkInAt) {
+    const finalCheckIn = setCheckIn
+      ? (dto.checkInAt ? new Date(dto.checkInAt) : null)
+      : (record.check_in_at ? new Date(record.check_in_at) : null);
+
+    const finalCheckOut = setCheckOut
+      ? (dto.checkOutAt ? new Date(dto.checkOutAt) : null)
+      : (record.check_out_at ? new Date(record.check_out_at) : null);
+
+    if (finalCheckIn && finalCheckOut && finalCheckOut < finalCheckIn) {
       throw new BadRequestException({
         code: 'ATTENDANCE_INVALID_TIME_RANGE',
         message: 'Thời gian check-out phải sau thời gian check-in.',
@@ -600,19 +655,24 @@ export class AttendanceService {
     }
 
     const { status, lateMinutes, earlyLeaveMinutes, workMinutes } =
-      this.calculateAttendanceMetrics(checkInAt, checkOutAt, settings);
+      this.calculateAttendanceMetrics(finalCheckIn, finalCheckOut, settings);
 
-    const finalStatus = dto.status || status;
+    const finalStatus = setStatus
+      ? dto.status
+      : (record.status || status);
 
-    // Call atomic adjustment RPC
+    // Call atomic adjustment RPC with omission check flags
     const { data, error } = await this.client.rpc(
       'phase5_adjust_attendance_record',
       {
         p_record_id: recordId,
         p_adjusted_by_profile: user.profileId,
         p_adjusted_by_auth: user.authUserId,
-        p_check_in_at: checkInAt ? checkInAt.toISOString() : null,
-        p_check_out_at: checkOutAt ? checkOutAt.toISOString() : null,
+        p_set_check_in: setCheckIn,
+        p_check_in_at: finalCheckIn ? finalCheckIn.toISOString() : null,
+        p_set_check_out: setCheckOut,
+        p_check_out_at: finalCheckOut ? finalCheckOut.toISOString() : null,
+        p_set_status: setStatus,
         p_status: finalStatus,
         p_late_minutes: lateMinutes,
         p_early_leave_minutes: earlyLeaveMinutes,
@@ -719,25 +779,35 @@ export class AttendanceService {
   async getPhotoUploadSignature(
     fileName: string,
     mimeType: string,
+    fileSize: number,
     user: RequestUser,
   ) {
     this.enforceInternalUser(user);
 
+    if (fileSize <= 0 || fileSize > 5242880) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_TOO_LARGE',
+        message: 'Kích thước tệp tải lên phải lớn hơn 0 và không vượt quá 5 MB.',
+      });
+    }
+
     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedMimes.includes(mimeType)) {
       throw new BadRequestException({
-        code: 'ATTENDANCE_WRITE_FAILED',
-        message:
-          'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
+        code: 'ATTENDANCE_PHOTO_INVALID_MIME',
+        message: 'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
       });
     }
 
     const todayStr = this.getVietnamDate();
     const [year, month] = todayStr.split('-');
 
-    // Generate secure upload path using crypto.randomUUID()
+    // Safe extension from MIME
+    const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType === 'image/webp' ? 'webp' : 'png';
+
+    // Generate secure upload path using crypto.randomUUID() without raw user file name prefixes
     const fileId = crypto.randomUUID();
-    const filePath = `attendance/${user.profileId}/${year}/${month}/${fileId}/${fileName}`;
+    const filePath = `attendance/${user.profileId}/${year}/${month}/${fileId}/evidence.${extension}`;
 
     // Get pre-signed storage upload URL (expires in 15 minutes)
     const supabaseAdmin = this.supabaseService.getSystemClient();
@@ -762,6 +832,7 @@ export class AttendanceService {
         user_id: user.profileId,
         expected_path: filePath,
         expected_mime: mimeType,
+        expected_size: fileSize,
         expires_at: expiresAt.toISOString(),
       })
       .select()

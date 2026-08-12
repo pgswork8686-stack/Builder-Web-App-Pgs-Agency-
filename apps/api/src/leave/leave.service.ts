@@ -32,24 +32,17 @@ export class LeaveService {
   }
 
   // Blocker 11: Leave Day Calculation Abstraction
-  // Counts only Mon-Fri as standard weekdays (Vietnam standard workday count)
+  // Inclusive calendar days (UTC-safe, date-only — no weekend exclusion)
   private calculateTotalDays(startStr: string, endStr: string): number {
-    const start = new Date(startStr);
-    const end = new Date(endStr);
+    const [sYear, sMonth, sDay] = startStr.split('-').map(Number);
+    const [eYear, eMonth, eDay] = endStr.split('-').map(Number);
 
-    let daysCount = 0;
-    const current = new Date(start);
+    const start = Date.UTC(sYear, sMonth - 1, sDay);
+    const end = Date.UTC(eYear, eMonth - 1, eDay);
 
-    while (current <= end) {
-      const dayOfWeek = current.getDay();
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        // Exclude Sunday (0) and Saturday (6)
-        daysCount++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
-
-    return daysCount;
+    const diffMs = end - start;
+    if (diffMs < 0) return 0;
+    return Math.floor(diffMs / 86400000) + 1;
   }
 
   // Get active leave types list
@@ -508,18 +501,40 @@ export class LeaveService {
       );
     }
 
-    const { data, error } = await this.client
+    const isAdmin = user.role === 'admin';
+    const isLeader = user.role === 'team_leader';
+    const isEmployee = user.role === 'employee';
+
+    let dbQuery = this.client
       .from('leave_requests')
       .select(
-        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles(full_name)',
+        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles!inner(id, full_name, employee_profile:employee_profiles(team_id))',
       )
       .eq('status', 'approved')
-      .or(`start_date.lte.${to},end_date.gte.${from}`);
+      .lte('start_date', to)
+      .gte('end_date', from);
+
+    if (isLeader) {
+      // Fetch leader's team
+      const { data: team } = await this.client
+        .from('teams')
+        .select('id')
+        .eq('leader_user_id', user.profileId)
+        .maybeSingle();
+
+      const teamId = team?.id || '00000000-0000-0000-0000-000000000000';
+      dbQuery = dbQuery.eq('profile.employee_profile.team_id', teamId);
+    } else if (isEmployee) {
+      // Self-only visibility
+      dbQuery = dbQuery.eq('user_id', user.profileId);
+    }
+
+    const { data, error } = await dbQuery;
 
     if (error) {
       throw new InternalServerErrorException({
         code: 'LEAVE_WRITE_FAILED',
-        message: 'Không thể tải lịch nghỉ phép của toàn công ty.',
+        message: 'Không thể tải lịch nghỉ phép.',
       });
     }
 

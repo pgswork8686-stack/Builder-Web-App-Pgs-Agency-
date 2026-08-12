@@ -165,4 +165,75 @@ describe('LeaveService', () => {
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
+
+  // =========================================================
+  // Phase 5 Fix Round 2 — Regression Contract Tests (R8–R15)
+  // =========================================================
+
+  describe('calculateTotalDays — UTC-safe inclusive calendar days (Fix Round 2)', () => {
+    const calc = (start: string, end: string) =>
+      (service as any).calculateTotalDays(start, end);
+
+    it('R8: single day request returns 1', () => {
+      expect(calc('2026-08-12', '2026-08-12')).toBe(1);
+    });
+
+    it('R9: 5-day weekday range returns 5 (Mon–Fri)', () => {
+      // 2026-08-10 Mon → 2026-08-14 Fri = 5 calendar days
+      expect(calc('2026-08-10', '2026-08-14')).toBe(5);
+    });
+
+    it('R10: includes Saturday and Sunday in count (no weekend exclusion)', () => {
+      // 2026-08-14 Fri → 2026-08-17 Mon = 4 days (Fri, Sat, Sun, Mon)
+      expect(calc('2026-08-14', '2026-08-17')).toBe(4);
+    });
+
+    it('R11: full week (Mon–Sun) returns 7', () => {
+      // 2026-08-10 Mon → 2026-08-16 Sun = 7 days
+      expect(calc('2026-08-10', '2026-08-16')).toBe(7);
+    });
+
+    it('R12: reversed range returns 0 (guard)', () => {
+      expect(calc('2026-08-17', '2026-08-10')).toBe(0);
+    });
+
+    it('R13: cross-month boundary is handled correctly', () => {
+      // 2026-08-30 → 2026-09-01 = 3 days
+      expect(calc('2026-08-30', '2026-09-01')).toBe(3);
+    });
+  });
+
+  describe('Leave request creation — multi-year guard (Fix Round 2)', () => {
+    it('R14: rejects request spanning different calendar years', async () => {
+      await expect(
+        service.createRequest(
+          {
+            leaveTypeId: 'type-id',
+            startDate: '2026-12-30',
+            endDate: '2027-01-02',
+          },
+          user('employee'),
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('Cancel leave — approved balance guard (Fix Round 2)', () => {
+    it('R15: delegates cancel to phase5_cancel_leave_request RPC', async () => {
+      client.rpc.mockResolvedValueOnce({
+        data: { id: REQUEST_ID, status: 'cancelled' },
+        error: null,
+      });
+
+      const res = await service.cancelRequest(REQUEST_ID, user('employee'));
+      expect(res).toBeDefined();
+      expect(client.rpc).toHaveBeenCalledWith(
+        'phase5_cancel_leave_request',
+        expect.objectContaining({
+          p_request_id: REQUEST_ID,
+          p_actor_profile_id: USER_ID,
+        }),
+      );
+    });
+  });
 });

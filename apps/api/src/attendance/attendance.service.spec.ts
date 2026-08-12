@@ -63,10 +63,12 @@ describe('AttendanceService', () => {
         if (table === 'attendance_settings') {
           return queryResult({ data: { timezone: 'Asia/Ho_Chi_Minh' } });
         }
-        if (table === 'attendance_records') {
-          return queryResult({ data: { id: RECORD_ID, user_id: USER_ID } });
-        }
         return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: { id: RECORD_ID, user_id: USER_ID },
+        error: null,
       });
 
       const res = await service.checkIn(
@@ -87,10 +89,12 @@ describe('AttendanceService', () => {
         if (table === 'attendance_settings') {
           return queryResult({ data: { timezone: 'Asia/Ho_Chi_Minh' } });
         }
-        if (table === 'attendance_records') {
-          return queryResult({ error: { code: '23505' } });
-        }
         return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { code: '23505', message: 'duplicate key' },
       });
 
       await expect(service.checkIn({}, user('employee'))).rejects.toThrow(
@@ -187,6 +191,139 @@ describe('AttendanceService', () => {
       await expect(
         service.adjustRecord(RECORD_ID, { reason: 'No' }, user('employee')),
       ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+  });
+
+  // =========================================================
+  // Phase 5 Fix Round 2 — Regression Contract Tests
+  // =========================================================
+
+  describe('Photo upload session (Fix Round 2)', () => {
+    const mockStorageClient = {
+      from: jest.fn().mockReturnValue({
+        createSignedUploadUrl: jest.fn().mockResolvedValue({
+          data: { signedUrl: 'https://storage/signed', token: 'tok' },
+          error: null,
+        }),
+      }),
+    };
+
+    beforeEach(() => {
+      (service as any).supabaseService = {
+        getSystemClient: () => ({
+          ...client,
+          storage: mockStorageClient,
+        }),
+      };
+    });
+
+    it('R1: rejects photo upload if fileSize > 5 MB', async () => {
+      await expect(
+        service.getPhotoUploadSignature('photo.jpg', 'image/jpeg', 6000000, user('employee')),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('R2: rejects photo upload if fileSize is 0', async () => {
+      await expect(
+        service.getPhotoUploadSignature('photo.jpg', 'image/jpeg', 0, user('employee')),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('R3: rejects photo upload with unsupported MIME type', async () => {
+      await expect(
+        service.getPhotoUploadSignature('photo.gif', 'image/gif', 1000, user('employee')),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('R4: rejects photo upload for client users', async () => {
+      await expect(
+        service.getPhotoUploadSignature('photo.jpg', 'image/jpeg', 1000, user('client')),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('R5: generates sanitized path without raw user filename', async () => {
+      // Mock settings for getVietnamDate
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({ data: { timezone: 'Asia/Ho_Chi_Minh' } });
+        }
+        if (table === 'attendance_photo_upload_sessions') {
+          return queryResult({ data: { id: 'session-id' } });
+        }
+        return queryResult({});
+      });
+
+      const result = await service.getPhotoUploadSignature(
+        'malicious<script>.jpg',
+        'image/jpeg',
+        1024,
+        user('employee'),
+      );
+      // Path must NOT contain the original filename
+      expect(result.path).not.toContain('malicious');
+      expect(result.path).toContain('evidence.jpg');
+    });
+  });
+
+  describe('Adjustment omit semantics (Fix Round 2)', () => {
+    it('R6: calls RPC with p_set_check_in=false when checkInAt is omitted', async () => {
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({ data: {} });
+        }
+        if (table === 'attendance_records') {
+          return queryResult({
+            data: { id: RECORD_ID, check_in_at: new Date().toISOString() },
+          });
+        }
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: { id: RECORD_ID },
+        error: null,
+      });
+
+      await service.adjustRecord(
+        RECORD_ID,
+        { reason: 'Only reason, no times' },
+        user('admin'),
+      );
+      expect(client.rpc).toHaveBeenCalled();
+      const rpcArgs = client.rpc.mock.calls[0][1];
+      expect(rpcArgs.p_set_check_in).toBe(false);
+      expect(rpcArgs.p_set_check_out).toBe(false);
+    });
+
+    it('R7: calls RPC with p_set_check_in=true when checkInAt is provided', async () => {
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({ data: {} });
+        }
+        if (table === 'attendance_records') {
+          return queryResult({
+            data: { id: RECORD_ID, check_in_at: new Date().toISOString() },
+          });
+        }
+        return queryResult({});
+      });
+
+      client.rpc.mockResolvedValueOnce({
+        data: { id: RECORD_ID },
+        error: null,
+      });
+
+      await service.adjustRecord(
+        RECORD_ID,
+        {
+          checkInAt: '2026-08-12T08:30:00+07:00',
+          reason: 'Fix early',
+        },
+        user('admin'),
+      );
+      expect(client.rpc).toHaveBeenCalled();
+      const rpcArgs = client.rpc.mock.calls[0][1];
+      expect(rpcArgs.p_set_check_in).toBe(true);
     });
   });
 });

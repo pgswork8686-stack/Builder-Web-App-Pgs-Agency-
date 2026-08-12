@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -12,6 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { RequestUser } from '../auth/auth.types';
 import { LeaveService } from './leave.service';
 import {
   LeaveRequestCreateSchema,
