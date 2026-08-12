@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
   Body,
   Query,
   Param,
@@ -13,7 +12,6 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequestUser } from '../auth/auth.types';
 import { AttendanceService } from './attendance.service';
 import {
   CheckInSchema,
@@ -100,6 +98,10 @@ export class AttendanceController {
     if (!fileName || !mimeType) {
       throw new BadRequestException('fileName và mimeType là bắt buộc.');
     }
-    return this.attendanceService.getPhotoUploadSignature(fileName, mimeType, user);
+    return this.attendanceService.getPhotoUploadSignature(
+      fileName,
+      mimeType,
+      user,
+    );
   }
 }

@@ -5,7 +5,6 @@ import { AppModule } from '../src/app.module';
 import { SupabaseService } from '../src/supabase/supabase.service';
 
 const USER_ID = '33333333-3333-4333-8333-333333333333';
-const OTHER_USER_ID = '44444444-4444-4444-8444-444444444444';
 const RECORD_ID = 'record-uuid-1111';
 const REQUEST_ID = 'request-uuid-2222';
 
@@ -88,14 +87,18 @@ describe('Attendance & Leave Management API (e2e)', () => {
           return {
             select: jest.fn().mockReturnThis(),
             limit: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({ data: { location_required: false } }),
+            maybeSingle: jest
+              .fn()
+              .mockResolvedValue({ data: { location_required: false } }),
           };
         }
         if (table === 'attendance_records') {
           return {
             insert: jest.fn().mockReturnThis(),
             select: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({ data: { id: RECORD_ID } }),
+            maybeSingle: jest
+              .fn()
+              .mockResolvedValue({ data: { id: RECORD_ID } }),
           };
         }
         return {};
@@ -125,7 +128,10 @@ describe('Attendance & Leave Management API (e2e)', () => {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             order: jest.fn().mockReturnThis(),
-            range: jest.fn().mockResolvedValue({ data: [{ id: RECORD_ID, user_id: USER_ID }], count: 1 }),
+            range: jest.fn().mockResolvedValue({
+              data: [{ id: RECORD_ID, user_id: USER_ID }],
+              count: 1,
+            }),
           };
         }
         return {};
@@ -158,28 +164,27 @@ describe('Attendance & Leave Management API (e2e)', () => {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({ data: { id: validUuid, code: 'annual' } }),
+            maybeSingle: jest
+              .fn()
+              .mockResolvedValue({ data: { id: validUuid, code: 'annual' } }),
           };
-        }
-        if (table === 'leave_requests') {
-          const q: any = {};
-          q.select = jest.fn().mockReturnValue(q);
-          q.eq = jest.fn().mockReturnValue(q);
-          q.in = jest.fn().mockReturnValue(q);
-          q.or = jest.fn().mockReturnValue(q);
-          q.limit = jest.fn().mockReturnValue(q);
-          q.insert = jest.fn().mockReturnValue(q);
-          q.maybeSingle = jest.fn().mockResolvedValue({ data: { id: REQUEST_ID }, error: null });
-          // Implement then handler for overlap check (returning an empty array)
-          q.then = jest.fn().mockImplementation((resolve) => resolve({ data: [], error: null }));
-          return q;
         }
         return {};
       });
 
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: { id: REQUEST_ID },
+        error: null,
+      });
+
       const res = await request(app.getHttpServer())
         .post('/api/v1/leave/requests')
-        .send({ leaveTypeId: validUuid, startDate: '2026-08-17', endDate: '2026-08-21', reason: 'Holiday' })
+        .send({
+          leaveTypeId: validUuid,
+          startDate: '2026-08-17',
+          endDate: '2026-08-21',
+          reason: 'Holiday',
+        })
         .set('Authorization', 'Bearer fake-token');
 
       expect(res.status).toBe(201);

@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
   Body,
   Query,
   Param,
@@ -13,7 +12,6 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequestUser } from '../auth/auth.types';
 import { LeaveService } from './leave.service';
 import {
   LeaveRequestCreateSchema,
@@ -33,10 +31,7 @@ export class LeaveController {
   }
 
   @Post('requests')
-  async createRequest(
-    @Body() body: unknown,
-    @CurrentUser() user: any,
-  ) {
+  async createRequest(@Body() body: unknown, @CurrentUser() user: any) {
     const result = LeaveRequestCreateSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(

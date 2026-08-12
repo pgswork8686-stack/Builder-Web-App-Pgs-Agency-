@@ -7,7 +7,12 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
-import { LeaveRequestCreateDto, LeaveReviewDto, LeaveBalanceAdjustmentDto, LeaveQuery } from './dto/leave.dto';
+import {
+  LeaveRequestCreateDto,
+  LeaveReviewDto,
+  LeaveBalanceAdjustmentDto,
+  LeaveQuery,
+} from './dto/leave.dto';
 
 @Injectable()
 export class LeaveService {
@@ -26,24 +31,25 @@ export class LeaveService {
     }
   }
 
-  // Calculate inclusive calendar/workday count between start and end date
+  // Blocker 11: Leave Day Calculation Abstraction
+  // Counts only Mon-Fri as standard weekdays (Vietnam standard workday count)
   private calculateTotalDays(startStr: string, endStr: string): number {
     const start = new Date(startStr);
     const end = new Date(endStr);
-    
+
     let daysCount = 0;
     const current = new Date(start);
 
     while (current <= end) {
       const dayOfWeek = current.getDay();
-      // Only count Monday-Friday as standard workdays
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        // Exclude Sunday (0) and Saturday (6)
         daysCount++;
       }
       current.setDate(current.getDate() + 1);
     }
 
-    return daysCount === 0 ? 1 : daysCount;
+    return daysCount;
   }
 
   // Get active leave types list
@@ -63,7 +69,7 @@ export class LeaveService {
     return data;
   }
 
-  // Create a leave request (Employee self-service)
+  // Create a leave request using atomic RPC transaction (Blocker 3)
   async createRequest(dto: LeaveRequestCreateDto, user: RequestUser) {
     this.enforceInternalUser(user);
 
@@ -74,62 +80,48 @@ export class LeaveService {
       });
     }
 
-    // Check leave type validity
-    const { data: leaveType, error: typeError } = await this.client
-      .from('leave_types')
-      .select('*')
-      .eq('id', dto.leaveTypeId)
-      .maybeSingle();
+    const startYear = new Date(dto.startDate).getFullYear();
+    const endYear = new Date(dto.endDate).getFullYear();
 
-    if (typeError || !leaveType) {
-      throw new NotFoundException({
-        code: 'LEAVE_TYPE_NOT_FOUND',
-        message: 'Loại nghỉ phép không tồn tại.',
-      });
-    }
-
-    // Overlap validation: search for active (pending / approved) leave requests overlapping this date range
-    const { data: overlap, error: overlapError } = await this.client
-      .from('leave_requests')
-      .select('id')
-      .eq('user_id', user.profileId)
-      .in('status', ['pending', 'approved'])
-      .or(`start_date.lte.${dto.endDate},end_date.gte.${dto.startDate}`)
-      .limit(1);
-
-    if (overlapError) {
-      throw new InternalServerErrorException({
-        code: 'LEAVE_WRITE_FAILED',
-        message: 'Lỗi kiểm tra trùng lịch nghỉ phép.',
-      });
-    }
-
-    // Double check specific date overlap overlap range checks
-    const hasOverlap = (overlap || []).length > 0;
-    if (hasOverlap) {
+    // Blocker 11: Multi-year requests rejected with a stable validation error
+    if (startYear !== endYear) {
       throw new BadRequestException({
-        code: 'LEAVE_DATE_OVERLAP',
-        message: 'Thời gian nghỉ phép đăng ký bị trùng với lịch nghỉ đã có hoặc đang chờ duyệt.',
+        code: 'LEAVE_YEAR_SPAN_NOT_SUPPORTED',
+        message:
+          'Đơn xin nghỉ phép kéo dài qua nhiều năm không được hỗ trợ. Vui lòng tách thành các đơn riêng cho từng năm.',
       });
     }
 
     const totalDays = this.calculateTotalDays(dto.startDate, dto.endDate);
 
-    const { data, error } = await this.client
-      .from('leave_requests')
-      .insert({
-        user_id: user.profileId,
-        leave_type_id: dto.leaveTypeId,
-        start_date: dto.startDate,
-        end_date: dto.endDate,
-        total_days: totalDays,
-        reason: dto.reason ?? null,
-        status: 'pending',
-      })
-      .select()
-      .maybeSingle();
+    // Call atomic create RPC
+    const { data, error } = await this.client.rpc(
+      'phase5_create_leave_request',
+      {
+        p_user_id: user.profileId,
+        p_leave_type_id: dto.leaveTypeId,
+        p_start_date: dto.startDate,
+        p_end_date: dto.endDate,
+        p_total_days: totalDays,
+        p_reason: dto.reason ?? '',
+      },
+    );
 
     if (error) {
+      const msg = error.message;
+      if (msg.includes('LEAVE_TYPE_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'LEAVE_TYPE_NOT_FOUND',
+          message: 'Loại nghỉ phép không tồn tại.',
+        });
+      }
+      if (msg.includes('LEAVE_DATE_OVERLAP')) {
+        throw new BadRequestException({
+          code: 'LEAVE_DATE_OVERLAP',
+          message:
+            'Thời gian nghỉ phép đăng ký bị trùng với lịch nghỉ đã có hoặc đang chờ duyệt.',
+        });
+      }
       throw new InternalServerErrorException({
         code: 'LEAVE_WRITE_FAILED',
         message: 'Không thể tạo đơn xin nghỉ phép.',
@@ -199,7 +191,7 @@ export class LeaveService {
     return data || [];
   }
 
-  // Scoped leave directory retrieval (Admin & Team Leader)
+  // Scoped leave directory retrieval (Blocker 10 - DB Side Scoping)
   async getDirectory(query: LeaveQuery, user: RequestUser) {
     this.enforceInternalUser(user);
 
@@ -229,9 +221,21 @@ export class LeaveService {
       }
     }
 
+    // Leader permission restrictions checked before DB query
+    if (query.teamId && isLeader && query.teamId !== teamIdConstraint) {
+      throw new ForbiddenException({
+        code: 'LEAVE_ACCESS_DENIED',
+        message: 'Bạn chỉ có thể xem đơn nghỉ phép của đội nhóm mình quản lý.',
+      });
+    }
+
+    // Scoped query filter logic on inner join profile scopes
     let dbQuery = this.client
       .from('leave_requests')
-      .select('*, leave_type:leave_types(*), profile:profiles(id, full_name, email, employee_profile:employee_profiles(team_id, department_id))', { count: 'exact' });
+      .select(
+        '*, leave_type:leave_types(*), profile:profiles!inner(id, full_name, email, employee_profile:employee_profiles!inner(team_id, department_id))',
+        { count: 'exact' },
+      );
 
     if (query.status) {
       dbQuery = dbQuery.eq('status', query.status);
@@ -241,6 +245,16 @@ export class LeaveService {
     }
     if (query.userId) {
       dbQuery = dbQuery.eq('user_id', query.userId);
+    }
+
+    // Scoped filtering at DB layer
+    if (isLeader) {
+      dbQuery = dbQuery.eq(
+        'profile.employee_profile.team_id',
+        teamIdConstraint,
+      );
+    } else if (query.teamId) {
+      dbQuery = dbQuery.eq('profile.employee_profile.team_id', query.teamId);
     }
 
     const offset = (query.page - 1) * query.pageSize;
@@ -255,46 +269,23 @@ export class LeaveService {
       });
     }
 
-    let filtered = (data || []).map((row: any) => {
+    const sanitized = (data || []).map((row: any) => {
+      const rowCopy = { ...row };
       const empProfile = Array.isArray(row.profile?.employee_profile)
         ? row.profile.employee_profile[0]
         : row.profile?.employee_profile;
 
-      return {
-        ...row,
-        employee: row.profile
-          ? {
-              id: row.profile.id,
-              fullName: row.profile.full_name,
-              email: row.profile.email,
-              teamId: empProfile?.team_id || null,
-              departmentId: empProfile?.department_id || null,
-            }
-          : null,
-      };
-    });
+      rowCopy.employee = row.profile
+        ? {
+            id: row.profile.id,
+            fullName: row.profile.full_name,
+            email: row.profile.email,
+            teamId: empProfile?.team_id || null,
+            departmentId: empProfile?.department_id || null,
+          }
+        : null;
 
-    if (isLeader && teamIdConstraint) {
-      filtered = filtered.filter((row: any) => row.employee?.teamId === teamIdConstraint);
-    }
-
-    if (query.teamId) {
-      if (isLeader && query.teamId !== teamIdConstraint) {
-        throw new ForbiddenException({
-          code: 'LEAVE_ACCESS_DENIED',
-          message: 'Bạn chỉ có thể xem đơn nghỉ phép của đội nhóm mình quản lý.',
-        });
-      }
-      filtered = filtered.filter((row: any) => row.employee?.teamId === query.teamId);
-    }
-
-    // Privacy filter: strip reasons unless authorized
-    const sanitized = filtered.map((row: any) => {
-      const rowCopy = { ...row };
       delete rowCopy.profile;
-      
-      // Hide reasons from non-admin/non-team-leader unless it belongs to self
-      // But directory is only accessed by leader & admin anyway
       return rowCopy;
     });
 
@@ -308,8 +299,12 @@ export class LeaveService {
     };
   }
 
-  // Leave Request Review (Approve/Reject) using atomic RPC transaction
-  async reviewRequest(requestId: string, dto: LeaveReviewDto, user: RequestUser) {
+  // Leave Request Review (Approve/Reject) using atomic RPC transaction (Blocker 4)
+  async reviewRequest(
+    requestId: string,
+    dto: LeaveReviewDto,
+    user: RequestUser,
+  ) {
     this.enforceInternalUser(user);
 
     const isAdmin = user.role === 'admin';
@@ -326,7 +321,9 @@ export class LeaveService {
     if (isLeader) {
       const { data: requestUserTeam, error: teamQueryError } = await this.client
         .from('leave_requests')
-        .select('user_id, profile:profiles(employee_profile:employee_profiles(team_id))')
+        .select(
+          'user_id, profile:profiles(employee_profile:employee_profiles(team_id))',
+        )
         .eq('id', requestId)
         .maybeSingle();
 
@@ -337,7 +334,6 @@ export class LeaveService {
         });
       }
 
-      // Check leader leads this team
       const profile = (requestUserTeam as any).profile;
       const empProfile = Array.isArray(profile?.employee_profile)
         ? profile.employee_profile[0]
@@ -353,32 +349,54 @@ export class LeaveService {
       if (!leadingTeam) {
         throw new ForbiddenException({
           code: 'LEAVE_ACCESS_DENIED',
-          message: 'Bạn chỉ có quyền duyệt đơn nghỉ phép cho thành viên thuộc đội nhóm của bạn.',
+          message:
+            'Bạn chỉ có quyền duyệt đơn nghỉ phép cho thành viên thuộc đội nhóm của bạn.',
         });
       }
     }
 
     // Call atomic review request database function
-    const { data, error } = await this.client.rpc('phase5_review_leave_request', {
-      p_request_id: requestId,
-      p_reviewer_id: user.profileId,
-      p_action: dto.action,
-      p_review_note: dto.reviewNote ?? '',
-    });
+    const { data, error } = await this.client.rpc(
+      'phase5_review_leave_request',
+      {
+        p_request_id: requestId,
+        p_reviewer_id: user.profileId,
+        p_action: dto.action,
+        p_review_note: dto.reviewNote ?? '',
+      },
+    );
 
     if (error) {
       const msg = error.message;
       if (msg.includes('LEAVE_REQUEST_NOT_FOUND')) {
-        throw new NotFoundException({ code: 'LEAVE_REQUEST_NOT_FOUND', message: 'Không tìm thấy đơn xin nghỉ phép.' });
+        throw new NotFoundException({
+          code: 'LEAVE_REQUEST_NOT_FOUND',
+          message: 'Không tìm thấy đơn xin nghỉ phép.',
+        });
       }
       if (msg.includes('LEAVE_ALREADY_REVIEWED')) {
-        throw new BadRequestException({ code: 'LEAVE_ALREADY_REVIEWED', message: 'Đơn này đã được duyệt hoặc từ chối trước đó.' });
+        throw new BadRequestException({
+          code: 'LEAVE_ALREADY_REVIEWED',
+          message: 'Đơn này đã được duyệt hoặc từ chối trước đó.',
+        });
       }
       if (msg.includes('LEAVE_SELF_REVIEW_DENIED')) {
-        throw new BadRequestException({ code: 'LEAVE_SELF_REVIEW_DENIED', message: 'Bạn không thể tự duyệt đơn nghỉ phép của chính mình.' });
+        throw new BadRequestException({
+          code: 'LEAVE_SELF_REVIEW_DENIED',
+          message: 'Bạn không thể tự duyệt đơn nghỉ phép của chính mình.',
+        });
+      }
+      if (msg.includes('LEAVE_BALANCE_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'LEAVE_BALANCE_NOT_FOUND',
+          message: 'Không tìm thấy thông tin số dư ngày phép cho nhân sự.',
+        });
       }
       if (msg.includes('LEAVE_INSUFFICIENT_BALANCE')) {
-        throw new BadRequestException({ code: 'LEAVE_INSUFFICIENT_BALANCE', message: 'Số dư ngày phép khả dụng không đủ.' });
+        throw new BadRequestException({
+          code: 'LEAVE_INSUFFICIENT_BALANCE',
+          message: 'Số dư ngày phép khả dụng không đủ.',
+        });
       }
       throw new InternalServerErrorException({
         code: 'LEAVE_WRITE_FAILED',
@@ -389,133 +407,51 @@ export class LeaveService {
     return data;
   }
 
-  // Cancel Leave Request (Employee cancellation for pending, admin cancellation for approved)
+  // Cancel Leave Request (Blocker 7 - Atomic RPC cancellation)
   async cancelRequest(requestId: string, user: RequestUser) {
     this.enforceInternalUser(user);
 
-    const { data: request, error: findError } = await this.client
-      .from('leave_requests')
-      .select('*')
-      .eq('id', requestId)
-      .maybeSingle();
+    const isAdmin = user.role === 'admin';
 
-    if (findError || !request) {
-      throw new NotFoundException({
-        code: 'LEAVE_REQUEST_NOT_FOUND',
-        message: 'Không tìm thấy đơn xin nghỉ phép.',
+    const { data, error } = await this.client.rpc(
+      'phase5_cancel_leave_request',
+      {
+        p_request_id: requestId,
+        p_actor_profile_id: user.profileId,
+        p_is_admin: isAdmin,
+      },
+    );
+
+    if (error) {
+      const msg = error.message;
+      if (msg.includes('LEAVE_REQUEST_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'LEAVE_REQUEST_NOT_FOUND',
+          message: 'Không tìm thấy đơn xin nghỉ phép.',
+        });
+      }
+      if (msg.includes('LEAVE_CANCEL_NOT_ALLOWED')) {
+        throw new BadRequestException({
+          code: 'LEAVE_CANCEL_NOT_ALLOWED',
+          message: 'Không thể hủy đơn nghỉ phép ở trạng thái hiện tại.',
+        });
+      }
+      if (msg.includes('LEAVE_ACCESS_DENIED')) {
+        throw new ForbiddenException({
+          code: 'LEAVE_ACCESS_DENIED',
+          message: 'Bạn không có quyền hủy đơn nghỉ phép này.',
+        });
+      }
+      throw new InternalServerErrorException({
+        code: 'LEAVE_WRITE_FAILED',
+        message: 'Lỗi hủy bỏ đơn nghỉ phép.',
       });
     }
 
-    const isSelf = request.user_id === user.profileId;
-    const isAdmin = user.role === 'admin';
-
-    // Employee can cancel their own PENDING requests only
-    if (isSelf) {
-      if (request.status !== 'pending') {
-        throw new BadRequestException({
-          code: 'LEAVE_CANCEL_NOT_ALLOWED',
-          message: 'Không thể hủy đơn nghỉ phép đã được duyệt hoặc từ chối. Hãy liên hệ Admin.',
-        });
-      }
-
-      const { data, error } = await this.client
-        .from('leave_requests')
-        .update({
-          status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
-          cancelled_by: user.profileId,
-        })
-        .eq('id', requestId)
-        .select()
-        .maybeSingle();
-
-      if (error) {
-        throw new InternalServerErrorException({
-          code: 'LEAVE_WRITE_FAILED',
-          message: 'Không thể hủy đơn nghỉ phép.',
-        });
-      }
-
-      return data;
-    }
-
-    // Admin can cancel APPROVED requests to restore balance atomically
-    if (isAdmin) {
-      if (request.status !== 'approved') {
-        throw new BadRequestException({
-          code: 'LEAVE_CANCEL_NOT_ALLOWED',
-          message: 'Chỉ có thể hủy đơn nghỉ phép đang ở trạng thái đã duyệt để phục hồi ngày phép.',
-        });
-      }
-
-      // Check and lock leave balance row atomically before restoration to prevent race double restoration
-      const year = EXTRACT_YEAR(request.start_date);
-      
-      const { data: leaveType } = await this.client
-        .from('leave_types')
-        .select('requires_balance')
-        .eq('id', request.leave_type_id)
-        .maybeSingle();
-
-      // Transaction: updates balance used_days and changes request status to cancelled
-      // Start transaction block by updating used_days
-      if (leaveType?.requires_balance) {
-        const { error: balanceError } = await this.client
-          .from('leave_balances')
-          .update({
-            // Restore used days
-            used_days: this.client.rpc('subtract', { value: request.total_days }) as any, // fallback or direct assignment
-          })
-          .eq('user_id', request.user_id)
-          .eq('leave_type_id', request.leave_type_id)
-          .eq('year', year);
-
-        // Safe balance adjustment implementation
-        const { data: balance, error: balanceFetchError } = await this.client
-          .from('leave_balances')
-          .select('id, used_days')
-          .eq('user_id', request.user_id)
-          .eq('leave_type_id', request.leave_type_id)
-          .eq('year', year)
-          .maybeSingle();
-
-        if (!balanceFetchError && balance) {
-          const newUsed = Math.max(0, Number(balance.used_days) - Number(request.total_days));
-          await this.client
-            .from('leave_balances')
-            .update({ used_days: newUsed })
-            .eq('id', balance.id);
-        }
-      }
-
-      const { data, error } = await this.client
-        .from('leave_requests')
-        .update({
-          status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
-          cancelled_by: user.profileId,
-        })
-        .eq('id', requestId)
-        .select()
-        .maybeSingle();
-
-      if (error) {
-        throw new InternalServerErrorException({
-          code: 'LEAVE_WRITE_FAILED',
-          message: 'Lỗi cập nhật hủy bỏ đơn phép.',
-        });
-      }
-
-      return data;
-    }
-
-    throw new ForbiddenException({
-      code: 'LEAVE_ACCESS_DENIED',
-      message: 'Bạn không có quyền hủy đơn nghỉ phép của nhân viên khác.',
-    });
+    return data;
   }
 
-  // Admin-only leave balance adjustments with adjustment audit trails
+  // Admin-only leave balance adjustments using atomic RPC (Blocker 8)
   async adjustBalance(
     balanceId: string,
     dto: LeaveBalanceAdjustmentDto,
@@ -529,60 +465,33 @@ export class LeaveService {
       });
     }
 
-    const { data: balance, error: findError } = await this.client
-      .from('leave_balances')
-      .select('*')
-      .eq('id', balanceId)
-      .maybeSingle();
+    const { data, error } = await this.client.rpc(
+      'phase5_adjust_leave_balance',
+      {
+        p_balance_id: balanceId,
+        p_delta_days: dto.deltaDays,
+        p_reason: dto.reason,
+        p_actor_profile: user.profileId,
+      },
+    );
 
-    if (findError || !balance) {
-      throw new NotFoundException({
-        code: 'LEAVE_BALANCE_NOT_FOUND',
-        message: 'Không tìm thấy thông tin số dư ngày phép cần điều chỉnh.',
-      });
-    }
-
-    const nextAdjusted = Number(balance.adjusted_days) + dto.deltaDays;
-    const available = Number(balance.allocated_days) + nextAdjusted - Number(balance.used_days);
-
-    if (available < 0) {
-      throw new BadRequestException({
-        code: 'LEAVE_INSUFFICIENT_BALANCE',
-        message: 'Không thể giảm số dư ngày phép dưới 0 ngày khả dụng.',
-      });
-    }
-
-    // Update leave balances adjusted days
-    const { error: updateError } = await this.client
-      .from('leave_balances')
-      .update({
-        adjusted_days: nextAdjusted,
-      })
-      .eq('id', balanceId);
-
-    if (updateError) {
+    if (error) {
+      const msg = error.message;
+      if (msg.includes('LEAVE_BALANCE_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'LEAVE_BALANCE_NOT_FOUND',
+          message: 'Không tìm thấy thông tin số dư ngày phép cần điều chỉnh.',
+        });
+      }
+      if (msg.includes('LEAVE_INSUFFICIENT_BALANCE')) {
+        throw new BadRequestException({
+          code: 'LEAVE_INSUFFICIENT_BALANCE',
+          message: 'Không thể giảm số dư ngày phép dưới 0 ngày khả dụng.',
+        });
+      }
       throw new InternalServerErrorException({
         code: 'LEAVE_WRITE_FAILED',
         message: 'Không thể cập nhật số dư phép nhân sự.',
-      });
-    }
-
-    // Insert adjustment audit log
-    const { data, error } = await this.client
-      .from('leave_balance_adjustments')
-      .insert({
-        leave_balance_id: balanceId,
-        delta_days: dto.deltaDays,
-        reason: dto.reason,
-        actor_user_id: user.profileId,
-      })
-      .select()
-      .maybeSingle();
-
-    if (error) {
-      throw new InternalServerErrorException({
-        code: 'LEAVE_WRITE_FAILED',
-        message: 'Không thể lưu vết lịch sử điều chỉnh số dư phép.',
       });
     }
 
@@ -594,12 +503,16 @@ export class LeaveService {
     this.enforceInternalUser(user);
 
     if (!from || !to) {
-      throw new BadRequestException('from và to query date parameters là bắt buộc.');
+      throw new BadRequestException(
+        'from và to query date parameters là bắt buộc.',
+      );
     }
 
     const { data, error } = await this.client
       .from('leave_requests')
-      .select('id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles(full_name)')
+      .select(
+        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles(full_name)',
+      )
       .eq('status', 'approved')
       .or(`start_date.lte.${to},end_date.gte.${from}`);
 
@@ -621,8 +534,4 @@ export class LeaveService {
       leaveType: row.leave_type?.name || 'Nghỉ phép',
     }));
   }
-}
-
-function EXTRACT_YEAR(dateStr: string): number {
-  return new Date(dateStr).getFullYear();
 }

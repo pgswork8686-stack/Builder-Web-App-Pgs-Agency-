@@ -7,7 +7,13 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
-import { CheckInDto, CheckOutDto, AttendanceQuery, AttendanceAdjustmentDto } from './dto/attendance.dto';
+import {
+  CheckInDto,
+  CheckOutDto,
+  AttendanceQuery,
+  AttendanceAdjustmentDto,
+} from './dto/attendance.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AttendanceService {
@@ -86,30 +92,46 @@ export class AttendanceService {
     checkOutAt: Date | null,
     settings: any,
   ) {
-    let status: 'present' | 'late' | 'early_leave' | 'late_and_early_leave' | 'incomplete' = 'incomplete';
+    let status:
+      | 'present'
+      | 'late'
+      | 'early_leave'
+      | 'late_and_early_leave'
+      | 'incomplete' = 'incomplete';
     let lateMinutes = 0;
     let earlyLeaveMinutes = 0;
     let workMinutes: number | null = null;
 
     if (checkInAt && checkOutAt) {
-      workMinutes = Math.max(0, Math.floor((checkOutAt.getTime() - checkInAt.getTime()) / 60000));
+      workMinutes = Math.max(
+        0,
+        Math.floor((checkOutAt.getTime() - checkInAt.getTime()) / 60000),
+      );
     }
 
-    if (checkInAt) {
+    // BLOCKER 1: Remove Invented HR Policy (late/early metrics remain 0 if workday_start/end is unconfigured)
+    const hasWorkdayStart = !!settings?.workday_start_time;
+    const hasWorkdayEnd = !!settings?.workday_end_time;
+
+    if (checkInAt && hasWorkdayStart) {
       const checkInMinutes = this.getVietnamMinutesOfDay(checkInAt);
-      const policyStartMinutes = this.getMinutesFromTime(settings?.workday_start_time || '08:30:00');
-      const lateGrace = settings?.late_grace_minutes || 15;
-      
+      const policyStartMinutes = this.getMinutesFromTime(
+        settings.workday_start_time,
+      );
+      const lateGrace = settings.late_grace_minutes ?? 0;
+
       const diff = checkInMinutes - policyStartMinutes;
       if (diff > lateGrace) {
         lateMinutes = diff;
       }
     }
 
-    if (checkOutAt) {
+    if (checkOutAt && hasWorkdayEnd) {
       const checkOutMinutes = this.getVietnamMinutesOfDay(checkOutAt);
-      const policyEndMinutes = this.getMinutesFromTime(settings?.workday_end_time || '17:30:00');
-      const earlyGrace = settings?.early_leave_grace_minutes || 15;
+      const policyEndMinutes = this.getMinutesFromTime(
+        settings.workday_end_time,
+      );
+      const earlyGrace = settings.early_leave_grace_minutes ?? 0;
 
       const diff = policyEndMinutes - checkOutMinutes;
       if (diff > earlyGrace) {
@@ -134,13 +156,62 @@ export class AttendanceService {
     return { status, lateMinutes, earlyLeaveMinutes, workMinutes };
   }
 
+  // Validate photo upload session matches requirements
+  private async verifyPhotoUploadSession(
+    sessionId: string | null | undefined,
+    userProfileId: string,
+  ) {
+    if (!sessionId) return null;
+
+    const { data: session, error } = await this.client
+      .from('attendance_photo_upload_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .maybeSingle();
+
+    if (error || !session) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_SESSION_INVALID',
+        message: 'Phiên tải ảnh lên không hợp lệ.',
+      });
+    }
+
+    if (session.user_id !== userProfileId) {
+      throw new ForbiddenException({
+        code: 'ATTENDANCE_PHOTO_SESSION_DENIED',
+        message: 'Bạn không sở hữu phiên tải ảnh này.',
+      });
+    }
+
+    if (new Date(session.expires_at) < new Date()) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_SESSION_EXPIRED',
+        message: 'Phiên tải ảnh đã hết hạn.',
+      });
+    }
+
+    // Mark session as completed
+    await this.client
+      .from('attendance_photo_upload_sessions')
+      .update({ completed_at: new Date().toISOString() })
+      .eq('id', sessionId);
+
+    return session.expected_path;
+  }
+
   // Check In API implementation
   async checkIn(dto: CheckInDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
 
     // Check location requirement
-    if (settings?.location_required && (dto.latitude === undefined || dto.longitude === undefined)) {
+    if (
+      settings?.location_required &&
+      (dto.latitude === undefined ||
+        dto.longitude === undefined ||
+        dto.latitude === null ||
+        dto.longitude === null)
+    ) {
       throw new BadRequestException({
         code: 'ATTENDANCE_LOCATION_REQUIRED',
         message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
@@ -148,17 +219,23 @@ export class AttendanceService {
     }
 
     // Check photo requirement
-    if (settings?.photo_required && !dto.photoPath) {
+    if (settings?.photo_required && !dto.photoUploadSessionId) {
       throw new BadRequestException({
         code: 'ATTENDANCE_PHOTO_REQUIRED',
         message: 'Ảnh bằng chứng là bắt buộc theo chính sách chấm công.',
       });
     }
 
+    // Verify photo session and load secure path
+    const securePhotoPath = await this.verifyPhotoUploadSession(
+      dto.photoUploadSessionId,
+      user.profileId,
+    );
+
     const todayStr = this.getVietnamDate();
     const checkInTime = new Date();
 
-    const { status, lateMinutes, earlyLeaveMinutes } = this.calculateAttendanceMetrics(
+    const { status, lateMinutes } = this.calculateAttendanceMetrics(
       checkInTime,
       null,
       settings,
@@ -174,7 +251,7 @@ export class AttendanceService {
         check_in_latitude: dto.latitude ?? null,
         check_in_longitude: dto.longitude ?? null,
         check_in_accuracy_meters: dto.accuracyMeters ?? null,
-        check_in_photo_path: dto.photoPath ?? null,
+        check_in_photo_path: securePhotoPath ?? null,
         check_in_note: dto.note ?? null,
         status,
         late_minutes: lateMinutes,
@@ -201,7 +278,7 @@ export class AttendanceService {
     return data;
   }
 
-  // Check Out API implementation
+  // Check Out API implementation using atomic DB RPC (Blocker 5)
   async checkOut(dto: CheckOutDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
@@ -209,7 +286,7 @@ export class AttendanceService {
     const todayStr = this.getVietnamDate();
     const checkOutTime = new Date();
 
-    // Query current day check-in record
+    // Query current day check-in record first (pre-check for Nest validation)
     const { data: record, error: findError } = await this.client
       .from('attendance_records')
       .select('*')
@@ -246,32 +323,54 @@ export class AttendanceService {
       });
     }
 
-    const { status, lateMinutes, earlyLeaveMinutes, workMinutes } = this.calculateAttendanceMetrics(
-      checkInTime,
-      checkOutTime,
-      settings,
+    // Verify photo session and load secure path
+    const securePhotoPath = await this.verifyPhotoUploadSession(
+      dto.photoUploadSessionId,
+      user.profileId,
     );
 
-    const { data, error } = await this.client
-      .from('attendance_records')
-      .update({
-        check_out_at: checkOutTime.toISOString(),
-        check_out_latitude: dto.latitude ?? null,
-        check_out_longitude: dto.longitude ?? null,
-        check_out_accuracy_meters: dto.accuracyMeters ?? null,
-        check_out_photo_path: dto.photoPath ?? null,
-        check_out_note: dto.note ?? null,
-        status,
-        late_minutes: lateMinutes,
-        early_leave_minutes: earlyLeaveMinutes,
-        work_minutes: workMinutes,
-        updated_by: user.authUserId,
-      })
-      .eq('id', record.id)
-      .select()
-      .maybeSingle();
+    const { status, lateMinutes, earlyLeaveMinutes, workMinutes } =
+      this.calculateAttendanceMetrics(checkInTime, checkOutTime, settings);
+
+    // Call atomic checkout RPC
+    const { data, error } = await this.client.rpc(
+      'phase5_check_out_attendance',
+      {
+        p_user_id: user.profileId,
+        p_attendance_date: todayStr,
+        p_checkout_time: checkOutTime.toISOString(),
+        p_latitude: dto.latitude ?? null,
+        p_longitude: dto.longitude ?? null,
+        p_accuracy_meters: dto.accuracyMeters ?? null,
+        p_photo_path: securePhotoPath ?? null,
+        p_note: dto.note ?? null,
+        p_status: status,
+        p_late_minutes: lateMinutes,
+        p_early_leave_minutes: earlyLeaveMinutes,
+        p_work_minutes: workMinutes,
+      },
+    );
 
     if (error) {
+      const msg = error.message;
+      if (msg.includes('ATTENDANCE_NOT_CHECKED_IN')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_NOT_CHECKED_IN',
+          message: 'Bạn chưa check-in cho ngày hôm nay.',
+        });
+      }
+      if (msg.includes('ATTENDANCE_ALREADY_CHECKED_OUT')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_ALREADY_CHECKED_OUT',
+          message: 'Bạn đã check-out ngày hôm nay rồi.',
+        });
+      }
+      if (msg.includes('ATTENDANCE_INVALID_TIME_RANGE')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_INVALID_TIME_RANGE',
+          message: 'Thời gian check-out phải sau thời gian check-in.',
+        });
+      }
       throw new InternalServerErrorException({
         code: 'ATTENDANCE_WRITE_FAILED',
         message: 'Không thể ghi nhận thông tin check-out.',
@@ -322,7 +421,7 @@ export class AttendanceService {
     };
   }
 
-  // Admin / Team Leader attendance lookup API
+  // Admin / Team Leader attendance lookup API (Blocker 10 - DB Side Filtering before Pagination)
   async getDirectory(query: AttendanceQuery, user: RequestUser) {
     this.enforceInternalUser(user);
 
@@ -336,11 +435,10 @@ export class AttendanceService {
       });
     }
 
-    // Scoped visibility: team_leaders can only see employees belonging to their team
+    // Resolve team leader scope first
     let teamIdConstraint: string | null = null;
 
     if (isLeader) {
-      // Find team led by this user
       const { data: team, error: teamError } = await this.client
         .from('teams')
         .select('id')
@@ -348,16 +446,36 @@ export class AttendanceService {
         .maybeSingle();
 
       if (teamError || !team) {
-        // If team leader doesn't lead any team, limit query returns nothing or raise scope restriction
         teamIdConstraint = '00000000-0000-0000-0000-000000000000';
       } else {
         teamIdConstraint = team.id;
       }
     }
 
+    // Raise access denied if team leader queries a different teamId
+    if (query.teamId && isLeader && query.teamId !== teamIdConstraint) {
+      throw new ForbiddenException({
+        code: 'ATTENDANCE_ACCESS_DENIED',
+        message: 'Bạn chỉ có quyền xem chấm công của đội nhóm của bạn.',
+      });
+    }
+
+    // Raise access denied if team leader queries departmentId
+    if (query.departmentId && isLeader) {
+      throw new ForbiddenException({
+        code: 'ATTENDANCE_ACCESS_DENIED',
+        message:
+          'Trưởng nhóm không có quyền xem chấm công theo toàn phòng ban.',
+      });
+    }
+
+    // Build the DB-side filters
     let dbQuery = this.client
       .from('attendance_records')
-      .select('*, profile:profiles(id, full_name, email, avatar_url, employee_profile:employee_profiles(team_id, department_id))', { count: 'exact' });
+      .select(
+        '*, profile:profiles!inner(id, full_name, email, avatar_url, employee_profile:employee_profiles!inner(team_id, department_id))',
+        { count: 'exact' },
+      );
 
     if (query.from) {
       dbQuery = dbQuery.gte('attendance_date', query.from);
@@ -372,6 +490,23 @@ export class AttendanceService {
       dbQuery = dbQuery.eq('user_id', query.userId);
     }
 
+    // Apply scoping at DB layer
+    if (isLeader) {
+      dbQuery = dbQuery.eq(
+        'profile.employee_profile.team_id',
+        teamIdConstraint,
+      );
+    } else if (query.teamId) {
+      dbQuery = dbQuery.eq('profile.employee_profile.team_id', query.teamId);
+    }
+
+    if (query.departmentId) {
+      dbQuery = dbQuery.eq(
+        'profile.employee_profile.department_id',
+        query.departmentId,
+      );
+    }
+
     const offset = (query.page - 1) * query.pageSize;
     const { data, count, error } = await dbQuery
       .order('attendance_date', { ascending: false })
@@ -384,57 +519,26 @@ export class AttendanceService {
       });
     }
 
-    // Filter results according to team leader team scope or admin scope
-    let filtered = (data || []).map((row: any) => {
+    // Map profiles/coordinates privacy filters
+    const sanitized = (data || []).map((row: any) => {
+      const rowCopy = { ...row };
       const empProfile = Array.isArray(row.profile?.employee_profile)
         ? row.profile.employee_profile[0]
         : row.profile?.employee_profile;
 
-      return {
-        ...row,
-        employee: row.profile
-          ? {
-              id: row.profile.id,
-              fullName: row.profile.full_name,
-              email: row.profile.email,
-              avatarUrl: row.profile.avatar_url,
-              teamId: empProfile?.team_id || null,
-              departmentId: empProfile?.department_id || null,
-            }
-          : null,
-      };
-    });
+      rowCopy.employee = row.profile
+        ? {
+            id: row.profile.id,
+            fullName: row.profile.full_name,
+            email: row.profile.email,
+            avatarUrl: row.profile.avatar_url,
+            teamId: empProfile?.team_id || null,
+            departmentId: empProfile?.department_id || null,
+          }
+        : null;
 
-    if (isLeader && teamIdConstraint) {
-      filtered = filtered.filter((row: any) => row.employee?.teamId === teamIdConstraint);
-    }
-
-    if (query.teamId) {
-      // Prevent team leaders from querying other teams
-      if (isLeader && query.teamId !== teamIdConstraint) {
-        throw new ForbiddenException({
-          code: 'ATTENDANCE_ACCESS_DENIED',
-          message: 'Bạn chỉ có thể truy vấn chấm công của đội nhóm mình quản lý.',
-        });
-      }
-      filtered = filtered.filter((row: any) => row.employee?.teamId === query.teamId);
-    }
-
-    if (query.departmentId) {
-      if (isLeader) {
-        throw new ForbiddenException({
-          code: 'ATTENDANCE_ACCESS_DENIED',
-          message: 'Trưởng nhóm không có quyền xem chấm công theo toàn phòng ban.',
-        });
-      }
-      filtered = filtered.filter((row: any) => row.employee?.departmentId === query.departmentId);
-    }
-
-    // Map profiles/coordinates privacy filters
-    const sanitized = filtered.map((row: any) => {
-      const rowCopy = { ...row };
       delete rowCopy.profile;
-      
+
       // Hide precise coordinates for non-self unless admin
       if (!isAdmin) {
         delete rowCopy.check_in_latitude;
@@ -455,7 +559,7 @@ export class AttendanceService {
     };
   }
 
-  // Admin correction/adjustment API
+  // Admin correction/adjustment API using atomic RPC (Blocker 6)
   async adjustRecord(
     recordId: string,
     dto: AttendanceAdjustmentDto,
@@ -469,7 +573,7 @@ export class AttendanceService {
       });
     }
 
-    // Get existing record details
+    // Get existing record details for Nest validation checks
     const { data: record, error: findError } = await this.client
       .from('attendance_records')
       .select('*')
@@ -495,77 +599,49 @@ export class AttendanceService {
       });
     }
 
-    const { status, lateMinutes, earlyLeaveMinutes, workMinutes } = this.calculateAttendanceMetrics(
-      checkInAt,
-      checkOutAt,
-      settings,
-    );
+    const { status, lateMinutes, earlyLeaveMinutes, workMinutes } =
+      this.calculateAttendanceMetrics(checkInAt, checkOutAt, settings);
 
     const finalStatus = dto.status || status;
 
-    const previousData = {
-      check_in_at: record.check_in_at,
-      check_out_at: record.check_out_at,
-      status: record.status,
-      late_minutes: record.late_minutes,
-      early_leave_minutes: record.early_leave_minutes,
-      work_minutes: record.work_minutes,
-    };
+    // Call atomic adjustment RPC
+    const { data, error } = await this.client.rpc(
+      'phase5_adjust_attendance_record',
+      {
+        p_record_id: recordId,
+        p_adjusted_by_profile: user.profileId,
+        p_adjusted_by_auth: user.authUserId,
+        p_check_in_at: checkInAt ? checkInAt.toISOString() : null,
+        p_check_out_at: checkOutAt ? checkOutAt.toISOString() : null,
+        p_status: finalStatus,
+        p_late_minutes: lateMinutes,
+        p_early_leave_minutes: earlyLeaveMinutes,
+        p_work_minutes: workMinutes,
+        p_reason: dto.reason,
+      },
+    );
 
-    const newData = {
-      check_in_at: checkInAt ? checkInAt.toISOString() : null,
-      check_out_at: checkOutAt ? checkOutAt.toISOString() : null,
-      status: finalStatus,
-      late_minutes: lateMinutes,
-      early_leave_minutes: earlyLeaveMinutes,
-      work_minutes: workMinutes,
-    };
-
-    // Update record and log adjustment in atomic execution
-    const { error: updateError } = await this.client
-      .from('attendance_records')
-      .update({
-        check_in_at: newData.check_in_at,
-        check_out_at: newData.check_out_at,
-        status: newData.status,
-        late_minutes: newData.late_minutes,
-        early_leave_minutes: newData.early_leave_minutes,
-        work_minutes: newData.work_minutes,
-        source: 'admin_adjustment',
-        updated_by: user.authUserId,
-      })
-      .eq('id', recordId);
-
-    if (updateError) {
+    if (error) {
+      const msg = error.message;
+      if (msg.includes('ATTENDANCE_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'ATTENDANCE_NOT_FOUND',
+          message: 'Không tìm thấy bản ghi chấm công.',
+        });
+      }
+      if (msg.includes('ATTENDANCE_INVALID_TIME_RANGE')) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_INVALID_TIME_RANGE',
+          message: 'Thời gian check-out phải sau thời gian check-in.',
+        });
+      }
       throw new InternalServerErrorException({
         code: 'ATTENDANCE_WRITE_FAILED',
         message: 'Không thể cập nhật điều chỉnh bản ghi chấm công.',
       });
     }
 
-    const { data: adjustment, error: logError } = await this.client
-      .from('attendance_adjustments')
-      .insert({
-        attendance_record_id: recordId,
-        requested_by: user.profileId,
-        approved_by: user.profileId,
-        reason: dto.reason,
-        previous_data: previousData,
-        new_data: newData,
-        status: 'approved',
-        reviewed_at: new Date().toISOString(),
-      })
-      .select()
-      .maybeSingle();
-
-    if (logError) {
-      throw new InternalServerErrorException({
-        code: 'ATTENDANCE_WRITE_FAILED',
-        message: 'Lỗi ghi chép lịch sử điều chỉnh chấm công.',
-      });
-    }
-
-    return adjustment;
+    return data;
   }
 
   // Dashboard attendance summary
@@ -605,9 +681,14 @@ export class AttendanceService {
       });
     }
 
-    const presentDays = monthRecords?.filter((r) => r.status === 'present').length || 0;
-    const lateCount = monthRecords?.filter((r) => r.status === 'late' || r.status === 'late_and_early_leave').length || 0;
-    const incompleteCount = monthRecords?.filter((r) => r.status === 'incomplete').length || 0;
+    const presentDays =
+      monthRecords?.filter((r) => r.status === 'present').length || 0;
+    const lateCount =
+      monthRecords?.filter(
+        (r) => r.status === 'late' || r.status === 'late_and_early_leave',
+      ).length || 0;
+    const incompleteCount =
+      monthRecords?.filter((r) => r.status === 'incomplete').length || 0;
 
     return {
       today: todayRecord
@@ -634,24 +715,29 @@ export class AttendanceService {
     };
   }
 
-  // Signed upload token flow for photo evidence
-  async getPhotoUploadSignature(fileName: string, mimeType: string, user: RequestUser) {
+  // Signed upload token flow for photo evidence (Blocker 9 - crypto.randomUUID Upload Session)
+  async getPhotoUploadSignature(
+    fileName: string,
+    mimeType: string,
+    user: RequestUser,
+  ) {
     this.enforceInternalUser(user);
 
     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedMimes.includes(mimeType)) {
       throw new BadRequestException({
         code: 'ATTENDANCE_WRITE_FAILED',
-        message: 'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
+        message:
+          'Định dạng tệp ảnh không được hỗ trợ. Vui lòng tải lên jpeg, png hoặc webp.',
       });
     }
 
     const todayStr = this.getVietnamDate();
     const [year, month] = todayStr.split('-');
-    
-    // Prefix path mapping
-    const fileId = gen_random_uuid();
-    const filePath = `attendance/${user.profileId}/${year}/${month}/${fileId}-${fileName}`;
+
+    // Generate secure upload path using crypto.randomUUID()
+    const fileId = crypto.randomUUID();
+    const filePath = `attendance/${user.profileId}/${year}/${month}/${fileId}/${fileName}`;
 
     // Get pre-signed storage upload URL (expires in 15 minutes)
     const supabaseAdmin = this.supabaseService.getSystemClient();
@@ -666,19 +752,33 @@ export class AttendanceService {
       });
     }
 
+    // Insert session tracker record into DB
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
+    const { data: session, error: sessionError } = await this.client
+      .from('attendance_photo_upload_sessions')
+      .insert({
+        user_id: user.profileId,
+        expected_path: filePath,
+        expected_mime: mimeType,
+        expires_at: expiresAt.toISOString(),
+      })
+      .select()
+      .maybeSingle();
+
+    if (sessionError || !session) {
+      throw new InternalServerErrorException({
+        code: 'ATTENDANCE_WRITE_FAILED',
+        message: 'Không thể lưu phiên đăng ký tải lên ảnh.',
+      });
+    }
+
     return {
+      photoUploadSessionId: session.id,
       signedUrl: data.signedUrl,
       token: data.token,
       path: filePath,
     };
   }
-}
-
-// Simple UUID generator fallback
-function gen_random_uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
 }

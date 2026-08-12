@@ -1,5 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ForbiddenException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { AttendanceService } from './attendance.service';
 
@@ -7,9 +6,24 @@ const USER_ID = '33333333-3333-4333-8333-333333333333';
 const AUTH_USER_ID = 'auth-user-id-123';
 const RECORD_ID = 'record-uuid-1111';
 
-function queryResult(result: { data?: any; count?: number | null; error?: any }, terminal: 'maybeSingle' | 'single' = 'maybeSingle') {
+function queryResult(
+  result: { data?: any; count?: number | null; error?: any },
+  terminal: 'maybeSingle' | 'single' = 'maybeSingle',
+) {
   const query: any = {};
-  for (const method of ['select', 'eq', 'gte', 'lte', 'insert', 'update', 'single', 'maybeSingle', 'limit', 'order', 'range']) {
+  for (const method of [
+    'select',
+    'eq',
+    'gte',
+    'lte',
+    'insert',
+    'update',
+    'single',
+    'maybeSingle',
+    'limit',
+    'order',
+    'range',
+  ]) {
     query[method] = jest.fn(() => query);
   }
   query[terminal] = jest.fn().mockResolvedValue({
@@ -63,9 +77,9 @@ describe('AttendanceService', () => {
     });
 
     it('rejects check-in if user is a client', async () => {
-      await expect(
-        service.checkIn({}, user('client')),
-      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(service.checkIn({}, user('client'))).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
     });
 
     it('rejects double check-in with duplicate constraint code 23505', async () => {
@@ -79,9 +93,9 @@ describe('AttendanceService', () => {
         return queryResult({});
       });
 
-      await expect(
-        service.checkIn({}, user('employee')),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.checkIn({}, user('employee'))).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('enforces location requirement policy when enabled', async () => {
@@ -92,9 +106,9 @@ describe('AttendanceService', () => {
         return queryResult({});
       });
 
-      await expect(
-        service.checkIn({}, user('employee')),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.checkIn({}, user('employee'))).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -110,9 +124,9 @@ describe('AttendanceService', () => {
         return queryResult({});
       });
 
-      await expect(
-        service.checkOut({}, user('employee')),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.checkOut({}, user('employee'))).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('rejects check-out if already checked out', async () => {
@@ -121,14 +135,20 @@ describe('AttendanceService', () => {
           return queryResult({ data: {} });
         }
         if (table === 'attendance_records') {
-          return queryResult({ data: { id: RECORD_ID, check_in_at: new Date().toISOString(), check_out_at: new Date().toISOString() } });
+          return queryResult({
+            data: {
+              id: RECORD_ID,
+              check_in_at: new Date().toISOString(),
+              check_out_at: new Date().toISOString(),
+            },
+          });
         }
         return queryResult({});
       });
 
-      await expect(
-        service.checkOut({}, user('employee')),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.checkOut({}, user('employee'))).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -139,17 +159,25 @@ describe('AttendanceService', () => {
           return queryResult({ data: {} });
         }
         if (table === 'attendance_records') {
-          return queryResult({ data: { id: RECORD_ID, check_in_at: new Date().toISOString() } });
-        }
-        if (table === 'attendance_adjustments') {
-          return queryResult({ data: { id: 'adjustment-id' } });
+          return queryResult({
+            data: { id: RECORD_ID, check_in_at: new Date().toISOString() },
+          });
         }
         return queryResult({});
       });
 
+      client.rpc.mockResolvedValueOnce({
+        data: { id: RECORD_ID },
+        error: null,
+      });
+
       const res = await service.adjustRecord(
         RECORD_ID,
-        { checkInAt: new Date().toISOString(), checkOutAt: new Date().toISOString(), reason: 'Corrected log' },
+        {
+          checkInAt: new Date().toISOString(),
+          checkOutAt: new Date().toISOString(),
+          reason: 'Corrected log',
+        },
         user('admin'),
       );
       expect(res).toBeDefined();
