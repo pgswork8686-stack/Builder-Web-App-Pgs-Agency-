@@ -6,7 +6,10 @@ import {
   ConflictException,
   InternalServerErrorException,
   Logger,
+  Optional,
 } from '@nestjs/common';
+import { AutomationService } from '../automation/automation.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
 import {
@@ -22,7 +25,11 @@ import {
 export class FinanceService {
   private readonly logger = new Logger(FinanceService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly automation?: AutomationService,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
@@ -295,6 +302,122 @@ export class FinanceService {
     };
   }
 
+  private async getClientMemberIds(clientCompanyId: string): Promise<string[]> {
+    const { data, error } = await this.client
+      .from('client_memberships')
+      .select(
+        'user_id, profile:profiles!client_memberships_user_id_fkey(account_status)',
+      )
+      .eq('client_company_id', clientCompanyId)
+      .limit(100);
+
+    if (error) {
+      this.logger.error(
+        `Finance client recipient lookup failed: ${error.message}`,
+      );
+      return [];
+    }
+
+    return (data ?? [])
+      .filter((row) => {
+        const profile = Array.isArray(row.profile)
+          ? row.profile[0]
+          : row.profile;
+        return profile?.account_status === 'active';
+      })
+      .map((row) => row.user_id);
+  }
+
+  private async notifyFinanceEvent(
+    triggerType:
+      | 'contract.status_changed'
+      | 'invoice.issued'
+      | 'invoice.overdue'
+      | 'invoice.payment_recorded',
+    entity: any,
+    user: RequestUser,
+    payment?: any,
+  ) {
+    if (!this.notifications && !this.automation) return;
+    try {
+      if (!entity?.client_visible || !entity?.client_company_id) {
+        return;
+      }
+
+      const recipients = await this.getClientMemberIds(
+        entity.client_company_id,
+      );
+      const entityType = triggerType.startsWith('contract')
+        ? 'contract'
+        : 'invoice';
+      const entityId = entity.id;
+      const actionUrl =
+        entityType === 'contract'
+          ? '/app/client/contracts'
+          : '/app/client/invoices';
+      const title =
+        triggerType === 'invoice.payment_recorded'
+          ? 'Da ghi nhan thanh toan'
+          : triggerType === 'invoice.overdue'
+            ? 'Hoa don qua han'
+            : triggerType === 'invoice.issued'
+              ? 'Hoa don da phat hanh'
+              : 'Hop dong da cap nhat';
+      const message =
+        triggerType === 'invoice.payment_recorded'
+          ? `Hoa don ${entity.invoice_number} da ghi nhan thanh toan.`
+          : triggerType === 'invoice.overdue'
+            ? `Hoa don ${entity.invoice_number} da qua han thanh toan.`
+            : triggerType === 'invoice.issued'
+              ? `Hoa don ${entity.invoice_number} da duoc phat hanh.`
+              : `Hop dong ${entity.contract_number} da doi trang thai.`;
+
+      await this.notifications?.createForUsers(recipients, {
+        type: triggerType,
+        title,
+        message,
+        entityType,
+        entityId,
+        actionUrl,
+        metadata: {
+          clientCompanyId: entity.client_company_id,
+          projectId: entity.project_id,
+          status: entity.status,
+          paymentId: payment?.id ?? null,
+        },
+        actorUserId: user.profileId,
+      });
+
+      const contractId =
+        entityType === 'contract' ? entity.id : (entity.contract_id ?? null);
+      const invoiceId = entityType === 'invoice' ? entity.id : null;
+
+      await this.automation?.runEvent({
+        triggerType,
+        eventKey: `${triggerType}:${entityId}:${payment?.id ?? entity.status ?? entity.updated_at}`,
+        payload: {
+          clientCompanyId: entity.client_company_id,
+          projectId: entity.project_id,
+          contractId,
+          invoiceId,
+          status: entity.status,
+          paymentId: payment?.id ?? null,
+        },
+        actorUserId: user.profileId,
+        defaultRecipients: recipients,
+        title,
+        message,
+        entityType,
+        entityId,
+        actionUrl,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Finance side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
   async getSummary(user: RequestUser) {
     this.enforceAdminOrAccountant(user);
 
@@ -443,6 +566,8 @@ export class FinanceService {
       this.handleDbError(error);
     }
 
+    await this.notifyFinanceEvent('contract.status_changed', data, user);
+
     return data;
   }
 
@@ -516,6 +641,12 @@ export class FinanceService {
       this.handleDbError(error);
     }
 
+    if (status === 'issued') {
+      await this.notifyFinanceEvent('invoice.issued', data, user);
+    } else if (status === 'overdue') {
+      await this.notifyFinanceEvent('invoice.overdue', data, user);
+    }
+
     return data;
   }
 
@@ -534,6 +665,13 @@ export class FinanceService {
     if (error) {
       this.handleDbError(error);
     }
+
+    await this.notifyFinanceEvent(
+      'invoice.payment_recorded',
+      data?.invoice ?? {},
+      user,
+      data?.payment ?? null,
+    );
 
     return data;
   }

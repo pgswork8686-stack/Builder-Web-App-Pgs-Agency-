@@ -62,6 +62,7 @@ export class AuthService {
         status: user.accountStatus,
         role: user.role,
         approvedAt: user.approvedAt,
+        rejectionReason: user.rejectionReason ?? null,
       },
       canBootstrapAdmin,
     };

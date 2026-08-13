@@ -11,9 +11,13 @@ import {
   ArrowRight,
   LogOut,
   FileText,
+  Bell,
+  MessageCircle,
+  Bot,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "@/components/phase7/notification-bell";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -41,6 +45,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Quản trị viên (Admin)</span>
@@ -65,6 +70,47 @@ export default function AdminDashboardPage() {
             Quản lý tài khoản người dùng, cấu hình hệ thống và phân quyền truy
             cập doanh nghiệp.
           </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <Link
+            href="/app/notifications"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
+          >
+            <Bell className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+              Thông báo
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Theo dõi sự kiện task, leave, attendance, finance, chat và dự án.
+            </p>
+          </Link>
+
+          <Link
+            href="/app/chat"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
+          >
+            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+              Chat
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Direct chat nội bộ và project chat có kiểm tra membership.
+            </p>
+          </Link>
+
+          <Link
+            href="/app/admin/automation"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
+          >
+            <Bot className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+              Automation
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Rule nội bộ an toàn, chỉ tạo notification qua trigger registry.
+            </p>
+          </Link>
         </div>
 
         {/* Feature Banner: Account Approvals */}

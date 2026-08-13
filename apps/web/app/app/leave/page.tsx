@@ -3,32 +3,29 @@
 import React, { useEffect, useState } from "react";
 import {
   Calendar,
-  Clock,
   Plus,
-  Trash2,
   AlertCircle,
   CheckCircle,
   FileText,
-  User2,
   XCircle,
   Loader2,
 } from "lucide-react";
-import { getMe } from "@/lib/api/auth";
 import {
   leaveApi,
   LeaveRequest,
   LeaveBalance,
   LeaveType,
 } from "@/lib/api/leave";
+import { FinanceConfirmDialog } from "@/components/finance/FinanceConfirmDialog";
 
 export default function EmployeeLeavePage() {
-  const [user, setUser] = useState<any>(null);
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [balances, setBalances] = useState<LeaveBalance[]>([]);
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState<string | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<LeaveRequest | null>(null);
 
   // New leave request states
   const [selectedType, setSelectedType] = useState("");
@@ -48,9 +45,6 @@ export default function EmployeeLeavePage() {
   const loadMetadata = async () => {
     try {
       setLoading(true);
-      const me = await getMe();
-      setUser(me);
-
       const typesRes = await leaveApi.getLeaveTypes();
       setLeaveTypes(typesRes);
 
@@ -130,14 +124,14 @@ export default function EmployeeLeavePage() {
     }
   };
 
-  const handleCancelRequest = async (requestId: string) => {
-    if (
-      !window.confirm("Bạn có chắc chắn muốn hủy đơn xin nghỉ phép này không?")
-    )
-      return;
+  const handleCancelRequest = async () => {
+    if (!cancelTarget) return;
+
+    const requestId = cancelTarget.id;
 
     try {
       setCancelLoading(requestId);
+      setCancelTarget(null);
       setFeedback(null);
 
       await leaveApi.cancelRequest(requestId);
@@ -399,7 +393,7 @@ export default function EmployeeLeavePage() {
                         <td className="py-3.5 px-4 text-right">
                           {req.status === "pending" && (
                             <button
-                              onClick={() => handleCancelRequest(req.id)}
+                              onClick={() => setCancelTarget(req)}
                               disabled={cancelLoading === req.id}
                               className="p-1 text-rose-500 hover:text-rose-400 disabled:opacity-50 transition-colors"
                               title="Hủy đơn xin nghỉ"
@@ -417,6 +411,14 @@ export default function EmployeeLeavePage() {
           </div>
         </div>
       </main>
+      <FinanceConfirmDialog
+        isOpen={Boolean(cancelTarget)}
+        title="Hủy đơn xin nghỉ"
+        message="Bạn có chắc chắn muốn hủy đơn xin nghỉ phép này không? Thao tác này sẽ được gửi lên hệ thống ngay lập tức."
+        isDanger
+        onConfirm={handleCancelRequest}
+        onCancel={() => setCancelTarget(null)}
+      />
     </div>
   );
 }

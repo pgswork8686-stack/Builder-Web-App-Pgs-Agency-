@@ -8,6 +8,8 @@ import {
   Optional,
 } from '@nestjs/common';
 import { RequestUser } from '../auth/auth.types';
+import { AutomationService } from '../automation/automation.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
@@ -19,6 +21,8 @@ export class TasksService {
   constructor(
     private readonly supabaseService: SupabaseService,
     @Optional() private readonly realtime?: WorkspaceRealtimeGateway,
+    @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly automation?: AutomationService,
   ) {}
 
   private get client() {
@@ -48,6 +52,63 @@ export class TasksService {
     } catch (error) {
       this.logger.error(
         `Realtime task broadcast failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  private async runTaskSideEffects(
+    triggerType: 'task.created' | 'task.assigned' | 'task.updated',
+    eventKey: string,
+    task: Record<string, any>,
+    actor: RequestUser,
+    previousTask?: Record<string, any>,
+  ) {
+    try {
+      if (
+        triggerType === 'task.assigned' &&
+        task.assignee_user_id &&
+        task.assignee_user_id !== actor.profileId
+      ) {
+        await this.notifications?.createForUser({
+          recipientUserId: task.assignee_user_id,
+          type: 'task.assigned',
+          title: 'Cong viec moi',
+          message: `Ban duoc giao cong viec: ${task.title}.`,
+          entityType: 'task',
+          entityId: task.id,
+          actionUrl: `/app/projects/${task.project_id}/tasks/${task.id}`,
+          metadata: { projectId: task.project_id },
+          actorUserId: actor.profileId,
+        });
+      }
+
+      await this.automation?.runEvent({
+        triggerType,
+        eventKey,
+        payload: {
+          taskId: task.id,
+          projectId: task.project_id,
+          title: task.title,
+          status: task.status,
+          priority: task.priority,
+          assigneeUserId: task.assignee_user_id,
+          previousStatus: previousTask?.status ?? null,
+          previousAssigneeUserId: previousTask?.assignee_user_id ?? null,
+        },
+        actorUserId: actor.profileId,
+        defaultRecipients: task.assignee_user_id ? [task.assignee_user_id] : [],
+        title:
+          triggerType === 'task.assigned'
+            ? 'Cong viec moi'
+            : 'Cap nhat cong viec',
+        message: `Cong viec ${task.title} da duoc cap nhat.`,
+        entityType: 'task',
+        entityId: task.id,
+        actionUrl: `/app/projects/${task.project_id}/tasks/${task.id}`,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Task side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
       );
     }
   }
@@ -366,6 +427,20 @@ export class TasksService {
     this.emit(projectId, data.id, 'task.created', data.updated_at, {
       status: data.status,
     });
+    await this.runTaskSideEffects(
+      'task.created',
+      `task.created:${data.id}`,
+      data,
+      user,
+    );
+    if (data.assignee_user_id) {
+      await this.runTaskSideEffects(
+        'task.assigned',
+        `task.assigned:${data.id}:${data.assignee_user_id}`,
+        data,
+        user,
+      );
+    }
     return data;
   }
 
@@ -483,6 +558,25 @@ export class TasksService {
     this.emit(projectId, taskId, 'task.updated', data.updated_at, {
       status: data.status,
     });
+    await this.runTaskSideEffects(
+      'task.updated',
+      `task.updated:${taskId}:${data.updated_at}`,
+      data,
+      user,
+      existing,
+    );
+    if (
+      data.assignee_user_id &&
+      data.assignee_user_id !== existing.assignee_user_id
+    ) {
+      await this.runTaskSideEffects(
+        'task.assigned',
+        `task.assigned:${taskId}:${data.assignee_user_id}`,
+        data,
+        user,
+        existing,
+      );
+    }
     return data;
   }
 }

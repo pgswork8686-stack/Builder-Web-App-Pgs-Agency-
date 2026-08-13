@@ -2,9 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
-import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
+import {
+  UserCheck,
+  ShieldCheck,
+  Activity,
+  LogOut,
+  Bell,
+  MessageCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "@/components/phase7/notification-bell";
 
 export default function ClientDashboardPage() {
   const router = useRouter();
@@ -29,6 +37,7 @@ export default function ClientDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
             <UserCheck className="w-3.5 h-3.5" />
             <span>Khách hàng (Client)</span>
@@ -94,6 +103,41 @@ export default function ClientDashboardPage() {
             <div className="text-xs text-emerald-400">
               Bảo mật thông tin khách hàng tuyệt đối
             </div>
+          </div>
+        </div>
+
+        <div className="border-t border-[#151516] pt-8">
+          <h2 className="text-xl font-bold text-white mb-4">
+            Thông báo & Trao đổi
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Link
+              href="/app/notifications"
+              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
+            >
+              <Bell className="w-5 h-5 text-[#FFC400]" />
+              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
+                Thông báo dự án
+              </h3>
+              <p className="text-xs text-[#606060]">
+                Theo dõi cập nhật project, hóa đơn, thanh toán và tin nhắn liên
+                quan đến công ty của bạn.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/chat"
+              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
+            >
+              <MessageCircle className="w-5 h-5 text-[#FFC400]" />
+              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
+                Project chat
+              </h3>
+              <p className="text-xs text-[#606060]">
+                Client chỉ tham gia project chat được server xác thực qua client
+                membership.
+              </p>
+            </Link>
           </div>
         </div>
 

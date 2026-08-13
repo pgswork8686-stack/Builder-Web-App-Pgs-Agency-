@@ -1,9 +1,18 @@
 "use client";
 
 import React from "react";
-import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
+import Link from "next/link";
+import {
+  UserCheck,
+  ShieldCheck,
+  Activity,
+  LogOut,
+  Bell,
+  MessageCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "@/components/phase7/notification-bell";
 
 export default function EmployeeDashboardPage() {
   const router = useRouter();
@@ -30,6 +39,7 @@ export default function EmployeeDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
             <UserCheck className="w-3.5 h-3.5" />
             <span>Nhân viên (Employee)</span>
@@ -96,6 +106,34 @@ export default function EmployeeDashboardPage() {
               Đã kết nối với NestJS API
             </div>
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Link
+            href="/app/notifications"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+          >
+            <Bell className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
+              Thông báo
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Cập nhật task, bình luận, nghỉ phép, chấm công và chat.
+            </p>
+          </Link>
+
+          <Link
+            href="/app/chat"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+          >
+            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
+              Chat
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Direct chat nội bộ và project chat đã được phân quyền.
+            </p>
+          </Link>
         </div>
       </main>
     </div>

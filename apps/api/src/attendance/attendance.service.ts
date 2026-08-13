@@ -4,9 +4,13 @@ import {
   NotFoundException,
   ForbiddenException,
   InternalServerErrorException,
+  Logger,
+  Optional,
 } from '@nestjs/common';
+import { AutomationService } from '../automation/automation.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   CheckInDto,
   CheckOutDto,
@@ -17,7 +21,13 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  private readonly logger = new Logger(AttendanceService.name);
+
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly automation?: AutomationService,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
@@ -64,6 +74,52 @@ export class AttendanceService {
     const month = parts.find((p) => p.type === 'month')?.value;
     const day = parts.find((p) => p.type === 'day')?.value;
     return `${year}-${month}-${day}`;
+  }
+
+  private async notifyAttendanceAdjusted(
+    record: any,
+    adjustment: any,
+    user: RequestUser,
+  ) {
+    if (!this.notifications && !this.automation) return;
+    try {
+      await this.notifications?.createForUser({
+        recipientUserId: record.user_id,
+        type: 'attendance.adjustment_requested',
+        title: 'Cham cong da dieu chinh',
+        message: 'Ban ghi cham cong cua ban da duoc quan tri vien dieu chinh.',
+        entityType: 'attendance_record',
+        entityId: record.id,
+        actionUrl: '/app/attendance',
+        metadata: {
+          recordId: record.id,
+          attendanceDate: record.attendance_date,
+          adjustmentId: adjustment?.id ?? null,
+        },
+        actorUserId: user.profileId,
+      });
+      await this.automation?.runEvent({
+        triggerType: 'attendance.adjustment_requested',
+        eventKey: `attendance.adjustment:${adjustment?.id ?? record.id}:${record.attendance_date}`,
+        payload: {
+          recordId: record.id,
+          attendanceDate: record.attendance_date,
+          targetUserId: record.user_id,
+          adjustmentId: adjustment?.id ?? null,
+        },
+        actorUserId: user.profileId,
+        defaultRecipients: [record.user_id],
+        title: 'Cham cong da dieu chinh',
+        message: 'Ban ghi cham cong vua duoc dieu chinh.',
+        entityType: 'attendance_record',
+        entityId: record.id,
+        actionUrl: '/app/attendance',
+      });
+    } catch (error) {
+      this.logger.error(
+        `Attendance side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   // Parse time string 'HH:MM:SS' into minutes of day
@@ -450,6 +506,8 @@ export class AttendanceService {
         message: 'Không thể ghi nhận thông tin check-out.',
       });
     }
+
+    await this.notifyAttendanceAdjusted(record, data, user);
 
     return data;
   }

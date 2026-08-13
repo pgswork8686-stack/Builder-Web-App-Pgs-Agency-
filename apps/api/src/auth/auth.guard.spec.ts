@@ -146,6 +146,7 @@ describe('AuthGuard', () => {
       fullName: 'Test User',
       avatarUrl: null,
       approvedAt: '2026-01-02',
+      rejectionReason: null,
     });
   });
 

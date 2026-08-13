@@ -4,9 +4,13 @@ import {
   NotFoundException,
   ForbiddenException,
   InternalServerErrorException,
+  Logger,
+  Optional,
 } from '@nestjs/common';
+import { AutomationService } from '../automation/automation.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   LeaveRequestCreateDto,
   LeaveReviewDto,
@@ -16,7 +20,13 @@ import {
 
 @Injectable()
 export class LeaveService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  private readonly logger = new Logger(LeaveService.name);
+
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly automation?: AutomationService,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
@@ -45,6 +55,116 @@ export class LeaveService {
     return Math.floor(diffMs / 86400000) + 1;
   }
 
+  private async usersByRole(role: string): Promise<string[]> {
+    const { data, error } = await this.client
+      .from('profiles')
+      .select('id')
+      .eq('role', role)
+      .eq('account_status', 'active')
+      .limit(100);
+    if (error) {
+      this.logger.error(
+        `Leave notification recipient lookup failed: ${error.message}`,
+      );
+      return [];
+    }
+    return (data ?? []).map((row) => row.id);
+  }
+
+  private async notifyLeaveSubmitted(request: any, user: RequestUser) {
+    if (!this.notifications && !this.automation) return;
+    try {
+      const admins = await this.usersByRole('admin');
+      await this.notifications?.createForUsers(admins, {
+        type: 'leave.submitted',
+        title: 'Don nghi phep moi',
+        message: `${user.fullName ?? user.email ?? 'Nhan su'} da gui don nghi phep.`,
+        entityType: 'leave_request',
+        entityId: request?.id ?? null,
+        actionUrl: '/app/admin/leave',
+        metadata: {
+          requestId: request?.id,
+          requesterUserId: request?.user_id ?? user.profileId,
+        },
+        actorUserId: user.profileId,
+      });
+      await this.automation?.runEvent({
+        triggerType: 'leave.submitted',
+        eventKey: `leave.submitted:${request?.id ?? user.profileId}`,
+        payload: {
+          requestId: request?.id,
+          requesterUserId: request?.user_id ?? user.profileId,
+          startDate: request?.start_date,
+          endDate: request?.end_date,
+        },
+        actorUserId: user.profileId,
+        defaultRecipients: admins,
+        title: 'Don nghi phep moi',
+        message: 'Co don nghi phep moi can xem xet.',
+        entityType: 'leave_request',
+        entityId: request?.id ?? null,
+        actionUrl: '/app/admin/leave',
+      });
+    } catch (error) {
+      this.logger.error(
+        `Leave submission side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  private async notifyLeaveReviewed(request: any, user: RequestUser) {
+    if (!this.notifications && !this.automation) return;
+    try {
+      const requesterUserId = request?.user_id;
+      const status = String(request?.status ?? '');
+      if (!requesterUserId) return;
+
+      await this.notifications?.createForUser({
+        recipientUserId: requesterUserId,
+        type: status === 'approved' ? 'leave.approved' : 'leave.rejected',
+        title:
+          status === 'approved'
+            ? 'Don nghi phep da duoc duyet'
+            : 'Don nghi phep bi tu choi',
+        message:
+          status === 'approved'
+            ? 'Don nghi phep cua ban da duoc duyet.'
+            : 'Don nghi phep cua ban da bi tu choi.',
+        entityType: 'leave_request',
+        entityId: request?.id ?? null,
+        actionUrl: '/app/leave',
+        metadata: { requestId: request?.id, status },
+        actorUserId: user.profileId,
+      });
+
+      await this.automation?.runEvent({
+        triggerType:
+          status === 'approved' ? 'leave.approved' : 'leave.rejected',
+        eventKey: `leave.${status}:${request?.id}`,
+        payload: {
+          requestId: request?.id,
+          requesterUserId,
+          reviewerUserId: user.profileId,
+          status,
+        },
+        actorUserId: user.profileId,
+        defaultRecipients: [requesterUserId],
+        title:
+          status === 'approved'
+            ? 'Don nghi phep da duoc duyet'
+            : 'Don nghi phep bi tu choi',
+        message: 'Trang thai don nghi phep cua ban da thay doi.',
+        entityType: 'leave_request',
+        entityId: request?.id ?? null,
+        actionUrl: '/app/leave',
+      });
+    } catch (error) {
+      this.logger.error(
+        `Leave review side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
   // Get active leave types list
   async getLeaveTypes(user: RequestUser) {
     this.enforceInternalUser(user);
@@ -59,6 +179,8 @@ export class LeaveService {
         message: 'Không thể tải danh sách loại nghỉ phép.',
       });
     }
+    await this.notifyLeaveSubmitted(data, user);
+
     return data;
   }
 
@@ -120,6 +242,8 @@ export class LeaveService {
         message: 'Không thể tạo đơn xin nghỉ phép.',
       });
     }
+
+    await this.notifyLeaveReviewed(data, user);
 
     return data;
   }

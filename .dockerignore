@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+.next
+dist
+coverage
+.git
+.github
+*.log
+.env
+.env.*
+!*.env.example
+apps/web/.env.local
+apps/api/.env
+apps/api/.env.test
+Dockerfile
+docker-compose.yml

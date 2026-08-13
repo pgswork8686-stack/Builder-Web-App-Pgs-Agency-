@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { XCircle, LogOut, Mail, AlertTriangle } from "lucide-react";
+import { getMe } from "@/lib/api/auth";
 
 export default function AccountRejectedPage() {
   const router = useRouter();
@@ -13,20 +14,9 @@ export default function AccountRejectedPage() {
   useEffect(() => {
     const fetchReason = async () => {
       try {
-        const supabase = createClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("rejection_reason")
-            .eq("id", session.user.id)
-            .single();
-
-          if (profile?.rejection_reason) {
-            setRejectionReason(profile.rejection_reason);
-          }
+        const me = await getMe();
+        if (me.account.rejectionReason) {
+          setRejectionReason(me.account.rejectionReason);
         }
       } catch (err) {
         console.error("Failed to load rejection reason", err);

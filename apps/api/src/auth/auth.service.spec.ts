@@ -79,6 +79,7 @@ describe('AuthService', () => {
           status: 'active',
           role: 'employee',
           approvedAt: '2026-01-02',
+          rejectionReason: null,
         },
         canBootstrapAdmin: false,
       });
