@@ -10,6 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { financeApi, Invoice } from "@/lib/api/finance";
+import { isInvoiceOverdue } from "@/lib/finance-date";
 
 export default function ClientInvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -50,11 +51,7 @@ export default function ClientInvoicesPage() {
   };
 
   const getStatusBadge = (status: string, dueDate: string) => {
-    const isOverdue =
-      (status === "issued" || status === "partially_paid") &&
-      new Date(dueDate) < new Date();
-
-    if (status === "overdue" || isOverdue) {
+    if (isInvoiceOverdue(status, dueDate)) {
       return (
         <span className="px-2 py-1 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
           Quá hạn

@@ -28,6 +28,25 @@ export class FinanceService {
     return this.supabaseService.getSystemClient();
   }
 
+  private getVietnamDateOnly(now: Date = new Date()): string {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(now);
+
+    const year = parts.find((part) => part.type === 'year')?.value;
+    const month = parts.find((part) => part.type === 'month')?.value;
+    const day = parts.find((part) => part.type === 'day')?.value;
+
+    if (!year || !month || !day) {
+      throw new Error('Unable to derive Vietnam business date');
+    }
+
+    return `${year}-${month}-${day}`;
+  }
+
   private enforceAdminOrAccountant(user: RequestUser) {
     if (user.role !== 'admin' && user.role !== 'accountant') {
       throw new ForbiddenException({
@@ -214,7 +233,7 @@ export class FinanceService {
         message: 'Số tiền thanh toán vượt quá số dư còn lại của hóa đơn.',
       });
     }
-    if (msg.includes('INVOICE_PAYMENT_STATE_INVALID') || code === 'P6024') {
+    if (msg.includes('INVOICE_PAYMENT_STATE_INVALID') || code === 'P6016') {
       throw new BadRequestException({
         code: 'INVOICE_PAYMENT_STATE_INVALID',
         message: 'Trạng thái hóa đơn không hợp lệ để thực hiện thanh toán.',
@@ -270,7 +289,9 @@ export class FinanceService {
       updated_at: i.updated_at,
       client_company: i.client_company ? { name: i.client_company.name } : null,
       project: i.project ? { name: i.project.name } : null,
-      contract: i.contract ? { contract_number: i.contract.contract_number } : null,
+      contract: i.contract
+        ? { contract_number: i.contract.contract_number }
+        : null,
     };
   }
 
@@ -324,7 +345,10 @@ export class FinanceService {
       dbQuery = dbQuery.eq('status', query.status);
     }
     if (query.query) {
-      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      const q = query.query
+        .trim()
+        .slice(0, 100)
+        .replace(/[(),%]/g, '');
       if (q.length > 0) {
         dbQuery = dbQuery.or(`contract_number.ilike.%${q}%,title.ilike.%${q}%`);
       }
@@ -554,10 +578,19 @@ export class FinanceService {
       dbQuery = dbQuery.eq('contract_id', query.contractId);
     }
     if (query.status) {
-      dbQuery = dbQuery.eq('status', query.status);
+      if (query.status === 'overdue') {
+        dbQuery = dbQuery
+          .in('status', ['overdue', 'issued', 'partially_paid'])
+          .lt('due_date', this.getVietnamDateOnly());
+      } else {
+        dbQuery = dbQuery.eq('status', query.status);
+      }
     }
     if (query.query) {
-      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      const q = query.query
+        .trim()
+        .slice(0, 100)
+        .replace(/[(),%]/g, '');
       if (q.length > 0) {
         dbQuery = dbQuery.or(`invoice_number.ilike.%${q}%`);
       }
@@ -855,7 +888,10 @@ export class FinanceService {
       .select('id, code, name, status', { count: 'exact' });
 
     if (query.query) {
-      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      const q = query.query
+        .trim()
+        .slice(0, 100)
+        .replace(/[(),%]/g, '');
       if (q.length > 0) {
         dbQuery = dbQuery.or(`name.ilike.%${q}%,code.ilike.%${q}%`);
       }
@@ -885,14 +921,19 @@ export class FinanceService {
 
     let dbQuery = this.client
       .from('projects')
-      .select('id, project_code, client_company_id, name, status', { count: 'exact' });
+      .select('id, project_code, client_company_id, name, status', {
+        count: 'exact',
+      });
 
     if (query.clientCompanyId) {
       dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
     }
 
     if (query.query) {
-      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      const q = query.query
+        .trim()
+        .slice(0, 100)
+        .replace(/[(),%]/g, '');
       if (q.length > 0) {
         dbQuery = dbQuery.or(`name.ilike.%${q}%,project_code.ilike.%${q}%`);
       }
@@ -922,7 +963,10 @@ export class FinanceService {
 
     let dbQuery = this.client
       .from('contracts')
-      .select('id, contract_number, client_company_id, project_id, currency_code, status, title', { count: 'exact' });
+      .select(
+        'id, contract_number, client_company_id, project_id, currency_code, status, title',
+        { count: 'exact' },
+      );
 
     if (query.clientCompanyId) {
       dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
@@ -935,7 +979,10 @@ export class FinanceService {
     }
 
     if (query.query) {
-      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      const q = query.query
+        .trim()
+        .slice(0, 100)
+        .replace(/[(),%]/g, '');
       if (q.length > 0) {
         dbQuery = dbQuery.or(`title.ilike.%${q}%,contract_number.ilike.%${q}%`);
       }

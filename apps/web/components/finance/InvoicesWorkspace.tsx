@@ -19,12 +19,15 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { financeApi, Invoice } from "@/lib/api/finance";
+import { isInvoiceOverdue } from "@/lib/finance-date";
 
 interface InvoicesWorkspaceProps {
   roleBasePath: string;
 }
 
-export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspaceProps) {
+export default function InvoicesWorkspace({
+  roleBasePath,
+}: InvoicesWorkspaceProps) {
   const searchParams = useSearchParams();
   const initContractId = searchParams.get("contractId") || "";
 
@@ -82,13 +85,22 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
 
   const loadMetadata = async () => {
     try {
-      const clientsRes = await financeApi.getMetaClients({ page: 1, pageSize: 100 });
+      const clientsRes = await financeApi.getMetaClients({
+        page: 1,
+        pageSize: 100,
+      });
       setClients(clientsRes.items || []);
 
-      const contractsRes = await financeApi.getMetaContracts({ page: 1, pageSize: 100 });
+      const contractsRes = await financeApi.getMetaContracts({
+        page: 1,
+        pageSize: 100,
+      });
       setContracts(contractsRes.items || []);
 
-      const projectsRes = await financeApi.getMetaProjects({ page: 1, pageSize: 100 });
+      const projectsRes = await financeApi.getMetaProjects({
+        page: 1,
+        pageSize: 100,
+      });
       setProjects(projectsRes.items || []);
     } catch (err) {
       console.error("Lỗi lấy siêu dữ liệu hóa đơn:", err);
@@ -252,27 +264,59 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
     }).format(amount);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, dueDate: string) => {
+    if (isInvoiceOverdue(status, dueDate)) {
+      return (
+        <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
+          {status === "partially_paid"
+            ? "Quá hạn · Thanh toán một phần"
+            : "Quá hạn"}
+        </span>
+      );
+    }
+
     switch (status) {
       case "draft":
-        return <span className="px-2 py-0.5 rounded bg-[#151516] text-[#FFC400] text-[10px] font-bold">Nháp</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#151516] text-[#FFC400] text-[10px] font-bold">
+            Nháp
+          </span>
+        );
       case "issued":
-        return <span className="px-2 py-0.5 rounded bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-bold">Đã phát hành</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-bold">
+            Đã phát hành
+          </span>
+        );
       case "partially_paid":
-        return <span className="px-2 py-0.5 rounded bg-[#FFC400]/10 text-[#FFC400] text-[10px] font-bold">Thanh toán một phần</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#FFC400]/10 text-[#FFC400] text-[10px] font-bold">
+            Thanh toán một phần
+          </span>
+        );
       case "paid":
-        return <span className="px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-bold">Đã thanh toán</span>;
-      case "overdue":
-        return <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">Quá hạn</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-bold">
+            Đã thanh toán
+          </span>
+        );
       case "cancelled":
-        return <span className="px-2 py-0.5 rounded bg-[#606060]/10 text-[#606060] text-[10px] font-bold">Đã hủy</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#606060]/10 text-[#606060] text-[10px] font-bold">
+            Đã hủy
+          </span>
+        );
       default:
         return null;
     }
   };
 
-  const filteredContracts = contracts.filter((c) => c.client_company_id === formClientCompanyId);
-  const filteredProjects = projects.filter((p) => p.client_company_id === formClientCompanyId);
+  const filteredContracts = contracts.filter(
+    (c) => c.client_company_id === formClientCompanyId,
+  );
+  const filteredProjects = projects.filter(
+    (p) => p.client_company_id === formClientCompanyId,
+  );
 
   return (
     <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
@@ -286,7 +330,8 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <span className="font-bold text-base tracking-wide text-white">
-            Tài chính <span className="text-[#FFC400] font-normal">| Hóa đơn</span>
+            Tài chính{" "}
+            <span className="text-[#FFC400] font-normal">| Hóa đơn</span>
           </span>
         </div>
 
@@ -322,13 +367,27 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="bg-transparent border-none text-[#FFF8E6] text-xs focus:outline-none cursor-pointer"
               >
-                <option value="" className="bg-[#0e0e0f]">Trạng thái</option>
-                <option value="draft" className="bg-[#0e0e0f]">Nháp</option>
-                <option value="issued" className="bg-[#0e0e0f]">Đã phát hành</option>
-                <option value="partially_paid" className="bg-[#0e0e0f]">Thanh toán một phần</option>
-                <option value="paid" className="bg-[#0e0e0f]">Đã thanh toán</option>
-                <option value="overdue" className="bg-[#0e0e0f]">Quá hạn</option>
-                <option value="cancelled" className="bg-[#0e0e0f]">Đã hủy</option>
+                <option value="" className="bg-[#0e0e0f]">
+                  Trạng thái
+                </option>
+                <option value="draft" className="bg-[#0e0e0f]">
+                  Nháp
+                </option>
+                <option value="issued" className="bg-[#0e0e0f]">
+                  Đã phát hành
+                </option>
+                <option value="partially_paid" className="bg-[#0e0e0f]">
+                  Thanh toán một phần
+                </option>
+                <option value="paid" className="bg-[#0e0e0f]">
+                  Đã thanh toán
+                </option>
+                <option value="overdue" className="bg-[#0e0e0f]">
+                  Quá hạn
+                </option>
+                <option value="cancelled" className="bg-[#0e0e0f]">
+                  Đã hủy
+                </option>
               </select>
             </div>
 
@@ -338,7 +397,9 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 onChange={(e) => setFilterClient(e.target.value)}
                 className="bg-transparent border-none text-[#FFF8E6] text-xs focus:outline-none cursor-pointer max-w-[200px]"
               >
-                <option value="" className="bg-[#0e0e0f]">Khách hàng</option>
+                <option value="" className="bg-[#0e0e0f]">
+                  Khách hàng
+                </option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id} className="bg-[#0e0e0f]">
                     {c.name}
@@ -353,7 +414,9 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 onChange={(e) => setFilterContract(e.target.value)}
                 className="bg-transparent border-none text-[#FFF8E6] text-xs focus:outline-none cursor-pointer max-w-[200px]"
               >
-                <option value="" className="bg-[#0e0e0f]">Hợp đồng</option>
+                <option value="" className="bg-[#0e0e0f]">
+                  Hợp đồng
+                </option>
                 {contracts.map((c) => (
                   <option key={c.id} value={c.id} className="bg-[#0e0e0f]">
                     {c.contract_number}
@@ -405,19 +468,34 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 </thead>
                 <tbody className="divide-y divide-[#151516] text-sm text-[#FFF8E6]/80">
                   {invoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-[#151516]/40 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-white">{inv.invoice_number}</td>
-                      <td className="px-6 py-4">{inv.client_company?.name || "—"}</td>
-                      <td className="px-6 py-4 font-mono text-xs">{inv.contract?.contract_number || "—"}</td>
-                      <td className="px-6 py-4 font-mono text-xs">{inv.issue_date}</td>
-                      <td className="px-6 py-4 font-mono text-xs">{inv.due_date}</td>
+                    <tr
+                      key={inv.id}
+                      className="hover:bg-[#151516]/40 transition-colors"
+                    >
+                      <td className="px-6 py-4 font-mono font-bold text-white">
+                        {inv.invoice_number}
+                      </td>
+                      <td className="px-6 py-4">
+                        {inv.client_company?.name || "—"}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs">
+                        {inv.contract?.contract_number || "—"}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs">
+                        {inv.issue_date}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs">
+                        {inv.due_date}
+                      </td>
                       <td className="px-6 py-4 font-extrabold text-white">
                         {formatCurrency(inv.amount, inv.currency_code)}
                       </td>
                       <td className="px-6 py-4 font-bold text-[#00E676]">
                         {formatCurrency(inv.paid_amount, inv.currency_code)}
                       </td>
-                      <td className="px-6 py-4">{getStatusBadge(inv.status)}</td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(inv.status, inv.due_date)}
+                      </td>
                       <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                         {inv.status === "draft" && (
                           <button
@@ -445,7 +523,8 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
             {totalPages > 1 && (
               <div className="px-6 py-4 border-t border-[#151516] flex items-center justify-between text-xs text-[#606060] bg-[#0c0c0d]">
                 <span>
-                  Hiển thị <span className="text-[#FFF8E6]">{invoices.length}</span>/
+                  Hiển thị{" "}
+                  <span className="text-[#FFF8E6]">{invoices.length}</span>/
                   <span className="text-[#FFF8E6]">{total}</span> hóa đơn
                 </span>
                 <div className="flex items-center gap-2">
@@ -479,14 +558,22 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
           <div className="w-full max-w-2xl bg-[#0E0E0F] border border-[#151516] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-[#151516] flex items-center justify-between bg-[#0c0c0d]">
               <h3 className="text-lg font-bold text-white">
-                {editingInvoice ? `Sửa hóa đơn: ${editingInvoice.invoice_number}` : "Tạo hóa đơn mới"}
+                {editingInvoice
+                  ? `Sửa hóa đơn: ${editingInvoice.invoice_number}`
+                  : "Tạo hóa đơn mới"}
               </h3>
-              <button onClick={() => setShowForm(false)} className="text-[#606060] hover:text-white transition-colors cursor-pointer">
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-[#606060] hover:text-white transition-colors cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveInvoice} className="p-6 overflow-y-auto space-y-4 flex-1">
+            <form
+              onSubmit={handleSaveInvoice}
+              className="p-6 overflow-y-auto space-y-4 flex-1"
+            >
               {formError && (
                 <div className="p-3.5 rounded-xl bg-[#FF1744]/10 border border-[#FF1744]/20 text-[#FF1744] text-xs font-semibold">
                   {formError}
@@ -496,17 +583,22 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
               {/* Warn if editing active/immutable invoice */}
               {editingInvoice && editingInvoice.status !== "draft" && (
                 <div className="p-3.5 rounded-xl bg-[#FFC400]/10 border border-[#FFC400]/25 text-[#FFC400] text-xs">
-                  Hóa đơn này đã phát hành. Bạn chỉ có thể sửa đổi Ghi chú và Chế độ hiển thị khách hàng.
+                  Hóa đơn này đã phát hành. Bạn chỉ có thể sửa đổi Ghi chú và
+                  Chế độ hiển thị khách hàng.
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Số hóa đơn *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Số hóa đơn *
+                  </label>
                   <input
                     type="text"
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     placeholder="VD: INV-2026-001"
                     value={formInvoiceNumber}
                     onChange={(e) => setFormInvoiceNumber(e.target.value)}
@@ -515,10 +607,14 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Khách hàng (Công ty) *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Khách hàng (Công ty) *
+                  </label>
                   <select
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formClientCompanyId}
                     onChange={(e) => {
                       setFormClientCompanyId(e.target.value);
@@ -539,9 +635,13 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Hợp đồng liên kết</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Hợp đồng liên kết
+                  </label>
                   <select
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formContractId}
                     onChange={(e) => setFormContractId(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -556,9 +656,13 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Dự án liên kết</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Dự án liên kết
+                  </label>
                   <select
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formProjectId}
                     onChange={(e) => setFormProjectId(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -575,11 +679,15 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Ngày phát hành *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Ngày phát hành *
+                  </label>
                   <input
                     type="date"
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formIssueDate}
                     onChange={(e) => setFormIssueDate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -587,11 +695,15 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Hạn thanh toán *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Hạn thanh toán *
+                  </label>
                   <input
                     type="date"
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formDueDate}
                     onChange={(e) => setFormDueDate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -601,11 +713,15 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Tổng số tiền *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Tổng số tiền *
+                  </label>
                   <input
                     type="number"
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     placeholder="VD: 10000000"
                     value={formAmount}
                     onChange={(e) => setFormAmount(e.target.value)}
@@ -613,10 +729,14 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Loại tiền *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Loại tiền *
+                  </label>
                   <select
                     required
-                    disabled={editingInvoice ? editingInvoice.status !== "draft" : false}
+                    disabled={
+                      editingInvoice ? editingInvoice.status !== "draft" : false
+                    }
                     value={formCurrencyCode}
                     onChange={(e) => setFormCurrencyCode(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -629,7 +749,9 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Ghi chú hóa đơn</label>
+                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                  Ghi chú hóa đơn
+                </label>
                 <textarea
                   rows={3}
                   placeholder="Ghi chú thanh toán, số tài khoản nhận tiền..."
@@ -647,7 +769,10 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                   onChange={(e) => setFormClientVisible(e.target.checked)}
                   className="w-4 h-4 accent-[#FFC400] cursor-pointer"
                 />
-                <label htmlFor="formClientVisible" className="text-xs font-bold text-[#FFF8E6]/80 cursor-pointer select-none">
+                <label
+                  htmlFor="formClientVisible"
+                  className="text-xs font-bold text-[#FFF8E6]/80 cursor-pointer select-none"
+                >
                   Cho phép khách hàng nhìn thấy hóa đơn này trên cổng thông tin
                 </label>
               </div>
@@ -665,8 +790,12 @@ export default function InvoicesWorkspace({ roleBasePath }: InvoicesWorkspacePro
                   disabled={submitting}
                   className="px-4 py-2 rounded-xl bg-[#FFC400] text-black hover:brightness-110 font-bold transition-all disabled:opacity-40 cursor-pointer text-xs flex items-center gap-2"
                 >
-                  {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{editingInvoice ? "Cập nhật hóa đơn" : "Lưu hóa đơn"}</span>
+                  {submitting && (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  )}
+                  <span>
+                    {editingInvoice ? "Cập nhật hóa đơn" : "Lưu hóa đơn"}
+                  </span>
                 </button>
               </div>
             </form>

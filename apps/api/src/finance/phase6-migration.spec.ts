@@ -110,15 +110,35 @@ describe('Phase 6 Migration Security Contract', () => {
     const migration = readFileSync(m19Path, 'utf8');
 
     // Verify correct signature and properties of replaced summary function
-    expect(migration).toContain('CREATE OR REPLACE FUNCTION public.phase6_finance_summary()');
+    expect(migration).toContain(
+      'CREATE OR REPLACE FUNCTION public.phase6_finance_summary()',
+    );
     expect(migration).toContain('SECURITY INVOKER');
     expect(migration).toContain('SET search_path = public, pg_temp');
 
     // Verify partially paid overdue business rule correction
-    expect(migration).toContain("status IN ('issued', 'partially_paid') AND due_date < CURRENT_DATE");
+    expect(migration).toContain(
+      "status IN ('issued', 'partially_paid') AND due_date < " +
+        "(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Ho_Chi_Minh')::date",
+    );
+    expect(migration).not.toContain(
+      "status IN ('issued', 'partially_paid') AND due_date < CURRENT_DATE",
+    );
+
+    // Explicit manual overdue transition must use the same Vietnam date.
+    expect(migration).toContain(
+      "NEW.due_date >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Ho_Chi_Minh')::date",
+    );
+    expect(migration).toContain(
+      'CREATE OR REPLACE FUNCTION public.phase6_validate_invoice_state()',
+    );
 
     // Verify execute privilege restrictions are preserved
-    expect(migration).toContain('REVOKE ALL ON FUNCTION public.phase6_finance_summary()\n  FROM PUBLIC, anon, authenticated;');
-    expect(migration).toContain('GRANT EXECUTE ON FUNCTION public.phase6_finance_summary()\n  TO service_role;');
+    expect(migration).toContain(
+      'REVOKE ALL ON FUNCTION public.phase6_finance_summary()\n  FROM PUBLIC, anon, authenticated;',
+    );
+    expect(migration).toContain(
+      'GRANT EXECUTE ON FUNCTION public.phase6_finance_summary()\n  TO service_role;',
+    );
   });
 });

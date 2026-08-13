@@ -20,7 +20,9 @@ interface FinanceDashboardProps {
   roleBasePath: string;
 }
 
-export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps) {
+export default function FinanceDashboard({
+  roleBasePath,
+}: FinanceDashboardProps) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [summary, setSummary] = useState<any>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -41,7 +43,9 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
       setAuditLogs(auditRes.items);
     } catch (err: any) {
       console.error("Lỗi lấy dữ liệu tổng quan tài chính:", err);
-      setError("Không thể tải thông tin tổng quan tài chính. Vui lòng thử lại.");
+      setError(
+        "Không thể tải thông tin tổng quan tài chính. Vui lòng thử lại.",
+      );
     } finally {
       setLoading(false);
     }
@@ -77,7 +81,9 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
     return (
       <div className="min-h-screen bg-[#070707] text-[#FFF8E6] flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-8 h-8 text-[#FFC400] animate-spin" />
-        <span className="text-sm text-[#606060]">Đang tải dữ liệu tài chính...</span>
+        <span className="text-sm text-[#606060]">
+          Đang tải dữ liệu tài chính...
+        </span>
       </div>
     );
   }
@@ -106,7 +112,7 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
     new Set([
       ...contractsList.map((c: any) => c.currency_code),
       ...invoicesList.map((i: any) => i.currency_code),
-    ])
+    ]),
   );
 
   return (
@@ -121,7 +127,8 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB <span className="text-[#FFC400] font-normal">| Tài chính</span>
+            PGS HUB{" "}
+            <span className="text-[#FFC400] font-normal">| Tài chính</span>
           </span>
         </div>
 
@@ -143,7 +150,8 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
               Tổng quan Tài chính
             </h1>
             <p className="mt-1 text-sm text-[#606060]">
-              Theo dõi tình hình hợp đồng, hóa đơn, doanh thu thực tế và nợ tồn đọng.
+              Theo dõi tình hình hợp đồng, hóa đơn, doanh thu thực tế và nợ tồn
+              đọng.
             </p>
           </div>
 
@@ -172,13 +180,13 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
           <div className="space-y-8">
             {currencies.map((currency: any) => {
               const contractData = contractsList.find(
-                (c: any) => c.currency_code === currency
+                (c: any) => c.currency_code === currency,
               ) || {
                 active_contracts: 0,
                 contracted_value: 0,
               };
               const invoiceData = invoicesList.find(
-                (i: any) => i.currency_code === currency
+                (i: any) => i.currency_code === currency,
               ) || {
                 overdue_invoices: 0,
                 invoiced_amount: 0,
@@ -203,10 +211,14 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
                         <TrendingUp className="w-4 h-4 text-[#FFC400]" />
                       </div>
                       <div className="text-xl font-extrabold text-white">
-                        {formatCurrency(contractData.contracted_value, currency)}
+                        {formatCurrency(
+                          contractData.contracted_value,
+                          currency,
+                        )}
                       </div>
                       <div className="text-xs text-[#606060]">
-                        {contractData.active_contracts} hợp đồng đang có hiệu lực.
+                        {contractData.active_contracts} hợp đồng đang có hiệu
+                        lực.
                       </div>
                     </div>
 
@@ -250,16 +262,23 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
                         </span>
                         <AlertTriangle
                           className={`w-4 h-4 ${
-                            invoiceData.overdue_invoices > 0 ? "text-[#FF1744]" : "text-[#FFC400]"
+                            invoiceData.overdue_invoices > 0
+                              ? "text-[#FF1744]"
+                              : "text-[#FFC400]"
                           }`}
                         />
                       </div>
                       <div className="text-xl font-extrabold text-white">
-                        {formatCurrency(invoiceData.outstanding_amount, currency)}
+                        {formatCurrency(
+                          invoiceData.outstanding_amount,
+                          currency,
+                        )}
                       </div>
                       <div className="text-xs text-[#FF1744] flex items-center gap-1 font-bold">
                         {invoiceData.overdue_invoices > 0 && (
-                          <span>{invoiceData.overdue_invoices} hóa đơn quá hạn.</span>
+                          <span>
+                            {invoiceData.overdue_invoices} hóa đơn quá hạn.
+                          </span>
                         )}
                       </div>
                     </div>
@@ -286,16 +305,24 @@ export default function FinanceDashboard({ roleBasePath }: FinanceDashboardProps
           ) : (
             <div className="divide-y divide-[#151516] space-y-3">
               {auditLogs.map((log) => (
-                <div key={log.id} className="pt-3 first:pt-0 flex justify-between items-start text-xs gap-3">
+                <div
+                  key={log.id}
+                  className="pt-3 first:pt-0 flex justify-between items-start text-xs gap-3"
+                >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 rounded bg-[#151516] border border-[#FFC400]/20 text-[10px] text-[#FFC400] font-mono">
                         {log.entity_type.toUpperCase()}
                       </span>
-                      <span className="font-bold text-white">{getActionLabel(log.action)}</span>
+                      <span className="font-bold text-white">
+                        {getActionLabel(log.action)}
+                      </span>
                     </div>
                     <div className="text-[#606060]">
-                      Entity ID: <span className="font-mono text-[#FFF8E6]/60">{log.entity_id}</span>
+                      Entity ID:{" "}
+                      <span className="font-mono text-[#FFF8E6]/60">
+                        {log.entity_id}
+                      </span>
                     </div>
                     <div className="text-[#606060]">
                       Thực hiện bởi:{" "}

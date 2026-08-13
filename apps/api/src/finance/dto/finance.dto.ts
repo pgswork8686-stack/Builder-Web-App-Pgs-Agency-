@@ -34,10 +34,12 @@ export const ContractCreateSchema = ContractBaseSchema.refine(
 
 export type ContractCreateDto = z.infer<typeof ContractCreateSchema>;
 
-export const ContractUpdateSchema = ContractBaseSchema.partial()
-  .refine((val) => Object.keys(val).length > 0, {
+export const ContractUpdateSchema = ContractBaseSchema.partial().refine(
+  (val) => Object.keys(val).length > 0,
+  {
     message: 'PATCH_EMPTY',
-  });
+  },
+);
 export type ContractUpdateDto = z.infer<typeof ContractUpdateSchema>;
 
 export const ContractTransitionSchema = z
@@ -63,17 +65,22 @@ const InvoiceBaseSchema = z
   })
   .strict();
 
-export const InvoiceCreateSchema = InvoiceBaseSchema.refine((data) => data.dueDate >= data.issueDate, {
-  message: 'Due date must be greater than or equal to issue date',
-  path: ['dueDate'],
-});
+export const InvoiceCreateSchema = InvoiceBaseSchema.refine(
+  (data) => data.dueDate >= data.issueDate,
+  {
+    message: 'Due date must be greater than or equal to issue date',
+    path: ['dueDate'],
+  },
+);
 
 export type InvoiceCreateDto = z.infer<typeof InvoiceCreateSchema>;
 
-export const InvoiceUpdateSchema = InvoiceBaseSchema.partial()
-  .refine((val) => Object.keys(val).length > 0, {
+export const InvoiceUpdateSchema = InvoiceBaseSchema.partial().refine(
+  (val) => Object.keys(val).length > 0,
+  {
     message: 'PATCH_EMPTY',
-  });
+  },
+);
 export type InvoiceUpdateDto = z.infer<typeof InvoiceUpdateSchema>;
 
 export const InvoiceTransitionSchema = z

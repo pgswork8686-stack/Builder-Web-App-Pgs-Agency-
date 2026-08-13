@@ -250,7 +250,9 @@ describe('Finance Management API (e2e)', () => {
       currentProfileId = ADMIN_ID;
 
       const res = await request(app.getHttpServer())
-        .post('/api/v1/finance/contracts/99999999-9999-4999-9999-999999999999/transition')
+        .post(
+          '/api/v1/finance/contracts/99999999-9999-4999-9999-999999999999/transition',
+        )
         .set('Authorization', 'Bearer fake-token')
         .send({ status: 'draft' })
         .expect(400);

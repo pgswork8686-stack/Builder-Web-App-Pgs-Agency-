@@ -274,12 +274,18 @@ describe('FinanceService', () => {
         };
       });
 
-      const listResult = await service.getContracts({ page: 1, pageSize: 20 }, clientUser);
+      const listResult = await service.getContracts(
+        { page: 1, pageSize: 20 },
+        clientUser,
+      );
       expect(listResult.items[0]).not.toHaveProperty('created_by');
       expect(listResult.items[0]).not.toHaveProperty('updated_by');
       expect(listResult.items[0]).not.toHaveProperty('notes');
 
-      const detailResult = await service.getContractById('contract-id', clientUser);
+      const detailResult = await service.getContractById(
+        'contract-id',
+        clientUser,
+      );
       expect(detailResult).not.toHaveProperty('created_by');
       expect(detailResult).not.toHaveProperty('updated_by');
       expect(detailResult).not.toHaveProperty('notes');
@@ -345,10 +351,18 @@ describe('FinanceService', () => {
 
   describe('Employee/Team Leader Denials', () => {
     it('should deny employee from creating, updating or deleting contracts and invoices', async () => {
-      await expect(service.createContract({} as any, employeeUser)).rejects.toThrow(ForbiddenException);
-      await expect(service.updateContract('id', {} as any, employeeUser)).rejects.toThrow(ForbiddenException);
-      await expect(service.transitionContract('id', 'active', employeeUser)).rejects.toThrow(ForbiddenException);
-      await expect(service.getAuditLogs({ page: 1, pageSize: 20 }, employeeUser)).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.createContract({} as any, employeeUser),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.updateContract('id', {} as any, employeeUser),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.transitionContract('id', 'active', employeeUser),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.getAuditLogs({ page: 1, pageSize: 20 }, employeeUser),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -362,7 +376,8 @@ describe('FinanceService', () => {
         range: jest.fn().mockResolvedValue({
           data: null,
           error: {
-            message: 'extremely sensitive query syntax internal details that should never be shown to users',
+            message:
+              'extremely sensitive query syntax internal details that should never be shown to users',
             code: 'XX001',
           },
         }),
@@ -374,7 +389,9 @@ describe('FinanceService', () => {
       } catch (err: any) {
         expect(err).toBeInstanceOf(InternalServerErrorException);
         expect(err.response.code).toBe('FINANCE_DATABASE_ERROR');
-        expect(err.response.message).toBe('Không thể xử lý yêu cầu tài chính. Vui lòng thử lại.');
+        expect(err.response.message).toBe(
+          'Không thể xử lý yêu cầu tài chính. Vui lòng thử lại.',
+        );
       }
     });
   });

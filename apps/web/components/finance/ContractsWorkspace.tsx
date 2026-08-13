@@ -22,7 +22,9 @@ interface ContractsWorkspaceProps {
   roleBasePath: string;
 }
 
-export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceProps) {
+export default function ContractsWorkspace({
+  roleBasePath,
+}: ContractsWorkspaceProps) {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -75,10 +77,16 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
 
   const loadMetadata = async () => {
     try {
-      const clientsRes = await financeApi.getMetaClients({ page: 1, pageSize: 100 });
+      const clientsRes = await financeApi.getMetaClients({
+        page: 1,
+        pageSize: 100,
+      });
       setClients(clientsRes.items || []);
 
-      const projectsRes = await financeApi.getMetaProjects({ page: 1, pageSize: 100 });
+      const projectsRes = await financeApi.getMetaProjects({
+        page: 1,
+        pageSize: 100,
+      });
       setProjects(projectsRes.items || []);
     } catch (err) {
       console.error("Lỗi lấy siêu dữ liệu hợp đồng:", err);
@@ -244,19 +252,37 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "draft":
-        return <span className="px-2 py-0.5 rounded bg-[#151516] text-[#FFC400] text-[10px] font-bold">Nháp</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#151516] text-[#FFC400] text-[10px] font-bold">
+            Nháp
+          </span>
+        );
       case "active":
-        return <span className="px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-bold">Đang hiệu lực</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-bold">
+            Đang hiệu lực
+          </span>
+        );
       case "completed":
-        return <span className="px-2 py-0.5 rounded bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-bold">Hoàn thành</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-bold">
+            Hoàn thành
+          </span>
+        );
       case "cancelled":
-        return <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">Đã hủy</span>;
+        return (
+          <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
+            Đã hủy
+          </span>
+        );
       default:
         return null;
     }
   };
 
-  const filteredProjects = projects.filter((p) => p.client_company_id === formClientCompanyId);
+  const filteredProjects = projects.filter(
+    (p) => p.client_company_id === formClientCompanyId,
+  );
 
   return (
     <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
@@ -270,7 +296,8 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <span className="font-bold text-base tracking-wide text-white">
-            Tài chính <span className="text-[#FFC400] font-normal">| Hợp đồng</span>
+            Tài chính{" "}
+            <span className="text-[#FFC400] font-normal">| Hợp đồng</span>
           </span>
         </div>
 
@@ -306,11 +333,21 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="bg-transparent border-none text-[#FFF8E6] text-xs focus:outline-none cursor-pointer"
               >
-                <option value="" className="bg-[#0e0e0f]">Trạng thái</option>
-                <option value="draft" className="bg-[#0e0e0f]">Nháp</option>
-                <option value="active" className="bg-[#0e0e0f]">Đang hiệu lực</option>
-                <option value="completed" className="bg-[#0e0e0f]">Hoàn thành</option>
-                <option value="cancelled" className="bg-[#0e0e0f]">Đã hủy</option>
+                <option value="" className="bg-[#0e0e0f]">
+                  Trạng thái
+                </option>
+                <option value="draft" className="bg-[#0e0e0f]">
+                  Nháp
+                </option>
+                <option value="active" className="bg-[#0e0e0f]">
+                  Đang hiệu lực
+                </option>
+                <option value="completed" className="bg-[#0e0e0f]">
+                  Hoàn thành
+                </option>
+                <option value="cancelled" className="bg-[#0e0e0f]">
+                  Đã hủy
+                </option>
               </select>
             </div>
 
@@ -320,7 +357,9 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                 onChange={(e) => setFilterClient(e.target.value)}
                 className="bg-transparent border-none text-[#FFF8E6] text-xs focus:outline-none cursor-pointer max-w-[200px]"
               >
-                <option value="" className="bg-[#0e0e0f]">Khách hàng</option>
+                <option value="" className="bg-[#0e0e0f]">
+                  Khách hàng
+                </option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id} className="bg-[#0e0e0f]">
                     {c.name}
@@ -370,11 +409,22 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                 </thead>
                 <tbody className="divide-y divide-[#151516] text-sm text-[#FFF8E6]/80">
                   {contracts.map((c) => (
-                    <tr key={c.id} className="hover:bg-[#151516]/40 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-white">{c.contract_number}</td>
-                      <td className="px-6 py-4">{c.client_company?.name || "—"}</td>
-                      <td className="px-6 py-4 truncate max-w-[200px]">{c.title}</td>
-                      <td className="px-6 py-4 font-mono text-xs">{c.start_date}</td>
+                    <tr
+                      key={c.id}
+                      className="hover:bg-[#151516]/40 transition-colors"
+                    >
+                      <td className="px-6 py-4 font-mono font-bold text-white">
+                        {c.contract_number}
+                      </td>
+                      <td className="px-6 py-4">
+                        {c.client_company?.name || "—"}
+                      </td>
+                      <td className="px-6 py-4 truncate max-w-[200px]">
+                        {c.title}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs">
+                        {c.start_date}
+                      </td>
                       <td className="px-6 py-4 font-extrabold text-white">
                         {formatCurrency(c.contract_value, c.currency_code)}
                       </td>
@@ -406,7 +456,8 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
             {totalPages > 1 && (
               <div className="px-6 py-4 border-t border-[#151516] flex items-center justify-between text-xs text-[#606060] bg-[#0c0c0d]">
                 <span>
-                  Hiển thị <span className="text-[#FFF8E6]">{contracts.length}</span>/
+                  Hiển thị{" "}
+                  <span className="text-[#FFF8E6]">{contracts.length}</span>/
                   <span className="text-[#FFF8E6]">{total}</span> hợp đồng
                 </span>
                 <div className="flex items-center gap-2">
@@ -440,14 +491,22 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
           <div className="w-full max-w-2xl bg-[#0E0E0F] border border-[#151516] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-[#151516] flex items-center justify-between bg-[#0c0c0d]">
               <h3 className="text-lg font-bold text-white">
-                {editingContract ? `Sửa hợp đồng: ${editingContract.contract_number}` : "Tạo hợp đồng mới"}
+                {editingContract
+                  ? `Sửa hợp đồng: ${editingContract.contract_number}`
+                  : "Tạo hợp đồng mới"}
               </h3>
-              <button onClick={() => setShowForm(false)} className="text-[#606060] hover:text-white transition-colors cursor-pointer">
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-[#606060] hover:text-white transition-colors cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveContract} className="p-6 overflow-y-auto space-y-4 flex-1">
+            <form
+              onSubmit={handleSaveContract}
+              className="p-6 overflow-y-auto space-y-4 flex-1"
+            >
               {formError && (
                 <div className="p-3.5 rounded-xl bg-[#FF1744]/10 border border-[#FF1744]/20 text-[#FF1744] text-xs font-semibold">
                   {formError}
@@ -457,17 +516,24 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
               {/* Warn if editing active/immutable contract */}
               {editingContract && editingContract.status !== "draft" && (
                 <div className="p-3.5 rounded-xl bg-[#FFC400]/10 border border-[#FFC400]/25 text-[#FFC400] text-xs">
-                  Hợp đồng này đã kích hoạt. Bạn chỉ có thể sửa đổi Ghi chú và Chế độ hiển thị khách hàng.
+                  Hợp đồng này đã kích hoạt. Bạn chỉ có thể sửa đổi Ghi chú và
+                  Chế độ hiển thị khách hàng.
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Mã số hợp đồng *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Mã số hợp đồng *
+                  </label>
                   <input
                     type="text"
                     required
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     placeholder="VD: HD-2026-001"
                     value={formContractNumber}
                     onChange={(e) => setFormContractNumber(e.target.value)}
@@ -476,10 +542,16 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Khách hàng (Công ty) *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Khách hàng (Công ty) *
+                  </label>
                   <select
                     required
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     value={formClientCompanyId}
                     onChange={(e) => {
                       setFormClientCompanyId(e.target.value);
@@ -498,11 +570,15 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Tiêu đề hợp đồng *</label>
+                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                  Tiêu đề hợp đồng *
+                </label>
                 <input
                   type="text"
                   required
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   placeholder="VD: Hợp đồng cung cấp nhân sự Phase 6"
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
@@ -512,9 +588,15 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Dự án liên kết</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Dự án liên kết
+                  </label>
                   <select
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     value={formProjectId}
                     onChange={(e) => setFormProjectId(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -530,11 +612,17 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
 
                 <div className="grid grid-cols-3 gap-2">
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Giá trị hợp đồng *</label>
+                    <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                      Giá trị hợp đồng *
+                    </label>
                     <input
                       type="number"
                       required
-                      disabled={editingContract ? editingContract.status !== "draft" : false}
+                      disabled={
+                        editingContract
+                          ? editingContract.status !== "draft"
+                          : false
+                      }
                       placeholder="VD: 50000000"
                       value={formContractValue}
                       onChange={(e) => setFormContractValue(e.target.value)}
@@ -542,10 +630,16 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Tiền tệ *</label>
+                    <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                      Tiền tệ *
+                    </label>
                     <select
                       required
-                      disabled={editingContract ? editingContract.status !== "draft" : false}
+                      disabled={
+                        editingContract
+                          ? editingContract.status !== "draft"
+                          : false
+                      }
                       value={formCurrencyCode}
                       onChange={(e) => setFormCurrencyCode(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -560,11 +654,17 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Ngày bắt đầu hiệu lực *</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Ngày bắt đầu hiệu lực *
+                  </label>
                   <input
                     type="date"
                     required
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     value={formStartDate}
                     onChange={(e) => setFormStartDate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -572,10 +672,16 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Ngày kết thúc hiệu lực</label>
+                  <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                    Ngày kết thúc hiệu lực
+                  </label>
                   <input
                     type="date"
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     value={formEndDate}
                     onChange={(e) => setFormEndDate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#151516] border border-[#1f1f22] text-[#FFF8E6] text-sm focus:outline-none focus:border-[#FFC400]/40 cursor-pointer disabled:opacity-50"
@@ -584,7 +690,9 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">Điều khoản & Ghi chú</label>
+                <label className="block text-xs font-bold text-[#606060] uppercase mb-1.5">
+                  Điều khoản & Ghi chú
+                </label>
                 <textarea
                   rows={3}
                   placeholder="Nhập ghi chú hoặc điều khoản chính..."
@@ -602,7 +710,10 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                   onChange={(e) => setFormClientVisible(e.target.checked)}
                   className="w-4 h-4 accent-[#FFC400] cursor-pointer"
                 />
-                <label htmlFor="formClientVisible" className="text-xs font-bold text-[#FFF8E6]/80 cursor-pointer select-none">
+                <label
+                  htmlFor="formClientVisible"
+                  className="text-xs font-bold text-[#FFF8E6]/80 cursor-pointer select-none"
+                >
                   Cho phép khách hàng nhìn thấy hợp đồng này trên cổng thông tin
                 </label>
               </div>
@@ -620,8 +731,12 @@ export default function ContractsWorkspace({ roleBasePath }: ContractsWorkspaceP
                   disabled={submitting}
                   className="px-4 py-2 rounded-xl bg-[#FFC400] text-black hover:brightness-110 font-bold transition-all disabled:opacity-40 cursor-pointer text-xs flex items-center gap-2"
                 >
-                  {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{editingContract ? "Cập nhật hợp đồng" : "Lưu hợp đồng"}</span>
+                  {submitting && (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  )}
+                  <span>
+                    {editingContract ? "Cập nhật hợp đồng" : "Lưu hợp đồng"}
+                  </span>
                 </button>
               </div>
             </form>
