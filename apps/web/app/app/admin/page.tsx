@@ -10,6 +10,7 @@ import {
   Activity,
   ArrowRight,
   LogOut,
+  FileText,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -87,6 +88,31 @@ export default function AdminDashboardPage() {
             className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
           >
             <span>Đến trang phê duyệt</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Feature Banner: Finance */}
+        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0E0E0F] via-[#151516] to-[#0E0E0F] border border-[#FFC400]/30 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="space-y-2 max-w-xl z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 text-[#FFC400] text-xs font-semibold">
+              <FileText className="w-3.5 h-3.5" />
+              <span>Quản lý tài chính doanh nghiệp</span>
+            </div>
+            <h3 className="text-xl font-bold text-white">
+              Hợp đồng, Hóa đơn & Doanh thu
+            </h3>
+            <p className="text-xs text-[#FFF8E6]/70 leading-relaxed">
+              Theo dõi và quản lý toàn bộ hợp đồng dịch vụ, hóa đơn phát hành,
+              ghi nhận thanh toán công nợ và báo cáo tổng quan.
+            </p>
+          </div>
+
+          <Link
+            href="/app/admin/finance"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
+          >
+            <span>Đến trang tài chính</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

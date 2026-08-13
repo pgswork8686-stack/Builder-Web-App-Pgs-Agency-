@@ -97,7 +97,6 @@ export default function AdminClientDetailPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [clientId]);
 

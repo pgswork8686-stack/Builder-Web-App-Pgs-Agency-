@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -93,6 +94,39 @@ export default function ClientDashboardPage() {
             <div className="text-xs text-emerald-400">
               Bảo mật thông tin khách hàng tuyệt đối
             </div>
+          </div>
+        </div>
+
+        <div className="border-t border-[#151516] pt-8">
+          <h2 className="text-xl font-bold text-white mb-4">
+            Tài chính & Thanh toán
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Link
+              href="/app/client/contracts"
+              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
+            >
+              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
+                Hợp đồng dịch vụ
+              </h3>
+              <p className="text-xs text-[#606060]">
+                Tra cứu thông tin chi tiết các hợp đồng, điều khoản và thời gian
+                hiệu lực đã ký kết.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/client/invoices"
+              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
+            >
+              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
+                Hóa đơn & Thanh toán
+              </h3>
+              <p className="text-xs text-[#606060]">
+                Kiểm tra các hóa đơn phát hành, số tiền cần thanh toán, dư nợ và
+                lịch sử giao dịch.
+              </p>
+            </Link>
           </div>
         </div>
       </main>

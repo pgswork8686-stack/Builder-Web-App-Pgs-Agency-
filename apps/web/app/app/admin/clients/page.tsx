@@ -76,7 +76,6 @@ export default function AdminClientsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchClients();
   }, [q, status, page]);
 
