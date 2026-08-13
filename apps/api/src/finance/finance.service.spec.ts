@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   NotFoundException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FinanceService } from './finance.service';
@@ -203,6 +204,7 @@ describe('FinanceService', () => {
           select: jest.fn().mockReturnThis(),
           in: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
+          neq: jest.fn().mockReturnThis(),
           order: jest.fn().mockReturnThis(),
           range: jest.fn().mockResolvedValue({
             data: [
@@ -225,6 +227,155 @@ describe('FinanceService', () => {
 
       expect(result.items.length).toBe(1);
       expect(result.items[0].title).toBe('Visible Contract');
+    });
+
+    it('should redact internal fields from contract list and detail for client role', async () => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'client_memberships') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockResolvedValue({
+              data: [{ client_company_id: 'company-uuid-xyz' }],
+              error: null,
+            }),
+          };
+        }
+        return {
+          select: jest.fn().mockReturnThis(),
+          in: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          neq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          range: jest.fn().mockResolvedValue({
+            data: [
+              {
+                id: 'contract-id',
+                title: 'Visible Contract',
+                created_by: 'internal-user',
+                updated_by: 'internal-user',
+                notes: 'internal confidential notes',
+                client_visible: true,
+              },
+            ],
+            count: 1,
+            error: null,
+          }),
+          maybeSingle: jest.fn().mockResolvedValue({
+            data: {
+              id: 'contract-id',
+              title: 'Visible Contract',
+              created_by: 'internal-user',
+              updated_by: 'internal-user',
+              notes: 'internal confidential notes',
+              client_visible: true,
+            },
+            error: null,
+          }),
+        };
+      });
+
+      const listResult = await service.getContracts({ page: 1, pageSize: 20 }, clientUser);
+      expect(listResult.items[0]).not.toHaveProperty('created_by');
+      expect(listResult.items[0]).not.toHaveProperty('updated_by');
+      expect(listResult.items[0]).not.toHaveProperty('notes');
+
+      const detailResult = await service.getContractById('contract-id', clientUser);
+      expect(detailResult).not.toHaveProperty('created_by');
+      expect(detailResult).not.toHaveProperty('updated_by');
+      expect(detailResult).not.toHaveProperty('notes');
+    });
+
+    it('should redact payment details for client role', async () => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'invoices') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            in: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            neq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { id: 'invoice-id', client_visible: true },
+              error: null,
+            }),
+          };
+        }
+        if (table === 'client_memberships') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockResolvedValue({
+              data: [{ client_company_id: 'company-uuid-xyz' }],
+              error: null,
+            }),
+          };
+        }
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockResolvedValue({
+            data: [
+              {
+                id: 'payment-id',
+                invoice_id: 'invoice-id',
+                amount: 100,
+                paid_at: '2026-08-12T00:00:00Z',
+                payment_reference: 'REF-XYZ',
+                payment_method: 'Bank Transfer',
+                notes: 'Confidential bank fee notes',
+                created_at: '2026-08-12T00:00:00Z',
+              },
+            ],
+            error: null,
+          }),
+        };
+      });
+
+      const payments = await service.getPayments('invoice-id', clientUser);
+      expect(payments[0]).toHaveProperty('id');
+      expect(payments[0]).toHaveProperty('invoiceId');
+      expect(payments[0]).toHaveProperty('amount');
+      expect(payments[0]).toHaveProperty('paidAt');
+      expect(payments[0]).toHaveProperty('createdAt');
+
+      expect(payments[0]).not.toHaveProperty('paymentReference');
+      expect(payments[0]).not.toHaveProperty('paymentMethod');
+      expect(payments[0]).not.toHaveProperty('notes');
+      expect(payments[0]).not.toHaveProperty('recordedBy');
+    });
+  });
+
+  describe('Employee/Team Leader Denials', () => {
+    it('should deny employee from creating, updating or deleting contracts and invoices', async () => {
+      await expect(service.createContract({} as any, employeeUser)).rejects.toThrow(ForbiddenException);
+      await expect(service.updateContract('id', {} as any, employeeUser)).rejects.toThrow(ForbiddenException);
+      await expect(service.transitionContract('id', 'active', employeeUser)).rejects.toThrow(ForbiddenException);
+      await expect(service.getAuditLogs({ page: 1, pageSize: 20 }, employeeUser)).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('Error Sanitization', () => {
+    it('should sanitize unknown database errors and prevent detail leakage', async () => {
+      mockSupabaseClient.from.mockImplementationOnce(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        neq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: null,
+          error: {
+            message: 'extremely sensitive query syntax internal details that should never be shown to users',
+            code: 'XX001',
+          },
+        }),
+      }));
+
+      try {
+        await service.getContracts({ page: 1, pageSize: 20 }, adminUser);
+        fail('should have thrown');
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(InternalServerErrorException);
+        expect(err.response.code).toBe('FINANCE_DATABASE_ERROR');
+        expect(err.response.message).toBe('Không thể xử lý yêu cầu tài chính. Vui lòng thử lại.');
+      }
     });
   });
 });

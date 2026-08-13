@@ -65,6 +65,7 @@ describe('Finance Management API (e2e)', () => {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             in: jest.fn().mockReturnThis(),
+            neq: jest.fn().mockReturnThis(),
             order: jest.fn().mockReturnThis(),
             range: jest.fn().mockResolvedValue({
               data: [
@@ -98,6 +99,7 @@ describe('Finance Management API (e2e)', () => {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             in: jest.fn().mockReturnThis(),
+            neq: jest.fn().mockReturnThis(),
             order: jest.fn().mockReturnThis(),
             range: jest.fn().mockResolvedValue({
               data: [
@@ -213,9 +215,47 @@ describe('Finance Management API (e2e)', () => {
       mockInvoiceResponse = null;
 
       await request(app.getHttpServer())
-        .get('/api/v1/finance/invoices/other-invoice-id')
+        .get('/api/v1/finance/invoices/99999999-9999-4999-9999-999999999999')
         .set('Authorization', 'Bearer fake-token')
         .expect(404); // Should return 404/Access Denied instead of leaking the invoice
+    });
+
+    it('GET /api/v1/finance/contracts/invalid-uuid - should return 400 Bad Request', async () => {
+      currentTestRole = 'admin';
+      currentProfileId = ADMIN_ID;
+
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/finance/contracts/invalid-uuid')
+        .set('Authorization', 'Bearer fake-token')
+        .expect(400);
+
+      expect(res.body.message).toContain('Validation failed');
+    });
+
+    it('PATCH /api/v1/finance/contracts/99999999-9999-4999-9999-999999999999 - should reject empty body with PATCH_EMPTY', async () => {
+      currentTestRole = 'admin';
+      currentProfileId = ADMIN_ID;
+
+      const res = await request(app.getHttpServer())
+        .patch('/api/v1/finance/contracts/99999999-9999-4999-9999-999999999999')
+        .set('Authorization', 'Bearer fake-token')
+        .send({})
+        .expect(400);
+
+      expect(res.body.code).toBe('PATCH_EMPTY');
+    });
+
+    it('POST /api/v1/finance/contracts/99999999-9999-4999-9999-999999999999/transition - should reject invalid transition target draft', async () => {
+      currentTestRole = 'admin';
+      currentProfileId = ADMIN_ID;
+
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/finance/contracts/99999999-9999-4999-9999-999999999999/transition')
+        .set('Authorization', 'Bearer fake-token')
+        .send({ status: 'draft' })
+        .expect(400);
+
+      expect(res.body.code).toBe('VALIDATION_FAILED');
     });
   });
 });

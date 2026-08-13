@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   ConflictException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RequestUser } from '../auth/auth.types';
@@ -19,6 +20,8 @@ import {
 
 @Injectable()
 export class FinanceService {
+  private readonly logger = new Logger(FinanceService.name);
+
   constructor(private readonly supabaseService: SupabaseService) {}
 
   private get client() {
@@ -66,6 +69,11 @@ export class FinanceService {
   private handleDbError(error: any) {
     const msg = error.message || '';
     const code = error.code || '';
+
+    // Log the real database error on the server side
+    this.logger.error(
+      `Database error encountered: Code: ${code}, Message: ${msg}, Details: ${JSON.stringify(error)}`,
+    );
 
     if (code === '23505') {
       if (
@@ -206,11 +214,64 @@ export class FinanceService {
         message: 'Số tiền thanh toán vượt quá số dư còn lại của hóa đơn.',
       });
     }
+    if (msg.includes('INVOICE_PAYMENT_STATE_INVALID') || code === 'P6024') {
+      throw new BadRequestException({
+        code: 'INVOICE_PAYMENT_STATE_INVALID',
+        message: 'Trạng thái hóa đơn không hợp lệ để thực hiện thanh toán.',
+      });
+    }
 
+    // Sanitize any other database error to client
     throw new InternalServerErrorException({
       code: 'FINANCE_DATABASE_ERROR',
-      message: `Lỗi cơ sở dữ liệu: ${error.message || error}`,
+      message: 'Không thể xử lý yêu cầu tài chính. Vui lòng thử lại.',
     });
+  }
+
+  private mapClientContract(c: any) {
+    return {
+      id: c.id,
+      contract_number: c.contract_number,
+      client_company_id: c.client_company_id,
+      project_id: c.project_id,
+      title: c.title,
+      start_date: c.start_date,
+      end_date: c.end_date,
+      contract_value: c.contract_value,
+      currency_code: c.currency_code,
+      status: c.status,
+      client_visible: c.client_visible,
+      completed_at: c.completed_at,
+      cancelled_at: c.cancelled_at,
+      created_at: c.created_at,
+      updated_at: c.updated_at,
+      client_company: c.client_company ? { name: c.client_company.name } : null,
+      project: c.project ? { name: c.project.name } : null,
+    };
+  }
+
+  private mapClientInvoice(i: any) {
+    return {
+      id: i.id,
+      invoice_number: i.invoice_number,
+      client_company_id: i.client_company_id,
+      project_id: i.project_id,
+      contract_id: i.contract_id,
+      issue_date: i.issue_date,
+      due_date: i.due_date,
+      amount: i.amount,
+      paid_amount: i.paid_amount,
+      currency_code: i.currency_code,
+      status: i.status,
+      paid_at: i.paid_at,
+      cancelled_at: i.cancelled_at,
+      client_visible: i.client_visible,
+      created_at: i.created_at,
+      updated_at: i.updated_at,
+      client_company: i.client_company ? { name: i.client_company.name } : null,
+      project: i.project ? { name: i.project.name } : null,
+      contract: i.contract ? { contract_number: i.contract.contract_number } : null,
+    };
   }
 
   async getSummary(user: RequestUser) {
@@ -248,7 +309,8 @@ export class FinanceService {
       }
       dbQuery = dbQuery
         .in('client_company_id', companyIds)
-        .eq('client_visible', true);
+        .eq('client_visible', true)
+        .neq('status', 'draft');
     } else {
       if (query.clientCompanyId) {
         dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
@@ -262,8 +324,10 @@ export class FinanceService {
       dbQuery = dbQuery.eq('status', query.status);
     }
     if (query.query) {
-      const q = query.query.trim();
-      dbQuery = dbQuery.or(`contract_number.ilike.%${q}%,title.ilike.%${q}%`);
+      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      if (q.length > 0) {
+        dbQuery = dbQuery.or(`contract_number.ilike.%${q}%,title.ilike.%${q}%`);
+      }
     }
 
     const offset = (query.page - 1) * query.pageSize;
@@ -275,9 +339,15 @@ export class FinanceService {
       this.handleDbError(error);
     }
 
+    const rawItems = data || [];
+    const items =
+      user.role === 'client'
+        ? rawItems.map((c) => this.mapClientContract(c))
+        : rawItems;
+
     const total = count || 0;
     return {
-      items: data || [],
+      items,
       page: query.page,
       pageSize: query.pageSize,
       total,
@@ -299,7 +369,8 @@ export class FinanceService {
       const companyIds = await this.getClientCompanyIds(user.profileId);
       dbQuery = dbQuery
         .in('client_company_id', companyIds)
-        .eq('client_visible', true);
+        .eq('client_visible', true)
+        .neq('status', 'draft');
     }
 
     const { data, error } = await dbQuery.maybeSingle();
@@ -315,11 +386,8 @@ export class FinanceService {
       });
     }
 
-    // Clean internal properties for client role
     if (user.role === 'client') {
-      delete data.created_by;
-      delete data.updated_by;
-      delete data.notes; // Notes can be internal-only
+      return this.mapClientContract(data);
     }
 
     return data;
@@ -357,7 +425,6 @@ export class FinanceService {
   async updateContract(id: string, dto: ContractUpdateDto, user: RequestUser) {
     this.enforceAdminOrAccountant(user);
 
-    // Get current contract state to see if it is immutable
     const { data: contract, error: getErr } = await this.client
       .from('contracts')
       .select('status')
@@ -371,7 +438,6 @@ export class FinanceService {
       });
     }
 
-    // If active/completed/cancelled, core fields cannot be edited
     if (contract.status !== 'draft') {
       const coreFields = [
         'contractNumber',
@@ -473,7 +539,8 @@ export class FinanceService {
       }
       dbQuery = dbQuery
         .in('client_company_id', companyIds)
-        .eq('client_visible', true);
+        .eq('client_visible', true)
+        .neq('status', 'draft');
     } else {
       if (query.clientCompanyId) {
         dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
@@ -490,8 +557,10 @@ export class FinanceService {
       dbQuery = dbQuery.eq('status', query.status);
     }
     if (query.query) {
-      const q = query.query.trim();
-      dbQuery = dbQuery.or(`invoice_number.ilike.%${q}%`);
+      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      if (q.length > 0) {
+        dbQuery = dbQuery.or(`invoice_number.ilike.%${q}%`);
+      }
     }
 
     const offset = (query.page - 1) * query.pageSize;
@@ -503,9 +572,15 @@ export class FinanceService {
       this.handleDbError(error);
     }
 
+    const rawItems = data || [];
+    const items =
+      user.role === 'client'
+        ? rawItems.map((i) => this.mapClientInvoice(i))
+        : rawItems;
+
     const total = count || 0;
     return {
-      items: data || [],
+      items,
       page: query.page,
       pageSize: query.pageSize,
       total,
@@ -527,7 +602,8 @@ export class FinanceService {
       const companyIds = await this.getClientCompanyIds(user.profileId);
       dbQuery = dbQuery
         .in('client_company_id', companyIds)
-        .eq('client_visible', true);
+        .eq('client_visible', true)
+        .neq('status', 'draft');
     }
 
     const { data, error } = await dbQuery.maybeSingle();
@@ -544,9 +620,7 @@ export class FinanceService {
     }
 
     if (user.role === 'client') {
-      delete data.created_by;
-      delete data.updated_by;
-      delete data.notes;
+      return this.mapClientInvoice(data);
     }
 
     return data;
@@ -717,6 +791,16 @@ export class FinanceService {
     }
 
     return (data || []).map((p) => {
+      if (user.role === 'client') {
+        return {
+          id: p.id,
+          invoiceId: p.invoice_id,
+          amount: p.amount,
+          paidAt: p.paid_at,
+          createdAt: p.created_at,
+        };
+      }
+
       const cleanPayment: any = {
         id: p.id,
         invoiceId: p.invoice_id,
@@ -728,10 +812,8 @@ export class FinanceService {
         createdAt: p.created_at,
       };
 
-      if (user.role !== 'client') {
-        const prof: any = p.profile;
-        cleanPayment.recordedBy = prof?.full_name || null;
-      }
+      const prof: any = p.profile;
+      cleanPayment.recordedBy = prof?.full_name || null;
 
       return cleanPayment;
     });
@@ -760,6 +842,119 @@ export class FinanceService {
       pageSize: query.pageSize,
       total,
       totalPages: Math.ceil(total / query.pageSize),
+    };
+  }
+
+  async getMetaClients(query: FinanceQuery, user: RequestUser) {
+    this.enforceAdminOrAccountant(user);
+    const limit = Math.min(query.pageSize || 100, 100);
+    const offset = ((query.page || 1) - 1) * limit;
+
+    let dbQuery = this.client
+      .from('client_companies')
+      .select('id, code, name, status', { count: 'exact' });
+
+    if (query.query) {
+      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      if (q.length > 0) {
+        dbQuery = dbQuery.or(`name.ilike.%${q}%,code.ilike.%${q}%`);
+      }
+    }
+
+    const { data, count, error } = await dbQuery
+      .order('name', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      this.handleDbError(error);
+    }
+
+    return {
+      items: data || [],
+      page: query.page || 1,
+      pageSize: limit,
+      total: count || 0,
+      totalPages: Math.ceil((count || 0) / limit),
+    };
+  }
+
+  async getMetaProjects(query: FinanceQuery, user: RequestUser) {
+    this.enforceAdminOrAccountant(user);
+    const limit = Math.min(query.pageSize || 100, 100);
+    const offset = ((query.page || 1) - 1) * limit;
+
+    let dbQuery = this.client
+      .from('projects')
+      .select('id, project_code, client_company_id, name, status', { count: 'exact' });
+
+    if (query.clientCompanyId) {
+      dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
+    }
+
+    if (query.query) {
+      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      if (q.length > 0) {
+        dbQuery = dbQuery.or(`name.ilike.%${q}%,project_code.ilike.%${q}%`);
+      }
+    }
+
+    const { data, count, error } = await dbQuery
+      .order('name', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      this.handleDbError(error);
+    }
+
+    return {
+      items: data || [],
+      page: query.page || 1,
+      pageSize: limit,
+      total: count || 0,
+      totalPages: Math.ceil((count || 0) / limit),
+    };
+  }
+
+  async getMetaContracts(query: FinanceQuery, user: RequestUser) {
+    this.enforceAdminOrAccountant(user);
+    const limit = Math.min(query.pageSize || 100, 100);
+    const offset = ((query.page || 1) - 1) * limit;
+
+    let dbQuery = this.client
+      .from('contracts')
+      .select('id, contract_number, client_company_id, project_id, currency_code, status, title', { count: 'exact' });
+
+    if (query.clientCompanyId) {
+      dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
+    }
+    if (query.projectId) {
+      dbQuery = dbQuery.eq('project_id', query.projectId);
+    }
+    if (query.status) {
+      dbQuery = dbQuery.eq('status', query.status);
+    }
+
+    if (query.query) {
+      const q = query.query.trim().slice(0, 100).replace(/[(),%]/g, '');
+      if (q.length > 0) {
+        dbQuery = dbQuery.or(`title.ilike.%${q}%,contract_number.ilike.%${q}%`);
+      }
+    }
+
+    const { data, count, error } = await dbQuery
+      .order('contract_number', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      this.handleDbError(error);
+    }
+
+    return {
+      items: data || [],
+      page: query.page || 1,
+      pageSize: limit,
+      total: count || 0,
+      totalPages: Math.ceil((count || 0) / limit),
     };
   }
 }

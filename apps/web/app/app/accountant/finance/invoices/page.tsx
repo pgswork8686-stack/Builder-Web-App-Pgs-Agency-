@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import InvoicesWorkspace from "@/components/finance/InvoicesWorkspace";
 
-export default function AdminInvoicesPage() {
+export default function AccountantInvoicesPage() {
   return (
     <Suspense
       fallback={
@@ -14,7 +14,7 @@ export default function AdminInvoicesPage() {
         </div>
       }
     >
-      <InvoicesWorkspace roleBasePath="/app/admin" />
+      <InvoicesWorkspace roleBasePath="/app/accountant" />
     </Suspense>
   );
 }

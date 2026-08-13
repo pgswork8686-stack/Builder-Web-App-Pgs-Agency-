@@ -99,4 +99,26 @@ describe('Phase 6 Migration Security Contract', () => {
       'GRANT EXECUTE ON FUNCTION public.phase6_finance_summary() TO service_role;',
     );
   });
+
+  it('verifies 190000 finance fix migration exists and enforces security + partially paid overdue count', () => {
+    const m19Path = resolve(
+      migrationsDirectory,
+      '20260812190000_phase6_finance_fix_round1.sql',
+    );
+    expect(existsSync(m19Path)).toBe(true);
+
+    const migration = readFileSync(m19Path, 'utf8');
+
+    // Verify correct signature and properties of replaced summary function
+    expect(migration).toContain('CREATE OR REPLACE FUNCTION public.phase6_finance_summary()');
+    expect(migration).toContain('SECURITY INVOKER');
+    expect(migration).toContain('SET search_path = public, pg_temp');
+
+    // Verify partially paid overdue business rule correction
+    expect(migration).toContain("status IN ('issued', 'partially_paid') AND due_date < CURRENT_DATE");
+
+    // Verify execute privilege restrictions are preserved
+    expect(migration).toContain('REVOKE ALL ON FUNCTION public.phase6_finance_summary()\n  FROM PUBLIC, anon, authenticated;');
+    expect(migration).toContain('GRANT EXECUTE ON FUNCTION public.phase6_finance_summary()\n  TO service_role;');
+  });
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -99,6 +100,48 @@ export default function AccountantDashboardPage() {
             <div className="text-xs text-emerald-400">
               Bảo vệ SSL & RLS Enforced
             </div>
+          </div>
+        </div>
+
+        {/* Finance Quick Links Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Quản lý Tài chính</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <Link
+              href="/app/accountant/finance"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Tổng quan tài chính
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Xem doanh thu thực tế, nợ quá hạn và các thay đổi tài chính.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/accountant/finance/contracts"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Danh sách hợp đồng
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Tạo mới, chỉnh sửa nháp và quản lý vòng đời hợp đồng.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/accountant/finance/invoices"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Danh sách hóa đơn
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Ghi nhận thanh toán, đánh dấu quá hạn, phát hành hóa đơn.
+              </p>
+            </Link>
           </div>
         </div>
       </main>

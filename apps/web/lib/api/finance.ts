@@ -275,4 +275,61 @@ export const financeApi = {
 
     return request(`/finance/audit?${params.toString()}`);
   },
+
+  getMetaClients: (
+    query: FinanceQuery = {},
+  ): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> => {
+    const params = new URLSearchParams();
+    if (query.page) params.append("page", query.page.toString());
+    if (query.pageSize) params.append("pageSize", query.pageSize.toString());
+    if (query.query) params.append("query", query.query);
+
+    return request(`/finance/meta/clients?${params.toString()}`);
+  },
+
+  getMetaProjects: (
+    query: FinanceQuery = {},
+  ): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> => {
+    const params = new URLSearchParams();
+    if (query.page) params.append("page", query.page.toString());
+    if (query.pageSize) params.append("pageSize", query.pageSize.toString());
+    if (query.query) params.append("query", query.query);
+    if (query.clientCompanyId)
+      params.append("clientCompanyId", query.clientCompanyId);
+
+    return request(`/finance/meta/projects?${params.toString()}`);
+  },
+
+  getMetaContracts: (
+    query: FinanceQuery = {},
+  ): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> => {
+    const params = new URLSearchParams();
+    if (query.page) params.append("page", query.page.toString());
+    if (query.pageSize) params.append("pageSize", query.pageSize.toString());
+    if (query.query) params.append("query", query.query);
+    if (query.clientCompanyId)
+      params.append("clientCompanyId", query.clientCompanyId);
+    if (query.projectId) params.append("projectId", query.projectId);
+    if (query.status) params.append("status", query.status);
+
+    return request(`/finance/meta/contracts?${params.toString()}`);
+  },
 };
