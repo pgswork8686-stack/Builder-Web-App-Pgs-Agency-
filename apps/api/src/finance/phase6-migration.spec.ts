@@ -133,6 +133,29 @@ describe('Phase 6 Migration Security Contract', () => {
       'CREATE OR REPLACE FUNCTION public.phase6_validate_invoice_state()',
     );
 
+    // Regression test for correct PL/pgSQL dollar-quoting delimiters
+    const cleanMigration = migration.replace(/\r\n/g, '\n');
+    expect(cleanMigration).toContain(
+      'CREATE OR REPLACE FUNCTION public.phase6_validate_invoice_state()\n' +
+        'RETURNS TRIGGER\n' +
+        'LANGUAGE plpgsql\n' +
+        'SECURITY INVOKER\n' +
+        'SET search_path = public, pg_temp\n' +
+        'AS $$\n' +
+        'BEGIN',
+    );
+    expect(cleanMigration).toContain('\nEND;\n$$;');
+    expect(cleanMigration).not.toContain(
+      'CREATE OR REPLACE FUNCTION public.phase6_validate_invoice_state()\n' +
+        'RETURNS TRIGGER\n' +
+        'LANGUAGE plpgsql\n' +
+        'SECURITY INVOKER\n' +
+        'SET search_path = public, pg_temp\n' +
+        'AS $\n' +
+        'BEGIN',
+    );
+    expect(cleanMigration).not.toContain('\nEND;\n$;');
+
     // Verify execute privilege restrictions are preserved
     expect(migration).toContain(
       'REVOKE ALL ON FUNCTION public.phase6_finance_summary()\n  FROM PUBLIC, anon, authenticated;',

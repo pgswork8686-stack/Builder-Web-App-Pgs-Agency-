@@ -65,7 +65,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY INVOKER
 SET search_path = public, pg_temp
-AS $
+AS $$
 BEGIN
   IF OLD.status <> 'draft' AND (
     OLD.invoice_number IS DISTINCT FROM NEW.invoice_number
@@ -121,7 +121,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$;
+$$;
 
 REVOKE ALL ON FUNCTION public.phase6_validate_invoice_state()
   FROM PUBLIC, anon, authenticated;
