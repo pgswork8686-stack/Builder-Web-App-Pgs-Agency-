@@ -20,6 +20,9 @@ import {
   type ChatMessage,
 } from "@/lib/api/chat";
 import { NotificationBell } from "./notification-bell";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type ConnectionState = "connecting" | "connected" | "reconnecting" | "denied";
 
@@ -338,70 +341,58 @@ export function ChatWorkspace() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6]">
-      <header className="sticky top-0 z-20 border-b border-[#151516] bg-[#0E0E0F]/90 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FFC400]">
-              Phase 7
-            </div>
-            <h1 className="mt-1 text-2xl font-black text-white">
-              Chat nội bộ & project
-            </h1>
-            <p className="mt-1 text-sm text-[#606060]">
-              Direct chat chỉ dành cho nội bộ. Client chỉ tham gia project chat
-              đã được server xác thực.
-            </p>
-          </div>
-          <NotificationBell />
-        </div>
-      </header>
+    <div className="space-y-6">
+      <SectionHeader
+        title="Chat nội bộ & Dự án"
+        description="Direct chat dành cho nhân sự nội bộ. Client tham gia project chat theo quyền truy cập được cấp."
+        action={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => void loadConversations()}
+            leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
+          >
+            Tải lại
+          </Button>
+        }
+      />
 
-      <main className="mx-auto grid max-w-7xl gap-6 p-6 lg:grid-cols-[22rem_1fr] lg:p-8">
+      <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
         <aside className="space-y-6">
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
+          <Card className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-bold text-white">Cuộc trò chuyện</h2>
-                <p className="mt-1 text-xs text-[#606060]">
-                  Danh sách theo membership hiện tại.
+                <h2 className="font-bold text-[#0F172A] text-sm">Cuộc trò chuyện</h2>
+                <p className="mt-0.5 text-[11px] text-[#64748B]">
+                  Danh sách theo quyền truy cập của bạn.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => void loadConversations()}
-                className="rounded-xl border border-[#FFC400]/20 p-2 text-[#FFC400]"
-                aria-label="Tải lại chat"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
             </div>
 
-            <div className="mt-4 flex items-center gap-2 text-xs text-[#606060]">
+            <div className="flex items-center gap-2 text-xs text-[#64748B]">
               {connectionState === "denied" ? (
-                <WifiOff className="h-3.5 w-3.5 text-red-400" />
+                <WifiOff className="h-3.5 w-3.5 text-red-500" />
               ) : (
                 <span
                   className={`h-2 w-2 rounded-full ${
                     connectionState === "connected"
-                      ? "bg-emerald-400"
-                      : "bg-amber-400"
+                      ? "bg-emerald-500"
+                      : "bg-amber-500"
                   }`}
                 />
               )}
               {connectionLabel}
             </div>
 
-            <div className="mt-5 max-h-[32rem] space-y-2 overflow-y-auto">
+            <div className="max-h-[32rem] space-y-2 overflow-y-auto pt-2">
               {loadingList ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-sm text-[#606060]">
-                  <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
+                <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#64748B]">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                   Đang tải...
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="rounded-2xl border border-[#151516] p-5 text-center text-sm text-[#606060]">
-                  Chưa có cuộc trò chuyện nào. Hãy mở project chat hoặc direct
-                  chat hợp lệ.
+                <div className="rounded-xl border border-dashed border-[#CBD5E1] p-5 text-center text-xs text-[#94A3B8]">
+                  Chưa có cuộc trò chuyện nào.
                 </div>
               ) : (
                 conversations.map((conversation) => (
@@ -409,29 +400,29 @@ export function ChatWorkspace() {
                     key={conversation.id}
                     type="button"
                     onClick={() => void openConversation(conversation)}
-                    className={`w-full rounded-2xl border p-4 text-left transition ${
+                    className={`w-full rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${
                       selected?.id === conversation.id
-                        ? "border-[#FFC400] bg-[#FFC400]/10"
-                        : "border-[#151516] hover:border-[#FFC400]/30"
+                        ? "border-[#4F75FF] bg-[#EEF2FF]"
+                        : "border-[#EDF2F7] bg-white hover:bg-[#F8FAFC]"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-bold text-white">
+                        <div className="truncate text-xs font-bold text-[#0F172A]">
                           {conversationTitle(conversation)}
                         </div>
-                        <div className="mt-1 text-[11px] uppercase tracking-wide text-[#606060]">
+                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#64748B]">
                           {conversation.type === "project"
                             ? "Project chat"
                             : "Direct chat"}
                         </div>
                       </div>
                       {conversation.hasUnread ? (
-                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#FFC400]" />
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#4F75FF]" />
                       ) : null}
                     </div>
                     {conversation.lastMessageAt ? (
-                      <div className="mt-3 text-[11px] text-[#606060]">
+                      <div className="mt-2 text-[10px] text-[#94A3B8] font-mono">
                         {formatDateTime(conversation.lastMessageAt)}
                       </div>
                     ) : null}
@@ -439,77 +430,75 @@ export function ChatWorkspace() {
                 ))
               )}
             </div>
-          </section>
+          </Card>
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-            <div className="flex items-center gap-3">
-              <UserPlus className="h-5 w-5 text-[#FFC400]" />
-              <h2 className="font-bold text-white">Mở direct chat</h2>
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center gap-2.5">
+              <UserPlus className="h-4 w-4 text-[#4F75FF]" />
+              <h2 className="font-bold text-[#0F172A] text-sm">Mở direct chat</h2>
             </div>
-            <p className="mt-2 text-xs leading-5 text-[#606060]">
-              Direct chat chỉ cho admin, team leader, employee, accountant với
-              user nội bộ đang active. Client bị chặn ở cả UI và server.
+            <p className="text-xs text-[#64748B]">
+              Direct chat chỉ dành cho nhân sự nội bộ (Admin, Leader, Employee, Accountant).
             </p>
-            <div className="mt-4 space-y-3">
+            <div className="space-y-2 pt-1">
               <input
                 value={peerUserId}
                 disabled={isClient}
                 onChange={(event) => setPeerUserId(event.target.value)}
-                placeholder="Peer user UUID"
-                className="w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                placeholder="Nhập User UUID..."
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
-              <button
-                type="button"
-                disabled={
-                  isClient || working === "direct" || !peerUserId.trim()
-                }
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full"
+                disabled={isClient || working === "direct" || !peerUserId.trim()}
                 onClick={createDirect}
-                className="w-full rounded-xl bg-[#FFC400] px-4 py-2 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {working === "direct" ? "Đang mở..." : "Mở direct chat"}
-              </button>
+              </Button>
             </div>
-          </section>
+          </Card>
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-            <div className="flex items-center gap-3">
-              <FolderOpen className="h-5 w-5 text-[#FFC400]" />
-              <h2 className="font-bold text-white">Mở project chat</h2>
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center gap-2.5">
+              <FolderOpen className="h-4 w-4 text-[#4F75FF]" />
+              <h2 className="font-bold text-[#0F172A] text-sm">Mở project chat</h2>
             </div>
-            <p className="mt-2 text-xs leading-5 text-[#606060]">
-              Server kiểm tra project membership/client company trước khi tạo
-              hoặc join phòng.
+            <p className="text-xs text-[#64748B]">
+              Hệ thống xác thực quyền tham gia dự án trước khi mở phòng chat.
             </p>
-            <div className="mt-4 space-y-3">
+            <div className="space-y-2 pt-1">
               <input
                 value={projectId}
                 onChange={(event) => setProjectId(event.target.value)}
-                placeholder="Project UUID"
-                className="w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                placeholder="Nhập Project UUID..."
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full"
                 disabled={working === "project" || !projectId.trim()}
                 onClick={openProjectChat}
-                className="w-full rounded-xl bg-[#FFC400] px-4 py-2 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {working === "project" ? "Đang mở..." : "Mở project chat"}
-              </button>
+              </Button>
             </div>
-          </section>
+          </Card>
         </aside>
 
-        <section className="flex min-h-[42rem] flex-col rounded-3xl border border-[#151516] bg-[#0E0E0F]">
-          <div className="flex items-center justify-between gap-4 border-b border-[#151516] p-5">
+        <Card className="flex min-h-[42rem] flex-col p-0 overflow-hidden">
+          <div className="flex items-center justify-between gap-4 border-b border-[#EDF2F7] p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFC400] text-black">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-white">
-                  {selected ? conversationTitle(selected) : "Chưa chọn chat"}
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  {selected ? conversationTitle(selected) : "Chưa chọn cuộc trò chuyện"}
                 </h2>
-                <p className="text-xs text-[#606060]">
+                <p className="text-[11px] text-[#64748B]">
                   {selected
                     ? `${selected.type === "project" ? "Project chat" : "Direct chat"} · ${selected.id}`
                     : "Chọn một cuộc trò chuyện ở cột trái."}
@@ -517,54 +506,53 @@ export function ChatWorkspace() {
               </div>
             </div>
             {selected ? (
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="sm"
                 disabled={loadingMessages}
                 onClick={() => void loadMessages(selected.id)}
-                className="rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-50"
               >
                 Tải lại
-              </button>
+              </Button>
             ) : null}
           </div>
 
           {error ? (
-            <div className="m-5 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+            <div className="m-4 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
               {error}
             </div>
           ) : null}
 
-          <div className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {!selected ? (
-              <div className="flex h-full items-center justify-center text-center text-sm text-[#606060]">
+              <div className="flex h-full items-center justify-center text-center text-xs text-[#94A3B8]">
                 Chọn hoặc mở một cuộc trò chuyện để bắt đầu.
               </div>
             ) : loadingMessages && messages.length === 0 ? (
-              <div className="flex h-full items-center justify-center gap-2 text-sm text-[#606060]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
+              <div className="flex h-full items-center justify-center gap-2 text-xs text-[#64748B]">
+                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                 Đang tải lịch sử chat...
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {nextBefore ? (
                   <div className="text-center">
-                    <button
-                      type="button"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       disabled={loadingMessages}
                       onClick={() =>
                         selected && void loadMessages(selected.id, nextBefore)
                       }
-                      className="rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-50"
                     >
                       Tải tin cũ hơn
-                    </button>
+                    </Button>
                   </div>
                 ) : null}
 
                 {messages.length === 0 ? (
-                  <div className="rounded-2xl border border-[#151516] p-8 text-center text-sm text-[#606060]">
-                    Chưa có tin nhắn. Tin nhắn chỉ hỗ trợ plain text, tối đa
-                    4000 ký tự.
+                  <div className="rounded-xl border border-dashed border-[#CBD5E1] p-8 text-center text-xs text-[#94A3B8]">
+                    Chưa có tin nhắn. Tin nhắn hỗ trợ plain text, tối đa 4000 ký tự.
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -576,27 +564,27 @@ export function ChatWorkspace() {
                         className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[78%] rounded-2xl border px-4 py-3 ${
+                          className={`max-w-[75%] rounded-2xl p-3.5 shadow-xs ${
                             isMe
-                              ? "border-[#FFC400]/40 bg-[#FFC400] text-black"
-                              : "border-[#151516] bg-[#070707] text-[#FFF8E6]"
+                              ? "bg-[#4F75FF] text-white"
+                              : "bg-[#F1F5F9] text-[#0F172A]"
                           }`}
                         >
                           <div
-                            className={`text-[11px] font-bold ${
-                              isMe ? "text-black/60" : "text-[#FFC400]"
+                            className={`text-[10px] font-bold ${
+                              isMe ? "text-white/80" : "text-[#4F75FF]"
                             }`}
                           >
                             {message.sender?.full_name ??
                               message.sender?.email ??
                               (isMe ? "Bạn" : "Thành viên")}
                           </div>
-                          <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">
+                          <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed">
                             {message.content}
                           </p>
                           <div
-                            className={`mt-2 text-[11px] ${
-                              isMe ? "text-black/55" : "text-[#606060]"
+                            className={`mt-1.5 text-[9px] font-mono text-right ${
+                              isMe ? "text-white/70" : "text-[#94A3B8]"
                             }`}
                           >
                             {formatDateTime(message.createdAt)}
@@ -611,7 +599,7 @@ export function ChatWorkspace() {
           </div>
 
           <form
-            className="border-t border-[#151516] p-5"
+            className="border-t border-[#EDF2F7] p-4 bg-[#F8FAFC]"
             onSubmit={(event) => {
               event.preventDefault();
               void sendMessage();
@@ -626,30 +614,33 @@ export function ChatWorkspace() {
                 }
                 placeholder={
                   selected
-                    ? "Nhập tin nhắn plain text..."
+                    ? "Nhập tin nhắn..."
                     : "Chọn cuộc trò chuyện trước"
                 }
-                className="min-h-20 flex-1 resize-none rounded-2xl border border-[#151516] bg-[#070707] px-4 py-3 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                className="min-h-16 flex-1 resize-none rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
               />
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                size="sm"
                 disabled={!selected || sending || !draft.trim()}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#FFC400] px-5 py-3 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
+                leftIcon={
+                  sending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )
+                }
               >
-                {sending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
                 Gửi
-              </button>
+              </Button>
             </div>
-            <div className="mt-2 text-right text-[11px] text-[#606060]">
+            <div className="mt-1 text-right text-[10px] text-[#94A3B8]">
               {draft.length}/4000
             </div>
           </form>
-        </section>
-      </main>
+        </Card>
+      </div>
     </div>
   );
 }

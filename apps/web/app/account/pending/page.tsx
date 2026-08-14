@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Clock, LogOut, RefreshCw, ShieldAlert } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function AccountPendingPage() {
   const router = useRouter();
@@ -23,59 +26,59 @@ export default function AccountPendingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#070707] text-[#FFF8E6] p-6 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFC400]/10 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-md w-full bg-[#0E0E0F] border border-[#151516] p-8 rounded-2xl shadow-2xl text-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-[#0F172A] p-6 relative">
+      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#EDF2F7]">
         {/* Status Icon Header */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FFC400]/10 border border-[#FFC400]/30 flex items-center justify-center text-[#FFC400] shadow-[0_0_30px_rgba(255,196,0,0.15)]">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
           <Clock className="w-8 h-8 animate-pulse" />
         </div>
 
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 border border-[#FFC400]/30 text-[#FFC400] text-xs font-semibold uppercase tracking-wider mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#FFC400] animate-ping" />
+        <div className="space-y-2">
+          <Badge variant="gold" size="md">
             Trạng thái: Chờ duyệt
-          </div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
+          </Badge>
+          <h2 className="text-xl font-extrabold text-[#0F172A] tracking-tight">
             Tài khoản đang chờ phê duyệt
           </h2>
         </div>
 
-        <p className="text-sm text-[#FFF8E6]/70 leading-relaxed bg-[#151516]/60 p-4 rounded-xl border border-[#151516]">
+        <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
           Tài khoản của bạn đã được khởi tạo thành công và đang chờ Quản trị
-          viên (Admin) kiểm tra và phân quyền truy cập. Vui lòng thử lại sau
-          hoặc liên hệ bộ phận hỗ trợ.
+          viên (Admin) phê duyệt và phân quyền truy cập. Vui lòng thử lại sau
+          hoặc liên hệ bộ phận quản lý.
         </p>
 
         <div className="flex flex-col gap-3 pt-2">
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             onClick={handleCheckStatus}
             disabled={checking}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] cursor-pointer disabled:opacity-50"
+            isLoading={checking}
+            leftIcon={<RefreshCw className="w-4 h-4" />}
+            className="w-full"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${checking ? "animate-spin" : ""}`}
-            />
-            <span>Kểm tra lại trạng thái</span>
-          </button>
+            Kiểm tra lại trạng thái
+          </Button>
 
-          <button
+          <Button
+            variant="secondary"
+            size="lg"
             onClick={handleLogout}
             disabled={loggingOut}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white font-medium text-sm transition-colors border border-[#151516] cursor-pointer disabled:opacity-50"
+            isLoading={loggingOut}
+            leftIcon={<LogOut className="w-4 h-4" />}
+            className="w-full"
           >
-            <LogOut className="w-4 h-4" />
-            <span>{loggingOut ? "Đang đăng xuất..." : "Đăng xuất"}</span>
-          </button>
+            Đăng xuất
+          </Button>
         </div>
 
-        <div className="pt-4 border-t border-[#151516] flex items-center justify-center gap-2 text-xs text-[#606060]">
-          <ShieldAlert className="w-3.5 h-3.5 text-[#FFC400]" />
+        <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-center gap-2 text-xs text-[#94A3B8]">
+          <ShieldAlert className="w-3.5 h-3.5 text-[#4F75FF]" />
           <span>PGS Agency Enterprise Operating System</span>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

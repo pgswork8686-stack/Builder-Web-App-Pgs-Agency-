@@ -221,7 +221,7 @@ function ProjectBoardContent({
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
   return (
-    <main className="min-h-screen bg-[#070707] px-4 py-7 text-[#FFF8E6] lg:px-8">
+    <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-[1600px] space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -231,9 +231,9 @@ function ProjectBoardContent({
           active="board"
         />
 
-        <section className="grid gap-3 rounded-2xl border border-zinc-800 bg-[#0E0E0F] p-4 md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
+        <section className="grid gap-3 rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
           <label className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-600" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
             <input
               value={filters.q}
               onChange={(event) =>
@@ -241,7 +241,7 @@ function ProjectBoardContent({
               }
               placeholder="Tìm theo tên công việc"
               aria-label="Tìm công việc"
-              className="w-full rounded-xl border border-zinc-800 bg-black py-2 pl-9 pr-3 text-sm"
+              className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] py-2 pl-9 pr-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
             />
           </label>
           <select
@@ -253,7 +253,7 @@ function ProjectBoardContent({
               })
             }
             aria-label="Lọc mức ưu tiên"
-            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Mọi ưu tiên</option>
             {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
@@ -270,7 +270,7 @@ function ProjectBoardContent({
               setFilters({ ...filters, assigneeUserId: event.target.value })
             }
             aria-label="Lọc người phụ trách"
-            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Mọi người phụ trách</option>
             {assignees.map(([id, name]) => (
@@ -288,7 +288,7 @@ function ProjectBoardContent({
               })
             }
             aria-label="Lọc trạng thái"
-            className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-sm"
+            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Mọi trạng thái</option>
             {columns.map((column) => (
@@ -300,25 +300,25 @@ function ProjectBoardContent({
         </section>
 
         {error && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
             {error}
           </div>
         )}
         {board?.truncated && (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
             Dự án có {board.total} công việc đang hoạt động. Kanban hiển thị{" "}
             {board.limit} công việc đầu tiên; hãy dùng bộ lọc để thu hẹp.
           </div>
         )}
         {!board?.canReorder && board && (
-          <p className="text-sm text-zinc-500">
+          <p className="text-xs text-[#64748B]">
             Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
             chỉ dành cho Admin và quản lý dự án.
           </p>
         )}
 
         {loading && !board ? (
-          <div className="rounded-2xl border border-zinc-800 p-8 text-zinc-500">
+          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
             Đang tải Kanban…
           </div>
         ) : (
@@ -372,11 +372,15 @@ function BoardColumn({
   return (
     <section
       ref={setNodeRef}
-      className={`w-[310px] shrink-0 rounded-2xl border p-3 ${isOver ? "border-[#FFC400] bg-[#FFC400]/5" : "border-zinc-800 bg-[#0E0E0F]"}`}
+      className={`w-[310px] shrink-0 rounded-2xl border p-3.5 shadow-xs transition-colors ${
+        isOver
+          ? "border-[#4F75FF] bg-[#EEF2FF]/60"
+          : "border-[#EDF2F7] bg-[#F1F5F9]/50"
+      }`}
     >
       <div className="mb-3 flex items-center justify-between px-1">
-        <h2 className="font-bold text-white">{label}</h2>
-        <span className="rounded-full bg-zinc-900 px-2 py-1 text-xs text-zinc-500">
+        <h2 className="font-bold text-[#0F172A] text-sm">{label}</h2>
+        <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
           {tasks.length}
         </span>
       </div>
@@ -396,7 +400,7 @@ function BoardColumn({
             />
           ))}
           {tasks.length === 0 && (
-            <p className="rounded-xl border border-dashed border-zinc-800 p-6 text-center text-xs text-zinc-600">
+            <p className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-xs text-[#94A3B8]">
               Chưa có công việc
             </p>
           )}
@@ -435,14 +439,16 @@ function BoardCard({
     <article
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-xl border border-zinc-800 bg-black p-3 ${isDragging ? "opacity-50" : ""}`}
+      className={`rounded-xl border border-[#EDF2F7] bg-white p-3.5 shadow-xs transition-shadow hover:shadow-md ${
+        isDragging ? "opacity-50" : ""
+      }`}
     >
       <div className="flex gap-2">
         {canReorder && (
           <button
             type="button"
             aria-label={`Kéo để sắp xếp ${task.title}`}
-            className="mt-0.5 cursor-grab text-zinc-600 active:cursor-grabbing"
+            className="mt-0.5 cursor-grab text-[#94A3B8] active:cursor-grabbing hover:text-[#0F172A]"
             {...attributes}
             {...listeners}
           >
@@ -452,20 +458,20 @@ function BoardCard({
         <div className="min-w-0 flex-1">
           <Link
             href={href}
-            className="font-semibold text-white hover:text-[#FFC400]"
+            className="font-bold text-sm text-[#0F172A] hover:text-[#4F75FF] transition-colors"
           >
             {task.title}
           </Link>
-          <p className="mt-1 truncate text-xs text-zinc-500">
+          <p className="mt-1 truncate text-xs text-[#64748B]">
             {task.assignee?.full_name || task.assignee?.email || "Chưa giao"}
           </p>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        <span className="rounded-full bg-zinc-900 px-2 py-1 text-zinc-400">
-          {task.priority}
+        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
+          {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
-        <span className="text-zinc-600">{task.due_date || "Chưa có hạn"}</span>
+        <span className="text-[#94A3B8] text-[11px] font-mono">{task.due_date || "Chưa có hạn"}</span>
       </div>
       {task.canUpdateStatus && (
         <select
@@ -475,7 +481,7 @@ function BoardCard({
             onStatus(task, event.target.value as BoardStatus)
           }
           aria-label={`Đổi trạng thái ${task.title}`}
-          className="mt-3 w-full rounded-lg border border-zinc-800 bg-[#0E0E0F] px-2 py-1.5 text-xs"
+          className="mt-3 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-1.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           {columns.map((column) => (
             <option key={column.status} value={column.status}>

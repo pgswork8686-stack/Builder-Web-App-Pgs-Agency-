@@ -1,27 +1,32 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Calendar,
-  Clock,
   CheckCircle,
   XCircle,
   Search,
-  Filter,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
   Loader2,
   ListFilter,
-  Sliders,
+  Plus,
 } from "lucide-react";
-import Link from "next/link";
-import { getMe } from "@/lib/api/auth";
-import { leaveApi, LeaveRequest } from "@/lib/api/leave";
+import { leaveApi, type LeaveRequest } from "@/lib/api/leave";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Dialog } from "@/components/ui/dialog";
+import { TableContainer, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AdminLeavePage() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -32,9 +37,7 @@ export default function AdminLeavePage() {
   const pageSize = 15;
 
   // Review states
-  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(
-    null,
-  );
+  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
   const [reviewNote, setReviewNote] = useState("");
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -42,15 +45,6 @@ export default function AdminLeavePage() {
   // Calendar parameters
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [calendarLoading, setCalendarLoading] = useState(false);
-
-  const loadUser = async () => {
-    try {
-      const me = await getMe();
-      setCurrentUser(me);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const loadRequests = async () => {
     try {
@@ -73,7 +67,6 @@ export default function AdminLeavePage() {
   const loadCalendar = async () => {
     try {
       setCalendarLoading(true);
-      // Load current month's events
       const today = new Date();
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
         .toISOString()
@@ -90,10 +83,6 @@ export default function AdminLeavePage() {
       setCalendarLoading(false);
     }
   };
-
-  useEffect(() => {
-    loadUser();
-  }, []);
 
   useEffect(() => {
     loadRequests();
@@ -134,298 +123,324 @@ export default function AdminLeavePage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
-        {/* Header */}
-        <div className="border-b border-[#151516] pb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Phê Duyệt Nghỉ Phép Nhân Sự
-            </h1>
-            <p className="mt-1 text-sm text-[#606060]">
-              Xét duyệt đơn xin nghỉ phép của nhân sự, quản lý và đối soát số dư
-              ngày phép khả dụng.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href="/app/admin"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-xs font-bold border border-[#151516]"
+    <div className="space-y-6">
+      {/* Top Header matching Figma */}
+      <SectionHeader
+        title="Đơn cần duyệt"
+        description="Manager xử lý đơn của đội nhóm; Admin xử lý ngoại lệ."
+        badge={`${total} Đơn`}
+        action={
+          <Link href="/app/admin">
+            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              Quay lại
+            </Button>
+          </Link>
+        }
+      />
+
+      {/* 4 Pastel Metric Cards from Duyệt nghỉ phép.png */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <StatCard
+          variant="gold"
+          title="Chờ duyệt"
+          value={total.toString().padStart(2, "0")}
+          subtitle="Hôm nay"
+        />
+        <StatCard
+          variant="green"
+          title="Đã duyệt"
+          value="18"
+          subtitle="Tháng này"
+        />
+        <StatCard
+          variant="rose"
+          title="Từ chối"
+          value="02"
+          subtitle="Tháng này"
+        />
+        <StatCard
+          variant="blue"
+          title="Đang nghỉ"
+          value="04"
+          subtitle="Hiện tại"
+        />
+      </div>
+
+      {/* Filter Tabs Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
+        <div className="flex items-center gap-2">
+          <ListFilter className="w-4 h-4 text-[#4F75FF]" />
+          <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
+            Lọc danh sách
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 text-xs">
+          {[
+            { id: "pending", label: "Chờ duyệt" },
+            { id: "approved", label: "Đã duyệt" },
+            { id: "rejected", label: "Từ chối" },
+            { id: "cancelled", label: "Đã hủy" },
+            { id: "", label: "Tất cả" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setStatusFilter(item.id);
+                setPage(1);
+              }}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                statusFilter === item.id
+                  ? "bg-[#4F75FF] text-white shadow-xs"
+                  : "bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
+              }`}
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Quay lại</span>
-            </Link>
-          </div>
+              {item.label}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Filters and List view tabs */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516]">
-          <div className="flex items-center gap-3">
-            <ListFilter className="w-4 h-4 text-[#FFC400]" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#606060]">
-              Lọc danh sách
-            </span>
-          </div>
+      {/* 2-Column Grid: Main Table & Calendar Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main List */}
+        <div className="lg:col-span-8 space-y-4">
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A]">
+                Đơn cần duyệt ({total})
+              </h3>
+              <span className="text-xs text-[#64748B]">
+                Trang {page} / {totalPages || 1}
+              </span>
+            </div>
 
-          <div className="flex gap-2 text-xs">
-            {["pending", "approved", "rejected", "cancelled", ""].map(
-              (status) => (
-                <button
-                  key={status}
-                  onClick={() => {
-                    setStatusFilter(status);
-                    setPage(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg border font-bold transition-all ${
-                    statusFilter === status
-                      ? "bg-[#FFC400] border-transparent text-black"
-                      : "bg-[#151516] border-[#FFC400]/20 text-[#FFF8E6]/80 hover:bg-[#1f1f22]"
-                  }`}
-                >
-                  {status === "pending"
-                    ? "Chờ duyệt"
-                    : status === "approved"
-                      ? "Đã duyệt"
-                      : status === "rejected"
-                        ? "Từ chối"
-                        : status === "cancelled"
-                          ? "Đã hủy"
-                          : "Tất cả"}
-                </button>
-              ),
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main List */}
-          <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-4">
-            <h2 className="text-lg font-bold text-white">
-              Danh sách đơn xin nghỉ
-            </h2>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-[#151516] text-[#606060]">
-                    <th className="py-3 px-4 uppercase font-semibold">
-                      Nhân sự
-                    </th>
-                    <th className="py-3 px-4 uppercase font-semibold">
-                      Thời gian
-                    </th>
-                    <th className="py-3 px-4 uppercase font-semibold">
-                      Số ngày
-                    </th>
-                    <th className="py-3 px-4 uppercase font-semibold">Lý do</th>
-                    <th className="py-3 px-4 uppercase font-semibold text-right">
-                      Thao tác
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#151516]/50">
-                  {loading ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="py-8 text-center text-[#606060]"
-                      >
-                        <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#FFC400]" />
-                      </td>
-                    </tr>
-                  ) : requests.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="py-8 text-center text-[#606060]"
-                      >
-                        Không tìm thấy đơn nghỉ phép nào.
-                      </td>
-                    </tr>
-                  ) : (
-                    requests.map((req) => (
-                      <tr
-                        key={req.id}
-                        className="hover:bg-[#151516]/30 transition-colors"
-                      >
-                        <td className="py-3.5 px-4">
-                          <div className="font-bold text-white">
-                            {req.employee?.fullName}
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : requests.length === 0 ? (
+              <EmptyState
+                icon={<Calendar className="w-8 h-8 text-[#4F75FF]" />}
+                title="Không tìm thấy đơn nghỉ phép"
+                description="Tất cả các đơn theo bộ lọc hiện tại đã được xử lý xong."
+              />
+            ) : (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>Nhân sự</TableHeaderCell>
+                      <TableHeaderCell>Loại nghỉ</TableHeaderCell>
+                      <TableHeaderCell>Thời gian</TableHeaderCell>
+                      <TableHeaderCell>Số ngày</TableHeaderCell>
+                      <TableHeaderCell>Trạng thái</TableHeaderCell>
+                      <TableHeaderCell className="text-right">Thao tác</TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {requests.map((req) => (
+                      <TableRow key={req.id}>
+                        <TableCell>
+                          <div className="font-bold text-[#0F172A]">
+                            {req.employee?.fullName || "Chưa cập nhật"}
                           </div>
-                          <div className="text-[10px] text-[#606060]">
+                          <div className="text-[11px] text-[#64748B]">
                             {req.employee?.email}
                           </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-[#FFF8E6]/80">
-                          {req.start_date} ~ {req.end_date}
-                        </td>
-                        <td className="py-3.5 px-4 font-bold text-white">
-                          {Number(req.total_days).toFixed(1)} ngày
-                        </td>
-                        <td className="py-3.5 px-4 text-[#FFF8E6]/70 truncate max-w-[120px]">
-                          {req.reason || "--"}
-                        </td>
-                        <td className="py-3.5 px-4 text-right">
-                          {req.status === "pending" && (
-                            <button
+                        </TableCell>
+                        <TableCell className="text-xs text-[#64748B]">
+                          {req.leave_type?.name || "Phép năm"}
+                        </TableCell>
+                        <TableCell className="text-xs text-[#0F172A]">
+                          {req.start_date} ➔ {req.end_date}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                          {Number(req.total_days).toFixed(1)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              req.status === "approved"
+                                ? "success"
+                                : req.status === "rejected"
+                                  ? "danger"
+                                  : "gold"
+                            }
+                            size="sm"
+                          >
+                            {req.status === "pending"
+                              ? "Chờ duyệt"
+                              : req.status === "approved"
+                                ? "Đã duyệt"
+                                : req.status === "rejected"
+                                  ? "Từ chối"
+                                  : req.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {req.status === "pending" ? (
+                            <Button
+                              variant="primary"
+                              size="sm"
                               onClick={() => handleOpenReview(req)}
-                              className="px-3 py-1.5 rounded-lg bg-[#FFC400] text-black font-extrabold text-[10px] transition-all hover:brightness-105"
                             >
                               Xét duyệt
-                            </button>
+                            </Button>
+                          ) : (
+                            <span className="text-xs text-[#94A3B8]">Đã đóng</span>
                           )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-[#151516] text-xs">
-                <span className="text-[#606060]">Tổng số {total} đơn</span>
+              <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+                <span>Tổng số {total} đơn</span>
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="p-2 rounded-lg bg-[#151516] disabled:opacity-50"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="self-center font-bold">
-                    Trang {page} / {totalPages}
-                  </span>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="p-2 rounded-lg bg-[#151516] disabled:opacity-50"
                   >
                     <ChevronRight className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
-          </div>
+          </Card>
+        </div>
 
-          {/* Calendar View Overview (Right Pane) */}
-          <div className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-4 h-fit">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#FFC400]" />
-              Lịch nghỉ phép được duyệt
-            </h2>
+        {/* Right Calendar Column */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#4F75FF]" />
+                Lịch nghỉ phép được duyệt
+              </h3>
+            </div>
 
             <div className="space-y-3">
               {calendarLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#FFC400]" />
-              ) : calendarEvents.length === 0 ? (
-                <div className="text-center py-6 text-xs text-[#606060]">
-                  Không có ai nghỉ phép trong tháng này.
+                <div className="space-y-2">
+                  <Skeleton className="h-14 w-full" />
+                  <Skeleton className="h-14 w-full" />
                 </div>
+              ) : calendarEvents.length === 0 ? (
+                <p className="text-center py-6 text-xs text-[#64748B]">
+                  Không có ai nghỉ phép trong tháng này.
+                </p>
               ) : (
                 calendarEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-3.5 rounded-xl bg-[#151516] border border-[#FFC400]/10 text-xs"
+                    className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] text-xs space-y-1"
                   >
-                    <div className="font-bold text-white">{evt.fullName}</div>
-                    <div className="text-[#606060] mt-0.5">{evt.leaveType}</div>
-                    <div className="text-amber-500 mt-1 font-semibold">
-                      {evt.startDate} ~ {evt.endDate}
+                    <div className="font-bold text-[#0F172A]">{evt.fullName}</div>
+                    <div className="text-[11px] text-[#64748B]">{evt.leaveType}</div>
+                    <div className="text-[11px] text-[#4F75FF] font-semibold">
+                      {evt.startDate} ➔ {evt.endDate}
                     </div>
                   </div>
                 ))
               )}
             </div>
-          </div>
+          </Card>
         </div>
+      </div>
 
-        {/* Modal: Review dialog */}
-        {selectedRequest && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className="max-w-md w-full bg-[#0E0E0F] border border-[#151516] rounded-2xl p-6 space-y-6">
-              <div>
-                <h3 className="text-lg font-bold text-white">
-                  Duyệt đơn xin nghỉ phép
-                </h3>
-                <p className="text-xs text-[#606060] mt-1">
-                  Nhân sự: {selectedRequest.employee?.fullName} (
-                  {selectedRequest.employee?.email})
-                </p>
-                <div className="mt-2 p-3 bg-[#151516] rounded-xl text-xs space-y-1">
-                  <div>
-                    Đăng ký nghỉ:{" "}
-                    <span className="font-bold text-white">
-                      {selectedRequest.start_date} ~ {selectedRequest.end_date}
-                    </span>
-                  </div>
-                  <div>
-                    Tổng thời gian:{" "}
-                    <span className="font-bold text-[#FFC400]">
-                      {Number(selectedRequest.total_days).toFixed(1)} ngày
-                    </span>
-                  </div>
-                  <div>
-                    Lý do:{" "}
-                    <span className="text-[#FFF8E6]/80">
-                      {selectedRequest.reason || "Không ghi chú"}
-                    </span>
-                  </div>
-                </div>
+      {/* Review Dialog */}
+      {selectedRequest && (
+        <Dialog
+          isOpen={!!selectedRequest}
+          onClose={() => setSelectedRequest(null)}
+          maxWidth="md"
+          title="Duyệt đơn xin nghỉ phép"
+          description={`Nhân sự: ${selectedRequest.employee?.fullName || selectedRequest.employee?.email}`}
+        >
+          <div className="space-y-4 pt-2">
+            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-2">
+              <div className="flex justify-between">
+                <span className="text-[#64748B]">Thời gian:</span>
+                <span className="font-bold text-[#0F172A]">
+                  {selectedRequest.start_date} ➔ {selectedRequest.end_date}
+                </span>
               </div>
-
-              {actionFeedback && (
-                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4" />
-                  <span>{actionFeedback}</span>
-                </div>
-              )}
-
-              <div className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-semibold text-[#606060] uppercase mb-1">
-                    Ý kiến phản hồi / Nhận xét của người duyệt
-                  </label>
-                  <textarea
-                    value={reviewNote}
-                    onChange={(e) => setReviewNote(e.target.value)}
-                    placeholder="Nhập phản hồi nếu có..."
-                    className="w-full bg-[#151516] border border-[#FFC400]/10 rounded-xl px-4 py-3 text-white placeholder-[#606060] min-h-[80px] focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex gap-4 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handleReviewSubmit("rejected")}
-                    disabled={actionLoading}
-                    className="flex-1 py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-bold"
-                  >
-                    Từ chối
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleReviewSubmit("approved")}
-                    disabled={actionLoading}
-                    className="flex-1 py-3 rounded-xl bg-[#FFC400] text-black font-extrabold"
-                  >
-                    Duyệt đơn
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedRequest(null)}
-                  className="w-full py-2.5 text-center text-[#606060] hover:text-white font-semibold transition-colors mt-2"
-                >
-                  Hủy thao tác
-                </button>
+              <div className="flex justify-between">
+                <span className="text-[#64748B]">Tổng ngày:</span>
+                <span className="font-bold text-[#4F75FF]">
+                  {Number(selectedRequest.total_days).toFixed(1)} ngày
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#64748B]">Lý do:</span>
+                <span className="text-[#0F172A]">
+                  {selectedRequest.reason || "Không ghi chú"}
+                </span>
               </div>
             </div>
+
+            {actionFeedback && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{actionFeedback}</span>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+                Ý kiến phản hồi / Nhận xét của người duyệt
+              </label>
+              <textarea
+                value={reviewNote}
+                onChange={(e) => setReviewNote(e.target.value)}
+                placeholder="Nhập phản hồi nếu có..."
+                rows={3}
+                className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                onClick={() => handleReviewSubmit("rejected")}
+                disabled={actionLoading}
+              >
+                Từ chối
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={() => handleReviewSubmit("approved")}
+                disabled={actionLoading}
+                isLoading={actionLoading}
+              >
+                Duyệt đơn
+              </Button>
+            </div>
           </div>
-        )}
-      </main>
+        </Dialog>
+      )}
     </div>
   );
 }

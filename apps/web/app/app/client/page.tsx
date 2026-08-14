@@ -3,177 +3,134 @@
 import React from "react";
 import Link from "next/link";
 import {
-  UserCheck,
-  ShieldCheck,
-  Activity,
-  LogOut,
+  FolderKanban,
+  CreditCard,
+  FileText,
+  MessageSquare,
   Bell,
-  MessageCircle,
+  ShieldCheck,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { NotificationBell } from "@/components/phase7/notification-bell";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import {
+  QuickActionGrid,
+  type QuickActionItem,
+} from "@/components/dashboard/quick-action";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function ClientDashboardPage() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
-  };
+  const quickActions: QuickActionItem[] = [
+    {
+      title: "Dự án hợp tác",
+      description:
+        "Theo dõi tiến độ, xem sản phẩm bàn giao và nghiệm thu dự án.",
+      href: "/app/client/projects",
+      icon: <FolderKanban className="w-5 h-5" />,
+      badge: "Dự án",
+      highlight: true,
+    },
+    {
+      title: "Hợp đồng dịch vụ",
+      description:
+        "Xem chi tiết điều khoản, thời hạn và phạm vi dịch vụ đã ký kết.",
+      href: "/app/client/contracts",
+      icon: <CreditCard className="w-5 h-5" />,
+    },
+    {
+      title: "Hóa đơn & Thanh toán",
+      description:
+        "Tra cứu hóa đơn định kỳ, số tiền cần thanh toán và lịch sử giao dịch.",
+      href: "/app/client/invoices",
+      icon: <FileText className="w-5 h-5" />,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FFC400] text-black font-black flex items-center justify-center text-sm">
-            P
-          </div>
-          <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">| Client Portal</span>
-          </span>
+    <div className="space-y-6">
+      <SectionHeader
+        title="Cổng thông tin Khách hàng (Client Portal)"
+        description="Theo dõi chất lượng, tiến độ thực hiện và bàn giao sản phẩm từ PGS Agency."
+        badge="Client Portal"
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <StatCard
+          variant="blue"
+          title="Vai trò tài khoản"
+          value="Khách hàng"
+          subtitle="Quyền xem dự án của đối tác"
+          icon={<ShieldCheck className="w-5 h-5" />}
+        />
+        <StatCard
+          variant="green"
+          title="Trạng thái xác thực"
+          value="Đang hoạt động"
+          subtitle="Tài khoản đối tác bảo mật"
+          icon={<ShieldCheck className="w-5 h-5" />}
+        />
+        <StatCard
+          variant="purple"
+          title="Hỗ trợ dự án"
+          value="24/7 Sẵn sàng"
+          subtitle="Kết nối trực tiếp qua kênh Chat"
+          icon={<Sparkles className="w-5 h-5" />}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Link href="/app/notifications">
+          <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  Thông báo Dự án
+                </h4>
+                <p className="text-xs text-[#64748B]">
+                  Nhận tin tức bàn giao task, hóa đơn mới và tin nhắn.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all" />
+          </Card>
+        </Link>
+
+        <Link href="/app/chat">
+          <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  Kênh Chat Dự án
+                </h4>
+                <p className="text-xs text-[#64748B]">
+                  Trao đổi trực tiếp với Account & Team thực hiện dự án.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all" />
+          </Card>
+        </Link>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
+            Khu vực Dịch vụ
+          </h3>
+          <Badge variant="outline" size="sm">
+            3 Phân hệ
+          </Badge>
         </div>
-
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Khách hàng (Client)</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors cursor-pointer"
-            title="Đăng xuất"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
-        <div className="border-b border-[#151516] pb-6">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Cổng thông tin Khách hàng
-          </h1>
-          <p className="mt-1 text-sm text-[#606060]">
-            Theo dõi chất lượng, bàn giao sản phẩm của dự án của bạn từ PGS
-            Agency.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Vai trò của bạn
-              </span>
-              <UserCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">Khách hàng</div>
-            <div className="text-xs text-[#606060]">
-              Quyền xem thông tin bàn giao dự án của bạn
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Trạng thái tài khoản
-              </span>
-              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Đang hoạt động
-            </div>
-            <div className="text-xs text-emerald-400">
-              Tài khoản đối tác được xác thực
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Kết nối an toàn
-              </span>
-              <Activity className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">Trực tuyến</div>
-            <div className="text-xs text-emerald-400">
-              Bảo mật thông tin khách hàng tuyệt đối
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-[#151516] pt-8">
-          <h2 className="text-xl font-bold text-white mb-4">
-            Thông báo & Trao đổi
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Link
-              href="/app/notifications"
-              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
-            >
-              <Bell className="w-5 h-5 text-[#FFC400]" />
-              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
-                Thông báo dự án
-              </h3>
-              <p className="text-xs text-[#606060]">
-                Theo dõi cập nhật project, hóa đơn, thanh toán và tin nhắn liên
-                quan đến công ty của bạn.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/chat"
-              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
-            >
-              <MessageCircle className="w-5 h-5 text-[#FFC400]" />
-              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
-                Project chat
-              </h3>
-              <p className="text-xs text-[#606060]">
-                Client chỉ tham gia project chat được server xác thực qua client
-                membership.
-              </p>
-            </Link>
-          </div>
-        </div>
-
-        <div className="border-t border-[#151516] pt-8">
-          <h2 className="text-xl font-bold text-white mb-4">
-            Tài chính & Thanh toán
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Link
-              href="/app/client/contracts"
-              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
-            >
-              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
-                Hợp đồng dịch vụ
-              </h3>
-              <p className="text-xs text-[#606060]">
-                Tra cứu thông tin chi tiết các hợp đồng, điều khoản và thời gian
-                hiệu lực đã ký kết.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/client/invoices"
-              className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/25 transition-all space-y-2 block"
-            >
-              <h3 className="text-base font-bold text-white group-hover:text-[#FFC400]">
-                Hóa đơn & Thanh toán
-              </h3>
-              <p className="text-xs text-[#606060]">
-                Kiểm tra các hóa đơn phát hành, số tiền cần thanh toán, dư nợ và
-                lịch sử giao dịch.
-              </p>
-            </Link>
-          </div>
-        </div>
-      </main>
+        <QuickActionGrid items={quickActions} columns={3} />
+      </div>
     </div>
   );
 }

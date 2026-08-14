@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   Loader2,
   AlertTriangle,
-  ShieldCheck,
   Briefcase,
   Plus,
   Trash2,
@@ -16,6 +15,11 @@ import {
 } from "lucide-react";
 import { clientsApi } from "../../../../../lib/api/clients";
 import { peopleApi } from "../../../../../lib/api/people";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog } from "@/components/ui/dialog";
 
 interface ClientCompany {
   id: string;
@@ -60,7 +64,7 @@ export default function AdminClientDetailPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [userId, setUserId] = useState("");
   const [title, setTitle] = useState("");
-  const [isPrimary, setIsPrimary] = useState(false);
+  const [isPrimary, setIsPrimary] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -69,28 +73,28 @@ export default function AdminClientDetailPage() {
       setLoading(true);
       setError(null);
 
-      const compData = await clientsApi.getClientCompanyById(clientId);
-      setCompany(compData);
+      // Load company profile
+      const data = await clientsApi.getClientCompanyById(clientId);
+      setCompany(data);
 
-      const membersData = await clientsApi.getMemberships(clientId);
-      setMemberships(membersData);
+      // Load memberships
+      const members = await clientsApi.getMemberships(clientId);
+      setMemberships(members);
 
-      // Load all client users to link (role=client, active)
-      const peopleData = await peopleApi.getPeopleDirectory({
+      // Load all client users for selector
+      const usersList = await peopleApi.getPeopleDirectory({
         role: "client",
         pageSize: 100,
       });
       setClientUsers(
-        (peopleData.items || [])
-          .filter((item: any) => item.accountStatus === "active")
-          .map((item: any) => ({
-            id: item.id,
-            fullName: item.fullName,
-            email: item.email,
-          })),
+        (usersList.items || []).map((u: any) => ({
+          id: u.id,
+          fullName: u.fullName,
+          email: u.email,
+        })),
       );
     } catch (err: any) {
-      setError(err.message || "Không thể tải chi tiết khách hàng");
+      setError(err.message || "Không thể tải chi tiết doanh nghiệp");
     } finally {
       setLoading(false);
     }
@@ -105,7 +109,7 @@ export default function AdminClientDetailPage() {
     setFormError(null);
 
     if (!userId) {
-      setFormError("Vui lòng chọn tài khoản liên kết");
+      setFormError("Vui lòng chọn tài khoản người dùng");
       return;
     }
 
@@ -113,126 +117,124 @@ export default function AdminClientDetailPage() {
       setSubmitting(true);
       await clientsApi.createMembership(clientId, {
         userId,
-        title: title.trim() || null,
+        title: title.trim() || undefined,
         isPrimary,
       });
-      await loadData();
+
       setShowAddForm(false);
       setUserId("");
       setTitle("");
-      setIsPrimary(false);
+      setIsPrimary(true);
+      await loadData();
     } catch (err: any) {
-      setFormError(err.message || "Liên kết tài khoản thất bại");
+      setFormError(err.message || "Thêm thành viên thất bại");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSetPrimary = async (mem: Membership) => {
-    try {
-      await clientsApi.updateMembership(clientId, mem.id, {
-        isPrimary: true,
-      });
-      await loadData();
-    } catch (err: any) {
-      alert(err.message || "Cập nhật tài khoản chính thất bại");
-    }
-  };
-
-  const handleDeleteMember = async (membershipId: string) => {
+  const handleRemoveMember = async (membershipId: string) => {
     if (
-      !confirm(
-        "Bạn có chắc chắn muốn gỡ bỏ tài khoản này khỏi doanh nghiệp khách hàng?",
+      !window.confirm(
+        "Bạn có chắc chắn muốn huỷ liên kết tài khoản này khỏi doanh nghiệp?",
       )
-    ) {
+    )
       return;
-    }
 
     try {
       await clientsApi.deleteMembership(clientId, membershipId);
       setMemberships((prev) => prev.filter((m) => m.id !== membershipId));
     } catch (err: any) {
-      alert(err.message || "Gỡ bỏ liên kết thất bại");
+      alert(err.message || "Huỷ liên kết thất bại");
+    }
+  };
+
+  const handleSetPrimary = async (
+    membershipId: string,
+    currentPrimary: boolean,
+  ) => {
+    try {
+      await clientsApi.updateMembership(clientId, membershipId, {
+        isPrimary: !currentPrimary,
+      });
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || "Cập nhật thất bại");
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] p-6 lg:p-12">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="max-w-5xl mx-auto mb-8">
-        <Link
-          href="/app/admin/clients"
-          className="inline-flex items-center gap-1 text-slate-400 hover:text-cyan-400 text-sm mb-3 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Doanh nghiệp khách hàng
-        </Link>
-        <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-          Quản Lý Liên Kết Khách Hàng
-        </h1>
-      </div>
+      <SectionHeader
+        title={company ? company.name : "Chi Tiết Doanh Nghiệp"}
+        description={`Mã doanh nghiệp: ${company?.code || "—"}`}
+        action={
+          <Link href="/app/admin/clients">
+            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              Danh sách khách hàng
+            </Button>
+          </Link>
+        }
+      />
 
       {loading ? (
-        <div className="max-w-5xl mx-auto flex flex-col items-center justify-center py-20 bg-slate-900/30 rounded-2xl border border-slate-800">
-          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-4" />
-          <span className="text-slate-400 text-sm">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
+          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+          <span className="text-xs text-[#64748B]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
         </div>
       ) : error || !company ? (
-        <div className="max-w-5xl mx-auto p-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3">
-          <AlertTriangle className="w-6 h-6 shrink-0" />
-          <div>
-            <h4 className="font-bold">Lỗi tải dữ liệu</h4>
-            <p className="text-sm mt-1">
-              {error || "Không tìm thấy thông tin doanh nghiệp"}
-            </p>
-            <button
-              onClick={loadData}
-              className="mt-3 px-4 py-2 bg-red-500 text-black font-semibold rounded-xl text-xs"
-            >
-              Thử lại
-            </button>
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
+            <span>{error || "Không tìm thấy thông tin doanh nghiệp"}</span>
           </div>
+          <Button variant="danger" size="sm" onClick={loadData}>
+            Thử lại
+          </Button>
         </div>
       ) : (
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Company Profile Detail */}
           <div className="space-y-6">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
-              <div className="w-12 h-12 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-4">
+            <Card className="p-6 space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
                 <Briefcase className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {company.name}
-              </h3>
-              <div className="inline-flex px-2 py-0.5 rounded bg-slate-800 text-orange-400 text-xs font-semibold uppercase tracking-wider mb-6">
-                Mã: {company.code}
+              <div>
+                <h3 className="text-lg font-extrabold text-[#0F172A]">
+                  {company.name}
+                </h3>
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
+                  Mã: {company.code}
+                </div>
               </div>
 
-              <div className="space-y-4 text-sm border-t border-slate-850 pt-4">
+              <div className="space-y-3 text-xs border-t border-[#EDF2F7] pt-4">
                 <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Mã số thuế
                   </span>
-                  <span className="text-slate-200">
+                  <span className="font-mono text-[#0F172A] font-medium">
                     {company.taxCode || "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Điện thoại
                   </span>
-                  <span className="text-slate-200">{company.phone || "—"}</span>
+                  <span className="text-[#0F172A]">{company.phone || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
-                  <span className="text-slate-200">{company.email || "—"}</span>
+                  <span className="text-[#0F172A] font-mono">{company.email || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Website
                   </span>
                   {company.website ? (
@@ -240,199 +242,202 @@ export default function AdminClientDetailPage() {
                       href={company.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-cyan-400 hover:underline"
+                      className="text-[#4F75FF] hover:underline"
                     >
                       {company.website}
                     </a>
                   ) : (
-                    <span className="text-slate-200">—</span>
+                    <span className="text-[#0F172A]">—</span>
                   )}
                 </div>
                 <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Địa chỉ trụ sở
                   </span>
-                  <span className="text-slate-200">
+                  <span className="text-[#0F172A]">
                     {company.address || "—"}
                   </span>
                 </div>
-                <div>
-                  <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                    Ghi chú
-                  </span>
-                  <span className="text-slate-400 text-xs">
-                    {company.notes || "—"}
-                  </span>
-                </div>
+                {company.notes && (
+                  <div>
+                    <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                      Ghi chú
+                    </span>
+                    <span className="text-xs text-[#64748B]">
+                      {company.notes}
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Right Column: Portal Accounts Membership Association */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Key className="w-5 h-5 text-cyan-400" />
+            <Card className="p-6 space-y-4">
+              <div className="flex justify-between items-center border-b border-[#EDF2F7] pb-3">
+                <h2 className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
+                  <Key className="w-4 h-4 text-[#4F75FF]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-600 text-black font-semibold rounded-xl transition duration-300 text-xs"
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setShowAddForm(true)}
+                  leftIcon={<Plus className="w-3.5 h-3.5" />}
                 >
-                  <Plus className="w-3.5 h-3.5" />
                   Liên kết tài khoản
-                </button>
+                </Button>
               </div>
 
-              {/* Inline Add Membership Form */}
-              {showAddForm && (
-                <form
-                  onSubmit={handleAddMember}
-                  className="bg-[#121826] border border-slate-800 p-4 rounded-xl mb-6 space-y-4"
-                >
-                  <h3 className="text-sm font-bold text-white">
-                    Liên kết tài khoản mới
-                  </h3>
-                  {formError && (
-                    <div className="p-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
-                      <span>{formError}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                        Chọn tài khoản khách hàng
-                      </label>
-                      <select
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        className="w-full bg-[#1A2338] border border-slate-750 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition duration-300"
-                      >
-                        <option value="">-- Chọn tài khoản client --</option>
-                        {clientUsers.map((cu) => (
-                          <option key={cu.id} value={cu.id}>
-                            {cu.fullName || "Không tên"} ({cu.email})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                        Chức danh / Vai trò đại diện
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ví dụ: Đại diện pháp luật, Kỹ sư IT"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full bg-[#1A2338] border border-slate-750 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-650 focus:outline-none focus:border-cyan-500 transition duration-300"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="is_primary_company"
-                      checked={isPrimary}
-                      onChange={(e) => setIsPrimary(e.target.checked)}
-                      className="w-4 h-4 accent-cyan-500"
-                    />
-                    <label
-                      htmlFor="is_primary_company"
-                      className="text-sm text-slate-300 cursor-pointer"
-                    >
-                      Đây là công ty chính liên kết với tài khoản này
-                    </label>
-                  </div>
-
-                  <div className="flex gap-2 justify-end">
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-black font-semibold rounded-lg text-xs flex items-center gap-1.5"
-                    >
-                      {submitting && (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      )}
-                      Thêm liên kết
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddForm(false)}
-                      className="px-4 py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-lg text-xs"
-                    >
-                      Huỷ
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* Memberships list */}
               {memberships.length === 0 ? (
-                <div className="text-center py-10 bg-slate-950/20 border border-dashed border-slate-850 rounded-xl">
-                  <Star className="w-8 h-8 text-slate-650 mx-auto mb-2" />
-                  <p className="text-slate-500 text-xs">
-                    Chưa có tài khoản khách hàng nào được liên kết.
-                  </p>
+                <div className="py-8 text-center text-xs text-[#94A3B8]">
+                  Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {memberships.map((mem) => (
+                <div className="divide-y divide-[#EDF2F7]">
+                  {memberships.map((m) => (
                     <div
-                      key={mem.id}
-                      className="flex items-center justify-between p-4 bg-[#121826]/40 border border-slate-850 rounded-xl hover:border-slate-700/60 transition duration-150"
+                      key={m.id}
+                      className="py-3.5 flex items-center justify-between gap-4 first:pt-0 last:pb-0 text-xs"
                     >
-                      <div className="space-y-1">
+                      <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">
-                            {mem.fullName || "Chưa cập nhật tên"}
+                          <span className="font-bold text-[#0F172A]">
+                            {m.fullName || "Chưa cập nhật tên"}
                           </span>
-                          {mem.isPrimary && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[10px] font-bold uppercase rounded-full">
-                              <Star className="w-3 h-3 fill-yellow-400" />
+                          {m.isPrimary && (
+                            <Badge variant="blue" size="sm">
                               Chính
-                            </span>
+                            </Badge>
                           )}
                         </div>
-                        <div className="text-xs text-slate-500">
-                          {mem.email}
+                        <div className="text-[11px] font-mono text-[#64748B] mt-0.5">
+                          {m.email}
                         </div>
-                        {mem.title && (
-                          <div className="text-xs text-slate-400 italic">
-                            Vị trí: {mem.title}
+                        {m.title && (
+                          <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                            Chức danh: {m.title}
                           </div>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {!mem.isPrimary && (
-                          <button
-                            onClick={() => handleSetPrimary(mem)}
-                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition"
-                          >
-                            Đặt làm chính
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDeleteMember(mem.id)}
-                          className="p-2 hover:bg-red-500/10 rounded-lg text-slate-500 hover:text-red-400 transition"
-                          title="Gỡ liên kết"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSetPrimary(m.id, m.isPrimary)}
+                          title={m.isPrimary ? "Bỏ đặt làm chính" : "Đặt làm chính"}
+                        >
+                          <Star
+                            className={`w-4 h-4 ${m.isPrimary ? "text-[#CA8A04] fill-[#CA8A04]" : "text-[#94A3B8]"}`}
+                          />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveMember(m.id)}
+                          className="text-red-600 hover:bg-red-50"
+                          title="Hủy liên kết"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           </div>
         </div>
+      )}
+
+      {/* Modal Add Member */}
+      {showAddForm && (
+        <Dialog
+          isOpen={showAddForm}
+          onClose={() => setShowAddForm(false)}
+          maxWidth="md"
+          title="Liên kết tài khoản mới"
+          description="Cấp quyền cho tài khoản khách hàng truy cập thông tin doanh nghiệp."
+        >
+          <form onSubmit={handleAddMember} className="space-y-4 pt-2">
+            {formError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Chọn tài khoản khách hàng *
+              </label>
+              <select
+                required
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chọn tài khoản client --</option>
+                {clientUsers.map((cu) => (
+                  <option key={cu.id} value={cu.id}>
+                    {cu.fullName || "Không tên"} ({cu.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Chức danh / Vai trò đại diện
+              </label>
+              <input
+                type="text"
+                placeholder="Ví dụ: Đại diện pháp luật, Giám đốc IT..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="is_primary_company"
+                checked={isPrimary}
+                onChange={(e) => setIsPrimary(e.target.checked)}
+                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+              />
+              <label
+                htmlFor="is_primary_company"
+                className="text-xs font-semibold text-[#0F172A] cursor-pointer select-none"
+              >
+                Đây là công ty chính liên kết với tài khoản này
+              </label>
+            </div>
+
+            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAddForm(false)}
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={submitting}
+                isLoading={submitting}
+              >
+                Liên kết tài khoản
+              </Button>
+            </div>
+          </form>
+        </Dialog>
       )}
     </div>
   );

@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import { getMe } from "../../../lib/api/auth";
 import { peopleApi } from "../../../lib/api/people";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface UserData {
   user: {
@@ -58,7 +62,6 @@ interface OrgContext {
     name: string;
     title: string | null;
     isPrimary: boolean;
-    status: string;
   }>;
 }
 
@@ -68,66 +71,57 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfileData = useCallback(async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch core user auth info
-      const meData = await getMe();
-      setUserProfile(meData);
+      const me = await getMe();
+      setUserProfile(me);
 
-      // Fetch own organization context
-      const orgData = await peopleApi.getMyOrganization();
-      setOrgContext(orgData);
+      const context = await peopleApi.getMyOrganization();
+      setOrgContext(context);
     } catch (err: any) {
-      setError(err.message || "Không thể tải thông tin trang cá nhân");
+      setError(err.message || "Không thể tải thông tin hồ sơ");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchProfileData();
-  }, [fetchProfileData]);
+    fetchProfile();
+  }, [fetchProfile]);
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] p-6 lg:p-12">
-      <div className="max-w-4xl mx-auto mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent flex items-center gap-3">
-          <User2 className="w-8 h-8 text-cyan-400" />
-          Trang Cá Nhân
-        </h1>
-      </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <SectionHeader
+        title="Hồ Sơ Cá Nhân"
+        description="Thông tin tài khoản, vai trò hệ thống và thông tin nhân sự / doanh nghiệp liên kết."
+      />
 
       {loading ? (
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-20 bg-slate-900/30 rounded-2xl border border-slate-800">
-          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-4" />
-          <span className="text-slate-400 text-sm">
-            Đang tải thông tin trang cá nhân...
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
+          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+          <span className="text-xs text-[#64748B]">
+            Đang tải thông tin hồ sơ của bạn...
           </span>
         </div>
       ) : error || !userProfile ? (
-        <div className="max-w-4xl mx-auto p-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3">
-          <AlertTriangle className="w-6 h-6 shrink-0" />
-          <div>
-            <h4 className="font-bold">Lỗi tải dữ liệu</h4>
-            <p className="text-sm mt-1">
-              {error || "Không tải được hồ sơ đăng nhập"}
-            </p>
-            <button
-              onClick={fetchProfileData}
-              className="mt-3 px-4 py-2 bg-red-500 text-black font-semibold rounded-xl text-xs"
-            >
-              Thử lại
-            </button>
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
+            <span>{error || "Không thể tải hồ sơ"}</span>
           </div>
+          <Button variant="danger" size="sm" onClick={fetchProfile}>
+            Thử lại
+          </Button>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Account Profile Card */}
-          <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 text-center self-start">
-            <div className="w-24 h-24 rounded-full bg-slate-850 border border-slate-700 flex items-center justify-center text-slate-500 font-bold overflow-hidden mx-auto mb-4">
+          <Card className="p-6 text-center self-start space-y-4">
+            <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] flex items-center justify-center text-[#4F75FF] font-bold overflow-hidden mx-auto shadow-xs">
               {userProfile.user.avatarUrl ? (
                 <img
                   src={userProfile.user.avatarUrl}
@@ -135,43 +129,45 @@ export default function UserProfilePage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <User2 className="w-10 h-10 text-slate-400" />
+                <User2 className="w-8 h-8 text-[#4F75FF]" />
               )}
             </div>
-            <h3 className="text-xl font-bold text-white mb-1">
-              {userProfile.user.fullName || "Chưa cập nhật tên"}
-            </h3>
-            <p className="text-slate-400 text-xs flex items-center justify-center gap-1.5 mb-6">
-              <Mail className="w-3.5 h-3.5" />
-              {userProfile.user.email}
-            </p>
+            <div>
+              <h3 className="text-base font-extrabold text-[#0F172A]">
+                {userProfile.user.fullName || "Chưa cập nhật tên"}
+              </h3>
+              <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
+                <Mail className="w-3 h-3 text-[#94A3B8]" />
+                {userProfile.user.email}
+              </p>
+            </div>
 
-            <div className="border-t border-slate-800 pt-4 space-y-3 text-left text-sm">
+            <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-slate-500 flex items-center gap-1">
-                  <Shield className="w-4 h-4" />
+                <span className="text-[#64748B] flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-[#94A3B8]" />
                   Vai trò
                 </span>
-                <span className="font-semibold text-cyan-400 uppercase text-xs tracking-wider">
-                  {userProfile.account.role}
-                </span>
+                <Badge variant="blue" size="sm">
+                  {userProfile.account.role?.toUpperCase()}
+                </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-500 flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4" />
+                <span className="text-[#64748B] flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5 text-[#94A3B8]" />
                   Tài khoản
                 </span>
-                <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400">
+                <Badge variant="success" size="sm">
                   Đã hoạt động
-                </span>
+                </Badge>
               </div>
               {userProfile.account.approvedAt && (
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500 flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                  <span className="text-[#64748B] flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                     Kích hoạt ngày
                   </span>
-                  <span className="text-slate-300 text-xs">
+                  <span className="font-mono text-[#0F172A] text-xs">
                     {new Date(
                       userProfile.account.approvedAt,
                     ).toLocaleDateString("vi-VN")}
@@ -179,160 +175,158 @@ export default function UserProfilePage() {
                 </div>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* Org / Client Membership Details Column */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 space-y-6">
             {orgContext?.type === "client" ? (
-              <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-cyan-400" />
-                  Liên Kết Doanh Nghiệp Khách Hàng
-                </h2>
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
+                  <Briefcase className="w-5 h-5 text-[#CA8A04]" />
+                  <h2 className="text-sm font-extrabold text-[#0F172A]">
+                    Liên Kết Doanh Nghiệp Khách Hàng
+                  </h2>
+                </div>
 
                 {!orgContext.companies || orgContext.companies.length === 0 ? (
-                  <div className="text-center py-10 bg-slate-950/25 border border-dashed border-slate-850 rounded-xl">
-                    <Briefcase className="w-10 h-10 text-slate-750 mx-auto mb-3" />
-                    <p className="text-slate-500 text-sm">
-                      Tài khoản của bạn chưa được liên kết với bất kỳ doanh
-                      nghiệp khách hàng nào trong hệ thống.
-                    </p>
+                  <div className="text-center py-8 text-xs text-[#94A3B8]">
+                    Tài khoản của bạn chưa được liên kết với doanh nghiệp khách hàng nào.
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {orgContext.companies.map((comp) => (
                       <div
                         key={comp.id}
-                        className="p-5 bg-[#121826]/40 border border-slate-850 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                        className="bg-[#F8FAFC] border border-[#EDF2F7] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-white text-lg">
+                            <h4 className="font-bold text-sm text-[#0F172A]">
                               {comp.name}
                             </h4>
                             {comp.isPrimary && (
-                              <span className="px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[10px] font-bold uppercase rounded-full">
+                              <Badge variant="blue" size="sm">
                                 Doanh nghiệp chính
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-[#64748B] mt-1 font-mono">
+                            <span>Mã: {comp.code}</span>
+                            {comp.title && (
+                              <span className="text-[#0F172A] font-sans font-medium">
+                                • {comp.title}
                               </span>
                             )}
                           </div>
-                          <span className="text-slate-500 text-xs block mt-1">
-                            Mã khách hàng: {comp.code}
-                          </span>
-                          {comp.title && (
-                            <span className="text-slate-400 text-xs block mt-1 italic">
-                              Chức vụ đại diện: {comp.title}
-                            </span>
-                          )}
                         </div>
-                        <span
-                          className={`self-start sm:self-center inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-                            comp.status === "active"
-                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                              : "bg-slate-800 border-slate-700 text-slate-400"
-                          }`}
-                        >
-                          {comp.status === "active"
-                            ? "Đang hợp tác"
-                            : "Ngừng hợp tác"}
-                        </span>
+
+                        <Link href="/app/client/projects">
+                          <Button variant="outline" size="sm">
+                            Xem dự án
+                          </Button>
+                        </Link>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
+              </Card>
             ) : (
-              <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 space-y-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Award className="w-5 h-5 text-cyan-400" />
-                  Thông Tin Hợp Đồng & Vị Trí
-                </h2>
+              <Card className="p-6 space-y-6">
+                <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
+                  <Award className="w-5 h-5 text-[#4F75FF]" />
+                  <h2 className="text-sm font-extrabold text-[#0F172A]">
+                    Thông Tin Hồ Sơ Nhân Sự
+                  </h2>
+                </div>
 
                 {!orgContext?.employee ? (
-                  <div className="text-center py-10 bg-slate-950/25 border border-dashed border-slate-850 rounded-xl">
-                    <User2 className="w-10 h-10 text-slate-750 mx-auto mb-3" />
-                    <p className="text-slate-500 text-sm">
-                      Hồ sơ nhân sự của bạn chưa được khởi tạo bởi Quản trị viên
-                      hệ thống.
-                    </p>
+                  <div className="text-center py-8 text-xs text-[#94A3B8]">
+                    Chưa có hồ sơ nhân sự (employee profile). Vui lòng liên hệ Quản trị viên để khởi tạo mã nhân sự.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Mã nhân sự
                       </span>
-                      <span className="font-bold text-white">
+                      <span className="text-sm font-bold font-mono text-[#4F75FF]">
                         {orgContext.employee.employeeCode}
                       </span>
                     </div>
 
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                        Chức danh / Vị trí
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                        Chức danh công việc
                       </span>
-                      <span className="font-semibold text-white">
+                      <span className="text-sm font-bold text-[#0F172A]">
                         {orgContext.employee.jobTitle || "Chưa cập nhật"}
                       </span>
                     </div>
 
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Building2 className="w-3.5 h-3.5 text-slate-500" />
-                        Phòng ban
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                        Phòng ban trực thuộc
                       </span>
-                      <span className="font-semibold text-white">
-                        {orgContext.department
-                          ? `${orgContext.department.name} (${orgContext.department.code})`
-                          : "Chưa phân bổ"}
+                      <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-[#64748B]" />
+                        {orgContext.department?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Users2 className="w-3.5 h-3.5 text-slate-500" />
-                        Đội nhóm
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                        Đội nhóm trực thuộc
                       </span>
-                      <span className="font-semibold text-white">
-                        {orgContext.team
-                          ? `${orgContext.team.name} (${orgContext.team.code})`
-                          : "Chưa phân bổ"}
+                      <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+                        <Users2 className="w-3.5 h-3.5 text-[#64748B]" />
+                        {orgContext.team?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                        Quản lý trực tiếp
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                        Người quản lý trực tiếp
                       </span>
-                      <span className="font-semibold text-white">
-                        {orgContext.manager ? (
-                          <div>
-                            <div>{orgContext.manager.fullName}</div>
-                            <span className="text-xs text-slate-500 font-normal">
-                              {orgContext.manager.email}
+                      <span className="text-xs text-[#0F172A]">
+                        {orgContext.manager?.fullName ? (
+                          <span className="font-semibold">
+                            {orgContext.manager.fullName}{" "}
+                            <span className="font-mono text-[11px] text-[#64748B]">
+                              ({orgContext.manager.email})
                             </span>
-                          </div>
+                          </span>
                         ) : (
                           "Không có"
                         )}
                       </span>
                     </div>
 
-                    <div className="bg-[#121826]/40 p-4 border border-slate-850 rounded-xl">
-                      <span className="block text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                        Ngày vào làm
+                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                        Trạng thái làm việc
                       </span>
-                      <span className="font-semibold text-white">
-                        {orgContext.employee.joinedDate
-                          ? new Date(
-                              orgContext.employee.joinedDate,
-                            ).toLocaleDateString("vi-VN")
-                          : "—"}
-                      </span>
+                      <Badge
+                        variant={
+                          orgContext.employee.employmentStatus === "active"
+                            ? "success"
+                            : orgContext.employee.employmentStatus === "probation"
+                              ? "gold"
+                              : "default"
+                        }
+                        size="sm"
+                      >
+                        {orgContext.employee.employmentStatus === "active"
+                          ? "Chính thức"
+                          : orgContext.employee.employmentStatus === "probation"
+                            ? "Thử việc"
+                            : orgContext.employee.employmentStatus === "on_leave"
+                              ? "Nghỉ phép"
+                              : "Nghỉ việc"}
+                      </Badge>
                     </div>
                   </div>
                 )}
-              </div>
+              </Card>
             )}
           </div>
         </div>

@@ -7,10 +7,24 @@ import {
   ChevronRight,
   Loader2,
   FileText,
-  Calendar,
 } from "lucide-react";
 import { financeApi, Invoice } from "@/lib/api/finance";
 import { isInvoiceOverdue } from "@/lib/finance-date";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function ClientInvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -50,159 +64,130 @@ export default function ClientInvoicesPage() {
     }).format(amount);
   };
 
-  const getStatusBadge = (status: string, dueDate: string) => {
-    if (isInvoiceOverdue(status, dueDate)) {
-      return (
-        <span className="px-2 py-1 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
-          Quá hạn
-        </span>
-      );
-    }
-
-    switch (status) {
-      case "issued":
-        return (
-          <span className="px-2 py-1 rounded bg-[#FFC400]/10 text-[#FFC400] text-[10px] font-bold">
-            Chờ thanh toán
-          </span>
-        );
-      case "partially_paid":
-        return (
-          <span className="px-2 py-1 rounded bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-bold">
-            Thanh toán một phần
-          </span>
-        );
-      case "paid":
-        return (
-          <span className="px-2 py-1 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-bold">
-            Đã thanh toán
-          </span>
-        );
-      case "cancelled":
-        return (
-          <span className="px-2 py-1 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
-            Đã hủy
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      {/* Header */}
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center gap-4 sticky top-0 z-20">
-        <Link
-          href="/app/client"
-          className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Link>
-        <span className="font-bold text-base tracking-wide text-white">
-          Cổng thông tin khách hàng{" "}
-          <span className="text-[#FFC400] font-normal">
-            | Hóa đơn & Công nợ
-          </span>
-        </span>
-      </header>
+    <div className="space-y-6">
+      {/* Top Header */}
+      <SectionHeader
+        title="Lịch sử hóa đơn"
+        description="Theo dõi chi tiết công nợ, hóa đơn chờ xử lý và lịch sử thanh toán của doanh nghiệp."
+        badge={`${total} Hóa đơn`}
+        action={
+          <Link href="/app/client">
+            <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+              Quay lại tổng quan
+            </Button>
+          </Link>
+        }
+      />
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
-        <div className="border-b border-[#151516] pb-4">
-          <h1 className="text-2xl font-extrabold text-white">
-            Lịch sử hóa đơn
-          </h1>
-          <p className="text-xs text-[#606060] mt-1">
-            Theo dõi chi tiết công nợ, hóa đơn chờ xử lý và lịch sử thanh toán
-            của doanh nghiệp.
-          </p>
-        </div>
-
+      {/* Main Table Card */}
+      <Card className="p-6 space-y-4">
         {loading ? (
-          <div className="flex items-center justify-center p-12 bg-[#0E0E0F] border border-[#151516] rounded-2xl">
-            <Loader2 className="w-6 h-6 text-[#FFC400] animate-spin" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
           </div>
         ) : invoices.length === 0 ? (
-          <div className="text-center p-12 rounded-2xl bg-[#0E0E0F] border border-[#151516] text-[#606060] space-y-3">
-            <FileText className="w-12 h-12 text-[#151516] mx-auto" />
-            <p className="text-xs">
-              Không có hóa đơn công khai nào được ghi nhận cho tài khoản của
-              bạn.
-            </p>
-          </div>
+          <EmptyState
+            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            title="Chưa có hóa đơn nào"
+            description="Không có hóa đơn công khai nào được ghi nhận cho tài khoản của bạn."
+          />
         ) : (
-          <div className="bg-[#0E0E0F] border border-[#151516] rounded-2xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-[#151516] text-[#606060] text-xs font-semibold uppercase tracking-wider bg-[#0c0c0d]">
-                    <th className="px-6 py-4">Mã số hóa đơn</th>
-                    <th className="px-6 py-4">Ngày phát hành</th>
-                    <th className="px-6 py-4">Hạn thanh toán</th>
-                    <th className="px-6 py-4">Tổng tiền</th>
-                    <th className="px-6 py-4">Đã thanh toán</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#151516] text-sm text-[#FFF8E6]/80">
+          <div className="space-y-4">
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>Mã số hóa đơn</TableHeaderCell>
+                    <TableHeaderCell>Ngày phát hành</TableHeaderCell>
+                    <TableHeaderCell>Hạn thanh toán</TableHeaderCell>
+                    <TableHeaderCell>Tổng tiền</TableHeaderCell>
+                    <TableHeaderCell>Đã thanh toán</TableHeaderCell>
+                    <TableHeaderCell>Trạng thái</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {invoices.map((i) => (
-                    <tr
-                      key={i.id}
-                      className="hover:bg-[#151516]/40 transition-colors"
-                    >
-                      <td className="px-6 py-4 font-mono font-bold text-white">
+                    <TableRow key={i.id}>
+                      <TableCell className="font-mono font-bold text-[#4F75FF]">
                         {i.invoice_number}
-                      </td>
-                      <td className="px-6 py-4 font-mono">{i.issue_date}</td>
-                      <td className="px-6 py-4 font-mono">{i.due_date}</td>
-                      <td className="px-6 py-4 font-extrabold text-white">
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-[#64748B]">
+                        {i.issue_date}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-[#64748B]">
+                        {i.due_date}
+                      </TableCell>
+                      <TableCell className="font-extrabold text-[#0F172A] text-xs">
                         {formatCurrency(i.amount, i.currency_code)}
-                      </td>
-                      <td className="px-6 py-4 font-extrabold text-[#00E676]">
+                      </TableCell>
+                      <TableCell className="font-extrabold text-emerald-600 text-xs">
                         {formatCurrency(i.paid_amount, i.currency_code)}
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(i.status, i.due_date)}
-                      </td>
-                    </tr>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            i.status === "paid"
+                              ? "success"
+                              : isInvoiceOverdue(i.status, i.due_date)
+                                ? "danger"
+                                : i.status === "issued"
+                                  ? "gold"
+                                  : "blue"
+                          }
+                          size="sm"
+                        >
+                          {isInvoiceOverdue(i.status, i.due_date)
+                            ? "Quá hạn"
+                            : i.status === "paid"
+                              ? "Đã thanh toán"
+                              : i.status === "issued"
+                                ? "Chờ thanh toán"
+                                : i.status === "partially_paid"
+                                  ? "Một phần"
+                                  : "Đã hủy"}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-[#151516] flex items-center justify-between text-xs text-[#606060] bg-[#0c0c0d]">
+              <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
                 <span>
-                  Hiển thị{" "}
-                  <span className="text-[#FFF8E6]">{invoices.length}</span>/
-                  <span className="text-[#FFF8E6]">{total}</span> hóa đơn
+                  Hiển thị <span className="font-bold text-[#0F172A]">{invoices.length}</span> / {total} hóa đơn
                 </span>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     disabled={page === 1}
                     onClick={() => setPage(page - 1)}
-                    className="p-1.5 rounded-lg bg-[#151516] border border-[#1f1f22] disabled:opacity-40 transition-colors cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="font-bold text-[#FFF8E6]">
+                  </Button>
+                  <span className="font-bold text-[#0F172A]">
                     Trang {page} / {totalPages}
                   </span>
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     disabled={page === totalPages}
                     onClick={() => setPage(page + 1)}
-                    className="p-1.5 rounded-lg bg-[#151516] border border-[#1f1f22] disabled:opacity-40 transition-colors cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
           </div>
         )}
-      </main>
+      </Card>
     </div>
   );
 }

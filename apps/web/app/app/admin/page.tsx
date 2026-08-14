@@ -6,196 +6,167 @@ import {
   ShieldCheck,
   UserCheck,
   Users,
-  Settings,
-  Activity,
-  ArrowRight,
-  LogOut,
-  FileText,
+  FolderKanban,
+  CreditCard,
   Bell,
-  MessageCircle,
+  MessageSquare,
   Bot,
+  Clock,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { NotificationBell } from "@/components/phase7/notification-bell";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import {
+  QuickActionGrid,
+  type QuickActionItem,
+} from "@/components/dashboard/quick-action";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboardPage() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
-  };
+  const quickActions: QuickActionItem[] = [
+    {
+      title: "Phê duyệt tài khoản",
+      description:
+        "Xét duyệt và phân quyền cho nhân sự mới đăng ký vào hệ thống.",
+      href: "/app/admin/accounts/pending",
+      icon: <UserCheck className="w-5 h-5" />,
+      badge: "Ưu tiên",
+      highlight: true,
+    },
+    {
+      title: "Quản lý Nhân sự",
+      description:
+        "Danh sách nhân viên, cơ cấu phòng ban và đội nhóm chuyên môn.",
+      href: "/app/admin/people",
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      title: "Dự án & Kanban Board",
+      description:
+        "Theo dõi tiến độ bàn giao, phân công tasks và quản trị dự án.",
+      href: "/app/admin/projects",
+      icon: <FolderKanban className="w-5 h-5" />,
+    },
+    {
+      title: "Chấm công & Nghỉ phép",
+      description:
+        "Kiểm soát lịch làm việc, bán kính GPS chấm công và duyệt đơn nghỉ.",
+      href: "/app/admin/attendance",
+      icon: <Clock className="w-5 h-5" />,
+    },
+    {
+      title: "Quản lý Tài chính",
+      description:
+        "Hợp đồng dịch vụ, xuất hóa đơn và theo dõi dòng tiền doanh nghiệp.",
+      href: "/app/admin/finance",
+      icon: <CreditCard className="w-5 h-5" />,
+    },
+    {
+      title: "Tự động hóa (Automation)",
+      description:
+        "Quy tắc tự động gửi thông báo khi có thay đổi trạng thái nghiệp vụ.",
+      href: "/app/admin/automation",
+      icon: <Bot className="w-5 h-5" />,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      {/* Header */}
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FFC400] text-black font-black flex items-center justify-center text-sm">
-            P
-          </div>
-          <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">
-              | Admin Workspace
-            </span>
-          </span>
+    <div className="space-y-6">
+      {/* Top Banner / Section Header */}
+      <SectionHeader
+        title="Bảng điều khiển Quản trị viên"
+        description="Tổng quan hệ thống, kiểm soát phân quyền tài khoản và vận hành toàn diện PGS Agency."
+        badge="Admin Center"
+      />
+
+      {/* KPI Stats Grid with Pastel Variants */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          variant="blue"
+          title="Vai trò"
+          value="Admin"
+          subtitle="Toàn quyền quản trị hệ thống"
+          icon={<ShieldCheck className="w-4 h-4" />}
+        />
+        <StatCard
+          variant="gold"
+          title="Duyệt tài khoản"
+          value="Trực tiếp"
+          subtitle="Kích hoạt nhân sự & phân quyền"
+          icon={<UserCheck className="w-4 h-4" />}
+        />
+        <StatCard
+          variant="green"
+          title="Realtime Sync"
+          value="Sẵn sàng"
+          subtitle="WebSocket & Supabase live"
+          icon={<Sparkles className="w-4 h-4" />}
+        />
+        <StatCard
+          variant="purple"
+          title="Bảo mật API"
+          value="Khép kín"
+          subtitle="RLS & Throttling kích hoạt"
+          icon={<ShieldCheck className="w-4 h-4" />}
+        />
+      </div>
+
+      {/* Quick Access Highlights */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Link href="/app/notifications">
+          <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  Trung tâm Thông báo
+                </h4>
+                <p className="text-xs text-[#64748B]">
+                  Sự kiện task, leave, attendance, finance và chat.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all" />
+          </Card>
+        </Link>
+
+        <Link href="/app/chat">
+          <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  Kênh Chat Nội bộ & Dự án
+                </h4>
+                <p className="text-xs text-[#64748B]">
+                  Trao đổi trực tiếp và xác thực quyền phòng chat realtime.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all" />
+          </Card>
+        </Link>
+      </div>
+
+      {/* Feature Navigation Grid */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
+            Phân hệ Quản trị Nhanh
+          </h3>
+          <Badge variant="outline" size="sm">
+            6 Phân hệ
+          </Badge>
         </div>
 
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Quản trị viên (Admin)</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors cursor-pointer"
-            title="Đăng xuất"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
-        <div className="border-b border-[#151516] pb-6">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Bảng điều khiển Quản trị viên
-          </h1>
-          <p className="mt-1 text-sm text-[#606060]">
-            Quản lý tài khoản người dùng, cấu hình hệ thống và phân quyền truy
-            cập doanh nghiệp.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <Link
-            href="/app/notifications"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <Bell className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Thông báo
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Theo dõi sự kiện task, leave, attendance, finance, chat và dự án.
-            </p>
-          </Link>
-
-          <Link
-            href="/app/chat"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Chat
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Direct chat nội bộ và project chat có kiểm tra membership.
-            </p>
-          </Link>
-
-          <Link
-            href="/app/admin/automation"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <Bot className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Automation
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Rule nội bộ an toàn, chỉ tạo notification qua trigger registry.
-            </p>
-          </Link>
-        </div>
-
-        {/* Feature Banner: Account Approvals */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0E0E0F] via-[#151516] to-[#0E0E0F] border border-[#FFC400]/30 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="space-y-2 max-w-xl z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 text-[#FFC400] text-xs font-semibold">
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>Yêu cầu mới cần phê duyệt</span>
-            </div>
-            <h3 className="text-xl font-bold text-white">
-              Phê duyệt & Phân quyền tài khoản
-            </h3>
-            <p className="text-xs text-[#FFF8E6]/70 leading-relaxed">
-              Xem danh sách nhân sự mới đăng ký, chọn vai trò thích hợp và duyệt
-              cấp tài khoản vào hệ thống.
-            </p>
-          </div>
-
-          <Link
-            href="/app/admin/accounts/pending"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
-          >
-            <span>Đến trang phê duyệt</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Feature Banner: Finance */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0E0E0F] via-[#151516] to-[#0E0E0F] border border-[#FFC400]/30 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="space-y-2 max-w-xl z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 text-[#FFC400] text-xs font-semibold">
-              <FileText className="w-3.5 h-3.5" />
-              <span>Quản lý tài chính doanh nghiệp</span>
-            </div>
-            <h3 className="text-xl font-bold text-white">
-              Hợp đồng, Hóa đơn & Doanh thu
-            </h3>
-            <p className="text-xs text-[#FFF8E6]/70 leading-relaxed">
-              Theo dõi và quản lý toàn bộ hợp đồng dịch vụ, hóa đơn phát hành,
-              ghi nhận thanh toán công nợ và báo cáo tổng quan.
-            </p>
-          </div>
-
-          <Link
-            href="/app/admin/finance"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
-          >
-            <span>Đến trang tài chính</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Real workspace claims */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Vai trò của bạn
-              </span>
-              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Quản trị viên
-            </div>
-            <div className="text-xs text-[#606060]">
-              Bạn sở hữu quyền quản trị toàn bộ cấu hình hệ thống và dữ liệu.
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Quyền hạn phê duyệt
-              </span>
-              <UserCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Quản lý tài khoản chờ duyệt
-            </div>
-            <div className="text-xs text-[#606060]">
-              Xét duyệt danh tính và phân quyền vai trò cho nhân sự mới đăng ký.
-            </div>
-          </div>
-        </div>
-      </main>
+        <QuickActionGrid items={quickActions} columns={3} />
+      </div>
     </div>
   );
 }

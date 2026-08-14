@@ -10,12 +10,15 @@ import {
   ShieldCheck,
   User2,
   Mail,
-  Calendar,
   HelpCircle,
   Save,
 } from "lucide-react";
 import { peopleApi } from "../../../../../lib/api/people";
 import { organizationApi } from "../../../../../lib/api/organization";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface Department {
   id: string;
@@ -80,15 +83,17 @@ export default function AdminPersonDetailPage() {
   >("active");
   const [joinedDate, setJoinedDate] = useState("");
   const [leftDate, setLeftDate] = useState("");
+
   const [formError, setFormError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
 
+      // Load person info
       const data = await peopleApi.getPersonByUserId(userId);
       setPerson(data);
 
@@ -189,50 +194,43 @@ export default function AdminPersonDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] p-6 lg:p-12">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="max-w-4xl mx-auto mb-8">
-        <Link
-          href="/app/admin/people"
-          className="inline-flex items-center gap-1 text-slate-400 hover:text-cyan-400 text-sm mb-3 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Danh bạ nhân sự
-        </Link>
-        <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-          Chi Tiết Hồ Sơ Nhân Sự
-        </h1>
-      </div>
+      <SectionHeader
+        title="Chi Tiết Hồ Sơ Nhân Sự"
+        description="Quản lý hồ sơ việc làm, chức danh, phòng ban và cấp quản lý trực tiếp."
+        action={
+          <Link href="/app/admin/people">
+            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              Danh bạ nhân sự
+            </Button>
+          </Link>
+        }
+      />
 
       {loading ? (
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-20 bg-slate-900/30 rounded-2xl border border-slate-800">
-          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-4" />
-          <span className="text-slate-400 text-sm">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
+          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+          <span className="text-xs text-[#64748B]">
             Đang tải dữ liệu hồ sơ nhân sự...
           </span>
         </div>
       ) : error || !person ? (
-        <div className="max-w-4xl mx-auto p-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3">
-          <AlertTriangle className="w-6 h-6 shrink-0" />
-          <div>
-            <h4 className="font-bold">Lỗi tải dữ liệu</h4>
-            <p className="text-sm mt-1">
-              {error || "Không tìm thấy tài khoản người dùng"}
-            </p>
-            <button
-              onClick={loadData}
-              className="mt-3 px-4 py-2 bg-red-500 text-black font-semibold rounded-xl text-xs"
-            >
-              Thử lại
-            </button>
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
+            <span>{error || "Không tìm thấy tài khoản người dùng"}</span>
           </div>
+          <Button variant="danger" size="sm" onClick={loadData}>
+            Thử lại
+          </Button>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Account Profile Meta */}
           <div className="space-y-6">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-slate-800 border border-slate-700 mx-auto mb-4 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
+            <Card className="p-6 text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] mx-auto flex items-center justify-center text-[#4F75FF] font-bold overflow-hidden shadow-xs">
                 {person.avatarUrl ? (
                   <img
                     src={person.avatarUrl}
@@ -240,87 +238,90 @@ export default function AdminPersonDetailPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User2 className="w-10 h-10 text-slate-400" />
+                  <User2 className="w-8 h-8 text-[#4F75FF]" />
                 )}
               </div>
-              <h3 className="text-xl font-bold text-white mb-1">
-                {person.fullName || "Chưa cập nhật tên"}
-              </h3>
-              <p className="text-slate-400 text-xs flex items-center justify-center gap-1.5 mb-4">
-                <Mail className="w-3.5 h-3.5" />
-                {person.email}
-              </p>
+              <div>
+                <h3 className="text-base font-extrabold text-[#0F172A]">
+                  {person.fullName || "Chưa cập nhật tên"}
+                </h3>
+                <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
+                  <Mail className="w-3 h-3 text-[#94A3B8]" />
+                  {person.email}
+                </p>
+              </div>
 
-              <div className="border-t border-slate-800 pt-4 space-y-3 text-left text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Vai trò hệ thống</span>
-                  <span className="font-semibold text-cyan-400 uppercase text-xs tracking-wider">
-                    {person.role}
-                  </span>
+              <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748B]">Vai trò hệ thống</span>
+                  <Badge variant="blue" size="sm">
+                    {person.role ? person.role.toUpperCase() : "CHƯA GÁN"}
+                  </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Trạng thái tài khoản</span>
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748B]">Trạng thái tài khoản</span>
+                  <Badge
+                    variant={
                       person.accountStatus === "active"
-                        ? "bg-emerald-500/10 text-emerald-400"
+                        ? "success"
                         : person.accountStatus === "pending"
-                          ? "bg-amber-500/10 text-amber-400"
-                          : "bg-red-500/10 text-red-400"
-                    }`}
+                          ? "gold"
+                          : "danger"
+                    }
+                    size="sm"
                   >
                     {person.accountStatus === "active"
                       ? "Đã kích hoạt"
                       : person.accountStatus === "pending"
                         ? "Chờ duyệt"
                         : "Từ chối"}
-                  </span>
+                  </Badge>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Right Column: Employment Profile Settings */}
           <div className="lg:col-span-2">
             {person.role === "client" ? (
-              <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 text-center">
-                <HelpCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-white">
+              <Card className="p-8 text-center space-y-3">
+                <HelpCircle className="w-10 h-10 text-[#94A3B8] mx-auto" />
+                <h3 className="text-sm font-bold text-[#0F172A]">
                   Tài khoản Khách hàng
                 </h3>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed">
-                  Tài khoản vai trò **client** không có hồ sơ nhân sự
-                  (employee_profile) trực thuộc công ty. Vui lòng quản lý liên
-                  kết khách hàng trong danh mục **Khách hàng** bên ngoài.
+                <p className="text-xs text-[#64748B] max-w-md mx-auto leading-relaxed">
+                  Tài khoản vai trò **client** không có hồ sơ nhân sự nội bộ trực thuộc công ty. Vui lòng quản lý liên kết khách hàng trong danh mục **Khách hàng**.
                 </p>
-              </div>
+              </Card>
             ) : (
-              <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-cyan-400" />
-                  {person.employeeProfile
-                    ? "Thông Tin Nhân Sự"
-                    : "Khởi Tạo Hồ Sơ Nhân Sự"}
-                </h2>
+              <Card className="p-6 space-y-6">
+                <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
+                  <ShieldCheck className="w-5 h-5 text-[#4F75FF]" />
+                  <h2 className="font-extrabold text-sm text-[#0F172A]">
+                    {person.employeeProfile
+                      ? "Thông Tin Hồ Sơ Nhân Sự"
+                      : "Khởi Tạo Hồ Sơ Nhân Sự"}
+                  </h2>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {formError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
                       <span>{formError}</span>
                     </div>
                   )}
 
                   {successMsg && (
-                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4" />
+                    <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600" />
                       <span>{successMsg}</span>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Mã nhân sự (Không được đổi)
                       </label>
                       <input
@@ -329,12 +330,12 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) => setEmployeeCode(e.target.value)}
                         disabled={!!person.employeeProfile}
                         placeholder="Ví dụ: PGS0102"
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition duration-300 disabled:opacity-50"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Chức danh (Job Title)
                       </label>
                       <input
@@ -342,23 +343,23 @@ export default function AdminPersonDetailPage() {
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
                         placeholder="Ví dụ: Chuyên viên SEO"
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition duration-300"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Phòng ban trực thuộc
                       </label>
                       <select
                         value={departmentId}
                         onChange={(e) => {
                           setDepartmentId(e.target.value);
-                          setTeamId(""); // reset team
+                          setTeamId("");
                         }}
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="">-- Chưa phân bổ phòng ban --</option>
                         {departments.map((d) => (
@@ -370,13 +371,13 @@ export default function AdminPersonDetailPage() {
                     </div>
 
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Đội nhóm trực thuộc
                       </label>
                       <select
                         value={teamId}
                         onChange={(e) => setTeamId(e.target.value)}
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="">-- Chưa phân bổ đội nhóm --</option>
                         {availableTeams.map((t) => (
@@ -389,13 +390,13 @@ export default function AdminPersonDetailPage() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                       Người quản lý trực tiếp (Reports To)
                     </label>
                     <select
                       value={reportsToUserId}
                       onChange={(e) => setReportsToUserId(e.target.value)}
-                      className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300"
+                      className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                     >
                       <option value="">-- Không có người quản lý --</option>
                       {managers.map((m) => (
@@ -408,7 +409,7 @@ export default function AdminPersonDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Trạng thái làm việc
                       </label>
                       <select
@@ -416,31 +417,29 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) =>
                           setEmploymentStatus(e.target.value as any)
                         }
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="probation">Thử việc (probation)</option>
                         <option value="active">Chính thức (active)</option>
                         <option value="on_leave">Nghỉ phép (on_leave)</option>
-                        <option value="terminated">
-                          Đã nghỉ việc (terminated)
-                        </option>
+                        <option value="terminated">Đã nghỉ việc (terminated)</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Ngày vào làm
                       </label>
                       <input
                         type="date"
                         value={joinedDate}
                         onChange={(e) => setJoinedDate(e.target.value)}
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                         Ngày nghỉ việc
                       </label>
                       <input
@@ -448,27 +447,25 @@ export default function AdminPersonDetailPage() {
                         value={leftDate}
                         onChange={(e) => setLeftDate(e.target.value)}
                         disabled={employmentStatus !== "terminated"}
-                        className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 transition duration-300 disabled:opacity-50"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-4 flex justify-end">
-                    <button
+                  <div className="pt-4 border-t border-[#EDF2F7] flex justify-end">
+                    <Button
                       type="submit"
+                      variant="primary"
+                      size="sm"
                       disabled={submitting}
-                      className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-black font-bold rounded-xl transition duration-300 text-sm flex items-center gap-2"
+                      isLoading={submitting}
+                      leftIcon={<Save className="w-4 h-4" />}
                     >
-                      {submitting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
                       Lưu thông tin hồ sơ
-                    </button>
+                    </Button>
                   </div>
                 </form>
-              </div>
+              </Card>
             )}
           </div>
         </div>

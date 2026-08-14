@@ -95,7 +95,7 @@ function ProjectCalendarContent({
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
   return (
-    <main className="min-h-screen bg-[#070707] px-4 py-7 text-[#FFF8E6] lg:px-8">
+    <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-[1500px] space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -104,43 +104,43 @@ function ProjectCalendarContent({
           projectCode={project?.projectCode}
           active="calendar"
         />
-        <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-[#0E0E0F] p-4">
+        <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
           <button
             type="button"
             onClick={() => changeMonth(-1)}
             aria-label="Tháng trước"
-            className="rounded-lg border border-zinc-800 p-2 hover:border-zinc-600"
+            className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <h2 className="font-bold text-white">
+          <h2 className="font-bold text-[#0F172A] text-base">
             Tháng {month.getUTCMonth() + 1}/{month.getUTCFullYear()}
           </h2>
           <button
             type="button"
             onClick={() => changeMonth(1)}
             aria-label="Tháng sau"
-            className="rounded-lg border border-zinc-800 p-2 hover:border-zinc-600"
+            className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
         {error && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
             {error}
           </div>
         )}
         {loading ? (
-          <div className="rounded-2xl border border-zinc-800 p-8 text-zinc-500">
+          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
             Đang tải lịch công việc…
           </div>
         ) : (
-          <section className="overflow-x-auto rounded-2xl border border-zinc-800 bg-[#0E0E0F]">
-            <div className="grid min-w-[900px] grid-cols-7 border-b border-zinc-800">
+          <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+            <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#F8FAFC]">
               {weekdayLabels.map((label) => (
                 <div
                   key={label}
-                  className="p-3 text-center text-xs font-bold text-zinc-500"
+                  className="p-3 text-center text-xs font-bold text-[#64748B]"
                 >
                   {label}
                 </div>
@@ -158,10 +158,12 @@ function ProjectCalendarContent({
                 return (
                   <div
                     key={key}
-                    className="min-h-36 border-b border-r border-zinc-800 p-2"
+                    className="min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60"
                   >
                     <p
-                      className={`mb-2 text-xs ${currentMonth ? "text-zinc-300" : "text-zinc-700"}`}
+                      className={`mb-2 text-xs font-bold ${
+                        currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
+                      }`}
                     >
                       {day.getUTCDate()}
                     </p>
@@ -170,7 +172,7 @@ function ProjectCalendarContent({
                         <Link
                           key={task.taskId}
                           href={`${base}/${projectId}/tasks/${task.taskId}`}
-                          className="block truncate rounded-md border border-[#FFC400]/20 bg-[#FFC400]/10 px-2 py-1 text-xs text-[#FFD84D] hover:border-[#FFC400]"
+                          className="block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
                           title={task.title}
                         >
                           {task.title}
@@ -184,7 +186,7 @@ function ProjectCalendarContent({
           </section>
         )}
         {!loading && tasks.length === 0 && (
-          <p className="text-center text-sm text-zinc-600">
+          <p className="text-center text-xs text-[#94A3B8]">
             Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
           </p>
         )}
