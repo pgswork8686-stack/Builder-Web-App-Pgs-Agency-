@@ -45,8 +45,8 @@ async function bootstrap() {
     }),
   );
 
-  // Trust proxy for production reverse proxy environments
-  if (isProduction) {
+  // Trust proxy configuration
+  if (configService.trustProxy) {
     app.set('trust proxy', 1);
   }
 

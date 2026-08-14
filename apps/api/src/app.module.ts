@@ -8,6 +8,7 @@ import { AutomationModule } from './automation/automation.module';
 import { ChatModule } from './chat/chat.module';
 import { ClientsModule } from './clients/clients.module';
 import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 import { HealthModule } from './health/health.module';
 import { FinanceModule } from './finance/finance.module';
 import { LeaveModule } from './leave/leave.module';
@@ -24,13 +25,17 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
 @Module({
   imports: [
     ConfigModule,
-    ThrottlerModule.forRoot([
-      {
-        name: 'default',
-        ttl: 60000,
-        limit: 120,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          name: 'default',
+          ttl: config.throttleTtl,
+          limit: config.throttleLimit,
+        },
+      ],
+    }),
     HealthModule,
     SupabaseModule,
     AuthModule,

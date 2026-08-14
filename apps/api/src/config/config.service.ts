@@ -34,4 +34,22 @@ export class ConfigService {
   get initialAdminEmail(): string {
     return this.nestConfigService.getOrThrow<string>('INITIAL_ADMIN_EMAIL');
   }
+
+  get throttleTtl(): number {
+    return this.nestConfigService.get<number>('THROTTLE_TTL', 60000);
+  }
+
+  get throttleLimit(): number {
+    return this.nestConfigService.get<number>('THROTTLE_LIMIT', 120);
+  }
+
+  get trustProxy(): boolean {
+    const configured = this.nestConfigService.get<boolean | undefined>(
+      'TRUST_PROXY',
+    );
+    if (configured !== undefined) {
+      return configured;
+    }
+    return this.appEnv === 'production';
+  }
 }

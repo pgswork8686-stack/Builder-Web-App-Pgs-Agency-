@@ -52,8 +52,11 @@ INITIAL_ADMIN_EMAIL=admin@example.com
 
 *Các biến cấu hình tùy chọn (Production Throttling & Proxy):*
 ```env
+# THROTTLE_TTL: cửa sổ giới hạn tính bằng mili-giây (default: 60000ms = 60s)
 THROTTLE_TTL=60000
+# THROTTLE_LIMIT: số lượng request tối đa trong mỗi cửa sổ (default: 120)
 THROTTLE_LIMIT=120
+# TRUST_PROXY: bật khi ứng dụng chạy sau reverse proxy (default: true trên production)
 TRUST_PROXY=true
 ```
 
