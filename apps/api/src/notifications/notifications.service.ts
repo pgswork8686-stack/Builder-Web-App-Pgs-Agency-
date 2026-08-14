@@ -133,6 +133,7 @@ export class NotificationsService {
       .update({ read_at: new Date().toISOString() })
       .eq('id', notificationId)
       .eq('recipient_user_id', user.profileId)
+      .is('read_at', null)
       .select()
       .maybeSingle();
 
@@ -143,16 +144,34 @@ export class NotificationsService {
         error,
       );
     }
-    if (!data) {
+    if (data) {
+      const mapped = this.mapNotification(data);
+      this.gateway?.emitToUser(user.profileId, 'notifications:read', mapped);
+      return mapped;
+    }
+
+    const { data: existing, error: existingError } = await this.client
+      .from('notifications')
+      .select('*')
+      .eq('id', notificationId)
+      .eq('recipient_user_id', user.profileId)
+      .maybeSingle();
+
+    if (existingError) {
+      this.databaseFailure(
+        'NOTIFICATION_MARK_READ_LOOKUP_FAILED',
+        'Khong the kiem tra thong bao.',
+        existingError,
+      );
+    }
+    if (!existing) {
       throw new NotFoundException({
         code: 'NOTIFICATION_NOT_FOUND',
         message: 'Khong tim thay thong bao.',
       });
     }
 
-    const mapped = this.mapNotification(data);
-    this.gateway?.emitToUser(user.profileId, 'notifications:read', mapped);
-    return mapped;
+    return this.mapNotification(existing);
   }
 
   async markAllRead(user: RequestUser) {
@@ -206,13 +225,21 @@ export class NotificationsService {
     dto: NotificationPreferencesUpdateDto,
     user: RequestUser,
   ) {
-    const payload = {
+    const payload: {
+      user_id: string;
+      updated_by: string;
+      in_app_enabled?: boolean;
+      email_enabled?: boolean;
+    } = {
       user_id: user.profileId,
-      in_app_enabled: dto.inAppEnabled ?? true,
-      email_enabled: dto.emailEnabled ?? false,
-      preferences: dto.preferences ?? {},
       updated_by: user.profileId,
     };
+    if (dto.inAppEnabled !== undefined) {
+      payload.in_app_enabled = dto.inAppEnabled;
+    }
+    if (dto.emailEnabled !== undefined) {
+      payload.email_enabled = dto.emailEnabled;
+    }
 
     const { data, error } = await this.client
       .from('notification_preferences')

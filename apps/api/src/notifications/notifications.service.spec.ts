@@ -102,10 +102,59 @@ describe('NotificationsService', () => {
 
     expect(readQuery.eq).toHaveBeenCalledWith('id', NOTIFICATION_ID);
     expect(readQuery.eq).toHaveBeenCalledWith('recipient_user_id', USER_ID);
+    expect(readQuery.is).toHaveBeenCalledWith('read_at', null);
     expect(gateway.emitToUser).toHaveBeenCalledWith(
       USER_ID,
       'notifications:read',
       expect.objectContaining({ id: NOTIFICATION_ID }),
+    );
+  });
+
+  it('returns an already-read notification without changing it or emitting again', async () => {
+    const updateQuery = query({ data: null });
+    const existingQuery = query({
+      data: {
+        id: NOTIFICATION_ID,
+        recipient_user_id: USER_ID,
+        read_at: '2026-08-13T00:00:00.000Z',
+        created_at: '2026-08-13T00:00:00.000Z',
+      },
+    });
+    from.mockReturnValueOnce(updateQuery).mockReturnValueOnce(existingQuery);
+
+    const result = await service.markRead(NOTIFICATION_ID, user());
+
+    expect(updateQuery.is).toHaveBeenCalledWith('read_at', null);
+    expect(existingQuery.eq).toHaveBeenCalledWith('id', NOTIFICATION_ID);
+    expect(existingQuery.eq).toHaveBeenCalledWith(
+      'recipient_user_id',
+      USER_ID,
+    );
+    expect(result.readAt).toBe('2026-08-13T00:00:00.000Z');
+    expect(gateway.emitToUser).not.toHaveBeenCalled();
+  });
+
+  it('updates only supplied preference booleans', async () => {
+    const preferencesQuery = query({
+      data: {
+        user_id: USER_ID,
+        in_app_enabled: false,
+        email_enabled: true,
+        preferences: {},
+        updated_at: '2026-08-13T00:00:00.000Z',
+      },
+    });
+    from.mockReturnValueOnce(preferencesQuery);
+
+    await service.updatePreferences({ emailEnabled: true }, user());
+
+    expect(preferencesQuery.upsert).toHaveBeenCalledWith(
+      {
+        user_id: USER_ID,
+        email_enabled: true,
+        updated_by: USER_ID,
+      },
+      { onConflict: 'user_id' },
     );
   });
 

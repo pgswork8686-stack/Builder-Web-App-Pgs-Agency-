@@ -166,6 +166,25 @@ describe('Phase 7 notifications chat automation API (e2e)', () => {
     expect(notificationsService.updatePreferences).not.toHaveBeenCalled();
   });
 
+  it('rejects unknown notification preference fields before service call', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/v1/notifications/preferences')
+      .set(authorized())
+      .send({ preferences: { redirect: 'https://example.com' } })
+      .expect(400);
+
+    expect(notificationsService.updatePreferences).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid notification identifiers before service call', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/v1/notifications/not-a-uuid/read')
+      .set(authorized())
+      .expect(400);
+
+    expect(notificationsService.markRead).not.toHaveBeenCalled();
+  });
+
   it('keeps automation management admin-only', async () => {
     currentRole = 'employee';
     await request(app.getHttpServer())

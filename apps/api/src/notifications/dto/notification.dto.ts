@@ -4,6 +4,13 @@ const InternalActionUrlSchema = z
   .string()
   .trim()
   .regex(/^\/app\/[A-Za-z0-9/_?=&.#-]*$/)
+  .refine((value) => {
+    const url = new URL(value, 'https://notifications.internal');
+    return (
+      url.origin === 'https://notifications.internal' &&
+      url.pathname.startsWith('/app/')
+    );
+  })
   .optional()
   .nullable();
 
@@ -21,7 +28,6 @@ export const NotificationPreferencesUpdateSchema = z
   .object({
     inAppEnabled: z.boolean().optional(),
     emailEnabled: z.boolean().optional(),
-    preferences: z.record(z.unknown()).optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

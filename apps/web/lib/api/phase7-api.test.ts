@@ -19,7 +19,6 @@ describe("Phase 7 API clients", () => {
     notificationsApi.updatePreferences({
       inAppEnabled: true,
       emailEnabled: false,
-      preferences: { chat: true },
     });
 
     expect(requestMock).toHaveBeenNthCalledWith(
@@ -39,7 +38,6 @@ describe("Phase 7 API clients", () => {
         body: JSON.stringify({
           inAppEnabled: true,
           emailEnabled: false,
-          preferences: { chat: true },
         }),
       },
     );

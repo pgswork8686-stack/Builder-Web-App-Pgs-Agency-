@@ -95,8 +95,6 @@ export function NotificationsCenter() {
     try {
       const updated = await notificationsApi.updatePreferences({
         inAppEnabled: !preferences.inAppEnabled,
-        emailEnabled: preferences.emailEnabled,
-        preferences: preferences.preferences,
       });
       setPreferences(updated);
     } catch (err) {
@@ -111,9 +109,7 @@ export function NotificationsCenter() {
     setSaving("preferences");
     try {
       const updated = await notificationsApi.updatePreferences({
-        inAppEnabled: preferences.inAppEnabled,
         emailEnabled: !preferences.emailEnabled,
-        preferences: preferences.preferences,
       });
       setPreferences(updated);
     } catch (err) {

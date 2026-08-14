@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bell, CheckCheck, Loader2, WifiOff } from "lucide-react";
 import { io, type Socket } from "socket.io-client";
 import { API_BASE_URL, getAccessToken } from "@/lib/api/client";
@@ -30,10 +30,13 @@ export function NotificationBell() {
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("connecting");
   const socketRef = useRef<Socket | null>(null);
+  const receivedNotificationIds = useRef(new Set<string>());
+  const handledReadIds = useRef(new Set<string>());
 
   const realtimeLabel = useMemo(() => {
     const labels: Record<ConnectionState, string> = {
@@ -45,28 +48,40 @@ export function NotificationBell() {
     return labels[connectionState];
   }, [connectionState]);
 
-  const reload = async () => {
-    const [list, count] = await Promise.all([
-      notificationsApi.list({ page: 1, pageSize: 6 }),
-      notificationsApi.unreadCount(),
-    ]);
-    setItems(list.items);
-    setUnreadCount(count.unreadCount);
-  };
+  const reload = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [list, count] = await Promise.all([
+        notificationsApi.list({ page: 1, pageSize: 6 }),
+        notificationsApi.unreadCount(),
+      ]);
+      list.items.forEach((item) => receivedNotificationIds.current.add(item.id));
+      setItems(list.items);
+      setUnreadCount(count.unreadCount);
+    } catch {
+      setItems([]);
+      setUnreadCount(0);
+      setError("Không thể tải thông báo. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const applyRead = useCallback((notification: NotificationItem) => {
+    if (handledReadIds.current.has(notification.id)) return;
+
+    handledReadIds.current.add(notification.id);
+    setItems((current) =>
+      current.map((item) => (item.id === notification.id ? notification : item)),
+    );
+    setUnreadCount((value) => Math.max(0, value - 1));
+  }, []);
 
   useEffect(() => {
     let disposed = false;
 
-    void reload()
-      .catch(() => {
-        if (!disposed) {
-          setItems([]);
-          setUnreadCount(0);
-        }
-      })
-      .finally(() => {
-        if (!disposed) setLoading(false);
-      });
+    void reload();
 
     void getAccessToken().then((token) => {
       if (disposed || !token) {
@@ -86,6 +101,9 @@ export function NotificationBell() {
       socket.on("disconnect", () => setConnectionState("reconnecting"));
       socket.on("connect_error", () => setConnectionState("reconnecting"));
       socket.on("notifications:new", (notification: NotificationItem) => {
+        if (receivedNotificationIds.current.has(notification.id)) return;
+
+        receivedNotificationIds.current.add(notification.id);
         setItems((current) =>
           [
             notification,
@@ -95,12 +113,7 @@ export function NotificationBell() {
         setUnreadCount((value) => value + 1);
       });
       socket.on("notifications:read", (notification: NotificationItem) => {
-        setItems((current) =>
-          current.map((item) =>
-            item.id === notification.id ? notification : item,
-          ),
-        );
-        setUnreadCount((value) => Math.max(0, value - 1));
+        applyRead(notification);
       });
       socket.on("notifications:read-all", () => {
         setItems((current) =>
@@ -118,17 +131,16 @@ export function NotificationBell() {
       socketRef.current?.disconnect();
       socketRef.current = null;
     };
-  }, []);
+  }, [applyRead, reload]);
 
   const markRead = async (notification: NotificationItem) => {
     if (notification.readAt) return;
     setBusyId(notification.id);
     try {
       const updated = await notificationsApi.markRead(notification.id);
-      setItems((current) =>
-        current.map((item) => (item.id === updated.id ? updated : item)),
-      );
-      setUnreadCount((value) => Math.max(0, value - 1));
+      applyRead(updated);
+    } catch {
+      setError("Không thể đánh dấu thông báo đã đọc. Vui lòng thử lại.");
     } finally {
       setBusyId(null);
     }
@@ -145,6 +157,8 @@ export function NotificationBell() {
         })),
       );
       setUnreadCount(0);
+    } catch {
+      setError("Không thể đánh dấu tất cả thông báo đã đọc. Vui lòng thử lại.");
     } finally {
       setBusyId(null);
     }
@@ -202,7 +216,21 @@ export function NotificationBell() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {loading ? (
+            {error ? (
+              <div
+                role="alert"
+                className="px-4 py-6 text-center text-sm text-red-300"
+              >
+                <p>{error}</p>
+                <button
+                  type="button"
+                  onClick={() => void reload()}
+                  className="mt-3 rounded-lg border border-[#FFC400]/20 px-2.5 py-1.5 text-xs font-semibold text-[#FFC400]"
+                >
+                  Thử lại
+                </button>
+              </div>
+            ) : loading ? (
               <div className="flex items-center justify-center gap-2 px-4 py-8 text-sm text-[#606060]">
                 <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
                 Đang tải thông báo...

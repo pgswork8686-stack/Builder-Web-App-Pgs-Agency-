@@ -79,7 +79,6 @@ export const notificationsApi = {
     payload: Partial<{
       inAppEnabled: boolean;
       emailEnabled: boolean;
-      preferences: Record<string, unknown>;
     }>,
   ) {
     return request<NotificationPreferences>("/notifications/preferences", {
