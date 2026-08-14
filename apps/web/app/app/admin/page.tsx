@@ -105,8 +105,7 @@ export default function AdminDashboardPage() {
     loadAdminData();
   }, []);
 
-  const userName =
-    user?.fullName || user?.email?.split("@")[0] || "Quản trị viên";
+  const userName = user?.fullName || "Phùng Quốc Bảo";
 
   return (
     <div className="space-y-6">
@@ -203,6 +202,22 @@ export default function AdminDashboardPage() {
 
       {/* 5-Metric Row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <Link href="/app/admin/clients">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Khách hàng
+              </p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.clientCount}
+              </p>
+            </div>
+          </Card>
+        </Link>
+
         <Link href="/app/admin/projects">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -228,22 +243,6 @@ export default function AdminDashboardPage() {
               </p>
               <p className="text-lg font-black text-[#24304A] tracking-tight">
                 {stats.taskCount}
-              </p>
-            </div>
-          </Card>
-        </Link>
-
-        <Link href="/app/admin/clients">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Briefcase className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">
-                Khách hàng
-              </p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
-                {stats.clientCount}
               </p>
             </div>
           </Card>

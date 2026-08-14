@@ -79,6 +79,10 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
   };
 
   const roleTitle = account.role ? ROLE_LABELS[account.role] : "Người dùng";
+  const displayName =
+    account.role === "admin"
+      ? "Phùng Quốc Bảo"
+      : roleTitle.split("(")[0].trim();
 
   return (
     <header className="h-16 border-b border-[#EDF2F7] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
@@ -128,10 +132,10 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
-            <Avatar name={roleTitle} size="sm" />
+            <Avatar name={displayName} size="sm" />
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-bold text-[#24304A] tracking-tight truncate max-w-[130px]">
-                {roleTitle.split("(")[0].trim()}
+                {displayName}
               </span>
               <span className="text-[10px] text-[#13DEB9] font-medium">
                 Trực tuyến
@@ -145,7 +149,7 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
             <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#EDF2F7] p-2 text-[#24304A] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="p-3 border-b border-[#EDF2F7]">
                 <p className="text-xs font-bold text-[#24304A] tracking-tight truncate">
-                  {roleTitle}
+                  {displayName}
                 </p>
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <Badge variant="blue" size="sm">
