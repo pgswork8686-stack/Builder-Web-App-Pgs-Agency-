@@ -170,7 +170,8 @@ export function NotificationsCenter() {
                   Luồng thông báo của bạn
                 </h2>
                 <p className="text-xs text-[#64748B]">
-                  Dữ liệu được phân trang từ database, scope theo tài khoản hiện tại.
+                  Dữ liệu được phân trang từ database, scope theo tài khoản hiện
+                  tại.
                 </p>
               </div>
             </div>
@@ -218,7 +219,9 @@ export function NotificationsCenter() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <h3 className="font-bold text-sm text-[#0F172A]">{item.title}</h3>
+                          <h3 className="font-bold text-sm text-[#0F172A]">
+                            {item.title}
+                          </h3>
                           <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">
                             {item.message}
                           </p>
@@ -293,7 +296,9 @@ export function NotificationsCenter() {
                 <Settings className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-[#0F172A] text-sm">Tùy chọn nhận tin</h2>
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Tùy chọn nhận tin
+                </h2>
                 <p className="text-[11px] text-[#64748B]">
                   Preferences quản lý thông qua Nest API.
                 </p>
@@ -315,7 +320,10 @@ export function NotificationsCenter() {
                     Áp dụng cho bell, center và realtime.
                   </span>
                 </span>
-                <Badge variant={preferences?.inAppEnabled ? "success" : "default"} size="sm">
+                <Badge
+                  variant={preferences?.inAppEnabled ? "success" : "default"}
+                  size="sm"
+                >
                   {preferences?.inAppEnabled ? "Bật" : "Tắt"}
                 </Badge>
               </button>
@@ -334,7 +342,10 @@ export function NotificationsCenter() {
                     Placeholder preference cho email.
                   </span>
                 </span>
-                <Badge variant={preferences?.emailEnabled ? "success" : "default"} size="sm">
+                <Badge
+                  variant={preferences?.emailEnabled ? "success" : "default"}
+                  size="sm"
+                >
                   {preferences?.emailEnabled ? "Bật" : "Tắt"}
                 </Badge>
               </button>
@@ -342,7 +353,9 @@ export function NotificationsCenter() {
           </Card>
 
           <Card className="p-6 space-y-3">
-            <h2 className="font-bold text-[#0F172A] text-sm">Đường dẫn nhanh</h2>
+            <h2 className="font-bold text-[#0F172A] text-sm">
+              Đường dẫn nhanh
+            </h2>
             <div className="grid gap-2">
               <Link
                 href="/app/chat"

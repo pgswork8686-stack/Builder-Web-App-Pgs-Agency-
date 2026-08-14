@@ -392,7 +392,9 @@ function Info({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex justify-between gap-4 border-b border-[#EDF2F7] pb-2">
       <dt className="text-[#64748B]">{label}</dt>
-      <dd className="break-all text-right font-semibold text-[#0F172A]">{value || "—"}</dd>
+      <dd className="break-all text-right font-semibold text-[#0F172A]">
+        {value || "—"}
+      </dd>
     </div>
   );
 }

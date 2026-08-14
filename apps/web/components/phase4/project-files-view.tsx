@@ -232,7 +232,10 @@ export function FileManager({
             </thead>
             <tbody className="divide-y divide-[#EDF2F7] text-[#0F172A]">
               {files.map((file) => (
-                <tr key={file.id} className="hover:bg-[#F8FAFC] transition-colors">
+                <tr
+                  key={file.id}
+                  className="hover:bg-[#F8FAFC] transition-colors"
+                >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
                       <FileText className="h-4 w-4 text-[#4F75FF]" />

@@ -190,7 +190,8 @@ export default function UserProfilePage() {
 
                 {!orgContext.companies || orgContext.companies.length === 0 ? (
                   <div className="text-center py-8 text-xs text-[#94A3B8]">
-                    Tài khoản của bạn chưa được liên kết với doanh nghiệp khách hàng nào.
+                    Tài khoản của bạn chưa được liên kết với doanh nghiệp khách
+                    hàng nào.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
@@ -241,7 +242,8 @@ export default function UserProfilePage() {
 
                 {!orgContext?.employee ? (
                   <div className="text-center py-8 text-xs text-[#94A3B8]">
-                    Chưa có hồ sơ nhân sự (employee profile). Vui lòng liên hệ Quản trị viên để khởi tạo mã nhân sự.
+                    Chưa có hồ sơ nhân sự (employee profile). Vui lòng liên hệ
+                    Quản trị viên để khởi tạo mã nhân sự.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -309,7 +311,8 @@ export default function UserProfilePage() {
                         variant={
                           orgContext.employee.employmentStatus === "active"
                             ? "success"
-                            : orgContext.employee.employmentStatus === "probation"
+                            : orgContext.employee.employmentStatus ===
+                                "probation"
                               ? "gold"
                               : "default"
                         }
@@ -319,7 +322,8 @@ export default function UserProfilePage() {
                           ? "Chính thức"
                           : orgContext.employee.employmentStatus === "probation"
                             ? "Thử việc"
-                            : orgContext.employee.employmentStatus === "on_leave"
+                            : orgContext.employee.employmentStatus ===
+                                "on_leave"
                               ? "Nghỉ phép"
                               : "Nghỉ việc"}
                       </Badge>

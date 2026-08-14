@@ -279,7 +279,13 @@ export default function AdminPeopleDirectoryPage() {
 
                     <TableCell>
                       <Badge
-                        variant={person.role === "admin" ? "gold" : person.role ? "blue" : "default"}
+                        variant={
+                          person.role === "admin"
+                            ? "gold"
+                            : person.role
+                              ? "blue"
+                              : "default"
+                        }
                         size="sm"
                       >
                         {person.role ? person.role.toUpperCase() : "CHƯA GÁN"}

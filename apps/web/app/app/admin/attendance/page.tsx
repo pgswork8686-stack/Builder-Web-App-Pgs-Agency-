@@ -25,7 +25,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@/components/ui/table";
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -49,7 +57,9 @@ export default function AdminAttendancePage() {
   const pageSize = 15;
 
   // Correction Adjustment Form States
-  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(
+    null,
+  );
   const [adjustCheckIn, setAdjustCheckIn] = useState("");
   const [adjustCheckOut, setAdjustCheckOut] = useState("");
   const [adjustStatus, setAdjustStatus] = useState("");
@@ -132,7 +142,9 @@ export default function AdminAttendancePage() {
 
       await attendanceApi.adjustRecord(selectedRecord.id, {
         checkInAt: adjustCheckIn ? new Date(adjustCheckIn).toISOString() : null,
-        checkOutAt: adjustCheckOut ? new Date(adjustCheckOut).toISOString() : null,
+        checkOutAt: adjustCheckOut
+          ? new Date(adjustCheckOut).toISOString()
+          : null,
         status: adjustStatus,
         reason: adjustReason,
       });
@@ -167,7 +179,11 @@ export default function AdminAttendancePage() {
         badge="Chấm công & Chốt lương"
         action={
           <Link href="/app/admin">
-            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
               Quay lại
             </Button>
           </Link>
@@ -328,7 +344,9 @@ export default function AdminAttendancePage() {
                   <TableHeaderCell>Giờ ra</TableHeaderCell>
                   <TableHeaderCell>Thời lượng</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Hiệu chỉnh</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Hiệu chỉnh
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>

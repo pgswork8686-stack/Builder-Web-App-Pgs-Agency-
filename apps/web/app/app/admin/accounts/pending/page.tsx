@@ -203,7 +203,9 @@ export default function AdminPendingAccountsPage() {
 
         <div className="text-xs text-[#64748B] hidden sm:block">
           Hiển thị:{" "}
-          <span className="font-bold text-[#0F172A]">{filteredUsers.length}</span>{" "}
+          <span className="font-bold text-[#0F172A]">
+            {filteredUsers.length}
+          </span>{" "}
           tài khoản
         </div>
       </div>
@@ -264,7 +266,9 @@ export default function AdminPendingAccountsPage() {
 
                     <TableCell>
                       <Badge variant="gold" size="sm">
-                        {user.accountStatus ? user.accountStatus.toUpperCase() : "PENDING"}
+                        {user.accountStatus
+                          ? user.accountStatus.toUpperCase()
+                          : "PENDING"}
                       </Badge>
                     </TableCell>
 

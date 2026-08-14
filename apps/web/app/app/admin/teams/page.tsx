@@ -198,9 +198,7 @@ export default function AdminTeamsPage() {
         isActive: editingTeam.is_active,
       });
 
-      setTeams((prev) =>
-        prev.map((t) => (t.id === updated.id ? updated : t)),
-      );
+      setTeams((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
       setEditingTeam(null);
     } catch (err: any) {
       setFormError(err.message || "Cập nhật đội nhóm thất bại");
@@ -229,7 +227,11 @@ export default function AdminTeamsPage() {
         action={
           <div className="flex items-center gap-3">
             <Link href="/app/admin/organization">
-              <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
+              >
                 Cơ cấu tổ chức
               </Button>
             </Link>
@@ -324,20 +326,28 @@ export default function AdminTeamsPage() {
                   <TableHeaderCell>Phòng ban trực thuộc</TableHeaderCell>
                   <TableHeaderCell>Trưởng nhóm</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Thao tác</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Thao tác
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filteredTeams.map((team) => {
-                  const leader = leaders.find((l) => l.id === team.leader_user_id);
-                  const dept = departments.find((d) => d.id === team.department_id);
+                  const leader = leaders.find(
+                    (l) => l.id === team.leader_user_id,
+                  );
+                  const dept = departments.find(
+                    (d) => d.id === team.department_id,
+                  );
                   return (
                     <TableRow key={team.id}>
                       <TableCell className="font-mono font-bold text-[#4F75FF]">
                         {team.code}
                       </TableCell>
                       <TableCell>
-                        <div className="font-bold text-[#0F172A]">{team.name}</div>
+                        <div className="font-bold text-[#0F172A]">
+                          {team.name}
+                        </div>
                         {team.description && (
                           <div className="text-[11px] text-[#64748B] line-clamp-1">
                             {team.description}
@@ -349,7 +359,9 @@ export default function AdminTeamsPage() {
                       </TableCell>
                       <TableCell className="text-xs text-[#64748B]">
                         {leader?.fullName || (
-                          <span className="text-[#94A3B8] italic">Chưa chỉ định</span>
+                          <span className="text-[#94A3B8] italic">
+                            Chưa chỉ định
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>

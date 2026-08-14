@@ -29,7 +29,12 @@ export default function Home() {
 
         <div className="w-full pt-4 border-t border-[#EDF2F7] flex flex-col gap-3">
           <Link href="/auth/login" className="w-full">
-            <Button variant="primary" size="lg" className="w-full" rightIcon={<ArrowRight className="w-4 h-4" />}>
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full"
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+            >
               Truy cập Hệ thống
             </Button>
           </Link>

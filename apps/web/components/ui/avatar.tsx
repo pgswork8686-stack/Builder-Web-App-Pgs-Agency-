@@ -53,9 +53,7 @@ export function Avatar({
             onError={() => setImageError(true)}
           />
         ) : (
-          <span className="tracking-wider">
-            {getInitials(name)}
-          </span>
+          <span className="tracking-wider">{getInitials(name)}</span>
         )}
       </div>
 

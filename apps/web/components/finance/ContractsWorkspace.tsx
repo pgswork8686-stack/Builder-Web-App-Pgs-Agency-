@@ -311,7 +311,11 @@ export default function ContractsWorkspace({
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance`}>
-              <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ChevronLeft className="w-4 h-4" />}
+              >
                 Quay lại
               </Button>
             </Link>
@@ -440,7 +444,9 @@ export default function ContractsWorkspace({
                   <TableHeaderCell>Giá trị</TableHeaderCell>
                   <TableHeaderCell>Hiệu lực</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Thao tác</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Thao tác
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -496,7 +502,9 @@ export default function ContractsWorkspace({
                             <Edit2 className="w-4 h-4" />
                           </Button>
                         )}
-                        <Link href={`${roleBasePath}/finance/contracts/${c.id}`}>
+                        <Link
+                          href={`${roleBasePath}/finance/contracts/${c.id}`}
+                        >
                           <Button
                             variant="ghost"
                             size="sm"
@@ -517,7 +525,11 @@ export default function ContractsWorkspace({
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
             <span>
-              Hiển thị <span className="font-bold text-[#0F172A]">{contracts.length}</span> / {total} hợp đồng
+              Hiển thị{" "}
+              <span className="font-bold text-[#0F172A]">
+                {contracts.length}
+              </span>{" "}
+              / {total} hợp đồng
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -550,7 +562,11 @@ export default function ContractsWorkspace({
           isOpen={showForm}
           onClose={() => setShowForm(false)}
           maxWidth="lg"
-          title={editingContract ? `Sửa hợp đồng: ${editingContract.contract_number}` : "Tạo hợp đồng mới"}
+          title={
+            editingContract
+              ? `Sửa hợp đồng: ${editingContract.contract_number}`
+              : "Tạo hợp đồng mới"
+          }
           description="Thiết lập thông tin pháp lý, đối tác khách hàng và giá trị hợp đồng."
         >
           <form onSubmit={handleSaveContract} className="space-y-4 pt-2">
@@ -562,7 +578,8 @@ export default function ContractsWorkspace({
 
             {editingContract && editingContract.status !== "draft" && (
               <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                Hợp đồng này đã kích hoạt. Bạn chỉ có thể sửa đổi Ghi chú và Chế độ hiển thị khách hàng.
+                Hợp đồng này đã kích hoạt. Bạn chỉ có thể sửa đổi Ghi chú và Chế
+                độ hiển thị khách hàng.
               </div>
             )}
 
@@ -574,7 +591,9 @@ export default function ContractsWorkspace({
                 <input
                   type="text"
                   required
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   placeholder="VD: HD-2026-001"
                   value={formContractNumber}
                   onChange={(e) => setFormContractNumber(e.target.value)}
@@ -588,7 +607,9 @@ export default function ContractsWorkspace({
                 </label>
                 <select
                   required
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   value={formClientCompanyId}
                   onChange={(e) => {
                     setFormClientCompanyId(e.target.value);
@@ -613,7 +634,9 @@ export default function ContractsWorkspace({
               <input
                 type="text"
                 required
-                disabled={editingContract ? editingContract.status !== "draft" : false}
+                disabled={
+                  editingContract ? editingContract.status !== "draft" : false
+                }
                 placeholder="VD: Hợp đồng cung cấp dịch vụ Digital Marketing"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
@@ -627,7 +650,9 @@ export default function ContractsWorkspace({
                   Dự án liên kết
                 </label>
                 <select
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   value={formProjectId}
                   onChange={(e) => setFormProjectId(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
@@ -649,7 +674,11 @@ export default function ContractsWorkspace({
                   <input
                     type="number"
                     required
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     placeholder="VD: 50000000"
                     value={formContractValue}
                     onChange={(e) => setFormContractValue(e.target.value)}
@@ -662,7 +691,11 @@ export default function ContractsWorkspace({
                   </label>
                   <select
                     required
-                    disabled={editingContract ? editingContract.status !== "draft" : false}
+                    disabled={
+                      editingContract
+                        ? editingContract.status !== "draft"
+                        : false
+                    }
                     value={formCurrencyCode}
                     onChange={(e) => setFormCurrencyCode(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
@@ -683,7 +716,9 @@ export default function ContractsWorkspace({
                 <input
                   type="date"
                   required
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   value={formStartDate}
                   onChange={(e) => setFormStartDate(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
@@ -696,7 +731,9 @@ export default function ContractsWorkspace({
                 </label>
                 <input
                   type="date"
-                  disabled={editingContract ? editingContract.status !== "draft" : false}
+                  disabled={
+                    editingContract ? editingContract.status !== "draft" : false
+                  }
                   value={formEndDate}
                   onChange={(e) => setFormEndDate(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"

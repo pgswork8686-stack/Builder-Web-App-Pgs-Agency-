@@ -206,15 +206,35 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
     switch (status) {
       case "draft":
-        return <Badge variant="gold" size="sm">Nháp</Badge>;
+        return (
+          <Badge variant="gold" size="sm">
+            Nháp
+          </Badge>
+        );
       case "issued":
-        return <Badge variant="blue" size="sm">Đã phát hành</Badge>;
+        return (
+          <Badge variant="blue" size="sm">
+            Đã phát hành
+          </Badge>
+        );
       case "partially_paid":
-        return <Badge variant="gold" size="sm">Thanh toán một phần</Badge>;
+        return (
+          <Badge variant="gold" size="sm">
+            Thanh toán một phần
+          </Badge>
+        );
       case "paid":
-        return <Badge variant="success" size="sm">Đã thanh toán</Badge>;
+        return (
+          <Badge variant="success" size="sm">
+            Đã thanh toán
+          </Badge>
+        );
       case "cancelled":
-        return <Badge variant="default" size="sm">Đã hủy</Badge>;
+        return (
+          <Badge variant="default" size="sm">
+            Đã hủy
+          </Badge>
+        );
       default:
         return null;
     }
@@ -239,7 +259,9 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
           Hóa đơn không tồn tại hoặc bạn không có quyền truy cập.
         </p>
         <Link href={`${roleBasePath}/finance/invoices`}>
-          <Button variant="secondary" size="sm">Quay lại danh sách</Button>
+          <Button variant="secondary" size="sm">
+            Quay lại danh sách
+          </Button>
         </Link>
       </div>
     );
@@ -276,7 +298,11 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance/invoices`}>
-              <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ChevronLeft className="w-4 h-4" />}
+              >
                 Quay lại
               </Button>
             </Link>
@@ -527,9 +553,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 variant={invoice.client_visible ? "outline" : "primary"}
                 size="sm"
                 disabled={transitioning}
-                onClick={() =>
-                  triggerToggleVisibility(invoice.client_visible)
-                }
+                onClick={() => triggerToggleVisibility(invoice.client_visible)}
               >
                 {invoice.client_visible ? "Ẩn đi" : "Hiển thị"}
               </Button>
@@ -589,7 +613,9 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 onChange={(e) => setPayMethod(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               >
-                <option value="Chuyển khoản ngân hàng">Chuyển khoản ngân hàng</option>
+                <option value="Chuyển khoản ngân hàng">
+                  Chuyển khoản ngân hàng
+                </option>
                 <option value="Tiền mặt">Tiền mặt</option>
                 <option value="Thẻ tín dụng">Thẻ tín dụng</option>
               </select>

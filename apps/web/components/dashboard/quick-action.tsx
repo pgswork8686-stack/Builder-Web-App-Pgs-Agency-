@@ -35,9 +35,7 @@ export function QuickActionGrid({
         <Link key={item.href + item.title} href={item.href}>
           <Card
             className={`h-full p-5 transition-all duration-150 hover:border-[#4F75FF]/40 hover:shadow-md group flex flex-col justify-between ${
-              item.highlight
-                ? "bg-[#EEF2FF]/40 border-[#E0EAFF]"
-                : "bg-white"
+              item.highlight ? "bg-[#EEF2FF]/40 border-[#E0EAFF]" : "bg-white"
             }`}
           >
             <div className="space-y-3">

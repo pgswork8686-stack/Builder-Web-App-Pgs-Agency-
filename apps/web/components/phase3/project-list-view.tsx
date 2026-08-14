@@ -31,7 +31,10 @@ type Mode = "admin" | "internal" | "client";
 
 const statusConfig: Record<
   ProjectStatus,
-  { label: string; variant: "blue" | "success" | "warning" | "default" | "danger" }
+  {
+    label: string;
+    variant: "blue" | "success" | "warning" | "default" | "danger";
+  }
 > = {
   draft: { label: "Nháp", variant: "default" },
   active: { label: "Đang chạy", variant: "blue" },
@@ -87,7 +90,9 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       setResult(data);
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "Không thể tải danh sách dự án.",
+        caught instanceof Error
+          ? caught.message
+          : "Không thể tải danh sách dự án.",
       );
     } finally {
       setLoading(false);
@@ -295,7 +300,8 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       {result.totalPages > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
           <span>
-            Hiển thị trang {result.page} / {result.totalPages} ({result.total} dự án)
+            Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
+            dự án)
           </span>
           <div className="flex items-center gap-2">
             <Button

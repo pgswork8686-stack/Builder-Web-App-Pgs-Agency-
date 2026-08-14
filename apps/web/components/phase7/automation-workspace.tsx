@@ -311,7 +311,9 @@ export function AutomationWorkspace() {
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-[#0F172A] text-sm">Tạo quy tắc mới</h2>
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Tạo quy tắc mới
+                </h2>
                 <p className="text-[11px] text-[#64748B]">
                   Hành động chuẩn hóa: `create_notification`.
                 </p>
@@ -426,7 +428,9 @@ export function AutomationWorkspace() {
                 disabled={working === "create" || name.trim().length < 2}
                 onClick={createRule}
               >
-                {working === "create" ? "Đang tạo quy tắc..." : "Tạo quy tắc mới"}
+                {working === "create"
+                  ? "Đang tạo quy tắc..."
+                  : "Tạo quy tắc mới"}
               </Button>
             </div>
           </Card>
@@ -434,7 +438,9 @@ export function AutomationWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center gap-2.5">
               <Play className="h-4 w-4 text-[#4F75FF]" />
-              <h2 className="font-bold text-[#0F172A] text-sm">Chạy thử nghiệm</h2>
+              <h2 className="font-bold text-[#0F172A] text-sm">
+                Chạy thử nghiệm
+              </h2>
             </div>
             <div className="space-y-2 pt-1">
               <Button
@@ -517,7 +523,9 @@ export function AutomationWorkspace() {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
               <div>
-                <h2 className="font-extrabold text-[#0F172A] text-sm">Danh sách quy tắc</h2>
+                <h2 className="font-extrabold text-[#0F172A] text-sm">
+                  Danh sách quy tắc
+                </h2>
                 <p className="text-[11px] text-[#64748B]">
                   Đảm bảo Idempotency và cách ly lỗi an toàn.
                 </p>
@@ -541,7 +549,9 @@ export function AutomationWorkspace() {
                   <article key={rule.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="font-bold text-sm text-[#0F172A]">{rule.name}</h3>
+                        <h3 className="font-bold text-sm text-[#0F172A]">
+                          {rule.name}
+                        </h3>
                         <div className="mt-1.5 flex flex-wrap gap-2">
                           <Badge variant="blue" size="sm">
                             {rule.triggerType}
@@ -549,7 +559,10 @@ export function AutomationWorkspace() {
                           <Badge variant="default" size="sm">
                             {rule.actionType}
                           </Badge>
-                          <Badge variant={rule.isEnabled ? "success" : "default"} size="sm">
+                          <Badge
+                            variant={rule.isEnabled ? "success" : "default"}
+                            size="sm"
+                          >
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
                           </Badge>
                         </div>
@@ -585,7 +598,9 @@ export function AutomationWorkspace() {
 
           <Card className="p-6 space-y-4">
             <div className="border-b border-[#EDF2F7] pb-3">
-              <h2 className="font-extrabold text-[#0F172A] text-sm">Lịch sử thực thi</h2>
+              <h2 className="font-extrabold text-[#0F172A] text-sm">
+                Lịch sử thực thi
+              </h2>
               <p className="text-[11px] text-[#64748B]">
                 Ghi nhận chi tiết kết quả chạy tự động.
               </p>
@@ -597,7 +612,10 @@ export function AutomationWorkspace() {
                 </div>
               ) : (
                 executions.map((execution) => (
-                  <article key={execution.id} className="py-3 first:pt-0 last:pb-0">
+                  <article
+                    key={execution.id}
+                    className="py-3 first:pt-0 last:pb-0"
+                  >
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="font-bold text-xs text-[#0F172A]">

@@ -4,331 +4,257 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Clock,
+  CalendarDays,
+  CheckCircle2,
+  ListTodo,
+  AlertTriangle,
+  ArrowRight,
+  Sparkles,
   Calendar,
   FolderKanban,
-  CheckCircle2,
+  FileText,
+  UserCheck,
   ChevronRight,
-  TrendingUp,
+  PlusCircle,
 } from "lucide-react";
+import { getMe, type UserPayload } from "@/lib/api/auth";
 import { attendanceApi } from "@/lib/api/attendance";
 import { leaveApi } from "@/lib/api/leave";
+import { projectsApi } from "@/lib/api/projects";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function EmployeeDashboardPage() {
+  const [user, setUser] = useState<UserPayload | null>(null);
   const [checkedInTime, setCheckedInTime] = useState<string | null>(null);
   const [leaveDaysRemaining, setLeaveDaysRemaining] = useState<number>(0);
+  const [taskCount, setTaskCount] = useState(0);
+  const [projectCount, setProjectCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [attSum, leaveBalances] = await Promise.all([
+        const [meRes, attSum, leaveBalances, projRes] = await Promise.allSettled([
+          getMe(),
           attendanceApi.getSummary(),
           leaveApi.getMyBalances(),
+          projectsApi.getInternalProjects(1, 6),
         ]);
-        if (attSum?.today?.checkInAt) {
+
+        if (meRes.status === "fulfilled") setUser(meRes.value.user);
+        if (attSum.status === "fulfilled" && attSum.value?.today?.checkInAt) {
           setCheckedInTime(
-            new Date(attSum.today.checkInAt).toLocaleTimeString("vi-VN", {
+            new Date(attSum.value.today.checkInAt).toLocaleTimeString("vi-VN", {
               hour: "2-digit",
               minute: "2-digit",
             }),
           );
         }
-        if (leaveBalances?.length) {
-          const totalRemaining = leaveBalances.reduce(
+        if (leaveBalances.status === "fulfilled" && leaveBalances.value?.length) {
+          const totalRemaining = leaveBalances.value.reduce(
             (acc, b) => acc + (b.allocated_days - b.used_days),
             0,
           );
           setLeaveDaysRemaining(totalRemaining);
         }
+        if (projRes.status === "fulfilled") {
+          setProjectCount(projRes.value.total || 0);
+        }
       } catch {
-        // Fallback initial
+        // Safe load
+      } finally {
+        setLoading(false);
       }
     }
     loadData();
   }, []);
 
+  const userName = user?.fullName || user?.email?.split("@")[0] || "Bạn";
+
   return (
     <div className="space-y-6">
-      {/* Top Greeting */}
+      {/* Top Greeting Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
-            Chào Nhân viên (Employee Dashboard)
+          <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
+            Chào {userName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
-            Tập trung vào công việc hôm nay, deadline, chấm công và phản hồi từ quản lý.
+          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+            Không gian làm việc cá nhân, quản lý nhiệm vụ và lịch trình hôm nay.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-[#64748B] px-3 py-1.5 rounded-full bg-white border border-[#E2E8F0] shadow-2xs">
-            Hôm nay
-          </span>
+          <Link href="/app/attendance">
+            <Button
+              variant={checkedInTime ? "secondary" : "primary"}
+              size="sm"
+              leftIcon={<Clock className="w-4 h-4" />}
+            >
+              {checkedInTime ? `Đã check-in (${checkedInTime})` : "Chấm công GPS"}
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Main Banner + Mini KPI Cards */}
+      {/* Main Hero + 2 Mini KPI Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Banner */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#FEF9C3] border border-[#FEF08A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+        {/* Banner: Bạn có X công việc hôm nay */}
+        <div className="lg:col-span-6 rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-              Bạn có 8 công việc hôm nay
+            <h2 className="text-xl sm:text-2xl font-black text-[#24304A] tracking-tight">
+              Bạn có {taskCount} công việc hôm nay
             </h2>
-            <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
-              5 task đang thực hiện, 3 task chờ duyệt và 2 task cần chú ý hạn chót.
+            <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
+              Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng thái trên bảng Kanban.
             </p>
           </div>
 
-          <div className="pt-6">
-            <Link href="/app/projects">
-              <Button variant="gold" size="sm">
-                Mở danh sách việc
+          <div className="flex flex-wrap items-center gap-3 pt-6">
+            <Link href="/app/employee/tasks">
+              <Button variant="primary" size="sm">
+                Xem danh sách việc
+              </Button>
+            </Link>
+            <Link href="/app/leave">
+              <Button variant="secondary" size="sm" leftIcon={<CalendarDays className="w-4 h-4" />}>
+                Xin nghỉ phép
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Attendance Metric */}
+        {/* Chấm công Card */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#64748B]">Chấm công</span>
-            <div className="text-3xl font-black text-[#0F172A] mt-2 font-mono">
-              {checkedInTime || "08:17"}
+            <span className="text-xs font-bold text-[#7C879D]">Chấm công</span>
+            <div className="text-2xl font-black text-[#24304A] mt-2">
+              {checkedInTime || "Chưa check-in"}
             </div>
-            <span className="text-xs text-[#00D09C] font-semibold block mt-1">
-              Đã check-in
-            </span>
           </div>
-          <div className="mt-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6FBF5] text-[#00B788] text-xs font-bold border border-[#A7F3D0]">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Đang làm việc
-            </span>
-          </div>
+          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            {checkedInTime ? "Đúng giờ" : "Vui lòng chấm công trước 08:30"}
+          </span>
         </div>
 
-        {/* Leave Balance Metric */}
+        {/* Ngày phép còn Card */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#64748B]">
-              Ngày phép còn
-            </span>
-            <div className="flex items-baseline justify-between mt-2">
-              <span className="text-3xl font-black text-[#0F172A]">
-                {leaveDaysRemaining}
-              </span>
-              <div className="w-10 h-10 rounded-full bg-[#EEF2FF] text-[#4F75FF] font-bold text-xs flex items-center justify-center border border-[#E0EAFF]">
-                {leaveDaysRemaining}
-              </div>
+            <span className="text-xs font-bold text-[#7C879D]">Ngày phép còn</span>
+            <div className="text-3xl font-black text-[#24304A] mt-2">
+              {leaveDaysRemaining.toString().padStart(2, "0")}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#64748B] mt-4">
-            Đã dùng 4 ngày
+          <span className="text-xs font-bold text-[#FFC400] mt-4">
+            Ngày phép năm 2026
           </span>
         </div>
       </div>
 
-      {/* 5 Pastel KPI Counters Row matching Figma */}
+      {/* 5-Metric Row: Hôm nay, Đang làm, Chờ duyệt, Quá hạn, Dự án */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <StatCard
-          variant="blue"
-          title="Hôm nay"
-          value="08"
-          badge="CV"
-        />
-        <StatCard
-          variant="cyan"
-          title="Đang làm"
-          value="05"
-          badge="DL"
-        />
-        <StatCard
-          variant="gold"
-          title="Chờ duyệt"
-          value="03"
-          badge="DU"
-        />
-        <StatCard
-          variant="rose"
-          title="Quá hạn"
-          value="02"
-          badge="QH"
-        />
-        <StatCard
-          variant="green"
-          title="Dự án"
-          value="04"
-          badge="DA"
-        />
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Hôm nay</span>
+          <p className="text-2xl font-black text-[#24304A] mt-2">
+            {taskCount.toString().padStart(2, "0")}
+          </p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Đang làm</span>
+          <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
+          <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Quá hạn</span>
+          <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+        </Card>
+
+        <Card className="p-4 col-span-2 sm:col-span-1">
+          <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
+          <p className="text-2xl font-black text-[#24304A] mt-2">
+            {projectCount.toString().padStart(2, "0")}
+          </p>
+        </Card>
       </div>
 
-      {/* 2 Middle Columns: Today's Tasks & Today's Calendar */}
+      {/* Dual Section: Công việc hôm nay & Lịch hôm nay */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <Card className="lg:col-span-7 p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
-            <h3 className="text-base font-extrabold text-[#0F172A]">
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Công việc hôm nay
             </h3>
-            <Link
-              href="/app/projects"
-              className="text-xs font-bold text-[#4F75FF] hover:underline"
-            >
-              Xem tất cả
+            <Link href="/app/employee/tasks" className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1">
+              Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="divide-y divide-[#EDF2F7] text-xs">
-            <div className="grid grid-cols-12 pb-2 font-semibold text-[#64748B]">
-              <span className="col-span-5">Công việc</span>
-              <span className="col-span-3">Dự án</span>
-              <span className="col-span-2">Hạn</span>
-              <span className="col-span-2 text-right">Trạng thái</span>
-            </div>
-            {[
-              { title: "Thiết kế slide SOLMAX", proj: "SOLMAX", time: "10:30", status: "Đang làm", var: "blue" as const },
-              { title: "Tối ưu bài SEO Global Carb", proj: "Global Carb", time: "12:00", status: "Cần làm", var: "default" as const },
-              { title: "Cập nhật UI PGS Hub", proj: "PGS Hub", time: "15:00", status: "Chờ duyệt", var: "gold" as const },
-              { title: "Báo cáo công việc ngày", proj: "Nội bộ", time: "17:30", status: "Cần làm", var: "default" as const },
-              { title: "Bổ sung file nghiệm thu", proj: "PGS Website", time: "Hôm qua", status: "Quá hạn", var: "danger" as const },
-            ].map((t) => (
-              <div key={t.title} className="grid grid-cols-12 py-3 items-center">
-                <span className="col-span-5 font-bold text-[#0F172A] truncate">
-                  {t.title}
-                </span>
-                <span className="col-span-3 text-[#64748B] truncate">{t.proj}</span>
-                <span className="col-span-2 text-[#64748B]">{t.time}</span>
-                <div className="col-span-2 text-right">
-                  <Badge variant={t.var} size="sm">
-                    {t.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+          <Card className="p-6 text-center">
+            <EmptyState
+              icon={<ListTodo className="w-8 h-8 text-[#7C879D]" />}
+              title="Không có công việc nào cần xử lý gấp"
+              description="Bạn đã hoàn thành tất cả công việc hoặc chưa có task mới được giao."
+            />
+          </Card>
+        </div>
 
-        <Card className="lg:col-span-5 p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
-            <h3 className="text-base font-extrabold text-[#0F172A]">
+        <div className="lg:col-span-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Lịch hôm nay
             </h3>
-            <Link
-              href="/app/projects"
-              className="text-xs font-bold text-[#4F75FF] hover:underline"
-            >
-              Xem tất cả
-            </Link>
+            <span className="text-xs text-[#7C879D]">Tháng 8/2026</span>
           </div>
 
-          <div className="space-y-3">
-            {[
-              { num: "01", title: "Họp tiến độ PGS Hub", sub: "14:00 • Google Meet", tag: "Dự án" },
-              { num: "02", title: "Duyệt nội dung SOLMAX", sub: "16:00 • Manager", tag: "Duyệt" },
-              { num: "03", title: "Báo cáo cuối ngày", sub: "17:30 • Nội bộ", tag: "Cá nhân" },
-              { num: "04", title: "Đào tạo SOP SEO", sub: "04/08 • Phòng họp", tag: "Đào tạo" },
-            ].map((item) => (
-              <div
-                key={item.num}
-                className="flex items-center justify-between p-3 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7]"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-[#EEF2FF] text-[#4F75FF] font-mono font-bold text-xs flex items-center justify-center">
-                    {item.num}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#0F172A]">{item.title}</p>
-                    <p className="text-[11px] text-[#64748B]">{item.sub}</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-semibold text-[#64748B]">
-                  {item.tag}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
+          <Card className="p-4">
+            <p className="text-xs text-[#7C879D]">
+              Không có sự kiện hoặc cuộc họp nào được lên lịch hôm nay.
+            </p>
+          </Card>
+        </div>
       </div>
 
-      {/* 2 Bottom Columns: Notifications & Quick Actions */}
+      {/* Dual Section: Thông báo và phản hồi & Thao tác nhanh */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <Card className="lg:col-span-7 p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
-            <h3 className="text-base font-extrabold text-[#0F172A]">
-              Thông báo và phản hồi
-            </h3>
-            <Link
-              href="/app/notifications"
-              className="text-xs font-bold text-[#4F75FF] hover:underline"
-            >
-              Xem tất cả
+        <div className="lg:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Thông báo và phản hồi
+          </h3>
+          <Card className="p-4 space-y-2">
+            <div className="flex items-center gap-2 text-xs text-[#24304A]">
+              <span className="w-2 h-2 rounded-full bg-[#5D87FF]" />
+              <span>Chào mừng bạn đến với PGS Hub Workspace.</span>
+            </div>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Thao tác nhanh
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link href="/app/employee/tasks" className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:bg-[#E0EAFF] transition-all text-center block">
+              <span className="text-xs font-bold text-[#5D87FF]">Cập nhật tiến độ</span>
+            </Link>
+            <Link href="/app/employee/reports" className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] hover:bg-[#EEF2FF] transition-all text-center block">
+              <span className="text-xs font-bold text-[#24304A]">Gửi báo cáo ngày</span>
+            </Link>
+            <Link href="/app/leave" className="p-3 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] hover:bg-[#FEF08A] transition-all text-center block">
+              <span className="text-xs font-bold text-[#92400E]">Tạo đơn nghỉ phép</span>
             </Link>
           </div>
-
-          <div className="space-y-3">
-            {[
-              { num: "01", title: "Manager yêu cầu chỉnh sửa", sub: "Slide SOLMAX • 8 phút" },
-              { num: "02", title: "Khách hàng đã bình luận", sub: "Website PGS • 26 phút" },
-              { num: "03", title: "Tài liệu mới được phát hành", sub: "SOP báo cáo • 1 giờ" },
-            ].map((item) => (
-              <div
-                key={item.num}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7]"
-              >
-                <div className="w-7 h-7 rounded-lg bg-[#EEF2FF] text-[#4F75FF] font-mono font-bold text-xs flex items-center justify-center">
-                  {item.num}
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-[#0F172A]">{item.title}</p>
-                  <p className="text-[11px] text-[#64748B]">{item.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="lg:col-span-5 p-6 space-y-4">
-          <div className="border-b border-[#EDF2F7] pb-3">
-            <h3 className="text-base font-extrabold text-[#0F172A]">
-              Thao tác nhanh
-            </h3>
-          </div>
-
-          <div className="space-y-3">
-            <Link
-              href="/app/projects"
-              className="flex items-center justify-between p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:border-[#4F75FF]/40 transition-colors group"
-            >
-              <span className="text-xs font-bold text-[#4F75FF]">
-                Cập nhật tiến độ
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#4F75FF] group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            <Link
-              href="/app/attendance"
-              className="flex items-center justify-between p-3.5 rounded-2xl bg-[#E6FBF5] border border-[#A7F3D0] hover:border-[#00D09C]/40 transition-colors group"
-            >
-              <span className="text-xs font-bold text-[#00B788]">
-                Gửi báo cáo ngày
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#00B788] group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            <Link
-              href="/app/leave"
-              className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] hover:border-[#CA8A04]/40 transition-colors group"
-            >
-              <span className="text-xs font-bold text-[#A16207]">
-                Tạo đơn nghỉ phép
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#A16207] group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

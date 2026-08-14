@@ -34,7 +34,9 @@ export function AuthHero() {
               01
             </div>
             <div>
-              <h4 className="text-xs font-bold text-white">Dự án & công việc</h4>
+              <h4 className="text-xs font-bold text-white">
+                Dự án & công việc
+              </h4>
               <p className="text-[11px] text-white/80">
                 Theo dõi tiến độ và luồng duyệt
               </p>

@@ -129,7 +129,11 @@ export function ServiceCatalogView() {
         action={
           <div className="flex items-center gap-3">
             <Link href="/app/admin">
-              <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ArrowLeft className="h-4 w-4" />}
+              >
                 Quay lại
               </Button>
             </Link>
@@ -237,16 +241,30 @@ export function ServiceCatalogView() {
                 }
                 className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
               />
-              <label htmlFor="formServiceActive" className="text-xs text-[#0F172A] cursor-pointer select-none">
+              <label
+                htmlFor="formServiceActive"
+                className="text-xs text-[#0F172A] cursor-pointer select-none"
+              >
                 Đang kích hoạt sử dụng
               </label>
             </div>
 
             <div className="flex justify-end gap-2 md:col-span-2 pt-2 border-t border-[#EDF2F7]">
-              <Button type="button" variant="secondary" size="sm" onClick={resetForm}>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={resetForm}
+              >
                 Hủy
               </Button>
-              <Button type="submit" variant="primary" size="sm" disabled={saving} isLoading={saving}>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={saving}
+                isLoading={saving}
+              >
                 {editingId ? "Lưu thay đổi" : "Tạo dịch vụ"}
               </Button>
             </div>
@@ -285,11 +303,16 @@ export function ServiceCatalogView() {
                       <span className="text-xs font-mono font-bold text-[#4F75FF]">
                         {service.code}
                       </span>
-                      <Badge variant={service.active ? "success" : "default"} size="sm">
+                      <Badge
+                        variant={service.active ? "success" : "default"}
+                        size="sm"
+                      >
                         {service.active ? "Hoạt động" : "Đã tắt"}
                       </Badge>
                     </div>
-                    <h4 className="font-bold text-[#0F172A] text-sm mt-0.5">{service.name}</h4>
+                    <h4 className="font-bold text-[#0F172A] text-sm mt-0.5">
+                      {service.name}
+                    </h4>
                     <p className="mt-0.5 text-xs text-[#64748B]">
                       {service.description || "Chưa có mô tả."}
                     </p>

@@ -554,7 +554,9 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
                 <span className="text-[#64748B]">Ngày khởi động:</span>
-                <span className="text-[#0F172A]">{project.startDate || "—"}</span>
+                <span className="text-[#0F172A]">
+                  {project.startDate || "—"}
+                </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
                 <span className="text-[#64748B]">Hạn chót bàn giao:</span>

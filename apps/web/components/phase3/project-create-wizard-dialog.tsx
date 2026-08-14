@@ -315,7 +315,9 @@ export function ProjectCreateWizardDialog({
                 label="Ngày bắt đầu *"
                 type="date"
                 value={form.startDate}
-                onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, startDate: e.target.value })
+                }
               />
 
               <Input

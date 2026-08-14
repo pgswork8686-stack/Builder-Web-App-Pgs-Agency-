@@ -382,7 +382,7 @@ export default function EmployeeAttendancePage() {
               </TableHead>
               <TableBody>
                 {history.map((rec) => {
-                  const isLate = rec.status === 'late';
+                  const isLate = rec.status === "late";
                   const checkInTime = rec.check_in_at
                     ? new Date(rec.check_in_at).toLocaleTimeString("vi-VN", {
                         hour: "2-digit",

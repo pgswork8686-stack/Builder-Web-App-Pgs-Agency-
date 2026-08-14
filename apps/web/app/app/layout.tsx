@@ -131,7 +131,9 @@ export default function ProtectedAppLayout({
             Đang kiểm tra quyền truy cập...
           </p>
           {error ? (
-            <p className="mt-3 max-w-md text-xs text-red-600 font-semibold">{error}</p>
+            <p className="mt-3 max-w-md text-xs text-red-600 font-semibold">
+              {error}
+            </p>
           ) : null}
         </div>
       </div>

@@ -25,12 +25,7 @@ export function FinanceConfirmDialog({
   if (!isOpen) return null;
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onCancel}
-      maxWidth="md"
-      title={title}
-    >
+    <Dialog isOpen={isOpen} onClose={onCancel} maxWidth="md" title={title}>
       <div className="space-y-4 pt-2">
         <div className="flex items-start gap-3">
           <div

@@ -362,7 +362,9 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-bold text-[#0F172A] text-sm">Cuộc trò chuyện</h2>
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Cuộc trò chuyện
+                </h2>
                 <p className="mt-0.5 text-[11px] text-[#64748B]">
                   Danh sách theo quyền truy cập của bạn.
                 </p>
@@ -435,10 +437,13 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center gap-2.5">
               <UserPlus className="h-4 w-4 text-[#4F75FF]" />
-              <h2 className="font-bold text-[#0F172A] text-sm">Mở direct chat</h2>
+              <h2 className="font-bold text-[#0F172A] text-sm">
+                Mở direct chat
+              </h2>
             </div>
             <p className="text-xs text-[#64748B]">
-              Direct chat chỉ dành cho nhân sự nội bộ (Admin, Leader, Employee, Accountant).
+              Direct chat chỉ dành cho nhân sự nội bộ (Admin, Leader, Employee,
+              Accountant).
             </p>
             <div className="space-y-2 pt-1">
               <input
@@ -452,7 +457,9 @@ export function ChatWorkspace() {
                 variant="primary"
                 size="sm"
                 className="w-full"
-                disabled={isClient || working === "direct" || !peerUserId.trim()}
+                disabled={
+                  isClient || working === "direct" || !peerUserId.trim()
+                }
                 onClick={createDirect}
               >
                 {working === "direct" ? "Đang mở..." : "Mở direct chat"}
@@ -463,7 +470,9 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center gap-2.5">
               <FolderOpen className="h-4 w-4 text-[#4F75FF]" />
-              <h2 className="font-bold text-[#0F172A] text-sm">Mở project chat</h2>
+              <h2 className="font-bold text-[#0F172A] text-sm">
+                Mở project chat
+              </h2>
             </div>
             <p className="text-xs text-[#64748B]">
               Hệ thống xác thực quyền tham gia dự án trước khi mở phòng chat.
@@ -496,7 +505,9 @@ export function ChatWorkspace() {
               </div>
               <div>
                 <h2 className="font-bold text-[#0F172A] text-sm">
-                  {selected ? conversationTitle(selected) : "Chưa chọn cuộc trò chuyện"}
+                  {selected
+                    ? conversationTitle(selected)
+                    : "Chưa chọn cuộc trò chuyện"}
                 </h2>
                 <p className="text-[11px] text-[#64748B]">
                   {selected
@@ -552,7 +563,8 @@ export function ChatWorkspace() {
 
                 {messages.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-[#CBD5E1] p-8 text-center text-xs text-[#94A3B8]">
-                    Chưa có tin nhắn. Tin nhắn hỗ trợ plain text, tối đa 4000 ký tự.
+                    Chưa có tin nhắn. Tin nhắn hỗ trợ plain text, tối đa 4000 ký
+                    tự.
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -613,9 +625,7 @@ export function ChatWorkspace() {
                   setDraft(event.target.value.slice(0, 4000))
                 }
                 placeholder={
-                  selected
-                    ? "Nhập tin nhắn..."
-                    : "Chọn cuộc trò chuyện trước"
+                  selected ? "Nhập tin nhắn..." : "Chọn cuộc trò chuyện trước"
                 }
                 className="min-h-16 flex-1 resize-none rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
               />

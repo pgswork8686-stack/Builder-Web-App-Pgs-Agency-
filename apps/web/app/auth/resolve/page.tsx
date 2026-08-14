@@ -80,7 +80,9 @@ export default function AuthResolvePage() {
       <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#EDF2F7]">
         {errorMsg ? (
           <>
-            <h3 className="text-base font-extrabold text-red-600">LỖI XÁC THỰC</h3>
+            <h3 className="text-base font-extrabold text-red-600">
+              LỖI XÁC THỰC
+            </h3>
             <p className="text-xs text-[#64748B]">{errorMsg}</p>
             <Button
               variant="danger"

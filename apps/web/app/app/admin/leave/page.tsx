@@ -22,7 +22,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@/components/ui/table";
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -37,7 +45,9 @@ export default function AdminLeavePage() {
   const pageSize = 15;
 
   // Review states
-  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(
+    null,
+  );
   const [reviewNote, setReviewNote] = useState("");
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -131,7 +141,11 @@ export default function AdminLeavePage() {
         badge={`${total} Đơn`}
         action={
           <Link href="/app/admin">
-            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
               Quay lại
             </Button>
           </Link>
@@ -237,7 +251,9 @@ export default function AdminLeavePage() {
                       <TableHeaderCell>Thời gian</TableHeaderCell>
                       <TableHeaderCell>Số ngày</TableHeaderCell>
                       <TableHeaderCell>Trạng thái</TableHeaderCell>
-                      <TableHeaderCell className="text-right">Thao tác</TableHeaderCell>
+                      <TableHeaderCell className="text-right">
+                        Thao tác
+                      </TableHeaderCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -290,7 +306,9 @@ export default function AdminLeavePage() {
                               Xét duyệt
                             </Button>
                           ) : (
-                            <span className="text-xs text-[#94A3B8]">Đã đóng</span>
+                            <span className="text-xs text-[#94A3B8]">
+                              Đã đóng
+                            </span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -353,8 +371,12 @@ export default function AdminLeavePage() {
                     key={evt.id}
                     className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] text-xs space-y-1"
                   >
-                    <div className="font-bold text-[#0F172A]">{evt.fullName}</div>
-                    <div className="text-[11px] text-[#64748B]">{evt.leaveType}</div>
+                    <div className="font-bold text-[#0F172A]">
+                      {evt.fullName}
+                    </div>
+                    <div className="text-[11px] text-[#64748B]">
+                      {evt.leaveType}
+                    </div>
                     <div className="text-[11px] text-[#4F75FF] font-semibold">
                       {evt.startDate} ➔ {evt.endDate}
                     </div>

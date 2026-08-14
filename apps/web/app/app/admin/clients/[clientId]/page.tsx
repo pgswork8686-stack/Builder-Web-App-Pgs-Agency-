@@ -171,7 +171,11 @@ export default function AdminClientDetailPage() {
         description={`Mã doanh nghiệp: ${company?.code || "—"}`}
         action={
           <Link href="/app/admin/clients">
-            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
               Danh sách khách hàng
             </Button>
           </Link>
@@ -231,7 +235,9 @@ export default function AdminClientDetailPage() {
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
-                  <span className="text-[#0F172A] font-mono">{company.email || "—"}</span>
+                  <span className="text-[#0F172A] font-mono">
+                    {company.email || "—"}
+                  </span>
                 </div>
                 <div>
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
@@ -327,7 +333,9 @@ export default function AdminClientDetailPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSetPrimary(m.id, m.isPrimary)}
-                          title={m.isPrimary ? "Bỏ đặt làm chính" : "Đặt làm chính"}
+                          title={
+                            m.isPrimary ? "Bỏ đặt làm chính" : "Đặt làm chính"
+                          }
                         >
                           <Star
                             className={`w-4 h-4 ${m.isPrimary ? "text-[#CA8A04] fill-[#CA8A04]" : "text-[#94A3B8]"}`}

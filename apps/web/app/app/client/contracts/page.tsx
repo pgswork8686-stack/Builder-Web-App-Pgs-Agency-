@@ -64,7 +64,11 @@ export default function ClientContractsPage() {
         badge={`${total} Hợp đồng`}
         action={
           <Link href="/app/client">
-            <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ChevronLeft className="w-4 h-4" />}
+            >
               Quay lại tổng quan
             </Button>
           </Link>
@@ -123,7 +127,9 @@ export default function ClientContractsPage() {
                     <Calendar className="w-3.5 h-3.5 text-[#4F75FF]" />
                     <span>
                       Hiệu lực:{" "}
-                      <span className="font-mono text-[#0F172A] font-semibold">{c.start_date}</span>
+                      <span className="font-mono text-[#0F172A] font-semibold">
+                        {c.start_date}
+                      </span>
                       {c.end_date ? ` ~ ${c.end_date}` : " (Không thời hạn)"}
                     </span>
                   </div>
@@ -147,7 +153,11 @@ export default function ClientContractsPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
               <span>
-                Hiển thị <span className="font-bold text-[#0F172A]">{contracts.length}</span> / {total} hợp đồng
+                Hiển thị{" "}
+                <span className="font-bold text-[#0F172A]">
+                  {contracts.length}
+                </span>{" "}
+                / {total} hợp đồng
               </span>
               <div className="flex items-center gap-2">
                 <Button

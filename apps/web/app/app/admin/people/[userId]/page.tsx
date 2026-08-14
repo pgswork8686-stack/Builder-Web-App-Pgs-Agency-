@@ -201,7 +201,11 @@ export default function AdminPersonDetailPage() {
         description="Quản lý hồ sơ việc làm, chức danh, phòng ban và cấp quản lý trực tiếp."
         action={
           <Link href="/app/admin/people">
-            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
               Danh bạ nhân sự
             </Button>
           </Link>
@@ -290,7 +294,9 @@ export default function AdminPersonDetailPage() {
                   Tài khoản Khách hàng
                 </h3>
                 <p className="text-xs text-[#64748B] max-w-md mx-auto leading-relaxed">
-                  Tài khoản vai trò **client** không có hồ sơ nhân sự nội bộ trực thuộc công ty. Vui lòng quản lý liên kết khách hàng trong danh mục **Khách hàng**.
+                  Tài khoản vai trò **client** không có hồ sơ nhân sự nội bộ
+                  trực thuộc công ty. Vui lòng quản lý liên kết khách hàng trong
+                  danh mục **Khách hàng**.
                 </p>
               </Card>
             ) : (
@@ -422,7 +428,9 @@ export default function AdminPersonDetailPage() {
                         <option value="probation">Thử việc (probation)</option>
                         <option value="active">Chính thức (active)</option>
                         <option value="on_leave">Nghỉ phép (on_leave)</option>
-                        <option value="terminated">Đã nghỉ việc (terminated)</option>
+                        <option value="terminated">
+                          Đã nghỉ việc (terminated)
+                        </option>
                       </select>
                     </div>
 

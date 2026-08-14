@@ -157,7 +157,11 @@ export default function AdminDepartmentsPage() {
         action={
           <div className="flex items-center gap-3">
             <Link href="/app/admin/organization">
-              <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
+              >
                 Cơ cấu tổ chức
               </Button>
             </Link>
@@ -215,7 +219,9 @@ export default function AdminDepartmentsPage() {
                   <TableHeaderCell>Mô tả nhiệm vụ</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
                   <TableHeaderCell>Ngày tạo</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Thao tác</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Thao tác
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>

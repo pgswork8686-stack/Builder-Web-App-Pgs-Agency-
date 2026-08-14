@@ -145,11 +145,7 @@ export default function LoginPage() {
               disabled={loading || oauthLoading}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#4F75FF] hover:bg-[#3D62EE] text-white font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {loading ? (
-                <span>Đang xử lý...</span>
-              ) : (
-                <span>Đăng nhập</span>
-              )}
+              {loading ? <span>Đang xử lý...</span> : <span>Đăng nhập</span>}
             </button>
           </form>
 

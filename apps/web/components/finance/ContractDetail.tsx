@@ -198,7 +198,9 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
           Hợp đồng không tồn tại hoặc bạn không có quyền truy cập.
         </p>
         <Link href={`${roleBasePath}/finance/contracts`}>
-          <Button variant="secondary" size="sm">Quay lại danh sách</Button>
+          <Button variant="secondary" size="sm">
+            Quay lại danh sách
+          </Button>
         </Link>
       </div>
     );
@@ -222,7 +224,11 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance/contracts`}>
-              <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ChevronLeft className="w-4 h-4" />}
+              >
                 Quay lại
               </Button>
             </Link>

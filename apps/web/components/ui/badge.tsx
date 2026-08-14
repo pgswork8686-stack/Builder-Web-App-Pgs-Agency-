@@ -30,8 +30,10 @@ export function Badge({
     default: "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]",
     blue: "bg-[#EEF2FF] text-[#4F75FF] border border-[#E0EAFF] font-semibold",
     gold: "bg-[#FEF9C3] text-[#A16207] border border-[#FEF08A] font-semibold",
-    success: "bg-[#E6FBF5] text-[#00B788] border border-[#A7F3D0] font-semibold",
-    warning: "bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] font-semibold",
+    success:
+      "bg-[#E6FBF5] text-[#00B788] border border-[#A7F3D0] font-semibold",
+    warning:
+      "bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] font-semibold",
     danger: "bg-[#FEE2E2] text-[#EF4444] border border-[#FECACA] font-semibold",
     purple: "bg-[#F3E8FF] text-[#7356F1] border border-[#E9D5FF] font-semibold",
     cyan: "bg-[#E0F7FE] text-[#0284C7] border border-[#BAE6FD] font-semibold",

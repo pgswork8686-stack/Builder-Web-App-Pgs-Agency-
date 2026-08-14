@@ -182,28 +182,42 @@ export default function FinanceDashboard({
                   <StatCard
                     variant="blue"
                     title="Giá trị hợp đồng active"
-                    value={formatCurrency(contractData.contracted_value, currency)}
+                    value={formatCurrency(
+                      contractData.contracted_value,
+                      currency,
+                    )}
                     subtitle={`${contractData.active_contracts} hợp đồng đang có hiệu lực`}
                     icon={<TrendingUp className="w-4 h-4" />}
                   />
                   <StatCard
                     variant="gold"
                     title="Đã phát hành hóa đơn"
-                    value={formatCurrency(invoiceData.invoiced_amount, currency)}
+                    value={formatCurrency(
+                      invoiceData.invoiced_amount,
+                      currency,
+                    )}
                     subtitle="Tổng giá trị hóa đơn đã phát hành"
                     icon={<FileText className="w-4 h-4" />}
                   />
                   <StatCard
                     variant="green"
                     title="Doanh thu thực tế"
-                    value={formatCurrency(invoiceData.received_amount, currency)}
+                    value={formatCurrency(
+                      invoiceData.received_amount,
+                      currency,
+                    )}
                     subtitle="Tổng số tiền thực tế đã thu"
                     icon={<DollarSign className="w-4 h-4" />}
                   />
                   <StatCard
-                    variant={invoiceData.overdue_invoices > 0 ? "rose" : "default"}
+                    variant={
+                      invoiceData.overdue_invoices > 0 ? "rose" : "default"
+                    }
                     title="Còn lại phải thu"
-                    value={formatCurrency(invoiceData.outstanding_amount, currency)}
+                    value={formatCurrency(
+                      invoiceData.outstanding_amount,
+                      currency,
+                    )}
                     subtitle={
                       invoiceData.overdue_invoices > 0
                         ? `${invoiceData.overdue_invoices} hóa đơn quá hạn`
@@ -248,10 +262,16 @@ export default function FinanceDashboard({
                     </span>
                   </div>
                   <div className="text-[11px] text-[#64748B]">
-                    Entity ID: <span className="font-mono text-[#0F172A]">{log.entity_id}</span>
+                    Entity ID:{" "}
+                    <span className="font-mono text-[#0F172A]">
+                      {log.entity_id}
+                    </span>
                   </div>
                   <div className="text-[11px] text-[#64748B]">
-                    Thực hiện bởi: <span className="font-bold text-[#0F172A]">{log.actor?.full_name || log.actor?.email || "System"}</span>
+                    Thực hiện bởi:{" "}
+                    <span className="font-bold text-[#0F172A]">
+                      {log.actor?.full_name || log.actor?.email || "System"}
+                    </span>
                   </div>
                 </div>
 

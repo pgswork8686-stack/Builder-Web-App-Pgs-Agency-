@@ -58,7 +58,11 @@ export default function AdminOrganizationDashboard() {
         description="Quản trị phòng ban, đội nhóm, hồ sơ nhân sự công ty và thông tin khách hàng đối tác."
         action={
           <Link href="/app/admin">
-            <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
               Quay lại Dashboard
             </Button>
           </Link>
@@ -73,7 +77,9 @@ export default function AdminOrganizationDashboard() {
             <Link key={item.href} href={item.href} className="group block">
               <Card className="p-6 h-full flex flex-col justify-between hover:border-[#4F75FF]/40 hover:shadow-md transition-all">
                 <div className="space-y-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.color} shadow-xs`}>
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.color} shadow-xs`}
+                  >
                     <Icon className="w-6 h-6" />
                   </div>
                   <div>

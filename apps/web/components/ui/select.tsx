@@ -8,7 +8,10 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className = "", label, error, helperText, id, children, ...props }, ref) => {
+  (
+    { className = "", label, error, helperText, id, children, ...props },
+    ref,
+  ) => {
     const selectId =
       id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
 

@@ -2,12 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  FileText,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, FileText } from "lucide-react";
 import { financeApi, Invoice } from "@/lib/api/finance";
 import { isInvoiceOverdue } from "@/lib/finance-date";
 import { SectionHeader } from "@/components/dashboard/section-header";
@@ -73,7 +68,11 @@ export default function ClientInvoicesPage() {
         badge={`${total} Hóa đơn`}
         action={
           <Link href="/app/client">
-            <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ChevronLeft className="w-4 h-4" />}
+            >
               Quay lại tổng quan
             </Button>
           </Link>
@@ -160,7 +159,11 @@ export default function ClientInvoicesPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
                 <span>
-                  Hiển thị <span className="font-bold text-[#0F172A]">{invoices.length}</span> / {total} hóa đơn
+                  Hiển thị{" "}
+                  <span className="font-bold text-[#0F172A]">
+                    {invoices.length}
+                  </span>{" "}
+                  / {total} hóa đơn
                 </span>
                 <div className="flex items-center gap-2">
                   <Button

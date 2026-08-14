@@ -471,7 +471,9 @@ function BoardCard({
         <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
-        <span className="text-[#94A3B8] text-[11px] font-mono">{task.due_date || "Chưa có hạn"}</span>
+        <span className="text-[#94A3B8] text-[11px] font-mono">
+          {task.due_date || "Chưa có hạn"}
+        </span>
       </div>
       {task.canUpdateStatus && (
         <select
