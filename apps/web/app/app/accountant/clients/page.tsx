@@ -8,7 +8,14 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AccountantClientsPage() {
@@ -18,7 +25,10 @@ export default function AccountantClientsPage() {
   useEffect(() => {
     async function loadClients() {
       try {
-        const res = await clientsApi.getClientCompanies({ page: 1, pageSize: 50 });
+        const res = await clientsApi.getClientCompanies({
+          page: 1,
+          pageSize: 50,
+        });
         setClients((res as any)?.items || (res as any)?.data || []);
       } catch {
         // Safe load
@@ -73,8 +83,17 @@ export default function AccountantClientsPage() {
                     {c.contactPerson || "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={c.isActive || c.status === "active" ? "success" : "default"} size="sm">
-                      {c.isActive || c.status === "active" ? "ĐANG HỢP TÁC" : "TẠM DỪNG"}
+                    <Badge
+                      variant={
+                        c.isActive || c.status === "active"
+                          ? "success"
+                          : "default"
+                      }
+                      size="sm"
+                    >
+                      {c.isActive || c.status === "active"
+                        ? "ĐANG HỢP TÁC"
+                        : "TẠM DỪNG"}
                     </Badge>
                   </TableCell>
                 </TableRow>

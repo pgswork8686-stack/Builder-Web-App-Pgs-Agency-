@@ -50,8 +50,13 @@ export default function TeamLeaderProjectsPage() {
             <Link key={p.id} href={`/app/projects/${p.id}`}>
               <Card className="p-5 space-y-3 hover:border-[#5D87FF]/40 transition-all group">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                  <Badge variant={p.status === "active" ? "blue" : "default"} size="sm">
+                  <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                    {p.projectCode}
+                  </span>
+                  <Badge
+                    variant={p.status === "active" ? "blue" : "default"}
+                    size="sm"
+                  >
                     {p.status}
                   </Badge>
                 </div>

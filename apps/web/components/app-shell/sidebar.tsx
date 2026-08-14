@@ -132,7 +132,8 @@ export function Sidebar({
             {group.items.map((item, itemIdx) => {
               const active = isItemActive(item);
               const Icon = item.icon;
-              const itemNum = item.index || (itemIdx + 1).toString().padStart(2, "0");
+              const itemNum =
+                item.index || (itemIdx + 1).toString().padStart(2, "0");
 
               return (
                 <Link
@@ -205,10 +206,7 @@ export function Sidebar({
             href="/app/profile"
             className="flex items-center gap-3 p-2 rounded-2xl hover:bg-[#F6F8FC] transition-colors group"
           >
-            <Avatar
-              name={roleLabel}
-              size="sm"
-            />
+            <Avatar name={roleLabel} size="sm" />
             <div className="flex flex-col min-w-0 flex-1">
               <p className="text-xs font-bold text-[#24304A] truncate group-hover:text-[#5D87FF]">
                 {roleLabel.split("(")[0].trim()}

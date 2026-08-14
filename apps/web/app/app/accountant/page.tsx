@@ -66,7 +66,11 @@ export default function AccountantDashboardPage() {
             Tháng 8/2026
           </span>
           <Link href="/app/accountant/finance/invoices">
-            <Button variant="primary" size="sm" leftIcon={<Receipt className="w-4 h-4" />}>
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Receipt className="w-4 h-4" />}
+            >
               Quản lý hóa đơn
             </Button>
           </Link>
@@ -82,7 +86,8 @@ export default function AccountantDashboardPage() {
               Doanh thu YTD: {formatVND(summary?.total_revenue_ytd || 0)}
             </h2>
             <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
-              Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang thực thi.
+              Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang
+              thực thi.
             </p>
           </div>
 
@@ -93,7 +98,11 @@ export default function AccountantDashboardPage() {
               </Button>
             </Link>
             <Link href="/app/accountant/payroll">
-              <Button variant="secondary" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<FileSpreadsheet className="w-4 h-4" />}
+              >
                 Bảng lương
               </Button>
             </Link>
@@ -103,7 +112,9 @@ export default function AccountantDashboardPage() {
         {/* Dòng tiền ròng */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Dòng tiền ròng</span>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Dòng tiền ròng
+            </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
               {formatVND(summary?.total_revenue_ytd || 0)}
             </div>
@@ -117,13 +128,17 @@ export default function AccountantDashboardPage() {
         {/* Quá hạn */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Công nợ quá hạn</span>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Công nợ quá hạn
+            </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
               {formatVND(summary?.total_outstanding_ar || 0)}
             </div>
           </div>
           <span className="text-xs font-bold text-[#FA896B] mt-4">
-            {summary?.total_outstanding_ar ? "Cần đôn đốc thanh toán" : "Không có nợ xấu"}
+            {summary?.total_outstanding_ar
+              ? "Cần đôn đốc thanh toán"
+              : "Không có nợ xấu"}
           </span>
         </div>
       </div>
@@ -186,7 +201,9 @@ export default function AccountantDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Khoản đến hạn
             </h3>
-            <Badge variant="gold" size="sm">0 khoản</Badge>
+            <Badge variant="gold" size="sm">
+              0 khoản
+            </Badge>
           </div>
 
           <Card className="p-4">
@@ -230,11 +247,16 @@ export default function AccountantDashboardPage() {
               Kiểm tra và chốt bảng công
             </h3>
             <p className="text-xs text-[#7C879D] mt-0.5">
-              Đối soát dữ liệu chấm công GPS của toàn bộ nhân sự trước khi tính lương.
+              Đối soát dữ liệu chấm công GPS của toàn bộ nhân sự trước khi tính
+              lương.
             </p>
           </div>
           <Link href="/app/attendance">
-            <Button variant="primary" size="sm" leftIcon={<Clock className="w-4 h-4" />}>
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Clock className="w-4 h-4" />}
+            >
               Mở bảng công
             </Button>
           </Link>

@@ -7,7 +7,7 @@ export interface DialogProps {
   title?: React.ReactNode;
   description?: React.ReactNode;
   children: React.ReactNode;
-  maxWidth?: "sm" | "md" | "lg" | "xl";
+  maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 }
 
 export function Dialog({
@@ -16,7 +16,7 @@ export function Dialog({
   title,
   description,
   children,
-  maxWidth = "md",
+  maxWidth = "lg",
 }: DialogProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,15 +34,18 @@ export function Dialog({
 
   if (!isOpen) return null;
 
-  const maxWidthStyles = {
-    sm: "max-w-sm",
-    md: "max-w-md",
-    lg: "max-w-lg",
-    xl: "max-w-2xl",
+  const maxWidthStyles: Record<string, string> = {
+    sm: "max-w-md",
+    md: "max-w-xl",
+    lg: "max-w-2xl",
+    xl: "max-w-3xl",
+    "2xl": "max-w-4xl",
+    "3xl": "max-w-5xl",
+    "4xl": "max-w-6xl",
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -51,29 +54,33 @@ export function Dialog({
 
       {/* Modal Dialog Box */}
       <div
-        className={`relative w-full ${maxWidthStyles[maxWidth]} rounded-3xl bg-white border border-[#E2E8F0] p-6 text-[#0F172A] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150`}
+        className={`relative w-full ${maxWidthStyles[maxWidth] || "max-w-2xl"} rounded-3xl bg-white border border-[#EDF2F7] p-6 sm:p-8 text-[#24304A] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 my-auto`}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-1.5 text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+          className="absolute right-5 top-5 rounded-xl p-2 text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           aria-label="Đóng dialog"
         >
           <X className="w-5 h-5" />
         </button>
 
         {title && (
-          <div className="mb-4 pr-6">
-            <h2 className="text-xl font-black text-[#0F172A] tracking-tight">
+          <div className="mb-5 pr-8">
+            <h3 className="text-lg sm:text-xl font-bold text-[#24304A] tracking-tight">
               {title}
-            </h2>
+            </h3>
             {description && (
-              <p className="mt-1 text-xs text-[#64748B]">{description}</p>
+              <p className="text-xs sm:text-sm text-[#7C879D] mt-1 leading-relaxed">
+                {description}
+              </p>
             )}
           </div>
         )}
 
-        <div>{children}</div>
+        <div className="max-h-[calc(85vh-120px)] overflow-y-auto pr-1">
+          {children}
+        </div>
       </div>
     </div>
   );

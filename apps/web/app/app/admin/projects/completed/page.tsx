@@ -17,7 +17,11 @@ export default function AdminCompletedProjectsPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await projectsApi.getAdminProjects({ page: 1, pageSize: 20, status: "completed" });
+        const res = await projectsApi.getAdminProjects({
+          page: 1,
+          pageSize: 20,
+          status: "completed",
+        });
         setProjects(res?.items || []);
       } catch {
         // Safe load
@@ -36,7 +40,11 @@ export default function AdminCompletedProjectsPage() {
         badge={`${projects.length} Dự án`}
         action={
           <Link href="/app/admin/projects">
-            <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ChevronLeft className="w-4 h-4" />}
+            >
               Tất cả dự án
             </Button>
           </Link>
@@ -56,11 +64,17 @@ export default function AdminCompletedProjectsPage() {
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                <Badge variant="success" size="sm">Đã hoàn thành</Badge>
+                <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                  {p.projectCode}
+                </span>
+                <Badge variant="success" size="sm">
+                  Đã hoàn thành
+                </Badge>
               </div>
               <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>
-              <p className="text-xs text-[#7C879D]">Khách hàng: {p.clientCompany?.name || "—"}</p>
+              <p className="text-xs text-[#7C879D]">
+                Khách hàng: {p.clientCompany?.name || "—"}
+              </p>
             </Card>
           ))}
         </div>

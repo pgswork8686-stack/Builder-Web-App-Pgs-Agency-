@@ -49,8 +49,15 @@ export default function EmployeeProjectsPage() {
             <Link key={p.id} href={`/app/projects/${p.id}`}>
               <Card className="p-5 space-y-3 hover:border-[#5D87FF]/40 transition-all group">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                  <Badge variant={p.status === "active" ? "blue" : "default"} size="sm">{p.status}</Badge>
+                  <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                    {p.projectCode}
+                  </span>
+                  <Badge
+                    variant={p.status === "active" ? "blue" : "default"}
+                    size="sm"
+                  >
+                    {p.status}
+                  </Badge>
                 </div>
                 <h4 className="text-sm font-bold text-[#24304A] group-hover:text-[#5D87FF] transition-colors">
                   {p.name}

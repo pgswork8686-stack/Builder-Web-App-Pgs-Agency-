@@ -66,7 +66,8 @@ export default function TeamLeaderDashboardPage() {
     loadData();
   }, []);
 
-  const userName = user?.fullName || user?.email?.split("@")[0] || "Trưởng nhóm";
+  const userName =
+    user?.fullName || user?.email?.split("@")[0] || "Trưởng nhóm";
 
   return (
     <div className="space-y-6">
@@ -77,7 +78,8 @@ export default function TeamLeaderDashboardPage() {
             Chào {userName}
           </h1>
           <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
-            Theo dõi tiến độ dự án, đội nhóm và các nội dung đang chờ duyệt hôm nay.
+            Theo dõi tiến độ dự án, đội nhóm và các nội dung đang chờ duyệt hôm
+            nay.
           </p>
         </div>
 
@@ -86,7 +88,11 @@ export default function TeamLeaderDashboardPage() {
             Tuần này
           </span>
           <Link href="/app/team-leader/projects">
-            <Button variant="primary" size="sm" leftIcon={<FolderKanban className="w-4 h-4" />}>
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<FolderKanban className="w-4 h-4" />}
+            >
               Dự án của tôi
             </Button>
           </Link>
@@ -102,7 +108,8 @@ export default function TeamLeaderDashboardPage() {
               {stats.projectCount} dự án đang được quản lý
             </h2>
             <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
-              Kiểm soát tiến độ bàn giao và các nội dung đang chờ phê duyệt hôm nay.
+              Kiểm soát tiến độ bàn giao và các nội dung đang chờ phê duyệt hôm
+              nay.
             </p>
           </div>
 
@@ -113,13 +120,17 @@ export default function TeamLeaderDashboardPage() {
               </Button>
             </Link>
             <Link href="/app/team-leader/attendance">
-              <span className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-2xs ${
-                checkedInToday
-                  ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
-                  : "bg-white border-[#EDF2F7] text-[#7C879D]"
-              }`}>
+              <span
+                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-2xs ${
+                  checkedInToday
+                    ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
+                    : "bg-white border-[#EDF2F7] text-[#7C879D]"
+                }`}
+              >
                 <CheckCircle2 className="w-4 h-4" />
-                {checkedInToday ? "Đã check-in hôm nay" : "Chưa chấm công hôm nay"}
+                {checkedInToday
+                  ? "Đã check-in hôm nay"
+                  : "Chưa chấm công hôm nay"}
               </span>
             </Link>
           </div>
@@ -157,7 +168,9 @@ export default function TeamLeaderDashboardPage() {
             </div>
           </div>
           <span className="text-xs font-bold text-[#FA896B] mt-4">
-            {stats.nearDeadlines > 0 ? "Cần điều phối nhân lực" : "Không có task quá hạn"}
+            {stats.nearDeadlines > 0
+              ? "Cần điều phối nhân lực"
+              : "Không có task quá hạn"}
           </span>
         </div>
       </div>
@@ -168,7 +181,9 @@ export default function TeamLeaderDashboardPage() {
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#5D87FF]">DA</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#5D87FF]">
+                DA
+              </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {stats.projectCount.toString().padStart(2, "0")}
@@ -180,7 +195,9 @@ export default function TeamLeaderDashboardPage() {
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#7C879D]">Task mở</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF9C3] text-[#FFC400]">CV</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF9C3] text-[#FFC400]">
+                CV
+              </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {stats.openTasks.toString().padStart(2, "0")}
@@ -191,8 +208,12 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/approvals">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#13DEB9]">DU</span>
+              <span className="text-xs font-bold text-[#7C879D]">
+                Chờ duyệt
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#13DEB9]">
+                DU
+              </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {stats.pendingApprovals.toString().padStart(2, "0")}
@@ -203,8 +224,12 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/teams">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Thành viên</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#A855F7]">TV</span>
+              <span className="text-xs font-bold text-[#7C879D]">
+                Thành viên
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#A855F7]">
+                TV
+              </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {stats.teamMembers.toString().padStart(2, "0")}
@@ -216,7 +241,9 @@ export default function TeamLeaderDashboardPage() {
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#7C879D]">Deadline</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#FA896B]">DL</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#FA896B]">
+                DL
+              </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {stats.nearDeadlines.toString().padStart(2, "0")}
@@ -232,7 +259,10 @@ export default function TeamLeaderDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Khối lượng công việc
             </h3>
-            <Link href="/app/team-leader/tasks" className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1">
+            <Link
+              href="/app/team-leader/tasks"
+              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            >
               Xem chi tiết <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -248,10 +278,17 @@ export default function TeamLeaderDashboardPage() {
           ) : (
             <Card className="divide-y divide-[#EDF2F7]">
               {projects.slice(0, 3).map((p) => (
-                <div key={p.id} className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors">
+                <div
+                  key={p.id}
+                  className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
+                >
                   <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                    <h4 className="text-xs font-bold text-[#24304A]">{p.name}</h4>
+                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                      {p.projectCode}
+                    </span>
+                    <h4 className="text-xs font-bold text-[#24304A]">
+                      {p.name}
+                    </h4>
                   </div>
                   <Badge variant="blue" size="sm">
                     {p.status}
@@ -267,7 +304,9 @@ export default function TeamLeaderDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Cần phê duyệt
             </h3>
-            <Badge variant="gold" size="sm">0 yêu cầu</Badge>
+            <Badge variant="gold" size="sm">
+              0 yêu cầu
+            </Badge>
           </div>
 
           <Card className="p-4">

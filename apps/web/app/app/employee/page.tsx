@@ -38,12 +38,13 @@ export default function EmployeeDashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [meRes, attSum, leaveBalances, projRes] = await Promise.allSettled([
-          getMe(),
-          attendanceApi.getSummary(),
-          leaveApi.getMyBalances(),
-          projectsApi.getInternalProjects(1, 6),
-        ]);
+        const [meRes, attSum, leaveBalances, projRes] =
+          await Promise.allSettled([
+            getMe(),
+            attendanceApi.getSummary(),
+            leaveApi.getMyBalances(),
+            projectsApi.getInternalProjects(1, 6),
+          ]);
 
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
         if (attSum.status === "fulfilled" && attSum.value?.today?.checkInAt) {
@@ -54,7 +55,10 @@ export default function EmployeeDashboardPage() {
             }),
           );
         }
-        if (leaveBalances.status === "fulfilled" && leaveBalances.value?.length) {
+        if (
+          leaveBalances.status === "fulfilled" &&
+          leaveBalances.value?.length
+        ) {
           const totalRemaining = leaveBalances.value.reduce(
             (acc, b) => acc + (b.allocated_days - b.used_days),
             0,
@@ -95,7 +99,9 @@ export default function EmployeeDashboardPage() {
               size="sm"
               leftIcon={<Clock className="w-4 h-4" />}
             >
-              {checkedInTime ? `Đã check-in (${checkedInTime})` : "Chấm công GPS"}
+              {checkedInTime
+                ? `Đã check-in (${checkedInTime})`
+                : "Chấm công GPS"}
             </Button>
           </Link>
         </div>
@@ -110,7 +116,8 @@ export default function EmployeeDashboardPage() {
               Bạn có {taskCount} công việc hôm nay
             </h2>
             <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
-              Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng thái trên bảng Kanban.
+              Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng
+              thái trên bảng Kanban.
             </p>
           </div>
 
@@ -121,7 +128,11 @@ export default function EmployeeDashboardPage() {
               </Button>
             </Link>
             <Link href="/app/leave">
-              <Button variant="secondary" size="sm" leftIcon={<CalendarDays className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<CalendarDays className="w-4 h-4" />}
+              >
                 Xin nghỉ phép
               </Button>
             </Link>
@@ -145,7 +156,9 @@ export default function EmployeeDashboardPage() {
         {/* Ngày phép còn Card */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Ngày phép còn</span>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Ngày phép còn
+            </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
               {leaveDaysRemaining.toString().padStart(2, "0")}
             </div>
@@ -195,7 +208,10 @@ export default function EmployeeDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Công việc hôm nay
             </h3>
-            <Link href="/app/employee/tasks" className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1">
+            <Link
+              href="/app/employee/tasks"
+              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -244,14 +260,29 @@ export default function EmployeeDashboardPage() {
             Thao tác nhanh
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link href="/app/employee/tasks" className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:bg-[#E0EAFF] transition-all text-center block">
-              <span className="text-xs font-bold text-[#5D87FF]">Cập nhật tiến độ</span>
+            <Link
+              href="/app/employee/tasks"
+              className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:bg-[#E0EAFF] transition-all text-center block"
+            >
+              <span className="text-xs font-bold text-[#5D87FF]">
+                Cập nhật tiến độ
+              </span>
             </Link>
-            <Link href="/app/employee/reports" className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] hover:bg-[#EEF2FF] transition-all text-center block">
-              <span className="text-xs font-bold text-[#24304A]">Gửi báo cáo ngày</span>
+            <Link
+              href="/app/employee/reports"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] hover:bg-[#EEF2FF] transition-all text-center block"
+            >
+              <span className="text-xs font-bold text-[#24304A]">
+                Gửi báo cáo ngày
+              </span>
             </Link>
-            <Link href="/app/leave" className="p-3 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] hover:bg-[#FEF08A] transition-all text-center block">
-              <span className="text-xs font-bold text-[#92400E]">Tạo đơn nghỉ phép</span>
+            <Link
+              href="/app/leave"
+              className="p-3 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] hover:bg-[#FEF08A] transition-all text-center block"
+            >
+              <span className="text-xs font-bold text-[#92400E]">
+                Tạo đơn nghỉ phép
+              </span>
             </Link>
           </div>
         </div>

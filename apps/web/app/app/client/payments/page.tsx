@@ -32,7 +32,11 @@ export default function ClientPaymentsPage() {
         badge="Thanh toán"
         action={
           <Link href="/app/client/invoices">
-            <Button variant="secondary" size="sm" leftIcon={<Receipt className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<Receipt className="w-4 h-4" />}
+            >
               Danh sách hóa đơn
             </Button>
           </Link>

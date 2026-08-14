@@ -71,40 +71,40 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
             {
               index: "02",
+              title: "Khách hàng",
+              href: "/app/admin/clients",
+              icon: Briefcase,
+            },
+            {
+              index: "03",
               title: "Dự án",
               href: "/app/admin/projects",
               icon: FolderKanban,
               exact: true,
             },
             {
-              index: "03",
+              index: "04",
               title: "Dự án hoàn thành",
               href: "/app/admin/projects/completed",
               icon: CheckCircle2,
             },
             {
-              index: "04",
+              index: "05",
               title: "Công việc",
               href: "/app/admin/tasks",
               icon: ListTodo,
             },
             {
-              index: "05",
+              index: "06",
               title: "Kanban",
               href: "/app/admin/kanban",
               icon: Kanban,
             },
             {
-              index: "06",
+              index: "07",
               title: "Lịch",
               href: "/app/admin/calendar",
               icon: Calendar,
-            },
-            {
-              index: "07",
-              title: "Khách hàng",
-              href: "/app/admin/clients",
-              icon: Briefcase,
             },
             {
               index: "08",
@@ -143,7 +143,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "team_leader":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
+          groupTitle: "TRANG CHÍNH",
           items: [
             {
               index: "01",
@@ -210,7 +210,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             {
               index: "11",
               title: "Chấm công",
-              href: "/app/team-leader/attendance",
+              href: "/app/attendance",
               icon: Clock,
             },
           ],
@@ -220,7 +220,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "employee":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
+          groupTitle: "TRANG CHÍNH",
           items: [
             {
               index: "01",
@@ -270,7 +270,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               index: "08",
               title: "Báo cáo công việc",
               href: "/app/employee/reports",
-              icon: FileSpreadsheet,
+              icon: FileText,
             },
             {
               index: "09",
@@ -282,7 +282,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               index: "10",
               title: "Phiếu lương",
               href: "/app/employee/payroll",
-              icon: FileText,
+              icon: DollarSign,
             },
           ],
         },
@@ -291,7 +291,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "accountant":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
+          groupTitle: "TRANG CHÍNH",
           items: [
             {
               index: "01",
@@ -373,7 +373,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "client":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
+          groupTitle: "TRANG CHÍNH",
           items: [
             {
               index: "01",

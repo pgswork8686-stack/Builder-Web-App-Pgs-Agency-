@@ -35,7 +35,11 @@ export default function TeamLeaderCompletedProjectsPage() {
         badge={`${projects.length} Dự án`}
         action={
           <Link href="/app/team-leader/projects">
-            <Button variant="secondary" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ChevronLeft className="w-4 h-4" />}
+            >
               Dự án đang chạy
             </Button>
           </Link>
@@ -54,7 +58,9 @@ export default function TeamLeaderCompletedProjectsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-2">
-              <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
+              <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                {p.projectCode}
+              </span>
               <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>
             </Card>
           ))}

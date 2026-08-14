@@ -57,12 +57,19 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
     if (pathname === "/app/accountant") return "Accounting Dashboard";
     if (pathname === "/app/client") return "Client Dashboard";
     if (pathname.includes("/projects")) return "Quản lý Dự án";
-    if (pathname.includes("/tasks") || pathname.includes("/kanban")) return "Công việc & Kanban";
+    if (pathname.includes("/tasks") || pathname.includes("/kanban"))
+      return "Công việc & Kanban";
     if (pathname.includes("/attendance")) return "Quản lý Chấm công";
     if (pathname.includes("/leave")) return "Quản lý Nghỉ phép";
     if (pathname.includes("/finance")) return "Quản lý Tài chính";
     if (pathname.includes("/clients")) return "Quản lý Khách hàng";
-    if (pathname.includes("/people") || pathname.includes("/organization") || pathname.includes("/departments") || pathname.includes("/teams")) return "Quản lý Nhân sự & Cơ cấu";
+    if (
+      pathname.includes("/people") ||
+      pathname.includes("/organization") ||
+      pathname.includes("/departments") ||
+      pathname.includes("/teams")
+    )
+      return "Quản lý Nhân sự & Cơ cấu";
     if (pathname.includes("/documents")) return "Thư viện Tài liệu PGS";
     if (pathname.includes("/reports")) return "Báo cáo Tổng hợp";
     if (pathname.includes("/chat")) return "Tin nhắn Nội bộ";
@@ -126,7 +133,9 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
               <span className="text-xs font-bold text-[#24304A] tracking-tight truncate max-w-[130px]">
                 {roleTitle.split("(")[0].trim()}
               </span>
-              <span className="text-[10px] text-[#13DEB9] font-medium">Trực tuyến</span>
+              <span className="text-[10px] text-[#13DEB9] font-medium">
+                Trực tuyến
+              </span>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-[#7C879D] hidden sm:block mr-1" />
           </button>
@@ -140,7 +149,9 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
                 </p>
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <Badge variant="blue" size="sm">
-                    {account.role ? account.role.toUpperCase() : "CHƯA PHÂN QUYỀN"}
+                    {account.role
+                      ? account.role.toUpperCase()
+                      : "CHƯA PHÂN QUYỀN"}
                   </Badge>
                 </div>
               </div>

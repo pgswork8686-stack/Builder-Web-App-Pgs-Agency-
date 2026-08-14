@@ -45,9 +45,12 @@ export default function ClientDashboardPage() {
         ]);
 
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
-        if (projRes.status === "fulfilled") setProjects(projRes.value.items || []);
-        if (contRes.status === "fulfilled") setContracts(contRes.value?.items || []);
-        if (invRes.status === "fulfilled") setInvoices(invRes.value?.items || []);
+        if (projRes.status === "fulfilled")
+          setProjects(projRes.value.items || []);
+        if (contRes.status === "fulfilled")
+          setContracts(contRes.value?.items || []);
+        if (invRes.status === "fulfilled")
+          setInvoices(invRes.value?.items || []);
       } catch {
         // Safe load
       } finally {
@@ -69,13 +72,18 @@ export default function ClientDashboardPage() {
             Chào {companyName}
           </h1>
           <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
-            Cổng thông tin khách hàng, theo dõi tiến độ thực hiện và bàn giao sản phẩm từ PGS Agency.
+            Cổng thông tin khách hàng, theo dõi tiến độ thực hiện và bàn giao
+            sản phẩm từ PGS Agency.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Link href="/app/client/support">
-            <Button variant="secondary" size="sm" leftIcon={<HelpCircle className="w-4 h-4" />}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<HelpCircle className="w-4 h-4" />}
+            >
               Yêu cầu hỗ trợ
             </Button>
           </Link>
@@ -93,7 +101,8 @@ export default function ClientDashboardPage() {
                 : "Chưa có dự án nào đang triển khai"}
             </h2>
             <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
-              Theo dõi các mốc hoàn thành, kiểm duyệt tài liệu nghiệm thu và hóa đơn thanh toán trực tiếp.
+              Theo dõi các mốc hoàn thành, kiểm duyệt tài liệu nghiệm thu và hóa
+              đơn thanh toán trực tiếp.
             </p>
           </div>
 
@@ -104,7 +113,11 @@ export default function ClientDashboardPage() {
               </Button>
             </Link>
             <Link href="/app/client/invoices">
-              <Button variant="secondary" size="sm" leftIcon={<Receipt className="w-4 h-4" />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Receipt className="w-4 h-4" />}
+              >
                 Xem hóa đơn
               </Button>
             </Link>
@@ -114,7 +127,9 @@ export default function ClientDashboardPage() {
         {/* Tiến độ tổng */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Tiến độ tổng</span>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Tiến độ tổng
+            </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
               {activeProjectsCount > 0 ? "100%" : "—"}
             </div>
@@ -128,7 +143,9 @@ export default function ClientDashboardPage() {
         {/* Công nợ còn lại */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Công nợ còn lại</span>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Công nợ còn lại
+            </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">0 ₫</div>
           </div>
           <span className="text-xs font-bold text-[#13DEB9] mt-4">
@@ -184,7 +201,10 @@ export default function ClientDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Tiến độ dự án
             </h3>
-            <Link href="/app/client/projects" className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1">
+            <Link
+              href="/app/client/projects"
+              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -200,10 +220,17 @@ export default function ClientDashboardPage() {
           ) : (
             <Card className="divide-y divide-[#EDF2F7]">
               {projects.map((p) => (
-                <div key={p.id} className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors">
+                <div
+                  key={p.id}
+                  className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
+                >
                   <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                    <h4 className="text-xs font-bold text-[#24304A]">{p.name}</h4>
+                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                      {p.projectCode}
+                    </span>
+                    <h4 className="text-xs font-bold text-[#24304A]">
+                      {p.name}
+                    </h4>
                   </div>
                   <Badge variant="blue" size="sm">
                     {p.status}
@@ -219,12 +246,15 @@ export default function ClientDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Sản phẩm chờ duyệt
             </h3>
-            <Badge variant="gold" size="sm">0 ấn phẩm</Badge>
+            <Badge variant="gold" size="sm">
+              0 ấn phẩm
+            </Badge>
           </div>
 
           <Card className="p-4">
             <p className="text-xs text-[#7C879D]">
-              Hiện tại không có ấn phẩm hoặc tài liệu nào đang chờ quý khách nghiệm thu.
+              Hiện tại không có ấn phẩm hoặc tài liệu nào đang chờ quý khách
+              nghiệm thu.
             </p>
           </Card>
         </div>
@@ -248,11 +278,21 @@ export default function ClientDashboardPage() {
             Hỗ trợ và thanh toán
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link href="/app/client/invoices" className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-center block">
-              <span className="text-xs font-bold text-[#5D87FF]">Tra cứu hóa đơn</span>
+            <Link
+              href="/app/client/invoices"
+              className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-center block"
+            >
+              <span className="text-xs font-bold text-[#5D87FF]">
+                Tra cứu hóa đơn
+              </span>
             </Link>
-            <Link href="/app/client/support" className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] text-center block">
-              <span className="text-xs font-bold text-[#24304A]">Gửi Ticket hỗ trợ</span>
+            <Link
+              href="/app/client/support"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] text-center block"
+            >
+              <span className="text-xs font-bold text-[#24304A]">
+                Gửi Ticket hỗ trợ
+              </span>
             </Link>
           </div>
         </div>

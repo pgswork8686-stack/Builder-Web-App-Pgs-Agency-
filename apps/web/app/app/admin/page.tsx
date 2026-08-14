@@ -31,7 +31,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AdminDashboardPage() {
@@ -51,26 +58,37 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadAdminData() {
       try {
-        const [meRes, pendingRes, projRes, peopleRes, clientRes, finRes] = await Promise.allSettled([
-          getMe(),
-          getPendingUsers(1, 10),
-          projectsApi.getAdminProjects({ page: 1, pageSize: 6 }),
-          peopleApi.getPeopleDirectory({ page: 1, pageSize: 1 }),
-          clientsApi.getClientCompanies({ page: 1, pageSize: 1 }),
-          financeApi.getSummary(),
-        ]);
+        const [meRes, pendingRes, projRes, peopleRes, clientRes, finRes] =
+          await Promise.allSettled([
+            getMe(),
+            getPendingUsers(1, 10),
+            projectsApi.getAdminProjects({ page: 1, pageSize: 6 }),
+            peopleApi.getPeopleDirectory({ page: 1, pageSize: 1 }),
+            clientsApi.getClientCompanies({ page: 1, pageSize: 1 }),
+            financeApi.getSummary(),
+          ]);
 
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
-        if (pendingRes.status === "fulfilled") setPendingUsers(pendingRes.value.items || []);
+        if (pendingRes.status === "fulfilled")
+          setPendingUsers(pendingRes.value.items || []);
         if (projRes.status === "fulfilled") {
           setProjects(projRes.value.items || []);
-          setStats((prev) => ({ ...prev, projectCount: projRes.value.total || 0 }));
+          setStats((prev) => ({
+            ...prev,
+            projectCount: projRes.value.total || 0,
+          }));
         }
         if (peopleRes.status === "fulfilled") {
-          setStats((prev) => ({ ...prev, peopleCount: peopleRes.value.total || 0 }));
+          setStats((prev) => ({
+            ...prev,
+            peopleCount: peopleRes.value.total || 0,
+          }));
         }
         if (clientRes.status === "fulfilled") {
-          setStats((prev) => ({ ...prev, clientCount: (clientRes.value as any)?.total || 0 }));
+          setStats((prev) => ({
+            ...prev,
+            clientCount: (clientRes.value as any)?.total || 0,
+          }));
         }
         if (finRes.status === "fulfilled" && finRes.value) {
           setStats((prev) => ({
@@ -87,7 +105,8 @@ export default function AdminDashboardPage() {
     loadAdminData();
   }, []);
 
-  const userName = user?.fullName || user?.email?.split("@")[0] || "Quản trị viên";
+  const userName =
+    user?.fullName || user?.email?.split("@")[0] || "Quản trị viên";
 
   return (
     <div className="space-y-6">
@@ -107,8 +126,13 @@ export default function AdminDashboardPage() {
             Hôm nay
           </span>
           <Link href="/app/admin/accounts/pending">
-            <Button variant="primary" size="sm" leftIcon={<UserCheck className="w-4 h-4" />}>
-              Duyệt tài khoản {pendingUsers.length > 0 && `(${pendingUsers.length})`}
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<UserCheck className="w-4 h-4" />}
+            >
+              Duyệt tài khoản{" "}
+              {pendingUsers.length > 0 && `(${pendingUsers.length})`}
             </Button>
           </Link>
         </div>
@@ -186,7 +210,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">{stats.projectCount}</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.projectCount}
+              </p>
             </div>
           </Card>
         </Link>
@@ -197,8 +223,12 @@ export default function AdminDashboardPage() {
               <ListTodo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Công việc</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">{stats.taskCount}</p>
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Công việc
+              </p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.taskCount}
+              </p>
             </div>
           </Card>
         </Link>
@@ -209,8 +239,12 @@ export default function AdminDashboardPage() {
               <Briefcase className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Khách hàng</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">{stats.clientCount}</p>
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Khách hàng
+              </p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.clientCount}
+              </p>
             </div>
           </Card>
         </Link>
@@ -222,7 +256,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Nhân sự</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">{stats.peopleCount}</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.peopleCount}
+              </p>
             </div>
           </Card>
         </Link>
@@ -234,7 +270,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Tài liệu</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">{stats.documentCount}</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.documentCount}
+              </p>
             </div>
           </Card>
         </Link>
@@ -248,7 +286,10 @@ export default function AdminDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Tiến độ dự án
             </h3>
-            <Link href="/app/admin/projects" className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1">
+            <Link
+              href="/app/admin/projects"
+              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -260,23 +301,39 @@ export default function AdminDashboardPage() {
                 title="Chưa có dự án nào"
                 description="Tạo dự án mới để theo dõi tiến độ công việc và phân bổ nhân sự."
                 actionLabel="Tạo dự án mới"
-                onAction={() => window.location.href = "/app/admin/projects"}
+                onAction={() => (window.location.href = "/app/admin/projects")}
               />
             </Card>
           ) : (
             <Card className="divide-y divide-[#EDF2F7]">
               {projects.slice(0, 4).map((p) => (
-                <div key={p.id} className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors">
+                <div
+                  key={p.id}
+                  className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
+                >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-[#5D87FF]">{p.projectCode}</span>
-                      <h4 className="text-xs font-bold text-[#24304A] truncate">{p.name}</h4>
+                      <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                        {p.projectCode}
+                      </span>
+                      <h4 className="text-xs font-bold text-[#24304A] truncate">
+                        {p.name}
+                      </h4>
                     </div>
                     <p className="text-[11px] text-[#7C879D] mt-0.5 truncate">
                       Khách hàng: {p.clientCompany?.name || "Chưa liên kết"}
                     </p>
                   </div>
-                  <Badge variant={p.status === "active" ? "blue" : p.status === "completed" ? "success" : "default"} size="sm">
+                  <Badge
+                    variant={
+                      p.status === "active"
+                        ? "blue"
+                        : p.status === "completed"
+                          ? "success"
+                          : "default"
+                    }
+                    size="sm"
+                  >
                     {p.status}
                   </Badge>
                 </div>
@@ -297,27 +354,41 @@ export default function AdminDashboardPage() {
           </div>
 
           <Card className="p-4 space-y-3">
-            <Link href="/app/admin/accounts/pending" className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] flex items-center justify-between hover:bg-[#E0EAFF] transition-all block">
+            <Link
+              href="/app/admin/accounts/pending"
+              className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] flex items-center justify-between hover:bg-[#E0EAFF] transition-all block"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#5D87FF] text-white flex items-center justify-center shrink-0">
                   <UserCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h5 className="text-xs font-bold text-[#24304A]">Tài khoản chờ duyệt</h5>
-                  <p className="text-[11px] text-[#7C879D]">{pendingUsers.length} tài khoản mới đăng ký</p>
+                  <h5 className="text-xs font-bold text-[#24304A]">
+                    Tài khoản chờ duyệt
+                  </h5>
+                  <p className="text-[11px] text-[#7C879D]">
+                    {pendingUsers.length} tài khoản mới đăng ký
+                  </p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-[#5D87FF]" />
             </Link>
 
-            <Link href="/app/admin/leave" className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] flex items-center justify-between hover:bg-[#EEF2FF] transition-all block">
+            <Link
+              href="/app/admin/leave"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] flex items-center justify-between hover:bg-[#EEF2FF] transition-all block"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#FFC400] text-white flex items-center justify-center shrink-0">
                   <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h5 className="text-xs font-bold text-[#24304A]">Đơn nghỉ phép</h5>
-                  <p className="text-[11px] text-[#7C879D]">Kiểm tra và phê duyệt nghỉ phép</p>
+                  <h5 className="text-xs font-bold text-[#24304A]">
+                    Đơn nghỉ phép
+                  </h5>
+                  <p className="text-[11px] text-[#7C879D]">
+                    Kiểm tra và phê duyệt nghỉ phép
+                  </p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-[#7C879D]" />
@@ -346,8 +417,12 @@ export default function AdminDashboardPage() {
           <Card className="p-4 space-y-2.5">
             <div className="flex items-center gap-3 text-xs">
               <span className="w-2 h-2 rounded-full bg-[#13DEB9]" />
-              <span className="text-[#24304A] font-medium">Hệ thống khởi chạy thành công</span>
-              <span className="text-[10px] text-[#7C879D] ml-auto">Vừa xong</span>
+              <span className="text-[#24304A] font-medium">
+                Hệ thống khởi chạy thành công
+              </span>
+              <span className="text-[10px] text-[#7C879D] ml-auto">
+                Vừa xong
+              </span>
             </div>
           </Card>
         </div>
@@ -361,7 +436,8 @@ export default function AdminDashboardPage() {
               Duyệt tài khoản và phân quyền mới
             </h3>
             <p className="text-xs text-[#7C879D] mt-0.5">
-              Danh sách người dùng mới đăng ký chờ xét duyệt vai trò và bộ phận làm việc.
+              Danh sách người dùng mới đăng ký chờ xét duyệt vai trò và bộ phận
+              làm việc.
             </p>
           </div>
           <Link href="/app/admin/accounts/pending">
@@ -401,7 +477,9 @@ export default function AdminDashboardPage() {
                           <p className="text-xs font-bold text-[#24304A]">
                             {u.fullName || "Chưa đặt tên"}
                           </p>
-                          <p className="text-[11px] text-[#7C879D]">{u.email}</p>
+                          <p className="text-[11px] text-[#7C879D]">
+                            {u.email}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
