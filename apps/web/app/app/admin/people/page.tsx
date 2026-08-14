@@ -89,7 +89,6 @@ export default function AdminPeopleDirectoryPage() {
   }, [q, role, departmentId, teamId, employmentStatus, page]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDirectory();
   }, [fetchDirectory]);
 

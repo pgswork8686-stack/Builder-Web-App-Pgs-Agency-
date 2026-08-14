@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AutomationModule } from '../automation/automation.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { CommentsController } from './comments.controller';
 import { CommentsService } from './comments.service';
@@ -10,7 +12,7 @@ import { WorkspaceRealtimeGateway } from './workspace-realtime.gateway';
 import { WorkspaceService } from './workspace.service';
 
 @Module({
-  imports: [SupabaseModule],
+  imports: [SupabaseModule, NotificationsModule, AutomationModule],
   controllers: [WorkspaceController, CommentsController, FilesController],
   providers: [
     WorkspaceAccessService,

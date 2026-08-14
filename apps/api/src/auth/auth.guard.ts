@@ -68,7 +68,9 @@ export class AuthGuard implements CanActivate {
     const userClient = this.supabaseService.createUserClient(token);
     const { data: profile, error: profileError } = await userClient
       .from('profiles')
-      .select('id,email,full_name,avatar_url,role,account_status,approved_at')
+      .select(
+        'id,email,full_name,avatar_url,role,account_status,approved_at,rejection_reason',
+      )
       .eq('id', user.id)
       .maybeSingle();
 
@@ -101,6 +103,7 @@ export class AuthGuard implements CanActivate {
       fullName: profile.full_name ?? null,
       avatarUrl: profile.avatar_url ?? null,
       approvedAt: profile.approved_at ?? null,
+      rejectionReason: profile.rejection_reason ?? null,
     };
 
     request.user = requestUser;

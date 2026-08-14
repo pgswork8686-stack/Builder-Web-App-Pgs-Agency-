@@ -15,6 +15,7 @@ export interface RequestUser {
   fullName: string | null;
   avatarUrl: string | null;
   approvedAt: string | null;
+  rejectionReason?: string | null;
 }
 
 export interface AuthenticatedRequest extends Request {

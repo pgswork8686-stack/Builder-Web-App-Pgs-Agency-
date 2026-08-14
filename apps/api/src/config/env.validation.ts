@@ -16,6 +16,29 @@ const envSchema = z.object({
   INITIAL_ADMIN_EMAIL: z
     .string()
     .email('INITIAL_ADMIN_EMAIL must be a valid email address'),
+  THROTTLE_TTL: z
+    .preprocess(
+      (val) =>
+        val !== undefined && val !== '' ? parseInt(val as string, 10) : 60000,
+      z.number().int().positive(),
+    )
+    .default(60000),
+  THROTTLE_LIMIT: z
+    .preprocess(
+      (val) =>
+        val !== undefined && val !== '' ? parseInt(val as string, 10) : 120,
+      z.number().int().positive(),
+    )
+    .default(120),
+  TRUST_PROXY: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      const lower = val.trim().toLowerCase();
+      if (lower === 'true' || lower === '1') return true;
+      if (lower === 'false' || lower === '0') return false;
+    }
+    if (typeof val === 'boolean') return val;
+    return undefined;
+  }, z.boolean().optional()),
 });
 
 export function validateEnv(config: Record<string, unknown>) {

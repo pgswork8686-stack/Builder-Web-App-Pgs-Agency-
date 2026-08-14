@@ -12,6 +12,7 @@ export interface AccountPayload {
   status: "pending" | "active" | "rejected";
   role: "admin" | "team_leader" | "employee" | "accountant" | "client" | null;
   approvedAt: string | null;
+  rejectionReason: string | null;
 }
 
 export interface AuthMeResponse {

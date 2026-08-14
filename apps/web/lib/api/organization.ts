@@ -1,39 +1,7 @@
-import { createBrowserClient } from "@supabase/ssr";
-
-const getSessionToken = async () => {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-  const { data } = await supabase.auth.getSession();
-  return data.session?.access_token || null;
-};
+import { request } from "./client";
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
-  const token = await getSessionToken();
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  } as Record<string, string>;
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/v1${url}`,
-    {
-      ...options,
-      headers,
-    },
-  );
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Yêu cầu API thất bại");
-  }
-
-  return res.json();
+  return request(url, options);
 };
 
 export const organizationApi = {

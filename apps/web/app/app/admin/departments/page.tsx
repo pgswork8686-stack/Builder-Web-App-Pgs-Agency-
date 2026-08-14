@@ -53,7 +53,6 @@ export default function AdminDepartmentsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDepts();
   }, []);
 

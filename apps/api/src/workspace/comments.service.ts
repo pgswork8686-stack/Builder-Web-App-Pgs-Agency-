@@ -3,9 +3,12 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  Optional,
   NotFoundException,
 } from '@nestjs/common';
+import { AutomationService } from '../automation/automation.service';
 import type { RequestUser } from '../auth/auth.types';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import type {
   CommentPagination,
@@ -29,6 +32,8 @@ export class CommentsService {
     private readonly supabaseService: SupabaseService,
     private readonly accessService: WorkspaceAccessService,
     private readonly realtime: WorkspaceRealtimeGateway,
+    @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly automation?: AutomationService,
   ) {}
 
   private get client() {
@@ -74,6 +79,63 @@ export class CommentsService {
       'COMMENT_ACCESS_DENIED',
     );
     return access;
+  }
+
+  private async notifyCommentCreated(
+    projectId: string,
+    taskId: string,
+    commentId: string,
+    user: RequestUser,
+  ) {
+    if (!this.notifications && !this.automation) return;
+
+    try {
+      const { data: task, error } = await this.client
+        .from('tasks')
+        .select('id,title,project_id,assignee_user_id,reporter_user_id')
+        .eq('id', taskId)
+        .maybeSingle();
+      if (error || !task) return;
+
+      const recipients = [task.assignee_user_id, task.reporter_user_id].filter(
+        (recipient): recipient is string =>
+          Boolean(recipient) && recipient !== user.profileId,
+      );
+
+      await this.notifications?.createForUsers(recipients, {
+        type: 'task.comment',
+        title: 'Binh luan moi',
+        message: `${user.fullName ?? user.email ?? 'Thanh vien'} da binh luan trong cong viec ${task.title}.`,
+        entityType: 'task_comment',
+        entityId: commentId,
+        actionUrl: `/app/projects/${projectId}/tasks/${taskId}`,
+        metadata: { projectId, taskId },
+        actorUserId: user.profileId,
+      });
+
+      await this.automation?.runEvent({
+        triggerType: 'task.updated',
+        eventKey: `task.comment.created:${commentId}`,
+        payload: {
+          projectId,
+          taskId,
+          commentId,
+          assigneeUserId: task.assignee_user_id,
+          reporterUserId: task.reporter_user_id,
+        },
+        actorUserId: user.profileId,
+        defaultRecipients: recipients,
+        title: 'Binh luan moi',
+        message: `Cong viec ${task.title} co binh luan moi.`,
+        entityType: 'task_comment',
+        entityId: commentId,
+        actionUrl: `/app/projects/${projectId}/tasks/${taskId}`,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Comment side effects failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   private mapComment(
@@ -196,6 +258,7 @@ export class CommentsService {
       updatedAt: data.updated_at,
       changes: { taskId },
     });
+    await this.notifyCommentCreated(projectId, taskId, data.id, user);
     return this.mapComment(data, access, user);
   }
 

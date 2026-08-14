@@ -1,9 +1,18 @@
 "use client";
 
 import React from "react";
-import { UserCheck, ShieldCheck, Activity, LogOut } from "lucide-react";
+import Link from "next/link";
+import {
+  UserCheck,
+  ShieldCheck,
+  Activity,
+  LogOut,
+  Bell,
+  MessageCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "@/components/phase7/notification-bell";
 
 export default function AccountantDashboardPage() {
   const router = useRouter();
@@ -30,6 +39,7 @@ export default function AccountantDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
             <UserCheck className="w-3.5 h-3.5" />
             <span>Kế toán (Accountant)</span>
@@ -99,6 +109,76 @@ export default function AccountantDashboardPage() {
             <div className="text-xs text-emerald-400">
               Bảo vệ SSL & RLS Enforced
             </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Link
+            href="/app/notifications"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+          >
+            <Bell className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
+              Thông báo
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Nhận cập nhật hóa đơn, thanh toán, chat và công việc liên quan.
+            </p>
+          </Link>
+
+          <Link
+            href="/app/chat"
+            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+          >
+            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
+            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
+              Chat
+            </h3>
+            <p className="text-xs text-[#606060]">
+              Trao đổi nội bộ hoặc theo project đã được phân quyền.
+            </p>
+          </Link>
+        </div>
+
+        {/* Finance Quick Links Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Quản lý Tài chính</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <Link
+              href="/app/accountant/finance"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Tổng quan tài chính
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Xem doanh thu thực tế, nợ quá hạn và các thay đổi tài chính.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/accountant/finance/contracts"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Danh sách hợp đồng
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Tạo mới, chỉnh sửa nháp và quản lý vòng đời hợp đồng.
+              </p>
+            </Link>
+
+            <Link
+              href="/app/accountant/finance/invoices"
+              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
+            >
+              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
+                Danh sách hóa đơn
+              </h4>
+              <p className="text-xs text-[#606060]">
+                Ghi nhận thanh toán, đánh dấu quá hạn, phát hành hóa đơn.
+              </p>
+            </Link>
           </div>
         </div>
       </main>
