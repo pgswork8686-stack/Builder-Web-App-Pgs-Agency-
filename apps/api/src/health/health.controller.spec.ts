@@ -17,9 +17,11 @@ describe('HealthController', () => {
   });
 
   it('should return health status', () => {
-    expect(controller.getHealth()).toEqual({
+    const result = controller.getHealth();
+    expect(result).toMatchObject({
       status: 'ok',
       service: 'pgs-hub-api',
     });
+    expect(result.timestamp).toBeDefined();
   });
 });

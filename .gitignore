@@ -9,13 +9,21 @@ dist/
 .next/
 out/
 build/
+.turbo/
+.tmp-production-api/
+.tmp*/
+cache/
 
 # local environment
 .env
 .env.local
+.env.development
 .env.development.local
 .env.test.local
+.env.production
 .env.production.local
+apps/api/.env
+apps/web/.env.local
 
 # logs
 npm-debug.log*

@@ -12,7 +12,8 @@ describe('notification DTO validation', () => {
       }).success,
     ).toBe(true);
     expect(
-      NotificationPreferencesUpdateSchema.safeParse({ preferences: {} }).success,
+      NotificationPreferencesUpdateSchema.safeParse({ preferences: {} })
+        .success,
     ).toBe(false);
     expect(
       NotificationPreferencesUpdateSchema.safeParse({ inAppEnabled: 'true' })

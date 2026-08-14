@@ -7,6 +7,7 @@ export class HealthController {
     return {
       status: 'ok',
       service: 'pgs-hub-api',
+      timestamp: new Date().toISOString(),
     };
   }
 }

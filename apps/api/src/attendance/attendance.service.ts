@@ -315,6 +315,61 @@ export class AttendanceService {
     return session.expected_path;
   }
 
+  private calculateHaversineDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
+    const R = 6371e3; // meters
+    const phi1 = (lat1 * Math.PI) / 180;
+    const phi2 = (lat2 * Math.PI) / 180;
+    const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+    const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) *
+        Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) *
+        Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
+  private validateGeofence(
+    latitude: number | null | undefined,
+    longitude: number | null | undefined,
+    settings: any,
+  ) {
+    if (
+      settings?.office_latitude !== null &&
+      settings?.office_latitude !== undefined &&
+      settings?.office_longitude !== null &&
+      settings?.office_longitude !== undefined &&
+      settings?.location_radius_meters !== null &&
+      settings?.location_radius_meters !== undefined &&
+      latitude !== null &&
+      latitude !== undefined &&
+      longitude !== null &&
+      longitude !== undefined
+    ) {
+      const distance = this.calculateHaversineDistance(
+        latitude,
+        longitude,
+        Number(settings.office_latitude),
+        Number(settings.office_longitude),
+      );
+      if (distance > Number(settings.location_radius_meters)) {
+        throw new BadRequestException({
+          code: 'OUTSIDE_ALLOWED_LOCATION',
+          message: 'Vị trí của bạn nằm ngoài bán kính cho phép chấm công.',
+        });
+      }
+    }
+  }
+
   // Check In API implementation using atomic DB RPC
   async checkIn(dto: CheckInDto, user: RequestUser) {
     this.enforceInternalUser(user);
@@ -333,6 +388,9 @@ export class AttendanceService {
         message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
       });
     }
+
+    // Validate geofence
+    this.validateGeofence(dto.latitude, dto.longitude, settings);
 
     // Check photo requirement
     if (settings?.photo_required && !dto.photoUploadSessionId) {
@@ -445,6 +503,9 @@ export class AttendanceService {
         message: 'Thời gian check-out phải sau thời gian check-in.',
       });
     }
+
+    // Validate geofence
+    this.validateGeofence(dto.latitude, dto.longitude, settings);
 
     // Verify photo session (validates ownership, expiry, MIME/size exact binding)
     // DB derives the photo path internally from the session — no path returned needed here

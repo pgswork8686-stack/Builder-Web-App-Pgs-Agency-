@@ -121,6 +121,9 @@ export class ChatRealtimeGateway implements OnGatewayConnection {
         parsed.data.conversationId,
         user,
       );
+      for (const room of client.rooms) {
+        if (room.startsWith('chat:')) await client.leave(room);
+      }
       await client.join(`chat:${parsed.data.conversationId}`);
       return { ok: true, conversationId: parsed.data.conversationId };
     } catch {
@@ -128,11 +131,42 @@ export class ChatRealtimeGateway implements OnGatewayConnection {
     }
   }
 
-  emitConversation(
+  async emitConversation(
     conversationId: string,
     event: string,
     payload: unknown,
-  ): void {
-    this.server?.to(`chat:${conversationId}`).emit(event, payload);
+  ): Promise<void> {
+    if (!this.server) return;
+
+    const room = `chat:${conversationId}`;
+    try {
+      const sockets = await this.server.in(room).fetchSockets();
+      const authorizedSockets = await Promise.all(
+        sockets.map(async (socket) => {
+          const user = socket.data.user as RequestUser | undefined;
+          try {
+            if (!user) throw new Error('missing socket user');
+            await this.accessService.requireConversationMembership(
+              conversationId,
+              user,
+            );
+            return socket;
+          } catch {
+            socket.emit('chat.error', { code: 'CHAT_ACCESS_DENIED' });
+            socket.leave(room);
+            return null;
+          }
+        }),
+      );
+      for (const socket of authorizedSockets) {
+        socket?.emit(event, payload);
+      }
+    } catch (error) {
+      const detail =
+        typeof error === 'object' && error && 'message' in error
+          ? String(error.message)
+          : String(error);
+      this.logger.error(`Chat room broadcast failed: ${detail}`);
+    }
   }
 }

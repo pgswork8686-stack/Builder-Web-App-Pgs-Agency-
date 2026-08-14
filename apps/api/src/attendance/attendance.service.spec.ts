@@ -114,6 +114,28 @@ describe('AttendanceService', () => {
         BadRequestException,
       );
     });
+
+    it('rejects check-in if coordinates are outside geofence', async () => {
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({
+            data: {
+              office_latitude: 21.0285,
+              office_longitude: 105.8542,
+              location_radius_meters: 100,
+            },
+          });
+        }
+        return queryResult({});
+      });
+
+      await expect(
+        service.checkIn(
+          { latitude: 10.8231, longitude: 106.6297 },
+          user('employee'),
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('Check-Out logic', () => {

@@ -126,10 +126,7 @@ describe('NotificationsService', () => {
 
     expect(updateQuery.is).toHaveBeenCalledWith('read_at', null);
     expect(existingQuery.eq).toHaveBeenCalledWith('id', NOTIFICATION_ID);
-    expect(existingQuery.eq).toHaveBeenCalledWith(
-      'recipient_user_id',
-      USER_ID,
-    );
+    expect(existingQuery.eq).toHaveBeenCalledWith('recipient_user_id', USER_ID);
     expect(result.readAt).toBe('2026-08-13T00:00:00.000Z');
     expect(gateway.emitToUser).not.toHaveBeenCalled();
   });

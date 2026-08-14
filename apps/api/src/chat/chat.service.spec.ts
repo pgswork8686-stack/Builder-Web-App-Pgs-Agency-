@@ -1,8 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
 import type { RequestUser } from '../auth/auth.types';
+import type { AutomationService } from '../automation/automation.service';
 import type { NotificationsService } from '../notifications/notifications.service';
 import type { SupabaseService } from '../supabase/supabase.service';
 import type { ChatAccessService } from './chat-access.service';
+import type { ChatRealtimeGateway } from './chat-realtime.gateway';
 import { ChatService } from './chat.service';
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
@@ -37,6 +39,8 @@ function query(result: Record<string, unknown> = {}) {
     'insert',
     'single',
     'maybeSingle',
+    'neq',
+    'gt',
   ]) {
     chain[method] = jest.fn(() => chain);
   }
@@ -56,23 +60,35 @@ function query(result: Record<string, unknown> = {}) {
 describe('ChatService', () => {
   let from: jest.Mock;
   let rpc: jest.Mock;
-  let access: { requireConversationMembership: jest.Mock };
+  let access: {
+    requireConversationMembership: jest.Mock;
+    listAccessibleConversationMemberships: jest.Mock;
+    listAuthorizedConversationUserIds: jest.Mock;
+  };
   let notifications: { createForUsers: jest.Mock };
+  let automation: { runEvent: jest.Mock };
   let realtime: { emitConversation: jest.Mock };
   let service: ChatService;
 
   beforeEach(() => {
     from = jest.fn();
     rpc = jest.fn();
-    access = { requireConversationMembership: jest.fn().mockResolvedValue({}) };
+    access = {
+      requireConversationMembership: jest.fn().mockResolvedValue({}),
+      listAccessibleConversationMemberships: jest.fn().mockResolvedValue([]),
+      listAuthorizedConversationUserIds: jest
+        .fn()
+        .mockResolvedValue([USER_ID, PEER_ID]),
+    };
     notifications = { createForUsers: jest.fn().mockResolvedValue([]) };
+    automation = { runEvent: jest.fn().mockResolvedValue(undefined) };
     realtime = { emitConversation: jest.fn() };
     service = new ChatService(
       { getSystemClient: () => ({ from, rpc }) } as unknown as SupabaseService,
       access as unknown as ChatAccessService,
       notifications as unknown as NotificationsService,
-      undefined,
-      realtime as any,
+      automation as unknown as AutomationService,
+      realtime as unknown as ChatRealtimeGateway,
     );
   });
 
@@ -122,6 +138,27 @@ describe('ChatService', () => {
     expect(result.nextBefore).toBe('2026-08-13T09:00:00.000Z');
   });
 
+  it('counts only live-authorized conversations instead of the legacy unread RPC', async () => {
+    access.listAccessibleConversationMemberships.mockResolvedValueOnce([
+      { conversation_id: CONVERSATION_ID, read_at: null },
+      {
+        conversation_id: '55555555-5555-4555-8555-555555555555',
+        read_at: null,
+      },
+    ]);
+    from
+      .mockReturnValueOnce(query({ data: [{ id: MESSAGE_ID }] }))
+      .mockReturnValueOnce(query({ data: [] }));
+
+    await expect(service.unreadCount(user())).resolves.toEqual({
+      unreadCount: 1,
+    });
+    expect(access.listAccessibleConversationMemberships).toHaveBeenCalledWith(
+      expect.objectContaining({ profileId: USER_ID }),
+    );
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
   it('persists before emitting and notifying other members', async () => {
     const messageQuery = query({
       data: {
@@ -155,6 +192,35 @@ describe('ChatService', () => {
         type: 'chat.message',
         actorUserId: USER_ID,
       }),
+    );
+    expect(access.listAuthorizedConversationUserIds).toHaveBeenCalledWith(
+      CONVERSATION_ID,
+    );
+  });
+
+  it('returns the persisted message when notification or automation side effects fail', async () => {
+    const messageQuery = query({
+      data: {
+        id: MESSAGE_ID,
+        conversation_id: CONVERSATION_ID,
+        sender_user_id: USER_ID,
+        content: 'hello',
+        created_at: '2026-08-13T10:00:00.000Z',
+      },
+    });
+    from.mockReturnValueOnce(messageQuery);
+    notifications.createForUsers.mockRejectedValueOnce(
+      new Error('notifications unavailable'),
+    );
+    automation.runEvent.mockRejectedValueOnce(
+      new Error('automation unavailable'),
+    );
+
+    await expect(
+      service.sendMessage(CONVERSATION_ID, { content: 'hello' }, user()),
+    ).resolves.toMatchObject({ id: MESSAGE_ID, content: 'hello' });
+    expect(automation.runEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ eventKey: `chat.message:${MESSAGE_ID}` }),
     );
   });
 });

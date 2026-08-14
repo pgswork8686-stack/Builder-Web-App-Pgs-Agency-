@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
@@ -17,10 +19,18 @@ import { ServicesModule } from './services/services.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { TasksModule } from './tasks/tasks.module';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 
 @Module({
   imports: [
     ConfigModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 120,
+      },
+    ]),
     HealthModule,
     SupabaseModule,
     AuthModule,
@@ -39,5 +49,15 @@ import { WorkspaceModule } from './workspace/workspace.module';
     ChatModule,
     AutomationModule,
   ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes('*');
+  }
+}

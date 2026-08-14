@@ -18,14 +18,16 @@ describe('HealthController (e2e)', () => {
     await app.init();
   });
 
-  it('/api/v1/health (GET)', () => {
-    return request(app.getHttpServer())
+  it('/api/v1/health (GET)', async () => {
+    const res = await request(app.getHttpServer())
       .get('/api/v1/health')
-      .expect(200)
-      .expect({
-        status: 'ok',
-        service: 'pgs-hub-api',
-      });
+      .expect(200);
+
+    expect(res.body).toMatchObject({
+      status: 'ok',
+      service: 'pgs-hub-api',
+    });
+    expect(res.body.timestamp).toBeDefined();
   });
 
   it('should run under test environment (APP_ENV=test)', () => {

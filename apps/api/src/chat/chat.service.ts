@@ -115,29 +115,14 @@ export class ChatService {
   }
 
   async listConversations(query: ChatConversationQuery, user: RequestUser) {
+    const memberships =
+      await this.accessService.listAccessibleConversationMemberships(user);
     const offset = (query.page - 1) * query.pageSize;
-    const { data, count, error } = await this.client
-      .from('chat_members')
-      .select(
-        '*, conversation:chat_conversations(*, project:projects(id,project_code,name))',
-        { count: 'exact' },
-      )
-      .eq('user_id', user.profileId)
-      .order('updated_at', { ascending: false })
-      .order('id', { ascending: false })
-      .range(offset, offset + query.pageSize - 1);
-
-    if (error) {
-      this.databaseFailure(
-        'CHAT_CONVERSATIONS_LOOKUP_FAILED',
-        'Khong the tai danh sach chat.',
-        error,
-      );
-    }
-
-    const total = count ?? 0;
+    const total = memberships.length;
     return {
-      items: (data ?? []).map((row) => this.mapConversation(row, user)),
+      items: memberships
+        .slice(offset, offset + query.pageSize)
+        .map((row) => this.mapConversation(row, user)),
       page: query.page,
       pageSize: query.pageSize,
       total,
@@ -146,17 +131,29 @@ export class ChatService {
   }
 
   async unreadCount(user: RequestUser) {
-    const { data, error } = await this.client.rpc('phase7_chat_unread_count', {
-      p_user_id: user.profileId,
-    });
-    if (error) {
-      this.databaseFailure(
-        'CHAT_UNREAD_COUNT_FAILED',
-        'Khong the dem tin nhan chua doc.',
-        error,
-      );
-    }
-    return { unreadCount: Number(data ?? 0) };
+    const memberships =
+      await this.accessService.listAccessibleConversationMemberships(user);
+    const unreadChecks = await Promise.all(
+      memberships.map(async (membership) => {
+        const { data, error } = await this.client
+          .from('chat_messages')
+          .select('id')
+          .eq('conversation_id', membership.conversation_id)
+          .neq('sender_user_id', user.profileId)
+          .gt('created_at', membership.read_at ?? '1970-01-01T00:00:00.000Z')
+          .limit(1);
+
+        if (error) {
+          this.databaseFailure(
+            'CHAT_UNREAD_COUNT_FAILED',
+            'Khong the dem tin nhan chua doc.',
+            error,
+          );
+        }
+        return (data?.length ?? 0) > 0;
+      }),
+    );
+    return { unreadCount: unreadChecks.filter(Boolean).length };
   }
 
   async createDirectConversation(
@@ -222,7 +219,7 @@ export class ChatService {
         message: 'Khong tim thay cuoc tro chuyen.',
       });
     }
-    return this.mapConversation(data, user);
+    return this.mapConversation(data as Record<string, any>, user);
   }
 
   async listMessages(
@@ -258,7 +255,9 @@ export class ChatService {
       );
     }
 
-    const rows = (data ?? []).map((row) => this.mapMessage(row));
+    const rows = ((data ?? []) as Record<string, any>[]).map((row) =>
+      this.mapMessage(row),
+    );
     const nextBefore =
       rows.length === query.limit
         ? (rows[rows.length - 1]?.createdAt ?? null)
@@ -300,38 +299,46 @@ export class ChatService {
       );
     }
 
-    const message = this.mapMessage(data);
-    this.realtime?.emitConversation(
-      conversationId,
-      'chat:message:new',
-      message,
-    );
-
-    const { data: members, error: membersError } = await this.client
-      .from('chat_members')
-      .select('user_id')
-      .eq('conversation_id', conversationId);
-
-    if (membersError) {
-      this.logger.error(
-        `Chat notification member lookup failed: ${membersError.message}`,
+    const message = this.mapMessage(data as Record<string, any>);
+    try {
+      this.realtime?.emitConversation(
+        conversationId,
+        'chat:message:new',
+        message,
       );
-    } else {
-      await this.notificationsService.createForUsers(
-        (members ?? [])
-          .map((member) => member.user_id)
-          .filter((recipient) => recipient !== user.profileId),
-        {
-          type: 'chat.message',
-          title: 'Tin nhắn mới',
-          message: `${user.fullName ?? user.email ?? 'Thanh vien'} da gui tin nhan moi.`,
-          entityType: 'chat_conversation',
-          entityId: conversationId,
-          actionUrl: `/app/chat?conversationId=${conversationId}`,
-          metadata: { messageId: message.id },
-          actorUserId: user.profileId,
-        },
+    } catch (realtimeError) {
+      this.logSideEffectFailure('realtime broadcast', realtimeError);
+    }
+
+    let recipients: string[] = [];
+    try {
+      recipients =
+        await this.accessService.listAuthorizedConversationUserIds(
+          conversationId,
+        );
+      recipients = recipients.filter(
+        (recipient) => recipient !== user.profileId,
       );
+    } catch (recipientError) {
+      this.logSideEffectFailure('recipient lookup', recipientError);
+    }
+
+    try {
+      await this.notificationsService.createForUsers(recipients, {
+        type: 'chat.message',
+        title: 'Tin nhắn mới',
+        message: `${user.fullName ?? user.email ?? 'Thanh vien'} da gui tin nhan moi.`,
+        entityType: 'chat_conversation',
+        entityId: conversationId,
+        actionUrl: `/app/chat?conversationId=${conversationId}`,
+        metadata: { messageId: message.id },
+        actorUserId: user.profileId,
+      });
+    } catch (notificationError) {
+      this.logSideEffectFailure('notification delivery', notificationError);
+    }
+
+    try {
       await this.automation?.runEvent({
         triggerType: 'chat.message',
         eventKey: `chat.message:${message.id}`,
@@ -341,15 +348,15 @@ export class ChatService {
           senderUserId: user.profileId,
         },
         actorUserId: user.profileId,
-        defaultRecipients: (members ?? [])
-          .map((member) => member.user_id)
-          .filter((recipient) => recipient !== user.profileId),
+        defaultRecipients: recipients,
         title: 'Tin nhan moi',
         message: `${user.fullName ?? user.email ?? 'Thanh vien'} da gui tin nhan moi.`,
         entityType: 'chat_message',
         entityId: message.id,
         actionUrl: `/app/chat?conversationId=${conversationId}`,
       });
+    } catch (automationError) {
+      this.logSideEffectFailure('automation', automationError);
     }
 
     return message;
@@ -374,14 +381,28 @@ export class ChatService {
         error,
       );
     }
-    this.realtime?.emitConversation(conversationId, 'chat:read', {
-      conversationId,
-      userId: user.profileId,
-      readAt: data?.read_at ?? new Date().toISOString(),
-    });
+    try {
+      this.realtime?.emitConversation(conversationId, 'chat:read', {
+        conversationId,
+        userId: user.profileId,
+        readAt: data?.read_at ?? new Date().toISOString(),
+      });
+    } catch (realtimeError) {
+      this.logSideEffectFailure('read receipt broadcast', realtimeError);
+    }
     return {
       conversationId,
       readAt: data?.read_at ?? null,
     };
+  }
+
+  private logSideEffectFailure(operation: string, error: unknown): void {
+    const detail =
+      typeof error === 'object' && error && 'message' in error
+        ? String(error.message)
+        : String(error);
+    this.logger.error(
+      `Chat ${operation} failed after message persistence: ${detail}`,
+    );
   }
 }

@@ -8,6 +8,7 @@ import { ChatRealtimeGateway } from './chat-realtime.gateway';
 
 const CONVERSATION_ID = '11111111-1111-4111-8111-111111111111';
 const USER_ID = '22222222-2222-4222-8222-222222222222';
+const REVOKED_USER_ID = '33333333-3333-4333-8333-333333333333';
 
 function profileQuery(data: unknown, error: unknown = null) {
   const chain: Record<string, jest.Mock> = {};
@@ -24,6 +25,7 @@ function socket(token?: string) {
     data: {},
     rooms: new Set(['socket-id']),
     join: jest.fn().mockResolvedValue(undefined),
+    leave: jest.fn().mockResolvedValue(undefined),
   } as unknown as Socket;
 }
 
@@ -94,6 +96,7 @@ describe('ChatRealtimeGateway', () => {
   it('allows only members to join a conversation room', async () => {
     const client = socket('token');
     client.data.user = requestUser('employee');
+    client.rooms.add('chat:old-conversation');
 
     await expect(
       gateway.joinConversation(client, { conversationId: CONVERSATION_ID }),
@@ -103,6 +106,7 @@ describe('ChatRealtimeGateway', () => {
       expect.objectContaining({ profileId: USER_ID }),
     );
     expect(client.join).toHaveBeenCalledWith(`chat:${CONVERSATION_ID}`);
+    expect(client.leave).toHaveBeenCalledWith('chat:old-conversation');
   });
 
   it('denies arbitrary room joins for non-members', async () => {
@@ -117,6 +121,52 @@ describe('ChatRealtimeGateway', () => {
     ).resolves.toEqual({
       ok: false,
       error: { code: 'CHAT_ACCESS_DENIED' },
+    });
+  });
+
+  it('evicts a revoked member before broadcasting to a stale room', async () => {
+    const authorizedSocket = {
+      data: { user: requestUser() },
+      emit: jest.fn(),
+      leave: jest.fn().mockResolvedValue(undefined),
+    };
+    const revokedSocket = {
+      data: {
+        user: { ...requestUser(), profileId: REVOKED_USER_ID },
+      },
+      emit: jest.fn(),
+      leave: jest.fn().mockResolvedValue(undefined),
+    };
+    const fetchSockets = jest
+      .fn()
+      .mockResolvedValue([authorizedSocket, revokedSocket]);
+    const server = {
+      in: jest.fn(() => ({ fetchSockets })),
+    };
+    (gateway as unknown as { server: unknown }).server = server;
+    access.requireConversationMembership.mockImplementation(
+      (_conversationId: string, candidate: RequestUser) => {
+        if (candidate.profileId === REVOKED_USER_ID) {
+          return Promise.reject(new ForbiddenException());
+        }
+        return Promise.resolve({});
+      },
+    );
+
+    await gateway.emitConversation(CONVERSATION_ID, 'chat:message:new', {
+      id: 'message-id',
+    });
+
+    expect(revokedSocket.emit).toHaveBeenCalledWith('chat.error', {
+      code: 'CHAT_ACCESS_DENIED',
+    });
+    expect(revokedSocket.leave).toHaveBeenCalledWith(`chat:${CONVERSATION_ID}`);
+    expect(authorizedSocket.leave).not.toHaveBeenCalled();
+    expect(authorizedSocket.emit).toHaveBeenCalledWith('chat:message:new', {
+      id: 'message-id',
+    });
+    expect(revokedSocket.emit).not.toHaveBeenCalledWith('chat:message:new', {
+      id: 'message-id',
     });
   });
 });
