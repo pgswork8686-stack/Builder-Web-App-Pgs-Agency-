@@ -56,7 +56,9 @@ export function NotificationBell() {
         notificationsApi.list({ page: 1, pageSize: 6 }),
         notificationsApi.unreadCount(),
       ]);
-      list.items.forEach((item) => receivedNotificationIds.current.add(item.id));
+      list.items.forEach((item) =>
+        receivedNotificationIds.current.add(item.id),
+      );
       setItems(list.items);
       setUnreadCount(count.unreadCount);
     } catch {
@@ -73,7 +75,9 @@ export function NotificationBell() {
 
     handledReadIds.current.add(notification.id);
     setItems((current) =>
-      current.map((item) => (item.id === notification.id ? notification : item)),
+      current.map((item) =>
+        item.id === notification.id ? notification : item,
+      ),
     );
     setUnreadCount((value) => Math.max(0, value - 1));
   }, []);

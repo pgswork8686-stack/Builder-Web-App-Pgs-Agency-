@@ -50,7 +50,8 @@ SUPABASE_SECRET_KEY=your-supabase-secret-key
 INITIAL_ADMIN_EMAIL=admin@example.com
 ```
 
-*Các biến cấu hình tùy chọn (Production Throttling & Proxy):*
+_Các biến cấu hình tùy chọn (Production Throttling & Proxy):_
+
 ```env
 # THROTTLE_TTL: cửa sổ giới hạn tính bằng mili-giây (default: 60000ms = 60s)
 THROTTLE_TTL=60000
@@ -122,6 +123,7 @@ pnpm build
 ## Security & Production Hardening (Phase 8)
 
 Hệ thống được bảo vệ qua các lớp bảo mật toàn diện:
+
 1. **API Security Headers**: Helmet kích hoạt CSP, Frame protection (`frameAncestors: none`), X-Content-Type-Options, Referrer-Policy, HSTS (Production).
 2. **Strict CORS**: Whitelist origin theo `WEB_URL`, kiểm tra nguồn request chặt chẽ.
 3. **Throttling / Rate Limiting**: Tích hợp `@nestjs/throttler` bảo vệ chống brute-force và DDoS.
