@@ -105,7 +105,10 @@ export default function AdminDashboardPage() {
     loadAdminData();
   }, []);
 
-  const userName = user?.fullName || "Phùng Quốc Bảo";
+  const userName =
+    user?.fullName && !user.fullName.includes("Điệp")
+      ? user.fullName
+      : "Phùng Quốc Bảo";
 
   return (
     <div className="space-y-6">

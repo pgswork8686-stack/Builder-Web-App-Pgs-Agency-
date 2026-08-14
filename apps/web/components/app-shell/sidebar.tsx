@@ -49,14 +49,14 @@ export function Sidebar({
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-[#EDF2F7] bg-white transition-all duration-300 relative z-20 select-none shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
+      className={`hidden lg:flex flex-col sticky top-0 h-screen border-r border-[#EDF2F7] bg-white transition-all duration-300 relative z-20 select-none shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-5 border-b border-[#EDF2F7]">
-        <Link href="/app" className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-sm shadow-md shrink-0">
+      <div className="h-14 flex items-center justify-between px-4 border-b border-[#EDF2F7] shrink-0">
+        <Link href="/app" className="flex items-center gap-2.5 min-w-0">
+          <div className="w-7 h-7 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-xs shadow-xs shrink-0">
             P
           </div>
           {!collapsed && (
@@ -64,7 +64,7 @@ export function Sidebar({
               <span className="font-black text-sm tracking-tight text-[#24304A]">
                 PGS Hub
               </span>
-              <span className="text-[11px] font-semibold text-[#7C879D] tracking-tight">
+              <span className="text-[10px] font-semibold text-[#7C879D] tracking-tight">
                 {subtitle}
               </span>
             </div>
@@ -75,7 +75,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="p-1 rounded-lg text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
         >
@@ -88,16 +88,16 @@ export function Sidebar({
       </div>
 
       {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-none">
+      <div className="flex-1 overflow-y-auto py-2.5 px-2.5 space-y-3 scrollbar-thin">
         {/* Dedicated Highlight Action if Admin or Employee */}
         {!collapsed && account.role === "admin" && (
           <Link
             href="/app/admin/accounts/pending"
-            className="flex items-center justify-between p-3 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] hover:bg-[#E0EAFF] transition-all group"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] hover:bg-[#E0EAFF] transition-all group"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#5D87FF] text-white flex items-center justify-center">
-                <UserCheck className="w-4 h-4" />
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-[#5D87FF] text-white flex items-center justify-center">
+                <UserCheck className="w-3.5 h-3.5" />
               </div>
               <span className="text-xs font-bold text-[#24304A] group-hover:text-[#5D87FF]">
                 Yêu cầu tài khoản
@@ -110,26 +110,26 @@ export function Sidebar({
         {!collapsed && account.role === "employee" && (
           <Link
             href="/app/attendance"
-            className="flex items-center justify-between p-3 rounded-2xl bg-[#FEF9C3] border border-[#FFC400]/40 text-[#92400E] hover:bg-[#FEF08A] transition-all group"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-[#FEF9C3] border border-[#FFC400]/40 text-[#92400E] hover:bg-[#FEF08A] transition-all group"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#FFC400] text-white flex items-center justify-center">
-                <Clock className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-[#FFC400] text-white flex items-center justify-center">
+                <Clock className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="text-xs font-bold text-[#92400E]">
                 Chấm công bắt buộc
               </span>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-white">
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FFC400] text-white">
               GPS
             </span>
           </Link>
         )}
 
         {navGroups.map((group, groupIdx) => (
-          <div key={group.groupTitle || groupIdx} className="space-y-1">
+          <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#7C879D]">
+              <div className="px-2.5 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#7C879D]">
                 {group.groupTitle}
               </div>
             )}
@@ -144,15 +144,15 @@ export function Sidebar({
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.title : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 group relative ${
+                  className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 group relative ${
                     active
                       ? "bg-[#EEF2FF] text-[#5D87FF] font-bold shadow-2xs"
                       : "text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC]"
-                  } ${collapsed ? "justify-center px-0" : ""}`}
+                  } ${collapsed ? "justify-center px-0 py-2" : ""}`}
                 >
                   {!collapsed && (
                     <span
-                      className={`text-[11px] font-mono font-medium ${
+                      className={`text-[10px] font-mono font-medium ${
                         active ? "text-[#5D87FF]" : "text-[#7C879D]"
                       }`}
                     >
@@ -171,7 +171,7 @@ export function Sidebar({
                     <span className="truncate flex-1">{item.title}</span>
                   )}
                   {!collapsed && item.badge && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-[#5D87FF]/10 text-[#5D87FF] text-[10px] font-bold">
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#5D87FF]/10 text-[#5D87FF] text-[9px] font-bold">
                       {item.badge}
                     </span>
                   )}
@@ -182,22 +182,22 @@ export function Sidebar({
         ))}
       </div>
 
-      {/* Footer / Support & User Card */}
+      {/* Footer / Support & User Card - Compact & Elevated */}
       {!collapsed ? (
-        <div className="p-4 border-t border-[#EDF2F7] space-y-3">
-          <div className="p-3.5 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-2">
-            <div className="flex items-center gap-2 text-[#5D87FF] text-xs font-bold">
-              <HelpCircle className="w-4 h-4" />
+        <div className="p-3 border-t border-[#EDF2F7] space-y-2 shrink-0 bg-white">
+          <div className="p-2.5 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[#5D87FF] text-xs font-bold">
+              <HelpCircle className="w-3.5 h-3.5" />
               <span>Cần hỗ trợ?</span>
             </div>
-            <p className="text-[11px] text-[#7C879D] leading-tight">
+            <p className="text-[10px] text-[#7C879D] leading-tight">
               {account.role === "admin"
-                ? "Xem hướng dẫn hoặc gửi yêu cầu cho bộ phận kỹ thuật."
-                : "Xem hướng dẫn và quy trình sử dụng theo vai trò."}
+                ? "Xem hướng dẫn hoặc gửi yêu cầu hỗ trợ."
+                : "Xem hướng dẫn và quy trình theo vai trò."}
             </p>
             <button
               type="button"
-              className="w-full py-1.5 px-2 rounded-xl bg-[#5D87FF] hover:bg-[#4F75FF] text-white text-[11px] font-bold transition-colors cursor-pointer"
+              className="w-full py-1 px-2 rounded-lg bg-[#5D87FF] hover:bg-[#4F75FF] text-white text-[10px] font-bold transition-colors cursor-pointer"
             >
               {account.role === "admin"
                 ? "Mở trung tâm hỗ trợ"
@@ -208,7 +208,7 @@ export function Sidebar({
           {/* Authenticated User Preview Card */}
           <Link
             href="/app/profile"
-            className="flex items-center gap-3 p-2 rounded-2xl hover:bg-[#F6F8FC] transition-colors group"
+            className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
           >
             <Avatar name={displayName} size="sm" />
             <div className="flex flex-col min-w-0 flex-1">
