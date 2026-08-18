@@ -95,9 +95,7 @@ export default function AdminDashboardPage() {
 
         // Test real API health
         try {
-          const healthRes = await fetch(
-            `${API_BASE_URL.replace("/api/v1", "")}/api/v1/health`,
-          );
+          const healthRes = await fetch(`${API_BASE_URL}/health`);
           if (healthRes.ok) {
             const healthData = await healthRes.json();
             setApiHealthy(healthData.status === "ok");

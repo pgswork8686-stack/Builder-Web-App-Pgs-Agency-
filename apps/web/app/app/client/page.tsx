@@ -160,7 +160,7 @@ export default function ClientDashboardPage() {
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
             <p className="text-2xl font-black text-[#24304A] mt-2">
-              {activeProjectsCount.toString().padStart(2, "0")}
+              {activeProjectsCount}
             </p>
           </Card>
         </Link>
@@ -168,28 +168,36 @@ export default function ClientDashboardPage() {
         <Link href="/app/client/approvals">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
-            <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo dự án
+            </p>
           </Card>
         </Link>
 
         <Link href="/app/client/documents">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <span className="text-xs font-bold text-[#7C879D]">Tài liệu</span>
-            <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo dự án
+            </p>
           </Card>
         </Link>
 
         <Link href="/app/client/meetings">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <span className="text-xs font-bold text-[#7C879D]">Cuộc họp</span>
-            <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo lịch
+            </p>
           </Card>
         </Link>
 
         <Link href="/app/client/support">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
-            <span className="text-xs font-bold text-[#7C879D]">Ticket</span>
-            <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
+            <span className="text-xs font-bold text-[#7C879D]">Hỗ trợ</span>
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Chat nội bộ
+            </p>
           </Card>
         </Link>
       </div>

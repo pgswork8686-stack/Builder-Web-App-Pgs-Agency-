@@ -186,7 +186,7 @@ export default function TeamLeaderDashboardPage() {
               </span>
             </div>
             <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.projectCount.toString().padStart(2, "0")}
+              {stats.projectCount}
             </p>
           </Card>
         </Link>
@@ -199,8 +199,8 @@ export default function TeamLeaderDashboardPage() {
                 CV
               </span>
             </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.openTasks.toString().padStart(2, "0")}
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo dự án
             </p>
           </Card>
         </Link>
@@ -215,8 +215,8 @@ export default function TeamLeaderDashboardPage() {
                 DU
               </span>
             </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.pendingApprovals.toString().padStart(2, "0")}
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Nghỉ phép & Task
             </p>
           </Card>
         </Link>
@@ -231,8 +231,8 @@ export default function TeamLeaderDashboardPage() {
                 TV
               </span>
             </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.teamMembers.toString().padStart(2, "0")}
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo nhóm
             </p>
           </Card>
         </Link>
@@ -245,8 +245,8 @@ export default function TeamLeaderDashboardPage() {
                 DL
               </span>
             </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.nearDeadlines.toString().padStart(2, "0")}
+            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+              Theo lịch
             </p>
           </Card>
         </Link>
