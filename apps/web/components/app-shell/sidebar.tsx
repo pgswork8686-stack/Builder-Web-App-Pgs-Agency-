@@ -49,11 +49,11 @@ export function Sidebar({
 
   return (
     <aside
-      className={`hidden lg:flex flex-col sticky top-0 h-screen border-r border-[#EDF2F7] bg-white transition-all duration-300 relative z-20 select-none shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
+      className={`hidden lg:flex flex-col sticky top-0 h-screen border-r border-[#EDF2F7] bg-white transition-all duration-300 z-20 select-none shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* Brand Header */}
+      {/* Brand Header - Fixed Top */}
       <div className="h-14 flex items-center justify-between px-4 border-b border-[#EDF2F7] shrink-0">
         <Link href="/app" className="flex items-center gap-2.5 min-w-0">
           <div className="w-7 h-7 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-xs shadow-xs shrink-0">
@@ -87,8 +87,8 @@ export function Sidebar({
         </button>
       </div>
 
-      {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto py-2.5 px-2.5 space-y-3 scrollbar-thin">
+      {/* Navigation Links - Scrollable Center Area */}
+      <div className="flex-1 overflow-y-auto py-2.5 px-2.5 space-y-3 scrollbar-none">
         {/* Dedicated Highlight Action if Admin or Employee */}
         {!collapsed && account.role === "admin" && (
           <Link
@@ -182,9 +182,9 @@ export function Sidebar({
         ))}
       </div>
 
-      {/* Footer / Support & User Card - Compact & Elevated */}
+      {/* Footer / Support & User Card - Fixed to Bottom (mt-auto) */}
       {!collapsed ? (
-        <div className="p-3 border-t border-[#EDF2F7] space-y-2 shrink-0 bg-white">
+        <div className="mt-auto p-3 border-t border-[#EDF2F7] space-y-2 shrink-0 bg-white">
           <div className="p-2.5 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-1.5">
             <div className="flex items-center gap-1.5 text-[#5D87FF] text-xs font-bold">
               <HelpCircle className="w-3.5 h-3.5" />
