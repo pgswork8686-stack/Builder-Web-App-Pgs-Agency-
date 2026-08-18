@@ -49,7 +49,7 @@ export function Sidebar({
 
   return (
     <aside
-      className={`hidden lg:flex flex-col sticky top-0 h-screen border-r border-[#EDF2F7] bg-white transition-all duration-300 z-20 select-none shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
+      className={`hidden lg:flex flex-col h-full border-r border-[#EDF2F7] bg-white transition-all duration-300 z-20 select-none shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
         collapsed ? "w-20" : "w-64"
       }`}
     >

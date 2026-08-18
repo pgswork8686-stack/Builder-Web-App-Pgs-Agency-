@@ -331,30 +331,39 @@ export default function ContractsWorkspace({
         }
       />
 
-      {/* 4 Pastel Metric Cards from Hợp đồng.png */}
+      {/* 4 Dynamic Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           variant="green"
           title="Đang hiệu lực"
-          value={total > 0 ? total.toString().padStart(2, "0") : "24"}
+          value={contracts
+            .filter((c) => c.status === "active")
+            .length.toString()
+            .padStart(2, "0")}
           subtitle="Toàn hệ thống"
         />
         <StatCard
           variant="gold"
-          title="Sắp hết hạn"
-          value="05"
-          subtitle="30 ngày tới"
+          title="Bản nháp"
+          value={contracts
+            .filter((c) => c.status === "draft")
+            .length.toString()
+            .padStart(2, "0")}
+          subtitle="Chờ hoàn thiện"
         />
         <StatCard
           variant="blue"
-          title="Chờ ký"
-          value="03"
-          subtitle="Cần xử lý"
+          title="Hoàn thành"
+          value={contracts
+            .filter((c) => c.status === "completed")
+            .length.toString()
+            .padStart(2, "0")}
+          subtitle="Đã thanh lý"
         />
         <StatCard
           variant="purple"
-          title="Đã thanh lý"
-          value="18"
+          title="Tổng hợp đồng"
+          value={total.toString().padStart(2, "0")}
           subtitle="Lưu trữ"
         />
       </div>

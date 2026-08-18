@@ -40,8 +40,8 @@ export function AppShell({ children, account }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-row overflow-x-hidden font-sans">
-      {/* Desktop Persistent / Collapsible Sidebar */}
+    <div className="h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-row overflow-hidden font-sans">
+      {/* Desktop Persistent / Collapsible Sidebar - fixed height, never scrolls with content */}
       <Sidebar
         account={account}
         collapsed={sidebarCollapsed}
@@ -55,15 +55,15 @@ export function AppShell({ children, account }: AppShellProps) {
         account={account}
       />
 
-      {/* Main App Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main App Content Area - scrolls independently */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar
           account={account}
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-200">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-200">
+          <div className="max-w-7xl w-full mx-auto">{children}</div>
         </main>
       </div>
     </div>

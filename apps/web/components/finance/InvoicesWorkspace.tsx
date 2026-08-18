@@ -335,6 +335,33 @@ export default function InvoicesWorkspace({
     (p) => p.client_company_id === formClientCompanyId,
   );
 
+  // Calculate dynamic stats from real invoices or 0
+  const totalRevenue = invoices
+    .filter((inv) => inv.status === "paid" || inv.status === "partially_paid")
+    .reduce((sum, inv) => sum + (inv.paid_amount || 0), 0);
+
+  const totalReceivable = invoices
+    .filter((inv) => inv.status === "issued" || inv.status === "partially_paid")
+    .reduce((sum, inv) => sum + (inv.amount - (inv.paid_amount || 0)), 0);
+
+  const overdueInvoices = invoices.filter(
+    (inv) =>
+      isInvoiceOverdue(inv.status, inv.due_date) || inv.status === "overdue",
+  );
+  const totalOverdue = overdueInvoices.reduce(
+    (sum, inv) => sum + (inv.amount - (inv.paid_amount || 0)),
+    0,
+  );
+
+  const formatShortCurrency = (amount: number) => {
+    if (amount === 0) return "0 đ";
+    if (amount >= 1_000_000_000)
+      return `${(amount / 1_000_000_000).toFixed(1)}B`;
+    if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(0)}M`;
+    if (amount >= 1_000) return `${(amount / 1_000).toFixed(0)}K`;
+    return `${amount.toLocaleString("vi-VN")} đ`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header matching Figma: Hóa đơn và công nợ.png */}
@@ -365,31 +392,31 @@ export default function InvoicesWorkspace({
         }
       />
 
-      {/* 4 Pastel Metric Cards from Hóa đơn và công nợ.png */}
+      {/* 4 Dynamic Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           variant="green"
           title="Doanh thu"
-          value="842M"
-          subtitle="Tháng này"
+          value={formatShortCurrency(totalRevenue)}
+          subtitle={`${invoices.filter((i) => i.status === "paid").length} đã thu`}
         />
         <StatCard
           variant="blue"
           title="Phải thu"
-          value="216M"
-          subtitle="9 khoản"
+          value={formatShortCurrency(totalReceivable)}
+          subtitle={`${invoices.filter((i) => i.status === "issued" || i.status === "partially_paid").length} khoản`}
         />
         <StatCard
           variant="rose"
           title="Quá hạn"
-          value="78M"
-          subtitle="3 hóa đơn"
+          value={formatShortCurrency(totalOverdue)}
+          subtitle={`${overdueInvoices.length} hóa đơn`}
         />
         <StatCard
           variant="gold"
-          title="Chi phí"
-          value="327M"
-          subtitle="Tháng này"
+          title="Tổng hóa đơn"
+          value={total.toString().padStart(2, "0")}
+          subtitle="Tất cả trạng thái"
         />
       </div>
 
