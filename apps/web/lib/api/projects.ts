@@ -12,7 +12,12 @@ export interface Project {
   id: string;
   projectCode: string;
   clientCompanyId: string;
-  clientCompany?: { id: string; code: string; name: string } | null;
+  clientCompany?: {
+    id: string;
+    code: string;
+    clientCode?: string;
+    name: string;
+  } | null;
   name: string;
   description?: string | null;
   status: ProjectStatus;

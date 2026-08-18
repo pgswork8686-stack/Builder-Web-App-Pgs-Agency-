@@ -9,6 +9,8 @@ export interface ProjectTask {
   id: string;
   project_id: string;
   parent_task_id?: string | null;
+  task_code?: string | null;
+  taskCode?: string | null;
   title: string;
   description?: string | null;
   status: TaskStatus;

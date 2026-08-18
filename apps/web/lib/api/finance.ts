@@ -3,6 +3,7 @@ import { request } from "./client";
 export interface Contract {
   id: string;
   contract_number: string;
+  contract_code?: string;
   client_company_id: string;
   project_id: string | null;
   title: string;
@@ -19,15 +20,18 @@ export interface Contract {
   updated_at: string;
   client_company?: {
     name: string;
+    client_code?: string;
   };
   project?: {
     name: string;
+    project_code?: string;
   };
 }
 
 export interface Invoice {
   id: string;
   invoice_number: string;
+  invoice_code?: string;
   client_company_id: string;
   project_id: string | null;
   contract_id: string | null;

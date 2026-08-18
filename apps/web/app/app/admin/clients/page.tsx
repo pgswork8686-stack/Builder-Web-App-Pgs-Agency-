@@ -36,6 +36,7 @@ import {
 interface ClientCompany {
   id: string;
   code: string;
+  clientCode?: string;
   name: string;
   taxCode: string | null;
   email: string | null;
@@ -278,8 +279,8 @@ export default function AdminClientsPage() {
             <TableBody>
               {companies.map((comp) => (
                 <TableRow key={comp.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
-                    {comp.code}
+                  <TableCell className="font-mono text-xs font-bold text-[#5D87FF]">
+                    {comp.clientCode || comp.code}
                   </TableCell>
 
                   <TableCell>
