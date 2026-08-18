@@ -21,6 +21,7 @@ import { getMe, type UserPayload } from "@/lib/api/auth";
 import { attendanceApi } from "@/lib/api/attendance";
 import { leaveApi } from "@/lib/api/leave";
 import { projectsApi } from "@/lib/api/projects";
+import { tasksApi } from "@/lib/api/tasks";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +47,11 @@ export default function EmployeeDashboardPage() {
             projectsApi.getInternalProjects(1, 6),
           ]);
 
-        if (meRes.status === "fulfilled") setUser(meRes.value.user);
+        let currentUserId: string | undefined;
+        if (meRes.status === "fulfilled") {
+          setUser(meRes.value.user);
+          currentUserId = meRes.value.user?.id;
+        }
         if (attSum.status === "fulfilled" && attSum.value?.today?.checkInAt) {
           setCheckedInTime(
             new Date(attSum.value.today.checkInAt).toLocaleTimeString("vi-VN", {
@@ -66,7 +71,25 @@ export default function EmployeeDashboardPage() {
           setLeaveDaysRemaining(totalRemaining);
         }
         if (projRes.status === "fulfilled") {
+          const projects = projRes.value.items || [];
           setProjectCount(projRes.value.total || 0);
+
+          if (projects.length > 0) {
+            const taskCounts = await Promise.all(
+              projects.map(async (p) => {
+                try {
+                  const res = await tasksApi.list(p.id, {
+                    assigneeUserId: currentUserId,
+                    pageSize: 1,
+                  });
+                  return res.total || res.items?.length || 0;
+                } catch {
+                  return 0;
+                }
+              }),
+            );
+            setTaskCount(taskCounts.reduce((acc, c) => acc + c, 0));
+          }
         }
       } catch {
         // Safe load
