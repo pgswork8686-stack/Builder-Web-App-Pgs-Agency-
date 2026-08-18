@@ -21,6 +21,10 @@ import {
   Receipt,
   HelpCircle,
   FolderOpen,
+  MessageSquare,
+  Bell,
+  Cpu,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/api/auth";
@@ -49,7 +53,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
 
 export const ROLE_HEADER_SUBTITLE: Record<AppRole, string> = {
   admin: "Agency Workspace",
-  team_leader: "Manager",
+  team_leader: "Manager Workspace",
   employee: "Nhân viên",
   accountant: "Kế toán",
   client: "Khách hàng",
@@ -60,46 +64,55 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "admin":
       return [
         {
-          groupTitle: "TRANG CHÍNH",
+          groupTitle: "TỔNG QUAN",
           items: [
             {
               index: "01",
-              title: "Tổng quan",
+              title: "Dashboard",
               href: "/app/admin",
               icon: LayoutDashboard,
               exact: true,
             },
+          ],
+        },
+        {
+          groupTitle: "TỔ CHỨC",
+          items: [
             {
               index: "02",
-              title: "Dự án",
-              href: "/app/admin/projects",
-              icon: FolderKanban,
-              exact: true,
+              title: "Cơ cấu tổ chức",
+              href: "/app/admin/organization",
+              icon: Building2,
             },
             {
               index: "03",
-              title: "Dự án hoàn thành",
-              href: "/app/admin/projects/completed",
-              icon: CheckCircle2,
+              title: "Phòng ban",
+              href: "/app/admin/departments",
+              icon: Layers,
             },
             {
               index: "04",
-              title: "Công việc",
-              href: "/app/admin/tasks",
-              icon: ListTodo,
+              title: "Teams",
+              href: "/app/admin/teams",
+              icon: Users,
             },
             {
               index: "05",
-              title: "Kanban",
-              href: "/app/admin/kanban",
-              icon: Kanban,
+              title: "Nhân sự",
+              href: "/app/admin/people",
+              icon: Users,
             },
             {
               index: "06",
-              title: "Lịch",
-              href: "/app/admin/calendar",
-              icon: Calendar,
+              title: "Tài khoản chờ duyệt",
+              href: "/app/admin/accounts/pending",
+              icon: UserCheck,
             },
+          ],
+        },
+        {
+          groupTitle: "KHÁCH HÀNG & DỰ ÁN",
+          items: [
             {
               index: "07",
               title: "Khách hàng",
@@ -108,30 +121,105 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
             {
               index: "08",
-              title: "Tài chính",
-              href: "/app/admin/finance",
-              icon: CreditCard,
+              title: "Dự án",
+              href: "/app/admin/projects",
+              icon: FolderKanban,
+              exact: true,
             },
             {
               index: "09",
-              title: "Nhân sự",
-              href: "/app/admin/people",
-              icon: Users,
+              title: "Dịch vụ",
+              href: "/app/admin/services",
+              icon: Shield,
             },
             {
               index: "10",
+              title: "Công việc",
+              href: "/app/admin/tasks",
+              icon: ListTodo,
+            },
+            {
+              index: "11",
+              title: "Kanban",
+              href: "/app/admin/kanban",
+              icon: Kanban,
+            },
+            {
+              index: "12",
+              title: "Lịch",
+              href: "/app/admin/calendar",
+              icon: Calendar,
+            },
+            {
+              index: "13",
               title: "Tài liệu PGS",
               href: "/app/admin/documents",
               icon: FolderOpen,
             },
+          ],
+        },
+        {
+          groupTitle: "NHÂN SỰ & CHẤM CÔNG",
+          items: [
             {
-              index: "11",
+              index: "14",
+              title: "Chấm công",
+              href: "/app/admin/attendance",
+              icon: Clock,
+            },
+            {
+              index: "15",
+              title: "Nghỉ phép",
+              href: "/app/admin/leave",
+              icon: CalendarDays,
+            },
+          ],
+        },
+        {
+          groupTitle: "TÀI CHÍNH",
+          items: [
+            {
+              index: "16",
+              title: "Finance",
+              href: "/app/admin/finance",
+              icon: CreditCard,
+            },
+            {
+              index: "17",
               title: "Báo cáo",
               href: "/app/admin/reports",
               icon: FileSpreadsheet,
             },
+          ],
+        },
+        {
+          groupTitle: "GIAO TIẾP",
+          items: [
             {
-              index: "12",
+              index: "18",
+              title: "Tin nhắn (Chat)",
+              href: "/app/chat",
+              icon: MessageSquare,
+            },
+            {
+              index: "19",
+              title: "Thông báo",
+              href: "/app/notifications",
+              icon: Bell,
+            },
+          ],
+        },
+        {
+          groupTitle: "HỆ THỐNG",
+          items: [
+            {
+              index: "20",
+              title: "Tự động hóa",
+              href: "/app/admin/automation",
+              icon: Cpu,
+            },
+            {
+              index: "21",
               title: "Cài đặt",
               href: "/app/admin/settings",
               icon: Settings,
@@ -213,6 +301,29 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               href: "/app/attendance",
               icon: Clock,
             },
+            {
+              index: "12",
+              title: "Nghỉ phép",
+              href: "/app/leave",
+              icon: CalendarDays,
+            },
+          ],
+        },
+        {
+          groupTitle: "GIAO TIẾP",
+          items: [
+            {
+              index: "13",
+              title: "Tin nhắn (Chat)",
+              href: "/app/chat",
+              icon: MessageSquare,
+            },
+            {
+              index: "14",
+              title: "Thông báo",
+              href: "/app/notifications",
+              icon: Bell,
+            },
           ],
         },
       ];
@@ -283,6 +394,23 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               title: "Phiếu lương",
               href: "/app/employee/payroll",
               icon: DollarSign,
+            },
+          ],
+        },
+        {
+          groupTitle: "GIAO TIẾP",
+          items: [
+            {
+              index: "11",
+              title: "Tin nhắn (Chat)",
+              href: "/app/chat",
+              icon: MessageSquare,
+            },
+            {
+              index: "12",
+              title: "Thông báo",
+              href: "/app/notifications",
+              icon: Bell,
             },
           ],
         },
@@ -368,6 +496,23 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
           ],
         },
+        {
+          groupTitle: "GIAO TIẾP",
+          items: [
+            {
+              index: "13",
+              title: "Tin nhắn (Chat)",
+              href: "/app/chat",
+              icon: MessageSquare,
+            },
+            {
+              index: "14",
+              title: "Thông báo",
+              href: "/app/notifications",
+              icon: Bell,
+            },
+          ],
+        },
       ];
 
     case "client":
@@ -436,6 +581,23 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               title: "Yêu cầu hỗ trợ",
               href: "/app/client/support",
               icon: HelpCircle,
+            },
+          ],
+        },
+        {
+          groupTitle: "GIAO TIẾP",
+          items: [
+            {
+              index: "11",
+              title: "Tin nhắn (Chat)",
+              href: "/app/chat",
+              icon: MessageSquare,
+            },
+            {
+              index: "12",
+              title: "Thông báo",
+              href: "/app/notifications",
+              icon: Bell,
             },
           ],
         },

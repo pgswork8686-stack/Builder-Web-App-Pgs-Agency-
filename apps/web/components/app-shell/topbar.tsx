@@ -11,6 +11,7 @@ import {
   Shield,
   ChevronDown,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { NotificationBell } from "@/components/phase7/notification-bell";
@@ -116,8 +117,18 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         </span>
       </div>
 
-      {/* Right side: Notification Bell, User Menu */}
-      <div className="flex items-center gap-3 shrink-0">
+      {/* Right side: Chat, Notification Bell, User Menu */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Quick Chat Link */}
+        <Link
+          href="/app/chat"
+          className="relative p-2 rounded-xl text-[#7C879D] hover:text-[#5D87FF] hover:bg-[#EEF2FF] transition-all cursor-pointer"
+          title="Tin nhắn nội bộ"
+          aria-label="Tin nhắn nội bộ"
+        >
+          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+        </Link>
+
         {/* Notifications */}
         <NotificationBell />
 
