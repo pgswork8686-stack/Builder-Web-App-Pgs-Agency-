@@ -41,72 +41,17 @@ import {
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 
-const EXACT_CLIENT_PROJECTS: Project[] = [
-  {
-    id: "prj-sango",
-    projectCode: "PGS-PRJ-001",
-    name: "Sangoopen – Thiết kế Website & Digital Marketing",
-    status: "active",
-    priority: "urgent",
-    clientCompany: { id: "c1", name: "Sangoopen", code: "KH-SANGO" },
-    startDate: "2026-08-01",
-    dueDate: "2026-08-30",
-    createdAt: "2026-08-01T00:00:00Z",
-    updatedAt: "2026-08-01T00:00:00Z",
-  },
-  {
-    id: "prj-activecarbon",
-    projectCode: "PGS-PRJ-002",
-    name: "Active Carbon – Chiến dịch Branding & Nhận diện Thương hiệu",
-    status: "active",
-    priority: "high",
-    clientCompany: {
-      id: "c2",
-      name: "Active Carbon",
-      code: "KH-ACTIVECARBON",
-    },
-    startDate: "2026-08-01",
-    dueDate: "2026-08-30",
-    createdAt: "2026-08-01T00:00:00Z",
-    updatedAt: "2026-08-01T00:00:00Z",
-  },
-  {
-    id: "prj-solmaxpipe",
-    projectCode: "PGS-PRJ-003",
-    name: "Solmax Pipe – Xây dựng Catalog & Hệ thống B2B Portal",
-    status: "active",
-    priority: "high",
-    clientCompany: { id: "c3", name: "Solmax Pipe", code: "KH-SOLMAXPIPE" },
-    startDate: "2026-08-01",
-    dueDate: "2026-08-30",
-    createdAt: "2026-08-01T00:00:00Z",
-    updatedAt: "2026-08-01T00:00:00Z",
-  },
-  {
-    id: "prj-sonhanoi",
-    projectCode: "PGS-PRJ-004",
-    name: "Sơn Hà Nội – Chiến dịch Performance Ads & Quản trị Truyền thông",
-    status: "active",
-    priority: "urgent",
-    clientCompany: { id: "c4", name: "Sơn Hà Nội", code: "KH-SONHANOI" },
-    startDate: "2026-08-01",
-    dueDate: "2026-08-30",
-    createdAt: "2026-08-01T00:00:00Z",
-    updatedAt: "2026-08-01T00:00:00Z",
-  },
-];
-
 export default function AdminDashboardPage() {
   const [user, setUser] = useState<UserPayload | null>(null);
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
-  const [projects, setProjects] = useState<Project[]>(EXACT_CLIENT_PROJECTS);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [stats, setStats] = useState({
-    projectCount: 35,
-    taskCount: 100,
-    clientCount: 35,
-    peopleCount: 20,
-    documentCount: 35,
-    monthlyRevenue: 1250000000,
+    projectCount: 0,
+    taskCount: 0,
+    clientCount: 0,
+    peopleCount: 0,
+    documentCount: 0,
+    monthlyRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -126,33 +71,29 @@ export default function AdminDashboardPage() {
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
         if (pendingRes.status === "fulfilled")
           setPendingUsers(pendingRes.value.items || []);
-        if (projRes.status === "fulfilled" && projRes.value.items?.length) {
-          setProjects(projRes.value.items);
+        if (projRes.status === "fulfilled") {
+          setProjects(projRes.value.items || []);
           setStats((prev) => ({
             ...prev,
-            projectCount: Math.max(projRes.value.total || 0, 35),
-            taskCount: 100,
+            projectCount: projRes.value.total || 0,
           }));
-        } else {
-          setProjects(EXACT_CLIENT_PROJECTS);
         }
         if (peopleRes.status === "fulfilled") {
           setStats((prev) => ({
             ...prev,
-            peopleCount: Math.max(peopleRes.value.total || 0, 20),
+            peopleCount: peopleRes.value.total || 0,
           }));
         }
         if (clientRes.status === "fulfilled") {
           setStats((prev) => ({
             ...prev,
-            clientCount: Math.max((clientRes.value as any)?.total || 0, 35),
-            documentCount: 35,
+            clientCount: (clientRes.value as any)?.total || 0,
           }));
         }
         if (finRes.status === "fulfilled" && finRes.value) {
           setStats((prev) => ({
             ...prev,
-            monthlyRevenue: finRes.value.total_revenue_ytd || 1250000000,
+            monthlyRevenue: finRes.value.total_revenue_ytd || 0,
           }));
         }
       } catch {
