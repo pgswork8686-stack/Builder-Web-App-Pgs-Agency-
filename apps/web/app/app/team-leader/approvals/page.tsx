@@ -23,6 +23,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TableHeaderCell,
   TableRow,
 } from "@/components/ui/table";
 import { leaveApi, type LeaveRequest } from "@/lib/api/leave";
@@ -134,14 +135,14 @@ export default function TeamLeaderApprovalsPage() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell isHeader>Nhân viên</TableCell>
-                  <TableCell isHeader>Loại nghỉ</TableCell>
-                  <TableCell isHeader>Thời gian</TableCell>
-                  <TableCell isHeader>Số ngày</TableCell>
-                  <TableCell isHeader>Lý do</TableCell>
-                  <TableCell isHeader align="right">
+                  <TableHeaderCell>Nhân viên</TableHeaderCell>
+                  <TableHeaderCell>Loại nghỉ</TableHeaderCell>
+                  <TableHeaderCell>Thời gian</TableHeaderCell>
+                  <TableHeaderCell>Số ngày</TableHeaderCell>
+                  <TableHeaderCell>Lý do</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
                     Thao tác
-                  </TableCell>
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>

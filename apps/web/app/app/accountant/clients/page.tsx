@@ -14,6 +14,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TableHeaderCell,
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -58,15 +59,15 @@ export default function AccountantClientsPage() {
       ) : (
         <TableContainer>
           <Table>
-            <thead>
+            <TableHead>
               <TableRow>
-                <TableHead>MÃ KH</TableHead>
-                <TableHead>TÊN DOANH NGHIỆP</TableHead>
-                <TableHead>MÃ SỐ THUẾ</TableHead>
-                <TableHead>NGƯỜI LIÊN HỆ</TableHead>
-                <TableHead>TRẠNG THÁI</TableHead>
+                <TableHeaderCell>MÃ KH</TableHeaderCell>
+                <TableHeaderCell>TÊN DOANH NGHIỆP</TableHeaderCell>
+                <TableHeaderCell>MÃ SỐ THUẾ</TableHeaderCell>
+                <TableHeaderCell>NGƯỜI LIÊN HỆ</TableHeaderCell>
+                <TableHeaderCell>TRẠNG THÁI</TableHeaderCell>
               </TableRow>
-            </thead>
+            </TableHead>
             <TableBody>
               {clients.map((c) => (
                 <TableRow key={c.id}>
