@@ -171,9 +171,15 @@ export class ProjectsService {
         message: 'Quản lý dự án phải là người dùng nội bộ đang hoạt động.',
       });
     }
+    if (message.includes('PRIMARY_PROJECT_MANAGER_MEMBERSHIP_REQUIRED')) {
+      throw new ConflictException({
+        code: 'PROJECT_MANAGER_CONSISTENCY_REQUIRED',
+        message: 'Không thể thay đổi thành viên quản lý dự án chính.',
+      });
+    }
     this.databaseFailure(
-      'PROJECT_MANAGER_WRITE_FAILED',
-      'Không thể lưu quản lý dự án lúc này.',
+      'PROJECT_CREATE_FAILED',
+      'Không thể tạo dự án lúc này. ' + (error?.message ?? ''),
       error,
     );
   }
