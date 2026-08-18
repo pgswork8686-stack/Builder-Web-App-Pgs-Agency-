@@ -103,9 +103,7 @@ export class PeopleService {
     const client = this.supabaseService.getSystemClient();
     const { data: profile, error } = await client
       .from('profiles')
-      .select(
-        '*, employee_profile:employee_profiles(*, department:departments(name), team:teams(name), manager:profiles!employee_profiles_reports_to_user_id_fkey(full_name))',
-      )
+      .select('*')
       .eq('id', userId)
       .maybeSingle();
 
@@ -124,7 +122,28 @@ export class PeopleService {
       });
     }
 
-    const emp = profile.employee_profile;
+    const { data: emp, error: empErr } = await client
+      .from('employee_profiles')
+      .select('*, department:departments(name), team:teams(name)')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (empErr) {
+      this.logger.warn(
+        `Failed to fetch employee_profile for ${userId}: ${empErr.message}`,
+      );
+    }
+
+    let reportsToFullName: string | null = null;
+    if (emp?.reports_to_user_id) {
+      const { data: mgr } = await client
+        .from('profiles')
+        .select('full_name')
+        .eq('id', emp.reports_to_user_id)
+        .maybeSingle();
+      reportsToFullName = mgr?.full_name ?? null;
+    }
+
     return {
       id: profile.id,
       email: profile.email ?? null,
@@ -142,7 +161,7 @@ export class PeopleService {
             teamName: emp.team?.name ?? null,
             jobTitle: emp.job_title ?? null,
             reportsToUserId: emp.reports_to_user_id ?? null,
-            reportsToFullName: emp.manager?.full_name ?? null,
+            reportsToFullName,
             employmentStatus: emp.employment_status,
             joinedDate: emp.joined_date ?? null,
             leftDate: emp.left_date ?? null,
@@ -492,7 +511,7 @@ export class PeopleService {
       const { data: emp, error } = await client
         .from('employee_profiles')
         .select(
-          '*, department:departments(code, name, description), team:teams(code, name, description), manager:profiles!employee_profiles_reports_to_user_id_fkey(full_name, email)',
+          '*, department:departments(code, name, description), team:teams(code, name, description)',
         )
         .eq('user_id', userId)
         .maybeSingle();
@@ -515,6 +534,24 @@ export class PeopleService {
         };
       }
 
+      let managerInfo: {
+        fullName: string | null;
+        email: string | null;
+      } | null = null;
+      if (emp.reports_to_user_id) {
+        const { data: mgr } = await client
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', emp.reports_to_user_id)
+          .maybeSingle();
+        if (mgr) {
+          managerInfo = {
+            fullName: mgr.full_name ?? null,
+            email: mgr.email ?? null,
+          };
+        }
+      }
+
       return {
         type: 'internal',
         employee: {
@@ -535,12 +572,7 @@ export class PeopleService {
               name: emp.team.name,
             }
           : null,
-        manager: emp.manager
-          ? {
-              fullName: emp.manager.full_name ?? null,
-              email: emp.manager.email ?? null,
-            }
-          : null,
+        manager: managerInfo,
       };
     }
   }
