@@ -94,6 +94,20 @@ describe('Business Code Generation and Migration Contracts', () => {
       expect(content).toContain('trg_set_employee_code');
       expect(content).toContain('trg_set_project_code');
       expect(content).toContain('trg_set_task_code');
+
+      // Check format check constraints
+      expect(content).toContain('check_profiles_account_code_format');
+      expect(content).toContain('check_employee_code_format');
+      expect(content).toContain('check_client_code_format');
+      expect(content).toContain('check_project_code_format');
+      expect(content).toContain('check_task_code_format');
+
+      // Check immutability triggers
+      expect(content).toContain('prevent_business_code_column_update');
+      expect(content).toContain('trg_immutable_client_code');
+      expect(content).toContain('trg_immutable_employee_code');
+      expect(content).toContain('trg_immutable_project_code');
+      expect(content).toContain('trg_immutable_task_code');
     });
 
     it('verifies 20260818161000_add_admin_readable_views.sql creates all admin views with security_invoker', () => {
@@ -104,17 +118,13 @@ describe('Business Code Generation and Migration Contracts', () => {
       expect(content).toContain(
         'CREATE OR REPLACE VIEW public.admin_account_approval_events',
       );
-      expect(content).toContain(
-        'CREATE OR REPLACE VIEW public.admin_clients',
-      );
+      expect(content).toContain('CREATE OR REPLACE VIEW public.admin_clients');
       expect(content).toContain('CREATE OR REPLACE VIEW public.admin_people');
       expect(content).toContain(
         'CREATE OR REPLACE VIEW public.admin_departments',
       );
       expect(content).toContain('CREATE OR REPLACE VIEW public.admin_teams');
-      expect(content).toContain(
-        'CREATE OR REPLACE VIEW public.admin_projects',
-      );
+      expect(content).toContain('CREATE OR REPLACE VIEW public.admin_projects');
       expect(content).toContain('CREATE OR REPLACE VIEW public.admin_tasks');
       expect(content).toContain(
         'CREATE OR REPLACE VIEW public.admin_attendance_records',

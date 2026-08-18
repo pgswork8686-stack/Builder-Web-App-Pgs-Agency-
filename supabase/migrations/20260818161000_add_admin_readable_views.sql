@@ -2,7 +2,7 @@
 -- Migration: Add Admin Readable PostgreSQL Views
 -- Timestamp: 20260818161000_add_admin_readable_views.sql
 -- Description: Creates human-readable views with business codes,
--- joined relation names, and Vietnamese display statuses for Supabase Table Editor.
+-- relation names, and Vietnamese display statuses for Supabase Table Editor.
 -- ============================================================
 
 -- 1. View: Account Approval Events (admin_account_approval_events)
@@ -13,19 +13,17 @@ SELECT
   aae.id AS event_id,
   aae.approval_event_code,
   
-  -- Target User info
-  aae.target_user_id,
+  -- Target User info (using actual column target_user)
+  aae.target_user AS target_user_id,
   tp.account_code AS target_account_code,
   tep.employee_code AS target_employee_code,
-  COALESCE(tp.full_name, tu.email) AS target_user_name,
-  tu.email AS target_user_email,
+  COALESCE(tp.full_name, 'Người dùng ' || SUBSTRING(aae.target_user::text, 1, 8)) AS target_user_name,
   
-  -- Actor info
-  aae.actor_id,
+  -- Actor info (using actual column actor)
+  aae.actor AS actor_id,
   ap.account_code AS actor_account_code,
   aep.employee_code AS actor_employee_code,
-  COALESCE(ap.full_name, au.email, 'Hệ thống') AS actor_name,
-  au.email AS actor_email,
+  COALESCE(ap.full_name, 'Hệ thống') AS actor_name,
   
   -- Action & Display
   aae.action,
@@ -80,12 +78,10 @@ SELECT
   aae.notes,
   aae.created_at
 FROM public.account_approval_events aae
-LEFT JOIN auth.users tu ON tu.id = aae.target_user_id
-LEFT JOIN public.profiles tp ON tp.id = aae.target_user_id
-LEFT JOIN public.employee_profiles tep ON tep.user_id = aae.target_user_id
-LEFT JOIN auth.users au ON au.id = aae.actor_id
-LEFT JOIN public.profiles ap ON ap.id = aae.actor_id
-LEFT JOIN public.employee_profiles aep ON aep.user_id = aae.actor_id;
+LEFT JOIN public.profiles tp ON tp.id = aae.target_user
+LEFT JOIN public.employee_profiles tep ON tep.user_id = aae.target_user
+LEFT JOIN public.profiles ap ON ap.id = aae.actor
+LEFT JOIN public.employee_profiles aep ON aep.user_id = aae.actor;
 
 COMMENT ON VIEW public.admin_account_approval_events IS 'Readable view for account approval events with resolved names, business codes, and Vietnamese action displays.';
 
@@ -103,9 +99,9 @@ SELECT
   c.phone,
   c.address,
   c.website,
-  c.contact_person AS contact_name,
-  c.is_active,
-  CASE WHEN c.is_active THEN 'Đang hợp tác' ELSE 'Tạm dừng' END AS status_display,
+  c.status,
+  CASE WHEN c.status = 'active' THEN 'Đang hợp tác' ELSE 'Tạm dừng' END AS status_display,
+  c.notes,
   c.created_at,
   c.updated_at
 FROM public.client_companies c;
@@ -121,9 +117,7 @@ SELECT
   p.id AS account_id,
   p.account_code,
   ep.employee_code,
-  COALESCE(p.full_name, u.email) AS full_name,
-  u.email,
-  u.phone,
+  COALESCE(p.full_name, 'Thành viên ' || SUBSTRING(p.id::text, 1, 8)) AS full_name,
   ep.job_title,
   
   -- Department
@@ -176,7 +170,6 @@ SELECT
   p.created_at,
   p.updated_at
 FROM public.profiles p
-LEFT JOIN auth.users u ON u.id = p.id
 LEFT JOIN public.employee_profiles ep ON ep.user_id = p.id
 LEFT JOIN public.departments d ON d.id = ep.department_id
 LEFT JOIN public.teams t ON t.id = ep.team_id
@@ -627,7 +620,7 @@ FROM public.services s;
 
 COMMENT ON VIEW public.admin_services IS 'Readable view for service catalog with DV_ business codes.';
 
--- 14. Permissions: Grant SELECT on views only to authenticated and service_role
+-- 14. Permissions: Grant SELECT on views to authenticated and service_role
 GRANT SELECT ON public.admin_account_approval_events TO authenticated, service_role;
 GRANT SELECT ON public.admin_clients TO authenticated, service_role;
 GRANT SELECT ON public.admin_people TO authenticated, service_role;
