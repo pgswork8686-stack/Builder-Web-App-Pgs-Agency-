@@ -18,6 +18,8 @@ import {
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { getMe, type UserPayload } from "@/lib/api/auth";
 import { attendanceApi } from "@/lib/api/attendance";
+import { leaveApi } from "@/lib/api/leave";
+import { organizationApi } from "@/lib/api/organization";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,11 +42,14 @@ export default function TeamLeaderDashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [meRes, projRes, attSum] = await Promise.allSettled([
-          getMe(),
-          projectsApi.getInternalProjects(1, 6),
-          attendanceApi.getSummary(),
-        ]);
+        const [meRes, projRes, attSum, leaveRes, teamsRes] =
+          await Promise.allSettled([
+            getMe(),
+            projectsApi.getInternalProjects(1, 6),
+            attendanceApi.getSummary(),
+            leaveApi.getDirectory({ status: "pending" }),
+            organizationApi.getTeams(),
+          ]);
 
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
         if (projRes.status === "fulfilled") {
@@ -56,6 +61,18 @@ export default function TeamLeaderDashboardPage() {
         }
         if (attSum.status === "fulfilled" && attSum.value?.today?.checkInAt) {
           setCheckedInToday(true);
+        }
+        if (leaveRes.status === "fulfilled") {
+          setStats((prev) => ({
+            ...prev,
+            pendingApprovals: leaveRes.value.total || leaveRes.value.items?.length || 0,
+          }));
+        }
+        if (teamsRes.status === "fulfilled" && Array.isArray(teamsRes.value)) {
+          setStats((prev) => ({
+            ...prev,
+            teamMembers: teamsRes.value.length,
+          }));
         }
       } catch {
         // Safe load
@@ -215,8 +232,8 @@ export default function TeamLeaderDashboardPage() {
                 DU
               </span>
             </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Nghỉ phép & Task
+            <p className="text-2xl font-black text-[#24304A] mt-2">
+              {stats.pendingApprovals}
             </p>
           </Card>
         </Link>
@@ -231,8 +248,8 @@ export default function TeamLeaderDashboardPage() {
                 TV
               </span>
             </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo nhóm
+            <p className="text-2xl font-black text-[#24304A] mt-2">
+              {stats.teamMembers}
             </p>
           </Card>
         </Link>
@@ -304,15 +321,28 @@ export default function TeamLeaderDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Cần phê duyệt
             </h3>
-            <Badge variant="gold" size="sm">
-              0 yêu cầu
+            <Badge variant={stats.pendingApprovals > 0 ? "gold" : "default"} size="sm">
+              {stats.pendingApprovals} yêu cầu
             </Badge>
           </div>
 
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
-              Hiện tại không có đề xuất duyệt nào cần xử lý.
-            </p>
+            {stats.pendingApprovals > 0 ? (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-[#24304A]">
+                  Có {stats.pendingApprovals} đơn xin nghỉ phép/giải trình đang chờ bạn xem xét.
+                </p>
+                <Link href="/app/team-leader/approvals">
+                  <Button variant="primary" size="sm">
+                    Mở trang duyệt đơn
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <p className="text-xs text-[#7C879D]">
+                Hiện tại không có đề xuất duyệt nào cần xử lý.
+              </p>
+            )}
           </Card>
         </div>
       </div>
