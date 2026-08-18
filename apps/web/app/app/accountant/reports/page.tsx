@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FileSpreadsheet, Download } from "lucide-react";
+import { Download, AlertCircle, Lock } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,28 @@ export default function AccountantReportsPage() {
       <SectionHeader
         title="Báo cáo Tài chính Kế toán (Financial Reports)"
         description="Báo cáo kết quả kinh doanh, bảng cân đối kế toán và dòng tiền định kỳ."
-        badge="Báo cáo"
+        badge="Xem trước"
         action={
           <Button
-            variant="primary"
+            variant="secondary"
             size="sm"
-            leftIcon={<Download className="w-4 h-4" />}
+            disabled
+            leftIcon={<Lock className="w-4 h-4" />}
           >
-            Xuất báo cáo tài chính
+            Xuất báo cáo tài chính (Chưa hỗ trợ)
           </Button>
         }
       />
+
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
+        <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
+        <span>
+          <strong>Thông tin tính năng:</strong> Chức năng kết xuất file báo cáo
+          tài chính tổng hợp đang trong lộ trình phát triển. Dữ liệu thời gian
+          thực được cập nhật trực tiếp tại Tổng quan tài chính, Hóa đơn và Hợp
+          đồng.
+        </span>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-5 space-y-2">

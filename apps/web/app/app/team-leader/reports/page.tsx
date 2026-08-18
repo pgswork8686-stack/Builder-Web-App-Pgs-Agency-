@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FileSpreadsheet, Download } from "lucide-react";
+import { Download, AlertCircle, Lock } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,27 @@ export default function TeamLeaderReportsPage() {
       <SectionHeader
         title="Báo cáo Tiến độ Đội nhóm"
         description="Tổng hợp năng suất, tỷ lệ hoàn thành tasks và đánh giá chất lượng dự án của nhóm."
-        badge="Báo cáo nhóm"
+        badge="Xem trước"
         action={
           <Button
-            variant="primary"
+            variant="secondary"
             size="sm"
-            leftIcon={<Download className="w-4 h-4" />}
+            disabled
+            leftIcon={<Lock className="w-4 h-4" />}
           >
-            Xuất báo cáo nhóm
+            Xuất báo cáo nhóm (Chưa hỗ trợ)
           </Button>
         }
       />
+
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
+        <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
+        <span>
+          <strong>Thông tin tính năng:</strong> Chức năng kết xuất báo cáo tổng
+          hợp đội nhóm đang trong lộ trình phát triển. Dữ liệu công việc có thể
+          theo dõi trực tiếp tại trang Dự án của tôi và Kanban.
+        </span>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="p-5 space-y-2">
