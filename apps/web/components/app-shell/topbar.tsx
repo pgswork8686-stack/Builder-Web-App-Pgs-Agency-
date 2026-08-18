@@ -17,14 +17,15 @@ import { NotificationBell } from "@/components/phase7/notification-bell";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ROLE_LABELS } from "./role-navigation";
-import type { AccountPayload } from "@/lib/api/auth";
+import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 
 export interface TopbarProps {
   account: AccountPayload;
+  user?: UserPayload | null;
   onOpenMobileSidebar: () => void;
 }
 
-export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
+export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -80,12 +81,12 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
 
   const roleTitle = account.role ? ROLE_LABELS[account.role] : "Người dùng";
   const displayName =
-    account.role === "admin"
-      ? "Phùng Quốc Bảo"
-      : roleTitle.split("(")[0].trim();
+    user?.fullName ||
+    user?.email?.split("@")[0] ||
+    roleTitle.split("(")[0].trim();
 
   return (
-    <header className="h-16 border-b border-[#EDF2F7] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <header className="h-[78px] border-b border-[#EDF2F7] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
       {/* Left side: Hamburger (mobile/tablet) + Search Field */}
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -97,17 +98,14 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#7C879D] hover:border-[#5D87FF]/40 transition-colors w-48 md:w-64">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#7C879D] w-48 md:w-64 select-none opacity-80 cursor-not-allowed">
           <Search className="w-3.5 h-3.5 shrink-0" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm toàn hệ thống..."
-            className="bg-transparent border-none outline-none text-xs text-[#24304A] placeholder:text-[#7C879D] w-full"
-            readOnly
-          />
-          <kbd className="hidden md:inline px-1.5 py-0.5 rounded bg-white text-[10px] text-[#7C879D] font-mono shadow-2xs border border-[#EDF2F7]">
-            ⌘K
-          </kbd>
+          <span className="text-xs text-[#7C879D] truncate flex-1">
+            Tìm kiếm...
+          </span>
+          <span className="hidden md:inline px-1.5 py-0.5 rounded bg-white text-[10px] text-[#7C879D] font-mono shadow-2xs border border-[#EDF2F7]">
+            Chưa hỗ trợ
+          </span>
         </div>
       </div>
 
@@ -137,8 +135,10 @@ export function Topbar({ account, onOpenMobileSidebar }: TopbarProps) {
               <span className="text-xs font-bold text-[#24304A] tracking-tight truncate max-w-[130px]">
                 {displayName}
               </span>
-              <span className="text-[10px] text-[#13DEB9] font-medium">
-                Trực tuyến
+              <span className="text-[10px] text-[#7C879D] font-medium truncate max-w-[130px]">
+                {account.role
+                  ? ROLE_LABELS[account.role].split("(")[0].trim()
+                  : "Người dùng"}
               </span>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-[#7C879D] hidden sm:block mr-1" />

@@ -10,19 +10,21 @@ import {
   ROLE_LABELS,
   type NavItem,
 } from "./role-navigation";
-import type { AccountPayload } from "@/lib/api/auth";
+import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 import { Avatar } from "@/components/ui/avatar";
 
 export interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   account: AccountPayload;
+  user?: UserPayload | null;
 }
 
 export function MobileSidebar({
   isOpen,
   onClose,
   account,
+  user,
 }: MobileSidebarProps) {
   const pathname = usePathname();
   const navGroups = account.role ? getNavigationForRole(account.role) : [];
@@ -31,9 +33,9 @@ export function MobileSidebar({
     : "Agency Workspace";
   const roleLabel = account.role ? ROLE_LABELS[account.role] : "Người dùng";
   const displayName =
-    account.role === "admin"
-      ? "Phùng Quốc Bảo"
-      : roleLabel.split("(")[0].trim();
+    user?.fullName ||
+    user?.email?.split("@")[0] ||
+    roleLabel.split("(")[0].trim();
 
   if (!isOpen) return null;
 
@@ -41,6 +43,9 @@ export function MobileSidebar({
     if (item.exact) return pathname === item.href;
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
+
+  const supportHref =
+    account.role === "client" ? "/app/client/support" : "/app/notifications";
 
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
@@ -108,12 +113,12 @@ export function MobileSidebar({
               className="flex items-center justify-between p-3 rounded-2xl bg-[#FEF9C3] border border-[#FFC400]/40 text-[#92400E] block"
             >
               <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-[#FFC400]" />
+                <Clock className="w-4 h-4 text-white p-0.5 rounded-sm bg-[#FFC400]" />
                 <span className="text-xs font-bold text-[#92400E]">
                   Chấm công bắt buộc
                 </span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-white">
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-white">
                 GPS
               </span>
             </Link>
@@ -122,7 +127,7 @@ export function MobileSidebar({
           {navGroups.map((group, groupIdx) => (
             <div key={group.groupTitle || groupIdx} className="space-y-1">
               {group.groupTitle && (
-                <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#7C879D]">
+                <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#7C879D]">
                   {group.groupTitle}
                 </div>
               )}
@@ -137,14 +142,14 @@ export function MobileSidebar({
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       active
                         ? "bg-[#EEF2FF] text-[#5D87FF] font-bold"
                         : "text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC]"
                     }`}
                   >
                     <span
-                      className={`text-[11px] font-mono font-medium ${
+                      className={`text-[10px] font-mono font-medium ${
                         active ? "text-[#5D87FF]" : "text-[#7C879D]"
                       }`}
                     >
@@ -157,7 +162,7 @@ export function MobileSidebar({
                     />
                     <span className="truncate flex-1">{item.title}</span>
                     {item.badge && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-[#5D87FF]/10 text-[#5D87FF] text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded-full bg-[#5D87FF]/10 text-[#5D87FF] text-[10px] font-bold">
                         {item.badge}
                       </span>
                     )}
@@ -168,21 +173,34 @@ export function MobileSidebar({
           ))}
         </div>
 
-        {/* Footer User Info */}
-        <div className="p-4 border-t border-[#EDF2F7]">
-          <div className="flex items-center gap-3 p-2 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7]">
+        {/* Footer Support & Profile */}
+        <div className="p-4 border-t border-[#EDF2F7] space-y-3 bg-[#F6F8FC]">
+          <Link
+            href={supportHref}
+            onClick={onClose}
+            className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-[#EDF2F7] text-xs font-bold text-[#24304A] hover:bg-[#EEF2FF] hover:text-[#5D87FF] transition-all block"
+          >
+            <HelpCircle className="w-4 h-4 text-[#5D87FF]" />
+            <span>
+              {account.role === "client"
+                ? "Trung tâm hỗ trợ"
+                : "Hướng dẫn & Trợ giúp"}
+            </span>
+          </Link>
+
+          <Link
+            href="/app/profile"
+            onClick={onClose}
+            className="flex items-center gap-3 p-1 rounded-xl"
+          >
             <Avatar name={displayName} size="sm" />
-            <div className="flex flex-col min-w-0 flex-1">
+            <div className="flex flex-col min-w-0">
               <p className="text-xs font-bold text-[#24304A] truncate">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#7C879D] truncate">
-                {account.role === "admin"
-                  ? "Quản trị viên (Admin)"
-                  : account.role || "Tài khoản hệ thống"}
-              </p>
+              <p className="text-[10px] text-[#7C879D] truncate">{roleLabel}</p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

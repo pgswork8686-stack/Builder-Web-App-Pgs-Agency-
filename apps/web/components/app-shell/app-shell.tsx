@@ -4,14 +4,15 @@ import React, { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { MobileSidebar } from "./mobile-sidebar";
 import { Topbar } from "./topbar";
-import type { AccountPayload } from "@/lib/api/auth";
+import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 
 export interface AppShellProps {
   children: React.ReactNode;
   account: AccountPayload;
+  user?: UserPayload | null;
 }
 
-export function AppShell({ children, account }: AppShellProps) {
+export function AppShell({ children, account, user }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -40,10 +41,11 @@ export function AppShell({ children, account }: AppShellProps) {
   };
 
   return (
-    <div className="h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-row overflow-hidden font-sans">
-      {/* Desktop Persistent / Collapsible Sidebar - fixed height, never scrolls with content */}
+    <div className="h-screen bg-[#F6F8FC] text-[#0F172A] flex flex-row overflow-hidden font-sans">
+      {/* Desktop Persistent / Collapsible Sidebar - exact 250px width in Figma */}
       <Sidebar
         account={account}
+        user={user}
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
       />
@@ -53,12 +55,14 @@ export function AppShell({ children, account }: AppShellProps) {
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
         account={account}
+        user={user}
       />
 
       {/* Main App Content Area - scrolls independently */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar
           account={account}
+          user={user}
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 

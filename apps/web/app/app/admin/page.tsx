@@ -2,24 +2,19 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShieldCheck,
+  ShieldAlert,
   UserCheck,
   Users,
   FolderKanban,
   CreditCard,
-  Bell,
-  MessageSquare,
-  Clock,
-  ArrowRight,
-  Sparkles,
-  ListTodo,
   Briefcase,
   FolderOpen,
-  AlertCircle,
-  CheckCircle2,
+  ListTodo,
   ChevronRight,
-  TrendingUp,
+  Clock,
 } from "lucide-react";
 import { getPendingUsers, type PendingUser } from "@/lib/api/admin";
 import { projectsApi, type Project } from "@/lib/api/projects";
@@ -27,6 +22,7 @@ import { peopleApi } from "@/lib/api/people";
 import { clientsApi } from "@/lib/api/clients";
 import { financeApi } from "@/lib/api/finance";
 import { getMe, type UserPayload } from "@/lib/api/auth";
+import { API_BASE_URL } from "@/lib/api/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,15 +38,15 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserPayload | null>(null);
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [stats, setStats] = useState({
     projectCount: 0,
-    taskCount: 0,
     clientCount: 0,
     peopleCount: 0,
-    documentCount: 0,
     monthlyRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -87,7 +83,7 @@ export default function AdminDashboardPage() {
         if (clientRes.status === "fulfilled") {
           setStats((prev) => ({
             ...prev,
-            clientCount: (clientRes.value as any)?.total || 0,
+            clientCount: (clientRes.value as { total?: number })?.total || 0,
           }));
         }
         if (finRes.status === "fulfilled" && finRes.value) {
@@ -95,6 +91,21 @@ export default function AdminDashboardPage() {
             ...prev,
             monthlyRevenue: finRes.value.total_revenue_ytd || 0,
           }));
+        }
+
+        // Test real API health
+        try {
+          const healthRes = await fetch(
+            `${API_BASE_URL.replace("/api/v1", "")}/api/v1/health`,
+          );
+          if (healthRes.ok) {
+            const healthData = await healthRes.json();
+            setApiHealthy(healthData.status === "ok");
+          } else {
+            setApiHealthy(false);
+          }
+        } catch {
+          setApiHealthy(false);
         }
       } catch {
         // Safe load
@@ -106,9 +117,16 @@ export default function AdminDashboardPage() {
   }, []);
 
   const userName =
-    user?.fullName && !user.fullName.includes("Điệp")
-      ? user.fullName
-      : "Phùng Quốc Bảo";
+    user?.fullName || user?.email?.split("@")[0] || "Quản trị viên";
+
+  const formatVND = (amount: number) => {
+    if (!amount) return "0 ₫";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   return (
     <div className="space-y-6">
@@ -142,22 +160,51 @@ export default function AdminDashboardPage() {
 
       {/* 3 Primary Hero Blocks */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Block 1: System Status */}
-        <div className="rounded-3xl bg-[#E6FBF5] border border-[#A7F3D0] p-6 flex flex-col justify-between shadow-xs">
+        {/* Block 1: System Status with Verified Health Check */}
+        <div
+          className={`rounded-3xl p-6 flex flex-col justify-between shadow-xs border ${
+            apiHealthy === false
+              ? "bg-rose-50 border-rose-200"
+              : "bg-[#E6FBF5] border-[#A7F3D0]"
+          }`}
+        >
           <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-2xl bg-[#13DEB9] text-white flex items-center justify-center shadow-xs">
-              <ShieldCheck className="w-5 h-5" />
+            <div
+              className={`w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-xs ${
+                apiHealthy === false ? "bg-rose-500" : "bg-[#13DEB9]"
+              }`}
+            >
+              {apiHealthy === false ? (
+                <ShieldAlert className="w-5 h-5" />
+              ) : (
+                <ShieldCheck className="w-5 h-5" />
+              )}
             </div>
-            <Badge variant="success" size="sm">
-              Trực tuyến
+            <Badge
+              variant={apiHealthy === false ? "danger" : "success"}
+              size="sm"
+            >
+              {apiHealthy === false
+                ? "Sự cố kết nối"
+                : apiHealthy === true
+                  ? "API đang hoạt động"
+                  : "Đang kiểm tra..."}
             </Badge>
           </div>
           <div className="mt-4">
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Hệ thống đang vận hành ổn định
+              {apiHealthy === false
+                ? "Hệ thống đang gặp sự cố kết nối"
+                : "Hệ thống đang vận hành ổn định"}
             </h3>
-            <p className="text-xs text-[#059669] mt-1 font-medium">
-              API, Supabase & WebSocket hoạt động bình thường
+            <p
+              className={`text-xs mt-1 font-medium ${
+                apiHealthy === false ? "text-rose-600" : "text-[#059669]"
+              }`}
+            >
+              {apiHealthy === false
+                ? "Không thể kết nối tới dịch vụ API backend"
+                : "Dịch vụ API backend phản hồi bình thường"}
             </p>
           </div>
         </div>
@@ -194,17 +241,50 @@ export default function AdminDashboardPage() {
           </div>
           <div className="mt-4">
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Doanh thu tháng
+              Doanh thu YTD: {formatVND(stats.monthlyRevenue)}
             </h3>
             <p className="text-xs text-[#B45309] mt-1 font-medium">
-              Hợp đồng & hóa đơn được cập nhật tự động
+              Hợp đồng & hóa đơn được đối soát tự động
             </p>
           </div>
         </div>
       </div>
 
-      {/* 5-Metric Row */}
+      {/* 5-Metric Row - Exact Figma Order: Dự án, Công việc, Khách hàng, Nhân sự, Tài liệu */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* 1. Dự án */}
+        <Link href="/app/admin/projects">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FolderKanban className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.projectCount}
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 2. Công việc (theo dõi trong chi tiết từng dự án) */}
+        <Link href="/app/admin/tasks">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#FFC400] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <ListTodo className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Công việc
+              </p>
+              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+                Theo dự án
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 3. Khách hàng */}
         <Link href="/app/admin/clients">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -221,36 +301,7 @@ export default function AdminDashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/app/admin/projects">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <FolderKanban className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
-                {stats.projectCount}
-              </p>
-            </div>
-          </Card>
-        </Link>
-
-        <Link href="/app/admin/tasks">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#FFC400] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <ListTodo className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">
-                Công việc
-              </p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
-                {stats.taskCount}
-              </p>
-            </div>
-          </Card>
-        </Link>
-
+        {/* 4. Nhân sự */}
         <Link href="/app/admin/people">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -265,6 +316,7 @@ export default function AdminDashboardPage() {
           </Card>
         </Link>
 
+        {/* 5. Tài liệu */}
         <Link href="/app/admin/documents">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group col-span-2 sm:col-span-1">
             <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#FA896B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -272,8 +324,8 @@ export default function AdminDashboardPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Tài liệu</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
-                {stats.documentCount}
+              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+                Theo dự án
               </p>
             </div>
           </Card>
@@ -303,7 +355,7 @@ export default function AdminDashboardPage() {
                 title="Chưa có dự án nào"
                 description="Tạo dự án mới để theo dõi tiến độ công việc và phân bổ nhân sự."
                 actionLabel="Tạo dự án mới"
-                onAction={() => (window.location.href = "/app/admin/projects")}
+                onAction={() => router.push("/app/admin/projects")}
               />
             </Card>
           ) : (
@@ -405,9 +457,9 @@ export default function AdminDashboardPage() {
           <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
             Dự án cần chú ý
           </h3>
-          <Card className="p-4">
+          <Card className="p-5 text-center">
             <p className="text-xs text-[#7C879D]">
-              Tất cả các dự án đang trong ngưỡng thời gian an toàn.
+              Chưa có dự án nào rơi vào tình trạng quá hạn hoặc cảnh báo rủi ro.
             </p>
           </Card>
         </div>
@@ -416,16 +468,8 @@ export default function AdminDashboardPage() {
           <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
             Hoạt động gần đây
           </h3>
-          <Card className="p-4 space-y-2.5">
-            <div className="flex items-center gap-3 text-xs">
-              <span className="w-2 h-2 rounded-full bg-[#13DEB9]" />
-              <span className="text-[#24304A] font-medium">
-                Hệ thống khởi chạy thành công
-              </span>
-              <span className="text-[10px] text-[#7C879D] ml-auto">
-                Vừa xong
-              </span>
-            </div>
+          <Card className="p-5 text-center">
+            <p className="text-xs text-[#7C879D]">Chưa có hoạt động gần đây</p>
           </Card>
         </div>
       </div>

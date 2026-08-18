@@ -55,6 +55,9 @@ export default function ProtectedAppLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [account, setAccount] = useState<AccountPayload | null>(null);
+  const [user, setUser] = useState<import("@/lib/api/auth").UserPayload | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
 
@@ -100,6 +103,7 @@ export default function ProtectedAppLayout({
         }
 
         setAccount(me.account);
+        setUser(me.user);
         if (!isAllowedPath(pathname, me.account.role)) {
           router.replace(roleHome[me.account.role]);
         }
@@ -124,7 +128,7 @@ export default function ProtectedAppLayout({
 
   if (checking || !account) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-[#0F172A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] text-[#0F172A]">
         <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-center shadow-lg">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4F75FF]" />
           <p className="mt-4 text-xs font-medium text-[#64748B]">
@@ -142,7 +146,7 @@ export default function ProtectedAppLayout({
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-6 text-[#0F172A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] p-6 text-[#0F172A]">
         <div className="max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-500" />
           <h1 className="mt-4 text-base font-extrabold text-[#0F172A]">
@@ -156,5 +160,9 @@ export default function ProtectedAppLayout({
     );
   }
 
-  return <AppShell account={account}>{children}</AppShell>;
+  return (
+    <AppShell account={account} user={user}>
+      {children}
+    </AppShell>
+  );
 }

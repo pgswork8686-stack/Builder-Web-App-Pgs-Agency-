@@ -9,7 +9,7 @@ import {
   HelpCircle,
   UserCheck,
   Clock,
-  Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import {
   getNavigationForRole,
@@ -17,17 +17,19 @@ import {
   ROLE_LABELS,
   type NavItem,
 } from "./role-navigation";
-import type { AccountPayload } from "@/lib/api/auth";
+import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 import { Avatar } from "@/components/ui/avatar";
 
 export interface SidebarProps {
   account: AccountPayload;
+  user?: UserPayload | null;
   collapsed: boolean;
   onToggleCollapse: () => void;
 }
 
 export function Sidebar({
   account,
+  user,
   collapsed,
   onToggleCollapse,
 }: SidebarProps) {
@@ -37,26 +39,32 @@ export function Sidebar({
     ? ROLE_HEADER_SUBTITLE[account.role] || "Agency Workspace"
     : "Agency Workspace";
   const roleLabel = account.role ? ROLE_LABELS[account.role] : "Người dùng";
+
+  // Derive real display name from authenticated user payload
   const displayName =
-    account.role === "admin"
-      ? "Phùng Quốc Bảo"
-      : roleLabel.split("(")[0].trim();
+    user?.fullName ||
+    user?.email?.split("@")[0] ||
+    roleLabel.split("(")[0].trim();
 
   const isItemActive = (item: NavItem) => {
     if (item.exact) return pathname === item.href;
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
 
+  // Determine support destination
+  const supportHref =
+    account.role === "client" ? "/app/client/support" : "/app/notifications";
+
   return (
     <aside
       className={`hidden lg:flex flex-col h-full border-r border-[#EDF2F7] bg-white transition-all duration-300 z-20 select-none shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
-        collapsed ? "w-20" : "w-64"
+        collapsed ? "w-20" : "w-[250px]"
       }`}
     >
-      {/* Brand Header - Fixed Top */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-[#EDF2F7] shrink-0">
+      {/* Brand Header - Fixed Top (78px height in Figma) */}
+      <div className="h-[78px] flex items-center justify-between px-4 border-b border-[#EDF2F7] shrink-0">
         <Link href="/app" className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-xs shadow-xs shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-sm shadow-xs shrink-0">
             P
           </div>
           {!collapsed && (
@@ -75,7 +83,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1 rounded-lg text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
         >
@@ -88,8 +96,8 @@ export function Sidebar({
       </div>
 
       {/* Navigation Links - Scrollable Center Area */}
-      <div className="flex-1 overflow-y-auto py-2.5 px-2.5 space-y-3 scrollbar-none">
-        {/* Dedicated Highlight Action if Admin or Employee */}
+      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3 scrollbar-none">
+        {/* Dedicated Highlight Action if Admin */}
         {!collapsed && account.role === "admin" && (
           <Link
             href="/app/admin/accounts/pending"
@@ -107,6 +115,7 @@ export function Sidebar({
           </Link>
         )}
 
+        {/* Dedicated Highlight Action if Employee */}
         {!collapsed && account.role === "employee" && (
           <Link
             href="/app/attendance"
@@ -129,7 +138,7 @@ export function Sidebar({
         {navGroups.map((group, groupIdx) => (
           <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-2.5 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#7C879D]">
+              <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#7C879D]">
                 {group.groupTitle}
               </div>
             )}
@@ -144,7 +153,7 @@ export function Sidebar({
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.title : undefined}
-                  className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 group relative ${
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150 group relative ${
                     active
                       ? "bg-[#EEF2FF] text-[#5D87FF] font-bold shadow-2xs"
                       : "text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC]"
@@ -191,18 +200,18 @@ export function Sidebar({
               <span>Cần hỗ trợ?</span>
             </div>
             <p className="text-[10px] text-[#7C879D] leading-tight">
-              {account.role === "admin"
-                ? "Xem hướng dẫn hoặc gửi yêu cầu hỗ trợ."
-                : "Xem hướng dẫn và quy trình theo vai trò."}
+              {account.role === "client"
+                ? "Gửi yêu cầu hỗ trợ và ticket tới bộ phận CSKH."
+                : "Xem hướng dẫn và trung tâm trợ giúp hệ thống."}
             </p>
-            <button
-              type="button"
-              className="w-full py-1 px-2 rounded-lg bg-[#5D87FF] hover:bg-[#4F75FF] text-white text-[10px] font-bold transition-colors cursor-pointer"
+            <Link
+              href={supportHref}
+              className="w-full py-1 px-2 rounded-lg bg-[#5D87FF] hover:bg-[#4F75FF] text-white text-[10px] font-bold transition-colors block text-center"
             >
-              {account.role === "admin"
+              {account.role === "client"
                 ? "Mở trung tâm hỗ trợ"
                 : "Mở hướng dẫn"}
-            </button>
+            </Link>
           </div>
 
           {/* Authenticated User Preview Card */}
@@ -215,11 +224,7 @@ export function Sidebar({
               <p className="text-xs font-bold text-[#24304A] truncate group-hover:text-[#5D87FF]">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#7C879D] truncate">
-                {account.role === "admin"
-                  ? "Quản trị viên (Admin)"
-                  : account.role || "Tài khoản hệ thống"}
-              </p>
+              <p className="text-[10px] text-[#7C879D] truncate">{roleLabel}</p>
             </div>
           </Link>
         </div>
