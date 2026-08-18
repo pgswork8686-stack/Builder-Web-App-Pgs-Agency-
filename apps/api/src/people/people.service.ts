@@ -7,7 +7,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateEmploymentDto, UpdateEmploymentDto } from './dto/employment.dto';
+import {
+  CreateEmploymentDto,
+  UpdateEmploymentDto,
+  UpdatePersonFullDto,
+  AssignUserProjectsDto,
+} from './dto/employment.dto';
 
 @Injectable()
 export class PeopleService {
@@ -538,5 +543,240 @@ export class PeopleService {
           : null,
       };
     }
+  }
+
+  // --- ADMIN EXTENDED MANAGEMENT ---
+
+  async updatePersonFull(
+    userId: string,
+    dto: UpdatePersonFullDto,
+    adminUserId: string,
+  ) {
+    const client = this.supabaseService.getSystemClient();
+
+    // 1. Update Profile
+    const profileUpdates: any = {};
+    if (dto.fullName !== undefined) profileUpdates.full_name = dto.fullName;
+    if (dto.role !== undefined) profileUpdates.role = dto.role;
+    if (dto.accountStatus !== undefined)
+      profileUpdates.account_status = dto.accountStatus;
+    if (dto.phone !== undefined) profileUpdates.phone = dto.phone;
+
+    if (Object.keys(profileUpdates).length > 0) {
+      profileUpdates.updated_at = new Date().toISOString();
+      const { error: profErr } = await client
+        .from('profiles')
+        .update(profileUpdates)
+        .eq('id', userId);
+
+      if (profErr) {
+        this.logger.error(`Failed to update profile: ${profErr.message}`);
+        throw new InternalServerErrorException({
+          code: 'PROFILE_UPDATE_FAILED',
+          message: 'Không thể cập nhật thông tin tài khoản.',
+        });
+      }
+    }
+
+    // 2. Manage employee profile if not client
+    const effectiveRole =
+      dto.role || (await this.getPersonByUserId(userId)).role;
+
+    if (effectiveRole === 'client') {
+      // Remove employee profile if existing
+      await client.from('employee_profiles').delete().eq('user_id', userId);
+    } else {
+      // Upsert employee profile if relevant fields provided
+      if (
+        dto.employeeCode !== undefined ||
+        dto.departmentId !== undefined ||
+        dto.teamId !== undefined ||
+        dto.jobTitle !== undefined ||
+        dto.employmentStatus !== undefined ||
+        dto.joinedDate !== undefined
+      ) {
+        const empPayload: any = {
+          user_id: userId,
+          updated_by: adminUserId,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (dto.employeeCode)
+          empPayload.employee_code = dto.employeeCode.toUpperCase();
+        if (dto.departmentId !== undefined)
+          empPayload.department_id = dto.departmentId || null;
+        if (dto.teamId !== undefined) empPayload.team_id = dto.teamId || null;
+        if (dto.jobTitle !== undefined)
+          empPayload.job_title = dto.jobTitle || null;
+        if (dto.employmentStatus)
+          empPayload.employment_status = dto.employmentStatus;
+        if (dto.joinedDate !== undefined)
+          empPayload.joined_date = dto.joinedDate || null;
+
+        // Ensure employee_code exists if record is new
+        const { data: existingEmp } = await client
+          .from('employee_profiles')
+          .select('user_id, employee_code')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (!existingEmp && !empPayload.employee_code) {
+          empPayload.employee_code = `EMP-${userId.slice(0, 6).toUpperCase()}`;
+        }
+        if (!existingEmp) {
+          empPayload.created_by = adminUserId;
+        }
+
+        const { error: empErr } = await client
+          .from('employee_profiles')
+          .upsert(empPayload, { onConflict: 'user_id' });
+
+        if (empErr) {
+          this.logger.error(
+            `Failed to upsert employee profile: ${empErr.message}`,
+          );
+        }
+      }
+    }
+
+    return this.getPersonByUserId(userId);
+  }
+
+  async deletePerson(userId: string, adminUserId: string) {
+    const client = this.supabaseService.getSystemClient();
+
+    // Check if target is admin
+    const { data: target } = await client
+      .from('profiles')
+      .select('id, role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!target) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Không tìm thấy tài khoản người dùng.',
+      });
+    }
+
+    // Terminate and deactivate profile
+    const { error } = await client
+      .from('profiles')
+      .update({
+        account_status: 'terminated',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (error) {
+      this.logger.error(`Failed to terminate user: ${error.message}`);
+      throw new InternalServerErrorException({
+        code: 'USER_TERMINATION_FAILED',
+        message: 'Không thể khóa hoặc thôi việc tài khoản này.',
+      });
+    }
+
+    // Set employee status to terminated
+    await client
+      .from('employee_profiles')
+      .update({
+        employment_status: 'terminated',
+        left_date: new Date().toISOString().split('T')[0],
+        updated_by: adminUserId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId);
+
+    // Remove active project memberships
+    await client.from('project_memberships').delete().eq('user_id', userId);
+
+    return { success: true, message: 'Đã chấm dứt tài khoản thành công.' };
+  }
+
+  async getUserProjects(userId: string) {
+    const client = this.supabaseService.getSystemClient();
+
+    const { data, error } = await client
+      .from('project_memberships')
+      .select(
+        `
+        id,
+        project_id,
+        project_role,
+        joined_at,
+        project:projects (
+          id,
+          project_code,
+          name,
+          status,
+          priority,
+          start_date,
+          due_date
+        )
+      `,
+      )
+      .eq('user_id', userId);
+
+    if (error) {
+      this.logger.error(`Failed to get user projects: ${error.message}`);
+      return [];
+    }
+
+    return (data || []).map((m: any) => ({
+      membershipId: m.id,
+      projectId: m.project_id,
+      projectRole: m.project_role,
+      joinedAt: m.joined_at,
+      project: m.project,
+    }));
+  }
+
+  async assignUserProjects(
+    userId: string,
+    dto: AssignUserProjectsDto,
+    adminUserId: string,
+  ) {
+    const client = this.supabaseService.getSystemClient();
+
+    // Verify user exists and is active
+    const { data: profile } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Không tìm thấy thông tin tài khoản người dùng.',
+      });
+    }
+
+    // Delete existing project memberships for this user
+    await client.from('project_memberships').delete().eq('user_id', userId);
+
+    // Insert new memberships
+    if (dto.projectIds.length > 0) {
+      const inserts = dto.projectIds.map((projId) => ({
+        project_id: projId,
+        user_id: userId,
+        project_role: dto.projectRole || 'member',
+        created_by: adminUserId,
+      }));
+
+      const { error: insErr } = await client
+        .from('project_memberships')
+        .insert(inserts);
+
+      if (insErr) {
+        this.logger.error(`Failed to assign user projects: ${insErr.message}`);
+        throw new InternalServerErrorException({
+          code: 'PROJECT_ASSIGNMENT_FAILED',
+          message: 'Không thể phân bổ dự án cho nhân sự.',
+        });
+      }
+    }
+
+    return this.getUserProjects(userId);
   }
 }

@@ -78,4 +78,48 @@ export const peopleApi = {
       body: JSON.stringify(data),
     });
   },
+
+  async updatePersonFull(
+    userId: string,
+    data: {
+      fullName?: string;
+      phone?: string | null;
+      role?: "admin" | "team_leader" | "employee" | "accountant" | "client";
+      accountStatus?: "pending" | "active" | "suspended" | "terminated";
+      employeeCode?: string | null;
+      departmentId?: string | null;
+      teamId?: string | null;
+      jobTitle?: string | null;
+      employmentStatus?: "probation" | "active" | "on_leave" | "terminated";
+      joinedDate?: string | null;
+    },
+  ) {
+    return fetchWithAuth(`/admin/people/${userId}/full`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deletePerson(userId: string) {
+    return fetchWithAuth(`/admin/people/${userId}`, {
+      method: "DELETE",
+    });
+  },
+
+  async getUserProjects(userId: string) {
+    return fetchWithAuth(`/admin/people/${userId}/projects`);
+  },
+
+  async assignUserProjects(
+    userId: string,
+    data: {
+      projectIds: string[];
+      projectRole?: "project_manager" | "member" | "client_contact" | "viewer";
+    },
+  ) {
+    return fetchWithAuth(`/admin/people/${userId}/projects`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };
