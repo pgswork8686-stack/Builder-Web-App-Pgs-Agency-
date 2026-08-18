@@ -65,7 +65,8 @@ export default function TeamLeaderDashboardPage() {
         if (leaveRes.status === "fulfilled") {
           setStats((prev) => ({
             ...prev,
-            pendingApprovals: leaveRes.value.total || leaveRes.value.items?.length || 0,
+            pendingApprovals:
+              leaveRes.value.total || leaveRes.value.items?.length || 0,
           }));
         }
         if (teamsRes.status === "fulfilled" && Array.isArray(teamsRes.value)) {
@@ -321,7 +322,10 @@ export default function TeamLeaderDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Cần phê duyệt
             </h3>
-            <Badge variant={stats.pendingApprovals > 0 ? "gold" : "default"} size="sm">
+            <Badge
+              variant={stats.pendingApprovals > 0 ? "gold" : "default"}
+              size="sm"
+            >
               {stats.pendingApprovals} yêu cầu
             </Badge>
           </div>
@@ -330,7 +334,8 @@ export default function TeamLeaderDashboardPage() {
             {stats.pendingApprovals > 0 ? (
               <div className="space-y-3">
                 <p className="text-xs font-semibold text-[#24304A]">
-                  Có {stats.pendingApprovals} đơn xin nghỉ phép/giải trình đang chờ bạn xem xét.
+                  Có {stats.pendingApprovals} đơn xin nghỉ phép/giải trình đang
+                  chờ bạn xem xét.
                 </p>
                 <Link href="/app/team-leader/approvals">
                   <Button variant="primary" size="sm">

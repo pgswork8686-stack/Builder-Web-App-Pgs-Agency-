@@ -15,22 +15,22 @@
 
 Mọi mã nghiệp vụ trong PGS Hub tuân theo định dạng chuẩn: `PREFIX_XX` (Tối thiểu 2 chữ số zero-padded, tự động tăng và transaction-safe thông qua PostgreSQL Sequences).
 
-| Đối tượng (Entity) | Tiền tố (Prefix) | Ví dụ mã | Cột dữ liệu (Database Column) | Bảng gốc (Source Table) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Khách hàng** | `KH_` | `KH_01`, `KH_02`, `KH_100` | `client_code` | `public.client_companies` |
-| **Nhân sự / Nhân viên** | `NV_` | `NV_01`, `NV_02`, `NV_15` | `employee_code` | `public.employee_profiles` |
-| **Tài khoản** | `TK_` | `TK_01`, `TK_02`, `TK_50` | `account_code` | `public.profiles` |
-| **Dự án** | `DA_` | `DA_01`, `DA_02`, `DA_35` | `project_code` | `public.projects` |
-| **Công việc / Task** | `CV_` | `CV_01`, `CV_02`, `CV_99` | `task_code` | `public.tasks` |
-| **Phòng ban** | `PB_` | `PB_01`, `PB_02` | `department_code` | `public.departments` |
-| **Nhóm / Team** | `N_` | `N_01`, `N_02` | `team_code` | `public.teams` |
-| **Dịch vụ** | `DV_` | `DV_01`, `DV_02` | `service_code` | `public.services` |
-| **Hợp đồng** | `HD_` | `HD_01`, `HD_02` | `contract_code` | `public.contracts` |
-| **Hóa đơn** | `HDON_` | `HDON_01`, `HDON_02` | `invoice_code` | `public.invoices` |
-| **Thanh toán** | `TT_` | `TT_01`, `TT_02` | `payment_code` | `public.invoice_payments` |
-| **Nghỉ phép** | `NP_` | `NP_01`, `NP_02` | `leave_code` | `public.leave_requests` |
-| **Chấm công** | `CC_` | `CC_01`, `CC_02` | `attendance_code` | `public.attendance_records` |
-| **Duyệt tài khoản** | `DTK_` | `DTK_01`, `DTK_02` | `approval_event_code` | `public.account_approval_events` |
+| Đối tượng (Entity)      | Tiền tố (Prefix) | Ví dụ mã                   | Cột dữ liệu (Database Column) | Bảng gốc (Source Table)          |
+| :---------------------- | :--------------- | :------------------------- | :---------------------------- | :------------------------------- |
+| **Khách hàng**          | `KH_`            | `KH_01`, `KH_02`, `KH_100` | `client_code`                 | `public.client_companies`        |
+| **Nhân sự / Nhân viên** | `NV_`            | `NV_01`, `NV_02`, `NV_15`  | `employee_code`               | `public.employee_profiles`       |
+| **Tài khoản**           | `TK_`            | `TK_01`, `TK_02`, `TK_50`  | `account_code`                | `public.profiles`                |
+| **Dự án**               | `DA_`            | `DA_01`, `DA_02`, `DA_35`  | `project_code`                | `public.projects`                |
+| **Công việc / Task**    | `CV_`            | `CV_01`, `CV_02`, `CV_99`  | `task_code`                   | `public.tasks`                   |
+| **Phòng ban**           | `PB_`            | `PB_01`, `PB_02`           | `department_code`             | `public.departments`             |
+| **Nhóm / Team**         | `N_`             | `N_01`, `N_02`             | `team_code`                   | `public.teams`                   |
+| **Dịch vụ**             | `DV_`            | `DV_01`, `DV_02`           | `service_code`                | `public.services`                |
+| **Hợp đồng**            | `HD_`            | `HD_01`, `HD_02`           | `contract_code`               | `public.contracts`               |
+| **Hóa đơn**             | `HDON_`          | `HDON_01`, `HDON_02`       | `invoice_code`                | `public.invoices`                |
+| **Thanh toán**          | `TT_`            | `TT_01`, `TT_02`           | `payment_code`                | `public.invoice_payments`        |
+| **Nghỉ phép**           | `NP_`            | `NP_01`, `NP_02`           | `leave_code`                  | `public.leave_requests`          |
+| **Chấm công**           | `CC_`            | `CC_01`, `CC_02`           | `attendance_code`             | `public.attendance_records`      |
+| **Duyệt tài khoản**     | `DTK_`           | `DTK_01`, `DTK_02`         | `approval_event_code`         | `public.account_approval_events` |
 
 ---
 
@@ -76,29 +76,29 @@ flowchart TD
 
 Khi quản trị dữ liệu trực tiếp trong Supabase Dashboard / Table Editor:
 
-| Dữ liệu cần quản trị | Bảng Backend (Chứa UUID) | View khuyên dùng cho Admin (Dễ đọc) |
-| :--- | :--- | :--- |
-| **Lịch sử duyệt tài khoản** | `account_approval_events` | 👉 **`admin_account_approval_events`** |
-| **Khách hàng doanh nghiệp** | `client_companies` | 👉 **`admin_clients`** |
-| **Nhân sự & Phòng ban** | `profiles`, `employee_profiles` | 👉 **`admin_people`** |
-| **Phòng ban** | `departments` | 👉 **`admin_departments`** |
-| **Đội nhóm (Teams)** | `teams` | 👉 **`admin_teams`** |
-| **Dự án** | `projects` | 👉 **`admin_projects`** |
-| **Công việc (Tasks)** | `tasks` | 👉 **`admin_tasks`** |
-| **Nhật ký chấm công** | `attendance_records` | 👉 **`admin_attendance_records`** |
-| **Đơn xin nghỉ phép** | `leave_requests` | 👉 **`admin_leave_requests`** |
-| **Hợp đồng kinh tế** | `contracts` | 👉 **`admin_contracts`** |
-| **Hóa đơn thanh toán** | `invoices` | 👉 **`admin_invoices`** |
-| **Giao dịch thanh toán** | `invoice_payments` | 👉 **`admin_payments`** |
-| **Danh mục dịch vụ** | `services` | 👉 **`admin_services`** |
+| Dữ liệu cần quản trị        | Bảng Backend (Chứa UUID)        | View khuyên dùng cho Admin (Dễ đọc)    |
+| :-------------------------- | :------------------------------ | :------------------------------------- |
+| **Lịch sử duyệt tài khoản** | `account_approval_events`       | 👉 **`admin_account_approval_events`** |
+| **Khách hàng doanh nghiệp** | `client_companies`              | 👉 **`admin_clients`**                 |
+| **Nhân sự & Phòng ban**     | `profiles`, `employee_profiles` | 👉 **`admin_people`**                  |
+| **Phòng ban**               | `departments`                   | 👉 **`admin_departments`**             |
+| **Đội nhóm (Teams)**        | `teams`                         | 👉 **`admin_teams`**                   |
+| **Dự án**                   | `projects`                      | 👉 **`admin_projects`**                |
+| **Công việc (Tasks)**       | `tasks`                         | 👉 **`admin_tasks`**                   |
+| **Nhật ký chấm công**       | `attendance_records`            | 👉 **`admin_attendance_records`**      |
+| **Đơn xin nghỉ phép**       | `leave_requests`                | 👉 **`admin_leave_requests`**          |
+| **Hợp đồng kinh tế**        | `contracts`                     | 👉 **`admin_contracts`**               |
+| **Hóa đơn thanh toán**      | `invoices`                      | 👉 **`admin_invoices`**                |
+| **Giao dịch thanh toán**    | `invoice_payments`              | 👉 **`admin_payments`**                |
+| **Danh mục dịch vụ**        | `services`                      | 👉 **`admin_services`**                |
 
 ---
 
 ## 5. CƠ CHẾ BẢO MẬT VIEW (VIEW SECURITY & RLS)
 
-* Tất cả các View được định nghĩa với **`WITH (security_invoker = true)`**.
-* Khi truy vấn qua View, quyền truy cập của người dùng được kiểm tra tự động theo chính sách RLS (Row Level Security) của bảng gốc bên dưới.
-* **Quyền thực thi (Permissions):**
-  * `GRANT SELECT` cho vai trò `authenticated` và `service_role`.
-  * `REVOKE ALL` đối với `anon` và `PUBLIC` để ngăn chặn rò rỉ dữ liệu ra ngoài.
-  * Tuyệt đối không đưa mật khẩu, token, secret key hay session hash vào View.
+- Tất cả các View được định nghĩa với **`WITH (security_invoker = true)`**.
+- Khi truy vấn qua View, quyền truy cập của người dùng được kiểm tra tự động theo chính sách RLS (Row Level Security) của bảng gốc bên dưới.
+- **Quyền thực thi (Permissions):**
+  - `GRANT SELECT` cho vai trò `authenticated` và `service_role`.
+  - `REVOKE ALL` đối với `anon` và `PUBLIC` để ngăn chặn rò rỉ dữ liệu ra ngoài.
+  - Tuyệt đối không đưa mật khẩu, token, secret key hay session hash vào View.

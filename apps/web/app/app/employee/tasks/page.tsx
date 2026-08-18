@@ -23,7 +23,9 @@ import { getMe } from "@/lib/api/auth";
 
 export default function EmployeeTasksPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [tasks, setTasks] = useState<(ProjectTask & { projectName: string })[]>([]);
+  const [tasks, setTasks] = useState<(ProjectTask & { projectName: string })[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
@@ -36,8 +38,10 @@ export default function EmployeeTasksPage() {
         projectsApi.getInternalProjects(1, 20),
       ]);
 
-      const currentUserId = meRes.status === "fulfilled" ? meRes.value.user?.id : null;
-      const userProjects = projRes.status === "fulfilled" ? projRes.value.items || [] : [];
+      const currentUserId =
+        meRes.status === "fulfilled" ? meRes.value.user?.id : null;
+      const userProjects =
+        projRes.status === "fulfilled" ? projRes.value.items || [] : [];
       setProjects(userProjects);
 
       if (userProjects.length > 0) {
@@ -169,7 +173,10 @@ export default function EmployeeTasksPage() {
           {filteredTasks.map((t) => {
             const isUpdating = updatingTaskId === t.id;
             return (
-              <Card key={t.id} className="p-5 flex flex-col justify-between space-y-4">
+              <Card
+                key={t.id}
+                className="p-5 flex flex-col justify-between space-y-4"
+              >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] font-bold text-[#5D87FF] truncate">
@@ -180,8 +187,8 @@ export default function EmployeeTasksPage() {
                         t.status === "done"
                           ? "success"
                           : t.status === "in_progress"
-                          ? "blue"
-                          : "default"
+                            ? "blue"
+                            : "default"
                       }
                       size="sm"
                     >

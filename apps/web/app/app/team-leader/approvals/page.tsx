@@ -40,7 +40,10 @@ export default function TeamLeaderApprovalsPage() {
   const fetchPendingRequests = async () => {
     setLoading(true);
     try {
-      const res = await leaveApi.getDirectory({ status: "pending", pageSize: 50 });
+      const res = await leaveApi.getDirectory({
+        status: "pending",
+        pageSize: 50,
+      });
       setRequests(res.items || []);
     } catch {
       // Safe fallback
