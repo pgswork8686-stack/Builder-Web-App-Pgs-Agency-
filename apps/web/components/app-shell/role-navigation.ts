@@ -71,40 +71,40 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
             {
               index: "02",
-              title: "Khách hàng",
-              href: "/app/admin/clients",
-              icon: Briefcase,
-            },
-            {
-              index: "03",
               title: "Dự án",
               href: "/app/admin/projects",
               icon: FolderKanban,
               exact: true,
             },
             {
-              index: "04",
+              index: "03",
               title: "Dự án hoàn thành",
               href: "/app/admin/projects/completed",
               icon: CheckCircle2,
             },
             {
-              index: "05",
+              index: "04",
               title: "Công việc",
               href: "/app/admin/tasks",
               icon: ListTodo,
             },
             {
-              index: "06",
+              index: "05",
               title: "Kanban",
               href: "/app/admin/kanban",
               icon: Kanban,
             },
             {
-              index: "07",
+              index: "06",
               title: "Lịch",
               href: "/app/admin/calendar",
               icon: Calendar,
+            },
+            {
+              index: "07",
+              title: "Khách hàng",
+              href: "/app/admin/clients",
+              icon: Briefcase,
             },
             {
               index: "08",
@@ -143,7 +143,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "team_leader":
       return [
         {
-          groupTitle: "TRANG CHÍNH",
+          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
             {
               index: "01",
@@ -220,7 +220,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "employee":
       return [
         {
-          groupTitle: "TRANG CHÍNH",
+          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
             {
               index: "01",
@@ -291,7 +291,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "accountant":
       return [
         {
-          groupTitle: "TRANG CHÍNH",
+          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
             {
               index: "01",
@@ -373,7 +373,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "client":
       return [
         {
-          groupTitle: "TRANG CHÍNH",
+          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
             {
               index: "01",
