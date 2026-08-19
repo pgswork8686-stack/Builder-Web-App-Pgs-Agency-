@@ -54,7 +54,7 @@ export class OrganizationService {
     const { data, error } = await client
       .from('departments')
       .select(
-        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles(employee_code))',
+        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles!employee_profiles_user_id_fkey(employee_code))',
       )
       .order('sort_order', { ascending: true })
       .order('department_code', { ascending: true });
@@ -98,7 +98,7 @@ export class OrganizationService {
     const { data, error } = await client
       .from('departments')
       .select(
-        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles(employee_code))',
+        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles!employee_profiles_user_id_fkey(employee_code))',
       )
       .eq('id', id)
       .maybeSingle();

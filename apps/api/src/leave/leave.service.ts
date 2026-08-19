@@ -439,7 +439,7 @@ export class LeaveService {
       const { data: requestUserTeam, error: teamQueryError } = await this.client
         .from('leave_requests')
         .select(
-          'user_id, profile:profiles(employee_profile:employee_profiles(team_id))',
+          'user_id, profile:profiles(employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
         )
         .eq('id', requestId)
         .maybeSingle();
@@ -640,7 +640,7 @@ export class LeaveService {
     let dbQuery = this.client
       .from('leave_requests')
       .select(
-        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles!inner(id, full_name, employee_profile:employee_profiles(team_id))',
+        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles!inner(id, full_name, employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
       )
       .eq('status', 'approved')
       .lte('start_date', to)
