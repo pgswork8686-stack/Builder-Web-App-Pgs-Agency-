@@ -31,7 +31,6 @@ export interface ServiceDeliveryItem {
   updated_at: string;
 }
 
-
 export interface ServiceResponsibilityRef {
   id: string;
   code?: string | null;
@@ -127,7 +126,6 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
-      isRequired?: boolean;
       active?: boolean;
       isActive?: boolean;
     }>,
@@ -137,7 +135,6 @@ export const servicesApi = {
     if (data.name !== undefined) payload.name = data.name;
     if (data.description !== undefined) payload.description = data.description;
     if (data.sortOrder !== undefined) payload.sortOrder = data.sortOrder;
-    if (data.isRequired !== undefined) payload.isRequired = data.isRequired;
     if (data.active !== undefined) payload.active = data.active;
     else if (data.isActive !== undefined) payload.active = data.isActive;
 

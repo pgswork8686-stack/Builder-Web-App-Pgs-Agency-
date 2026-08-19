@@ -6,7 +6,8 @@ export const CreateClientCompanySchema = z.object({
     .trim()
     .transform((v) => v.toUpperCase())
     .refine((v) => !v || (v.length >= 2 && v.length <= 30), {
-      message: 'Mã khách hàng phải từ 2 đến 30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).',
+      message:
+        'Mã khách hàng phải từ 2 đến 30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).',
     })
     .optional()
     .nullable(),

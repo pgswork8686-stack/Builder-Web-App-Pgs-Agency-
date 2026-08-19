@@ -139,9 +139,7 @@ export default function AdminPeopleDirectoryPage() {
       setTotalPages(data.totalPages);
       setTotal(data.total);
 
-      const deptsData = await organizationApi
-        .getDepartments()
-        .catch(() => []);
+      const deptsData = await organizationApi.getDepartments().catch(() => []);
       setDepartments(
         deptsData.filter((d: any) => d.isActive ?? d.is_active ?? true),
       );

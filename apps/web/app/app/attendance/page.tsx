@@ -265,7 +265,11 @@ export default function EmployeeAttendancePage() {
                 Điểm danh ca làm việc
               </h3>
               <p className="text-xs text-[#64748B]">
-                Văn phòng: <span className="font-medium text-[#0F172A]">Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn Phúc, Hà Đông, Hà Nội</span>
+                Văn phòng:{" "}
+                <span className="font-medium text-[#0F172A]">
+                  Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
+                  Phúc, Hà Đông, Hà Nội
+                </span>
               </p>
             </div>
 

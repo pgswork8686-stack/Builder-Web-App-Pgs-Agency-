@@ -109,9 +109,7 @@ export default function AdminPersonDetailPage() {
       }
 
       // Load depts & teams for selectors
-      const deptsData = await organizationApi
-        .getDepartments()
-        .catch(() => []);
+      const deptsData = await organizationApi.getDepartments().catch(() => []);
       setDepartments(
         deptsData.filter((d: any) => d.isActive ?? d.is_active ?? true),
       );

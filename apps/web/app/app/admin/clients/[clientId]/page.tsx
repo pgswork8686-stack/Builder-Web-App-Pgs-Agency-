@@ -548,7 +548,9 @@ export default function AdminClientDetailPage() {
               </label>
               <select
                 value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value as "active" | "inactive")}
+                onChange={(e) =>
+                  setEditStatus(e.target.value as "active" | "inactive")
+                }
                 className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
                 <option value="active">Đang hoạt động (Active)</option>

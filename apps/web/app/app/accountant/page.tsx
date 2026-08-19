@@ -248,7 +248,8 @@ export default function AccountantDashboardPage() {
               Chấm công & Quản lý ngày công toàn công ty
             </h3>
             <p className="text-xs text-[#7C879D]">
-              Điểm danh ca làm việc cá nhân và đối soát dữ liệu chấm công GPS của toàn bộ nhân sự phục vụ tính lương.
+              Điểm danh ca làm việc cá nhân và đối soát dữ liệu chấm công GPS
+              của toàn bộ nhân sự phục vụ tính lương.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">

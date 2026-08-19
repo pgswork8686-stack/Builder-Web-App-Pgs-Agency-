@@ -507,10 +507,7 @@ export class ServicesService {
       (id) => id !== dto.ownerTeamId,
     );
 
-    const departmentIds = [
-      dto.ownerDepartmentId,
-      ...collaboratorDepartmentIds,
-    ];
+    const departmentIds = [dto.ownerDepartmentId, ...collaboratorDepartmentIds];
     const { data: departments, error: departmentError } = await this.client
       .from('departments')
       .select('id,department_code,is_active')
@@ -524,7 +521,8 @@ export class ServicesService {
     ) {
       throw new BadRequestException({
         code: 'SERVICE_RESPONSIBILITY_INVALID_DEPARTMENT',
-        message: 'Phòng ban phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
+        message:
+          'Phòng ban phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
       });
     }
 
@@ -547,7 +545,8 @@ export class ServicesService {
       ) {
         throw new BadRequestException({
           code: 'SERVICE_RESPONSIBILITY_INVALID_TEAM',
-          message: 'Team phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
+          message:
+            'Team phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
         });
       }
       teams = data;

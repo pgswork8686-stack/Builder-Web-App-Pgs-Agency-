@@ -75,6 +75,29 @@ const emptyResponsibilityForm = {
   collaboratorTeamIds: [] as string[],
 };
 
+export function cleanCollaboratorTeamIds(
+  collaboratorTeamIds: string[],
+  ownerDepartmentId: string,
+  ownerTeamId: string | null | undefined,
+  collaboratorDepartmentIds: string[],
+  teams: Array<{ id: string; departmentId?: string; department_id?: string }>,
+): string[] {
+  const allowedDepartmentIds = new Set([
+    ownerDepartmentId,
+    ...collaboratorDepartmentIds,
+  ]);
+
+  return collaboratorTeamIds.filter((teamId) => {
+    if (teamId === ownerTeamId) return false;
+    const team = teams.find((t) => t.id === teamId);
+    if (!team) return false;
+    const teamDepartmentId = team.departmentId ?? team.department_id;
+    return Boolean(
+      teamDepartmentId && allowedDepartmentIds.has(teamDepartmentId),
+    );
+  });
+}
+
 export function ServiceCatalogView() {
   const [activeTab, setActiveTab] = useState<"services" | "categories">(
     "services",
@@ -172,8 +195,7 @@ export function ServiceCatalogView() {
       .then(([departmentRows, teamRows]) => {
         setDepartments(
           departmentRows.filter(
-            (department) =>
-              department.isActive ?? department.is_active ?? true,
+            (department) => department.isActive ?? department.is_active ?? true,
           ),
         );
         setTeams(
@@ -216,8 +238,9 @@ export function ServiceCatalogView() {
       setResponsibilityForm({
         ownerDepartmentId: responsibility.ownerDepartment?.id ?? "",
         ownerTeamId: responsibility.ownerTeam?.id ?? "",
-        collaboratorDepartmentIds:
-          responsibility.collaboratingDepartments.map((item) => item.id),
+        collaboratorDepartmentIds: responsibility.collaboratingDepartments.map(
+          (item) => item.id,
+        ),
         collaboratorTeamIds: responsibility.collaboratingTeams.map(
           (item) => item.id,
         ),
@@ -620,25 +643,25 @@ export function ServiceCatalogView() {
                             >
                               Phụ trách
                             </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingServiceId(svc.id);
-                              setServiceForm({
-                                code: svc.code,
-                                name: svc.name,
-                                description: svc.description ?? "",
-                                categoryId: svc.service_category_id ?? "",
-                                sortOrder: svc.sort_order ?? 0,
-                                active: svc.active,
-                              });
-                              setShowServiceModal(true);
-                            }}
-                            leftIcon={<Pencil className="w-3.5 h-3.5" />}
-                          >
-                            Sửa
-                          </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setEditingServiceId(svc.id);
+                                setServiceForm({
+                                  code: svc.code,
+                                  name: svc.name,
+                                  description: svc.description ?? "",
+                                  categoryId: svc.service_category_id ?? "",
+                                  sortOrder: svc.sort_order ?? 0,
+                                  active: svc.active,
+                                });
+                                setShowServiceModal(true);
+                              }}
+                              leftIcon={<Pencil className="w-3.5 h-3.5" />}
+                            >
+                              Sửa
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -952,7 +975,10 @@ export function ServiceCatalogView() {
               Đang tải thông tin phụ trách...
             </div>
           ) : (
-            <form onSubmit={handleSaveResponsibility} className="space-y-5 pt-2">
+            <form
+              onSubmit={handleSaveResponsibility}
+              className="space-y-5 pt-2"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
@@ -962,22 +988,33 @@ export function ServiceCatalogView() {
                     required
                     value={responsibilityForm.ownerDepartmentId}
                     onChange={(e) => {
-                      const departmentId = e.target.value;
+                      const nextOwnerDepartmentId = e.target.value;
+                      const nextOwnerTeamId = teams.some(
+                        (team) =>
+                          team.id === responsibilityForm.ownerTeamId &&
+                          (team.departmentId ?? team.department_id) ===
+                            nextOwnerDepartmentId,
+                      )
+                        ? responsibilityForm.ownerTeamId
+                        : "";
+                      const nextCollaboratorDepartmentIds =
+                        responsibilityForm.collaboratorDepartmentIds.filter(
+                          (id) => id !== nextOwnerDepartmentId,
+                        );
+                      const nextCollaboratorTeamIds = cleanCollaboratorTeamIds(
+                        responsibilityForm.collaboratorTeamIds,
+                        nextOwnerDepartmentId,
+                        nextOwnerTeamId,
+                        nextCollaboratorDepartmentIds,
+                        teams,
+                      );
+
                       setResponsibilityForm({
-                        ...responsibilityForm,
-                        ownerDepartmentId: departmentId,
-                        ownerTeamId: teams.some(
-                          (team) =>
-                            team.id === responsibilityForm.ownerTeamId &&
-                            (team.departmentId ?? team.department_id) ===
-                              departmentId,
-                        )
-                          ? responsibilityForm.ownerTeamId
-                          : "",
+                        ownerDepartmentId: nextOwnerDepartmentId,
+                        ownerTeamId: nextOwnerTeamId,
                         collaboratorDepartmentIds:
-                          responsibilityForm.collaboratorDepartmentIds.filter(
-                            (id) => id !== departmentId,
-                          ),
+                          nextCollaboratorDepartmentIds,
+                        collaboratorTeamIds: nextCollaboratorTeamIds,
                       });
                     }}
                     className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
@@ -997,16 +1034,22 @@ export function ServiceCatalogView() {
                   </label>
                   <select
                     value={responsibilityForm.ownerTeamId}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const nextOwnerTeamId = e.target.value;
+                      const nextCollaboratorTeamIds = cleanCollaboratorTeamIds(
+                        responsibilityForm.collaboratorTeamIds,
+                        responsibilityForm.ownerDepartmentId,
+                        nextOwnerTeamId,
+                        responsibilityForm.collaboratorDepartmentIds,
+                        teams,
+                      );
+
                       setResponsibilityForm({
                         ...responsibilityForm,
-                        ownerTeamId: e.target.value,
-                        collaboratorTeamIds:
-                          responsibilityForm.collaboratorTeamIds.filter(
-                            (id) => id !== e.target.value,
-                          ),
-                      })
-                    }
+                        ownerTeamId: nextOwnerTeamId,
+                        collaboratorTeamIds: nextCollaboratorTeamIds,
+                      });
+                    }}
                     disabled={!responsibilityForm.ownerDepartmentId}
                     className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
                   >
@@ -1038,8 +1081,7 @@ export function ServiceCatalogView() {
                   {departments
                     .filter(
                       (department) =>
-                        department.id !==
-                        responsibilityForm.ownerDepartmentId,
+                        department.id !== responsibilityForm.ownerDepartmentId,
                     )
                     .map((department) => {
                       const checked =
@@ -1055,7 +1097,8 @@ export function ServiceCatalogView() {
                             type="checkbox"
                             checked={checked}
                             onChange={(e) => {
-                              const ids = e.target.checked
+                              const nextCollaboratorDepartmentIds = e.target
+                                .checked
                                 ? [
                                     ...responsibilityForm.collaboratorDepartmentIds,
                                     department.id,
@@ -1063,9 +1106,20 @@ export function ServiceCatalogView() {
                                 : responsibilityForm.collaboratorDepartmentIds.filter(
                                     (id) => id !== department.id,
                                   );
+                              const nextCollaboratorTeamIds =
+                                cleanCollaboratorTeamIds(
+                                  responsibilityForm.collaboratorTeamIds,
+                                  responsibilityForm.ownerDepartmentId,
+                                  responsibilityForm.ownerTeamId,
+                                  nextCollaboratorDepartmentIds,
+                                  teams,
+                                );
+
                               setResponsibilityForm({
                                 ...responsibilityForm,
-                                collaboratorDepartmentIds: ids,
+                                collaboratorDepartmentIds:
+                                  nextCollaboratorDepartmentIds,
+                                collaboratorTeamIds: nextCollaboratorTeamIds,
                               });
                             }}
                             className="w-4 h-4 accent-[#4F75FF]"
@@ -1089,7 +1143,8 @@ export function ServiceCatalogView() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
                   {teams.filter((team) => {
-                    const departmentId = team.departmentId ?? team.department_id;
+                    const departmentId =
+                      team.departmentId ?? team.department_id;
                     return (
                       team.id !== responsibilityForm.ownerTeamId &&
                       [
@@ -1356,7 +1411,8 @@ export function ServiceCatalogView() {
                             name: item.name,
                             description: item.description ?? "",
                             sortOrder: item.sort_order,
-                            isRequired: item.is_required ?? item.isRequired ?? true,
+                            isRequired:
+                              item.is_required ?? item.isRequired ?? true,
                             isActive: item.active ?? item.is_active ?? true,
                           });
                           setShowItemForm(true);

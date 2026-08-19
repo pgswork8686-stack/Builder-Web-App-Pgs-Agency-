@@ -118,14 +118,18 @@ export default function AdminClientsPage() {
       return;
     }
     if (code.trim() && !/^[A-Z0-9_-]{2,30}$/i.test(code.trim())) {
-      setFormError("Mã khách hàng phải từ 2-30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).");
+      setFormError(
+        "Mã khách hàng phải từ 2-30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).",
+      );
       return;
     }
 
     try {
       setSubmitting(true);
       await clientsApi.createClientCompany({
-        code: code.trim() ? code.trim().toUpperCase() : `KH_${Date.now().toString().slice(-4)}`,
+        code: code.trim()
+          ? code.trim().toUpperCase()
+          : `KH_${Date.now().toString().slice(-4)}`,
         name: name.trim(),
         status: "active",
         taxCode: taxCode.trim() || null,
@@ -564,7 +568,9 @@ export default function AdminClientsPage() {
               </label>
               <select
                 value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value as "active" | "inactive")}
+                onChange={(e) =>
+                  setEditStatus(e.target.value as "active" | "inactive")
+                }
                 className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
                 <option value="active">Đang hoạt động (Active)</option>

@@ -117,7 +117,8 @@ export class ClientsService {
 
   async createClientCompany(dto: CreateClientCompanyDto, adminUserId: string) {
     const client = this.supabaseService.getSystemClient();
-    const effectiveCode = dto.code?.trim().toUpperCase() || `KH_${Date.now().toString().slice(-4)}`;
+    const effectiveCode =
+      dto.code?.trim().toUpperCase() || `KH_${Date.now().toString().slice(-4)}`;
 
     // Check unique code
     const { data: existing } = await client

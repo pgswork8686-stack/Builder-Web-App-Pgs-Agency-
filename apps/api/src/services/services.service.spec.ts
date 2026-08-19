@@ -10,6 +10,7 @@ function queryResult(
   for (const method of [
     'select',
     'eq',
+    'in',
     'or',
     'order',
     'range',
@@ -281,6 +282,225 @@ describe('ServicesService', () => {
         'admin-1',
       );
       expect(res).toMatchObject({ active: false });
+    });
+
+    it('updates delivery item isRequired property', async () => {
+      client.from
+        .mockReturnValueOnce(
+          queryResult(
+            {
+              data: { id: 'item-1', service_id: 'svc-1', active: true },
+            },
+            'maybeSingle',
+          ),
+        )
+        .mockReturnValueOnce(
+          queryResult(
+            {
+              data: {
+                id: 'item-1',
+                name: 'Khảo sát',
+                is_required: false,
+                active: true,
+              },
+            },
+            'single',
+          ),
+        );
+
+      const res = await service.updateDeliveryItem(
+        'svc-1',
+        'item-1',
+        { isRequired: false },
+        'admin-1',
+      );
+      expect(res).toMatchObject({ is_required: false });
+    });
+  });
+
+  describe('Service Responsibility Validations', () => {
+    const serviceId = '11111111-1111-4111-8111-111111111111';
+    const dept1 = '22222222-2222-4222-8222-222222222222';
+    const dept2 = '33333333-3333-4333-8333-333333333333';
+    const teamDept1 = '44444444-4444-4444-8444-444444444444';
+    const teamDept2 = '55555555-5555-4555-8555-555555555555';
+    const teamOtherDept = '66666666-6666-4666-8666-666666666666';
+
+    it('rejects when owner team belongs to a different department than owner department', async () => {
+      // 1. getServiceResponsibilities -> service lookup
+      client.from
+        .mockReturnValueOnce(
+          queryResult(
+            { data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } },
+            'maybeSingle',
+          ),
+        )
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        // 2. department lookup
+        .mockReturnValueOnce(
+          queryResult({
+            data: [{ id: dept1, department_code: 'PB_02', is_active: true }],
+          }),
+        )
+        // 3. team lookup -> team belongs to dept2
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              {
+                id: teamDept2,
+                team_code: 'TM_02',
+                department_id: dept2,
+                is_active: true,
+              },
+            ],
+          }),
+        );
+
+      await expect(
+        service.updateServiceResponsibilities(
+          serviceId,
+          {
+            ownerDepartmentId: dept1,
+            ownerTeamId: teamDept2,
+            collaboratorDepartmentIds: [],
+            collaboratorTeamIds: [],
+          },
+          'admin-1',
+        ),
+      ).rejects.toThrow('Owner Team phải thuộc Owner Department của dịch vụ.');
+    });
+
+    it('rejects when collaborator team belongs to an unassigned department', async () => {
+      client.from
+        // 1. getServiceResponsibilities
+        .mockReturnValueOnce(
+          queryResult(
+            { data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } },
+            'maybeSingle',
+          ),
+        )
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        // 2. department lookup
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              { id: dept1, department_code: 'PB_02', is_active: true },
+              { id: dept2, department_code: 'PB_03', is_active: true },
+            ],
+          }),
+        )
+        // 3. team lookup -> teamOtherDept belongs to 'dept-99'
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              {
+                id: teamDept1,
+                team_code: 'TM_01',
+                department_id: dept1,
+                is_active: true,
+              },
+              {
+                id: teamOtherDept,
+                team_code: 'TM_99',
+                department_id: 'dept-99',
+                is_active: true,
+              },
+            ],
+          }),
+        );
+
+      await expect(
+        service.updateServiceResponsibilities(
+          serviceId,
+          {
+            ownerDepartmentId: dept1,
+            ownerTeamId: teamDept1,
+            collaboratorDepartmentIds: [dept2],
+            collaboratorTeamIds: [teamOtherDept],
+          },
+          'admin-1',
+        ),
+      ).rejects.toThrow(
+        'Team phối hợp phải thuộc Owner Department hoặc một Collaborating Department.',
+      );
+    });
+
+    it('successfully updates responsibilities when owner team and collaborating teams are valid', async () => {
+      client.from
+        // 1. getServiceResponsibilities check
+        .mockReturnValueOnce(
+          queryResult({ data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } }, 'maybeSingle'),
+        )
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        // 2. department lookup
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              { id: dept1, department_code: 'PB_02', is_active: true },
+              { id: dept2, department_code: 'PB_03', is_active: true },
+            ],
+          }),
+        )
+        // 3. team lookup
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              { id: teamDept1, team_code: 'TM_01', department_id: dept1, is_active: true },
+              { id: teamDept2, team_code: 'TM_02', department_id: dept2, is_active: true },
+            ],
+          }),
+        )
+        // 4. snapshot old assignments
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        .mockReturnValueOnce(queryResult({ data: [] }))
+        // 5. delete existing team & department assignments
+        .mockReturnValueOnce(queryResult({ data: null }))
+        .mockReturnValueOnce(queryResult({ data: null }))
+        // 6. insert new department & team assignments
+        .mockReturnValueOnce(queryResult({ data: null }))
+        .mockReturnValueOnce(queryResult({ data: null }))
+        // 7. return updated responsibilities (getServiceResponsibilities)
+        .mockReturnValueOnce(
+          queryResult({ data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } }, 'maybeSingle'),
+        )
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              { id: 'da-1', department_id: dept1, department_code: 'PB_02', responsibility_role: 'owner' },
+              { id: 'da-2', department_id: dept2, department_code: 'PB_03', responsibility_role: 'collaborator' },
+            ],
+          }),
+        )
+        .mockReturnValueOnce(
+          queryResult({
+            data: [
+              { id: 'ta-1', team_id: teamDept1, team_code: 'TM_01', department_code: 'PB_02', responsibility_role: 'owner' },
+              { id: 'ta-2', team_id: teamDept2, team_code: 'TM_02', department_code: 'PB_03', responsibility_role: 'collaborator' },
+            ],
+          }),
+        );
+
+      const res = await service.updateServiceResponsibilities(
+        serviceId,
+        {
+          ownerDepartmentId: dept1,
+          ownerTeamId: teamDept1,
+          collaboratorDepartmentIds: [dept2],
+          collaboratorTeamIds: [teamDept2],
+        },
+        'admin-1',
+      );
+
+      expect(res).toMatchObject({
+        serviceId,
+        ownerDepartment: { id: dept1, code: 'PB_02' },
+        ownerTeam: { id: teamDept1, code: 'TM_01' },
+      });
+      expect(res.collaboratingDepartments).toHaveLength(1);
+      expect(res.collaboratingTeams).toHaveLength(1);
     });
   });
 });

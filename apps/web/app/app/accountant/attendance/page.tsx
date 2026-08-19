@@ -638,7 +638,11 @@ export default function AccountantAttendancePage() {
                     Điểm danh ca làm việc cá nhân
                   </h3>
                   <p className="text-xs text-[#7C879D]">
-                    Văn phòng: <span className="font-medium text-[#24304A]">Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn Phúc, Hà Đông, Hà Nội</span>
+                    Văn phòng:{" "}
+                    <span className="font-medium text-[#24304A]">
+                      Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
+                      Phúc, Hà Đông, Hà Nội
+                    </span>
                   </p>
                 </div>
 
@@ -678,7 +682,9 @@ export default function AccountantAttendancePage() {
                   onClick={handleCheckIn}
                   isLoading={actionLoading}
                   disabled={
-                    actionLoading || personalSummary?.today?.checkedIn || !geoCoords
+                    actionLoading ||
+                    personalSummary?.today?.checkedIn ||
+                    !geoCoords
                   }
                   leftIcon={<LogIn className="w-4 h-4" />}
                 >
