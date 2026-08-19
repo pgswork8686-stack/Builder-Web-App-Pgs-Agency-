@@ -10,6 +10,11 @@ import {
   Send,
   UserPlus,
   WifiOff,
+  Search,
+  Plus,
+  Users,
+  Briefcase,
+  Building,
 } from "lucide-react";
 import { io, type Socket } from "socket.io-client";
 import { getMe, type AccountPayload } from "@/lib/api/auth";
@@ -19,12 +24,28 @@ import {
   type ChatConversation,
   type ChatMessage,
 } from "@/lib/api/chat";
-import { NotificationBell } from "./notification-bell";
+import { peopleApi } from "@/lib/api/people";
+import { projectsApi, type Project } from "@/lib/api/projects";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Dialog } from "@/components/ui/dialog";
 
 type ConnectionState = "connecting" | "connected" | "reconnecting" | "denied";
+
+interface ContactUser {
+  id: string;
+  email: string;
+  fullName: string | null;
+  role: string;
+  avatarUrl?: string | null;
+  employmentProfile?: {
+    jobTitle?: string | null;
+    employeeCode?: string | null;
+  } | null;
+}
 
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -39,6 +60,47 @@ function conversationTitle(conversation: ChatConversation) {
     return conversation.project?.name ?? conversation.title ?? "Project chat";
   }
   return conversation.title ?? "Direct chat";
+}
+
+function getRoleBadge(role: string) {
+  switch (role?.toLowerCase()) {
+    case "admin":
+      return (
+        <Badge variant="blue" size="sm">
+          Admin
+        </Badge>
+      );
+    case "team_leader":
+      return (
+        <Badge variant="purple" size="sm">
+          Trưởng nhóm
+        </Badge>
+      );
+    case "employee":
+      return (
+        <Badge variant="cyan" size="sm">
+          Nhân viên
+        </Badge>
+      );
+    case "accountant":
+      return (
+        <Badge variant="gold" size="sm">
+          Kế toán
+        </Badge>
+      );
+    case "client":
+      return (
+        <Badge variant="warning" size="sm">
+          Khách hàng
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="default" size="sm">
+          {role}
+        </Badge>
+      );
+  }
 }
 
 export function ChatWorkspace() {
@@ -62,6 +124,19 @@ export function ChatWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("connecting");
+
+  // Filter & Search states
+  const [conversationSearch, setConversationSearch] = useState("");
+  const [contacts, setContacts] = useState<ContactUser[]>([]);
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
+
+  // New Chat Modal state
+  const [newChatModalOpen, setNewChatModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState<"direct" | "project">("direct");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+  const [projectSearchQuery, setProjectSearchQuery] = useState("");
 
   const isClient = account?.role === "client";
 
@@ -89,6 +164,32 @@ export function ChatWorkspace() {
       return [];
     } finally {
       setLoadingList(false);
+    }
+  }, []);
+
+  const loadContactsAndProjects = useCallback(async () => {
+    setLoadingContacts(true);
+    try {
+      const [peopleRes, projectsRes] = await Promise.allSettled([
+        peopleApi.getPeopleDirectory({ pageSize: 100 }),
+        projectsApi.getInternalProjects(1, 100).catch(async () => {
+          return await projectsApi.getClientProjects(1, 100);
+        }),
+      ]);
+
+      if (peopleRes.status === "fulfilled" && peopleRes.value?.items) {
+        setContacts(peopleRes.value.items as any);
+      }
+      if (
+        projectsRes.status === "fulfilled" &&
+        (projectsRes.value as any)?.items
+      ) {
+        setProjectsList((projectsRes.value as any).items);
+      }
+    } catch {
+      // Non-blocking background loader
+    } finally {
+      setLoadingContacts(false);
     }
   }, []);
 
@@ -177,7 +278,11 @@ export function ChatWorkspace() {
   useEffect(() => {
     let disposed = false;
 
-    void Promise.all([getMe(), loadConversations()]).then(([me, list]) => {
+    void Promise.all([
+      getMe(),
+      loadConversations(),
+      loadContactsAndProjects(),
+    ]).then(([me, list]) => {
       if (disposed) return;
       setAccount(me.account);
 
@@ -216,6 +321,7 @@ export function ChatWorkspace() {
   }, [
     fetchConversationAndOpen,
     loadConversations,
+    loadContactsAndProjects,
     openConversation,
     searchParams,
   ]);
@@ -272,41 +378,44 @@ export function ChatWorkspace() {
     };
   }, [joinRealtimeRoom]);
 
-  const createDirect = async () => {
-    if (!peerUserId.trim()) return;
+  const createDirect = async (targetId?: string) => {
+    const idToUse = targetId || peerUserId.trim();
+    if (!idToUse) return;
     setWorking("direct");
     setError(null);
     try {
-      const conversation = await chatApi.createDirect(peerUserId.trim());
+      const conversation = await chatApi.createDirect(idToUse);
       await loadConversations();
       await openConversation(conversation);
       setPeerUserId("");
+      setNewChatModalOpen(false);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Không tạo được direct chat. Hãy kiểm tra user id.",
+          : "Không tạo được direct chat. Hãy kiểm tra quyền hạn người dùng.",
       );
     } finally {
       setWorking(null);
     }
   };
 
-  const openProjectChat = async () => {
-    if (!projectId.trim()) return;
+  const openProjectChat = async (targetProjId?: string) => {
+    const idToUse = targetProjId || projectId.trim();
+    if (!idToUse) return;
     setWorking("project");
     setError(null);
     try {
-      const conversation = await chatApi.getProjectConversation(
-        projectId.trim(),
-      );
+      const conversation = await chatApi.getProjectConversation(idToUse);
       await loadConversations();
       await openConversation(conversation);
+      setProjectId("");
+      setNewChatModalOpen(false);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Không mở được project chat. Server sẽ kiểm tra membership.",
+          : "Không mở được project chat. Hãy kiểm tra quyền tham gia dự án.",
       );
     } finally {
       setWorking(null);
@@ -340,24 +449,80 @@ export function ChatWorkspace() {
     }
   };
 
+  // Filtered conversations
+  const filteredConversations = useMemo(() => {
+    if (!conversationSearch.trim()) return conversations;
+    const q = conversationSearch.toLowerCase();
+    return conversations.filter((c) =>
+      conversationTitle(c).toLowerCase().includes(q),
+    );
+  }, [conversations, conversationSearch]);
+
+  // Filtered contacts for modal
+  const filteredContacts = useMemo(() => {
+    return contacts.filter((c) => {
+      if (userRoleFilter !== "all" && c.role !== userRoleFilter) return false;
+      if (!userSearchQuery.trim()) return true;
+      const q = userSearchQuery.toLowerCase();
+      const matchName = c.fullName?.toLowerCase().includes(q);
+      const matchEmail = c.email?.toLowerCase().includes(q);
+      const matchTitle = c.employmentProfile?.jobTitle
+        ?.toLowerCase()
+        .includes(q);
+      const matchCode = c.employmentProfile?.employeeCode
+        ?.toLowerCase()
+        .includes(q);
+      return matchName || matchEmail || matchTitle || matchCode;
+    });
+  }, [contacts, userRoleFilter, userSearchQuery]);
+
+  // Filtered projects for modal
+  const filteredProjects = useMemo(() => {
+    if (!projectSearchQuery.trim()) return projectsList;
+    const q = projectSearchQuery.toLowerCase();
+    return projectsList.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.projectCode?.toLowerCase().includes(q),
+    );
+  }, [projectsList, projectSearchQuery]);
+
   return (
     <div className="space-y-6">
       <SectionHeader
         title="Chat nội bộ & Dự án"
-        description="Direct chat dành cho nhân sự nội bộ. Client tham gia project chat theo quyền truy cập được cấp."
+        description="Trò chuyện trực tiếp giữa nhân sự và thảo luận trao đổi theo từng dự án của PGS Agency."
         action={
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => void loadConversations()}
-            leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
-          >
-            Tải lại
-          </Button>
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="h-4 w-4" />}
+              onClick={() => {
+                setModalTab("direct");
+                setNewChatModalOpen(true);
+              }}
+              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            >
+              Cuộc trò chuyện mới
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                void loadConversations();
+                void loadContactsAndProjects();
+              }}
+              leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
+            >
+              Tải lại
+            </Button>
+          </div>
         }
       />
 
       <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
+        {/* Left Column: Conversation list and quick search */}
         <aside className="space-y-6">
           <Card className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-3">
@@ -366,9 +531,30 @@ export function ChatWorkspace() {
                   Cuộc trò chuyện
                 </h2>
                 <p className="mt-0.5 text-[11px] text-[#64748B]">
-                  Danh sách theo quyền truy cập của bạn.
+                  {conversations.length} cuộc hội thoại
                 </p>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setNewChatModalOpen(true)}
+                className="text-[#4F75FF] hover:bg-[#EEF2FF] p-1.5 h-8 rounded-lg"
+                title="Bắt đầu cuộc trò chuyện mới"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Conversation filter input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+              <input
+                type="text"
+                value={conversationSearch}
+                onChange={(e) => setConversationSearch(e.target.value)}
+                placeholder="Tìm cuộc trò chuyện..."
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+              />
             </div>
 
             <div className="flex items-center gap-2 text-xs text-[#64748B]">
@@ -386,18 +572,20 @@ export function ChatWorkspace() {
               {connectionLabel}
             </div>
 
-            <div className="max-h-[32rem] space-y-2 overflow-y-auto pt-2">
+            <div className="max-h-[26rem] space-y-2 overflow-y-auto pt-1">
               {loadingList ? (
                 <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#64748B]">
                   <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                   Đang tải...
                 </div>
-              ) : conversations.length === 0 ? (
+              ) : filteredConversations.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-[#CBD5E1] p-5 text-center text-xs text-[#94A3B8]">
-                  Chưa có cuộc trò chuyện nào.
+                  {conversationSearch
+                    ? "Không tìm thấy cuộc trò chuyện phù hợp."
+                    : "Chưa có cuộc trò chuyện nào. Bấm nút '+' để tạo mới."}
                 </div>
               ) : (
-                conversations.map((conversation) => (
+                filteredConversations.map((conversation) => (
                   <button
                     key={conversation.id}
                     type="button"
@@ -413,10 +601,16 @@ export function ChatWorkspace() {
                         <div className="truncate text-xs font-bold text-[#0F172A]">
                           {conversationTitle(conversation)}
                         </div>
-                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#64748B]">
-                          {conversation.type === "project"
-                            ? "Project chat"
-                            : "Direct chat"}
+                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#64748B] flex items-center gap-1.5">
+                          {conversation.type === "project" ? (
+                            <span className="text-[#4F75FF] font-semibold">
+                              ● Project
+                            </span>
+                          ) : (
+                            <span className="text-emerald-600 font-semibold">
+                              ● Direct
+                            </span>
+                          )}
                         </div>
                       </div>
                       {conversation.hasUnread ? (
@@ -434,70 +628,125 @@ export function ChatWorkspace() {
             </div>
           </Card>
 
+          {/* Quick Direct Chat Card */}
           <Card className="p-5 space-y-3">
-            <div className="flex items-center gap-2.5">
-              <UserPlus className="h-4 w-4 text-[#4F75FF]" />
-              <h2 className="font-bold text-[#0F172A] text-sm">
-                Mở direct chat
-              </h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4 text-[#4F75FF]" />
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Mở Direct Chat
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setModalTab("direct");
+                  setNewChatModalOpen(true);
+                }}
+                className="text-xs text-[#4F75FF] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+              >
+                Xem danh sách
+              </Button>
             </div>
             <p className="text-xs text-[#64748B]">
-              Direct chat chỉ dành cho nhân sự nội bộ (Admin, Leader, Employee,
-              Accountant).
+              Chọn nhanh nhân sự nội bộ hoặc khách hàng để nhắn tin:
             </p>
             <div className="space-y-2 pt-1">
-              <input
-                value={peerUserId}
+              <select
                 disabled={isClient}
-                onChange={(event) => setPeerUserId(event.target.value)}
-                placeholder="Nhập User UUID..."
-                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-              />
+                value={peerUserId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPeerUserId(val);
+                  if (val) void createDirect(val);
+                }}
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+              >
+                <option value="">-- Chọn nhân sự / khách hàng --</option>
+                {contacts.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.fullName || user.email} ({user.role})
+                  </option>
+                ))}
+              </select>
+
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full"
-                disabled={
-                  isClient || working === "direct" || !peerUserId.trim()
-                }
-                onClick={createDirect}
+                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white"
+                disabled={isClient}
+                onClick={() => {
+                  setModalTab("direct");
+                  setNewChatModalOpen(true);
+                }}
+                leftIcon={<Search className="w-3.5 h-3.5" />}
               >
-                {working === "direct" ? "Đang mở..." : "Mở direct chat"}
+                Tìm kiếm & Chọn nhân sự
               </Button>
             </div>
           </Card>
 
+          {/* Quick Project Chat Card */}
           <Card className="p-5 space-y-3">
-            <div className="flex items-center gap-2.5">
-              <FolderOpen className="h-4 w-4 text-[#4F75FF]" />
-              <h2 className="font-bold text-[#0F172A] text-sm">
-                Mở project chat
-              </h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4 text-[#4F75FF]" />
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Mở Project Chat
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setModalTab("project");
+                  setNewChatModalOpen(true);
+                }}
+                className="text-xs text-[#4F75FF] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+              >
+                Xem dự án
+              </Button>
             </div>
             <p className="text-xs text-[#64748B]">
-              Hệ thống xác thực quyền tham gia dự án trước khi mở phòng chat.
+              Chọn nhanh phòng chat theo dự án đang tham gia:
             </p>
             <div className="space-y-2 pt-1">
-              <input
+              <select
                 value={projectId}
-                onChange={(event) => setProjectId(event.target.value)}
-                placeholder="Nhập Project UUID..."
-                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-              />
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setProjectId(val);
+                  if (val) void openProjectChat(val);
+                }}
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+              >
+                <option value="">-- Chọn dự án --</option>
+                {projectsList.map((proj) => (
+                  <option key={proj.id} value={proj.id}>
+                    [{proj.projectCode}] {proj.name}
+                  </option>
+                ))}
+              </select>
+
               <Button
-                variant="primary"
+                variant="outline"
                 size="sm"
                 className="w-full"
-                disabled={working === "project" || !projectId.trim()}
-                onClick={openProjectChat}
+                onClick={() => {
+                  setModalTab("project");
+                  setNewChatModalOpen(true);
+                }}
+                leftIcon={<Search className="w-3.5 h-3.5" />}
               >
-                {working === "project" ? "Đang mở..." : "Mở project chat"}
+                Tìm kiếm phòng chat dự án
               </Button>
             </div>
           </Card>
         </aside>
 
-        <Card className="flex min-h-[42rem] flex-col p-0 overflow-hidden">
+        {/* Right Column: Chat window */}
+        <Card className="flex min-h-[44rem] flex-col p-0 overflow-hidden">
           <div className="flex items-center justify-between gap-4 border-b border-[#EDF2F7] p-5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
@@ -511,8 +760,8 @@ export function ChatWorkspace() {
                 </h2>
                 <p className="text-[11px] text-[#64748B]">
                   {selected
-                    ? `${selected.type === "project" ? "Project chat" : "Direct chat"} · ${selected.id}`
-                    : "Chọn một cuộc trò chuyện ở cột trái."}
+                    ? `${selected.type === "project" ? "Phòng chat dự án" : "Trò chuyện cá nhân"}`
+                    : "Chọn một cuộc trò chuyện từ danh sách hoặc bấm 'Cuộc trò chuyện mới'."}
                 </p>
               </div>
             </div>
@@ -536,8 +785,26 @@ export function ChatWorkspace() {
 
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {!selected ? (
-              <div className="flex h-full items-center justify-center text-center text-xs text-[#94A3B8]">
-                Chọn hoặc mở một cuộc trò chuyện để bắt đầu.
+              <div className="flex flex-col h-full items-center justify-center text-center text-xs text-[#94A3B8] py-20 space-y-3">
+                <MessageCircle className="w-12 h-12 text-[#CBD5E1]" />
+                <div>
+                  <p className="font-bold text-[#64748B] text-sm mb-1">
+                    Bắt đầu cuộc trò chuyện
+                  </p>
+                  <p>
+                    Chọn một cuộc trò chuyện bên trái hoặc tạo cuộc trò chuyện
+                    mới.
+                  </p>
+                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Plus className="w-4 h-4" />}
+                  onClick={() => setNewChatModalOpen(true)}
+                  className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white"
+                >
+                  Tạo cuộc trò chuyện mới
+                </Button>
               </div>
             ) : loadingMessages && messages.length === 0 ? (
               <div className="flex h-full items-center justify-center gap-2 text-xs text-[#64748B]">
@@ -563,8 +830,8 @@ export function ChatWorkspace() {
 
                 {messages.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-[#CBD5E1] p-8 text-center text-xs text-[#94A3B8]">
-                    Chưa có tin nhắn. Tin nhắn hỗ trợ plain text, tối đa 4000 ký
-                    tự.
+                    Chưa có tin nhắn. Hãy gửi tin nhắn đầu tiên để bắt đầu trao
+                    đổi!
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -634,6 +901,7 @@ export function ChatWorkspace() {
                 variant="primary"
                 size="sm"
                 disabled={!selected || sending || !draft.trim()}
+                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
                 leftIcon={
                   sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -651,6 +919,224 @@ export function ChatWorkspace() {
           </form>
         </Card>
       </div>
+
+      {/* New Chat Selection Modal */}
+      <Dialog
+        isOpen={newChatModalOpen}
+        onClose={() => setNewChatModalOpen(false)}
+        maxWidth="lg"
+        title="Bắt đầu cuộc trò chuyện"
+        description="Tìm kiếm và chọn người dùng hoặc phòng chat dự án để trò chuyện ngay lập tức."
+      >
+        <div className="space-y-4 pt-2">
+          {/* Tabs */}
+          <div className="flex border-b border-[#EDF2F7]">
+            <button
+              type="button"
+              onClick={() => setModalTab("direct")}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+                modalTab === "direct"
+                  ? "border-[#4F75FF] text-[#4F75FF]"
+                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Nhân viên & Khách hàng ({filteredContacts.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setModalTab("project")}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+                modalTab === "project"
+                  ? "border-[#4F75FF] text-[#4F75FF]"
+                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+              }`}
+            >
+              <Briefcase className="w-4 h-4" />
+              Phòng chat Dự án ({filteredProjects.length})
+            </button>
+          </div>
+
+          {/* Direct Chat Tab */}
+          {modalTab === "direct" && (
+            <div className="space-y-3">
+              {/* Search Bar & Role Filter */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder="Tìm kiếm theo tên, email, chức danh..."
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                  />
+                </div>
+                <select
+                  value={userRoleFilter}
+                  onChange={(e) => setUserRoleFilter(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+                >
+                  <option value="all">Tất cả vai trò</option>
+                  <option value="admin">Admin</option>
+                  <option value="team_leader">Trưởng nhóm</option>
+                  <option value="employee">Nhân viên</option>
+                  <option value="accountant">Kế toán</option>
+                  <option value="client">Khách hàng</option>
+                </select>
+              </div>
+
+              {/* User List */}
+              <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                {loadingContacts ? (
+                  <div className="py-10 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+                    Đang tải danh bạ...
+                  </div>
+                ) : filteredContacts.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-[#94A3B8] border border-dashed border-[#CBD5E1] rounded-2xl">
+                    Không tìm thấy nhân sự hoặc khách hàng nào.
+                  </div>
+                ) : (
+                  filteredContacts.map((contact) => (
+                    <div
+                      key={contact.id}
+                      onClick={() => void createDirect(contact.id)}
+                      className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          src={contact.avatarUrl || undefined}
+                          name={contact.fullName || contact.email}
+                          size="md"
+                        />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
+                              {contact.fullName || contact.email}
+                            </span>
+                            {contact.employmentProfile?.jobTitle && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-[#475569] font-medium">
+                                {contact.employmentProfile.jobTitle}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-[#64748B] font-mono truncate">
+                            {contact.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {getRoleBadge(contact.role)}
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          Nhắn tin
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Project Chat Tab */}
+          {modalTab === "project" && (
+            <div className="space-y-3">
+              {/* Project Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                <input
+                  type="text"
+                  value={projectSearchQuery}
+                  onChange={(e) => setProjectSearchQuery(e.target.value)}
+                  placeholder="Tìm kiếm dự án theo tên hoặc mã..."
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                />
+              </div>
+
+              {/* Project List */}
+              <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                {filteredProjects.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-[#94A3B8] border border-dashed border-[#CBD5E1] rounded-2xl">
+                    Không tìm thấy dự án nào.
+                  </div>
+                ) : (
+                  filteredProjects.map((proj) => (
+                    <div
+                      key={proj.id}
+                      onClick={() => void openProjectChat(proj.id)}
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center shrink-0">
+                          <FolderOpen className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
+                              {proj.name}
+                            </span>
+                            <span className="text-[10px] font-mono font-bold text-[#4F75FF] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
+                              {proj.projectCode}
+                            </span>
+                          </div>
+                          {proj.clientCompany?.name && (
+                            <div className="text-[11px] text-[#64748B] flex items-center gap-1 mt-0.5">
+                              <Building className="w-3 h-3 text-[#94A3B8]" />
+                              {proj.clientCompany.name}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Badge
+                          variant={
+                            proj.status === "active"
+                              ? "success"
+                              : proj.status === "completed"
+                                ? "blue"
+                                : "default"
+                          }
+                          size="sm"
+                        >
+                          {proj.status === "active"
+                            ? "Đang chạy"
+                            : proj.status === "completed"
+                              ? "Hoàn thành"
+                              : proj.status}
+                        </Badge>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          Vào phòng
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end pt-3 border-t border-[#EDF2F7]">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setNewChatModalOpen(false)}
+            >
+              Đóng
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
