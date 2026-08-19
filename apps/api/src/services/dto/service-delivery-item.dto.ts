@@ -9,6 +9,7 @@ export const CreateServiceDeliveryItemSchema = z
       .max(255, 'Tên hạng mục tối đa 255 ký tự'),
     description: z.string().trim().max(5000).nullable().optional(),
     sortOrder: z.coerce.number().int().min(0).optional().default(0),
+    isRequired: z.boolean().optional().default(true),
     active: z.boolean().optional().default(true),
   })
   .strict();
@@ -22,6 +23,7 @@ export const UpdateServiceDeliveryItemSchema = z
     name: z.string().trim().min(1).max(255).optional(),
     description: z.string().trim().max(5000).nullable().optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
+    isRequired: z.boolean().optional(),
     active: z.boolean().optional(),
   })
   .strict()

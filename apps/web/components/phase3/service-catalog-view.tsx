@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
+  Building2,
   FolderKanban,
   Layers,
   ListOrdered,
@@ -12,6 +13,7 @@ import {
   Plus,
   Search,
   Trash2,
+  UsersRound,
   Wrench,
 } from "lucide-react";
 import {
@@ -20,6 +22,11 @@ import {
   type ServiceCategory,
   type ServiceDeliveryItem,
 } from "@/lib/api/services";
+import {
+  organizationApi,
+  type Department,
+  type Team,
+} from "@/lib/api/organization";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +64,15 @@ const emptyItemForm = {
   name: "",
   description: "",
   sortOrder: 0,
+  isRequired: true,
   isActive: true,
+};
+
+const emptyResponsibilityForm = {
+  ownerDepartmentId: "",
+  ownerTeamId: "",
+  collaboratorDepartmentIds: [] as string[],
+  collaboratorTeamIds: [] as string[],
 };
 
 export function ServiceCatalogView() {
@@ -94,6 +109,16 @@ export function ServiceCatalogView() {
   const [itemForm, setItemForm] = useState(emptyItemForm);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [showItemForm, setShowItemForm] = useState(false);
+
+  // Service responsibility state
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [activeServiceForResponsibility, setActiveServiceForResponsibility] =
+    useState<ServiceCatalogItem | null>(null);
+  const [responsibilityForm, setResponsibilityForm] = useState(
+    emptyResponsibilityForm,
+  );
+  const [loadingResponsibility, setLoadingResponsibility] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -140,6 +165,27 @@ export function ServiceCatalogView() {
   }, [loadCategories]);
 
   useEffect(() => {
+    Promise.all([
+      organizationApi.getDepartments(),
+      organizationApi.getTeams({ isActive: true }),
+    ])
+      .then(([departmentRows, teamRows]) => {
+        setDepartments(
+          departmentRows.filter(
+            (department) =>
+              department.isActive ?? department.is_active ?? true,
+          ),
+        );
+        setTeams(
+          teamRows.filter((team) => team.isActive ?? team.is_active ?? true),
+        );
+      })
+      .catch((err) => {
+        console.error("Failed to load organization options:", err);
+      });
+  }, []);
+
+  useEffect(() => {
     if (activeTab === "services") {
       loadServices();
     }
@@ -159,6 +205,58 @@ export function ServiceCatalogView() {
       console.error("Failed to load delivery items:", err);
     } finally {
       setLoadingItems(false);
+    }
+  };
+
+  const openResponsibilityModal = async (service: ServiceCatalogItem) => {
+    setActiveServiceForResponsibility(service);
+    setLoadingResponsibility(true);
+    try {
+      const responsibility = await servicesApi.getResponsibilities(service.id);
+      setResponsibilityForm({
+        ownerDepartmentId: responsibility.ownerDepartment?.id ?? "",
+        ownerTeamId: responsibility.ownerTeam?.id ?? "",
+        collaboratorDepartmentIds:
+          responsibility.collaboratingDepartments.map((item) => item.id),
+        collaboratorTeamIds: responsibility.collaboratingTeams.map(
+          (item) => item.id,
+        ),
+      });
+    } catch (err: any) {
+      alert(err.message || "Không thể tải thông tin phụ trách dịch vụ.");
+      setActiveServiceForResponsibility(null);
+    } finally {
+      setLoadingResponsibility(false);
+    }
+  };
+
+  const handleSaveResponsibility = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!activeServiceForResponsibility) return;
+    if (!responsibilityForm.ownerDepartmentId) {
+      alert("Vui lòng chọn Owner Department.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await servicesApi.updateResponsibilities(
+        activeServiceForResponsibility.id,
+        {
+          ownerDepartmentId: responsibilityForm.ownerDepartmentId,
+          ownerTeamId: responsibilityForm.ownerTeamId || null,
+          collaboratorDepartmentIds:
+            responsibilityForm.collaboratorDepartmentIds,
+          collaboratorTeamIds: responsibilityForm.collaboratorTeamIds,
+        },
+      );
+      setActiveServiceForResponsibility(null);
+      setResponsibilityForm(emptyResponsibilityForm);
+      await loadServices();
+    } catch (err: any) {
+      alert(err.message || "Không thể cập nhật phụ trách dịch vụ.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -241,6 +339,7 @@ export function ServiceCatalogView() {
             name: itemForm.name.trim(),
             description: itemForm.description?.trim() || null,
             sortOrder: itemForm.sortOrder,
+            isRequired: itemForm.isRequired,
             isActive: itemForm.isActive,
           },
         );
@@ -249,6 +348,7 @@ export function ServiceCatalogView() {
           name: itemForm.name.trim(),
           description: itemForm.description?.trim() || null,
           sortOrder: itemForm.sortOrder,
+          isRequired: itemForm.isRequired,
           isActive: itemForm.isActive,
         });
       }
@@ -437,6 +537,7 @@ export function ServiceCatalogView() {
                       <TableHeaderCell>Mã DV</TableHeaderCell>
                       <TableHeaderCell>Tên dịch vụ</TableHeaderCell>
                       <TableHeaderCell>Nhóm dịch vụ</TableHeaderCell>
+                      <TableHeaderCell>Phụ trách</TableHeaderCell>
                       <TableHeaderCell>Hạng mục chuẩn</TableHeaderCell>
                       <TableHeaderCell>Trạng thái</TableHeaderCell>
                       <TableHeaderCell className="text-right">
@@ -474,6 +575,22 @@ export function ServiceCatalogView() {
                           )}
                         </TableCell>
                         <TableCell>
+                          {(() => {
+                            const owner = svc.department_assignments?.find(
+                              (item) => item.responsibility_role === "owner",
+                            );
+                            return owner ? (
+                              <Badge variant="blue" size="sm">
+                                {owner.department_code || "Đã gán"}
+                              </Badge>
+                            ) : (
+                              <span className="text-xs text-[#94A3B8]">
+                                Chưa gán
+                              </span>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell>
                           <Button
                             variant="secondary"
                             size="sm"
@@ -494,6 +611,15 @@ export function ServiceCatalogView() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => openResponsibilityModal(svc)}
+                              leftIcon={<Building2 className="w-3.5 h-3.5" />}
+                            >
+                              Phụ trách
+                            </Button>
                           <Button
                             variant="outline"
                             size="sm"
@@ -513,6 +639,7 @@ export function ServiceCatalogView() {
                           >
                             Sửa
                           </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -811,6 +938,247 @@ export function ServiceCatalogView() {
         </Dialog>
       )}
 
+      {/* Modal: Service Responsibility */}
+      {activeServiceForResponsibility && (
+        <Dialog
+          isOpen={!!activeServiceForResponsibility}
+          onClose={() => setActiveServiceForResponsibility(null)}
+          maxWidth="lg"
+          title={`Phụ trách dịch vụ: ${activeServiceForResponsibility.name}`}
+          description="Thiết lập phòng ban/Team chủ quản và các đơn vị phối hợp. Team chủ quản bắt buộc phải thuộc phòng ban chủ quản."
+        >
+          {loadingResponsibility ? (
+            <div className="py-10 text-center text-xs text-[#64748B]">
+              Đang tải thông tin phụ trách...
+            </div>
+          ) : (
+            <form onSubmit={handleSaveResponsibility} className="space-y-5 pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                    Owner Department *
+                  </label>
+                  <select
+                    required
+                    value={responsibilityForm.ownerDepartmentId}
+                    onChange={(e) => {
+                      const departmentId = e.target.value;
+                      setResponsibilityForm({
+                        ...responsibilityForm,
+                        ownerDepartmentId: departmentId,
+                        ownerTeamId: teams.some(
+                          (team) =>
+                            team.id === responsibilityForm.ownerTeamId &&
+                            (team.departmentId ?? team.department_id) ===
+                              departmentId,
+                        )
+                          ? responsibilityForm.ownerTeamId
+                          : "",
+                        collaboratorDepartmentIds:
+                          responsibilityForm.collaboratorDepartmentIds.filter(
+                            (id) => id !== departmentId,
+                          ),
+                      });
+                    }}
+                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  >
+                    <option value="">-- Chọn phòng chủ quản --</option>
+                    {departments.map((department) => (
+                      <option key={department.id} value={department.id}>
+                        {department.departmentCode}: {department.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                    Owner Team
+                  </label>
+                  <select
+                    value={responsibilityForm.ownerTeamId}
+                    onChange={(e) =>
+                      setResponsibilityForm({
+                        ...responsibilityForm,
+                        ownerTeamId: e.target.value,
+                        collaboratorTeamIds:
+                          responsibilityForm.collaboratorTeamIds.filter(
+                            (id) => id !== e.target.value,
+                          ),
+                      })
+                    }
+                    disabled={!responsibilityForm.ownerDepartmentId}
+                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+                  >
+                    <option value="">-- Chưa gán Team chủ quản --</option>
+                    {teams
+                      .filter(
+                        (team) =>
+                          (team.departmentId ?? team.department_id) ===
+                          responsibilityForm.ownerDepartmentId,
+                      )
+                      .map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.teamCode || team.team_code || team.code}:{" "}
+                          {team.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4 text-[#4F75FF]" />
+                  <span className="text-xs font-bold text-[#0F172A]">
+                    Phòng ban phối hợp
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                  {departments
+                    .filter(
+                      (department) =>
+                        department.id !==
+                        responsibilityForm.ownerDepartmentId,
+                    )
+                    .map((department) => {
+                      const checked =
+                        responsibilityForm.collaboratorDepartmentIds.includes(
+                          department.id,
+                        );
+                      return (
+                        <label
+                          key={department.id}
+                          className="flex items-center gap-2 text-xs cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              const ids = e.target.checked
+                                ? [
+                                    ...responsibilityForm.collaboratorDepartmentIds,
+                                    department.id,
+                                  ]
+                                : responsibilityForm.collaboratorDepartmentIds.filter(
+                                    (id) => id !== department.id,
+                                  );
+                              setResponsibilityForm({
+                                ...responsibilityForm,
+                                collaboratorDepartmentIds: ids,
+                              });
+                            }}
+                            className="w-4 h-4 accent-[#4F75FF]"
+                          />
+                          <span className="font-mono text-[#4F75FF]">
+                            {department.departmentCode}
+                          </span>
+                          <span>{department.name}</span>
+                        </label>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <UsersRound className="w-4 h-4 text-[#4F75FF]" />
+                  <span className="text-xs font-bold text-[#0F172A]">
+                    Team phối hợp
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                  {teams.filter((team) => {
+                    const departmentId = team.departmentId ?? team.department_id;
+                    return (
+                      team.id !== responsibilityForm.ownerTeamId &&
+                      [
+                        responsibilityForm.ownerDepartmentId,
+                        ...responsibilityForm.collaboratorDepartmentIds,
+                      ].includes(departmentId)
+                    );
+                  }).length === 0 ? (
+                    <div className="text-xs text-[#94A3B8]">
+                      Chưa có Team phù hợp. Có thể lưu Owner Department trước và
+                      gán Team sau.
+                    </div>
+                  ) : (
+                    teams
+                      .filter((team) => {
+                        const departmentId =
+                          team.departmentId ?? team.department_id;
+                        return (
+                          team.id !== responsibilityForm.ownerTeamId &&
+                          [
+                            responsibilityForm.ownerDepartmentId,
+                            ...responsibilityForm.collaboratorDepartmentIds,
+                          ].includes(departmentId)
+                        );
+                      })
+                      .map((team) => {
+                        const checked =
+                          responsibilityForm.collaboratorTeamIds.includes(
+                            team.id,
+                          );
+                        return (
+                          <label
+                            key={team.id}
+                            className="flex items-center gap-2 text-xs cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(e) => {
+                                const ids = e.target.checked
+                                  ? [
+                                      ...responsibilityForm.collaboratorTeamIds,
+                                      team.id,
+                                    ]
+                                  : responsibilityForm.collaboratorTeamIds.filter(
+                                      (id) => id !== team.id,
+                                    );
+                                setResponsibilityForm({
+                                  ...responsibilityForm,
+                                  collaboratorTeamIds: ids,
+                                });
+                              }}
+                              className="w-4 h-4 accent-[#4F75FF]"
+                            />
+                            <span className="font-mono text-[#4F75FF]">
+                              {team.teamCode || team.team_code || team.code}
+                            </span>
+                            <span>{team.name}</span>
+                          </label>
+                        );
+                      })
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t border-[#EDF2F7] pt-4 flex justify-end gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setActiveServiceForResponsibility(null)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  disabled={saving}
+                  isLoading={saving}
+                >
+                  Lưu phụ trách
+                </Button>
+              </div>
+            </form>
+          )}
+        </Dialog>
+      )}
+
       {/* Modal: Service Delivery Items (Hạng mục chuẩn) */}
       {activeServiceForItems && (
         <Dialog
@@ -882,6 +1250,36 @@ export function ServiceCatalogView() {
                       className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF] resize-none"
                     />
                   </div>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={itemForm.isRequired}
+                        onChange={(e) =>
+                          setItemForm({
+                            ...itemForm,
+                            isRequired: e.target.checked,
+                          })
+                        }
+                        className="w-4 h-4 accent-[#4F75FF]"
+                      />
+                      Hạng mục bắt buộc
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={itemForm.isActive}
+                        onChange={(e) =>
+                          setItemForm({
+                            ...itemForm,
+                            isActive: e.target.checked,
+                          })
+                        }
+                        className="w-4 h-4 accent-[#4F75FF]"
+                      />
+                      Đang hoạt động
+                    </label>
+                  </div>
                   <div className="flex items-center justify-end gap-2 pt-2">
                     <Button
                       type="button"
@@ -933,6 +1331,12 @@ export function ServiceCatalogView() {
                           <span className="font-mono text-[10px] text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">
                             {item.delivery_item_code}
                           </span>
+                          <Badge
+                            variant={item.is_required ? "success" : "default"}
+                            size="sm"
+                          >
+                            {item.is_required ? "Bắt buộc" : "Tùy chọn"}
+                          </Badge>
                         </div>
                         {item.description && (
                           <div className="text-xs text-[#64748B] mt-0.5">
@@ -952,6 +1356,7 @@ export function ServiceCatalogView() {
                             name: item.name,
                             description: item.description ?? "",
                             sortOrder: item.sort_order,
+                            isRequired: item.is_required ?? item.isRequired ?? true,
                             isActive: item.active ?? item.is_active ?? true,
                           });
                           setShowItemForm(true);

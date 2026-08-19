@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -20,6 +21,7 @@ import {
   ServiceListQuery,
   UpdateServiceDto,
 } from './dto/service.dto';
+import { UpdateServiceResponsibilityDto } from './dto/service-responsibility.dto';
 
 @Injectable()
 export class ServicesService {
@@ -212,7 +214,7 @@ export class ServicesService {
     let query = this.client
       .from('services')
       .select(
-        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(id,delivery_item_code,name,sort_order,active)',
+        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(id,delivery_item_code,name,sort_order,is_required,active), department_assignments:service_department_assignments(id,department_id,department_code,responsibility_role), team_assignments:service_team_assignments(id,team_id,team_code,department_code,responsibility_role)',
         { count: 'exact' },
       );
 
@@ -256,7 +258,7 @@ export class ServicesService {
     const { data, error } = await this.client
       .from('services')
       .select(
-        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(*)',
+        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(*), department_assignments:service_department_assignments(id,department_id,department_code,responsibility_role), team_assignments:service_team_assignments(id,team_id,team_code,department_code,responsibility_role)',
       )
       .eq('id', serviceId)
       .maybeSingle();
@@ -399,6 +401,315 @@ export class ServicesService {
   }
 
   // ============================================================
+  // SERVICE RESPONSIBILITY (Department / Team ownership)
+  // ============================================================
+
+  async getServiceResponsibilities(serviceId: string) {
+    const { data: service, error: serviceError } = await this.client
+      .from('services')
+      .select('id,service_code,name')
+      .eq('id', serviceId)
+      .maybeSingle();
+
+    if (serviceError) {
+      this.databaseFailure(
+        'SERVICE_RESPONSIBILITY_LOOKUP_FAILED',
+        'Không thể kiểm tra dịch vụ.',
+        serviceError,
+      );
+    }
+    if (!service) {
+      throw new NotFoundException({
+        code: 'SERVICE_NOT_FOUND',
+        message: 'Không tìm thấy dịch vụ.',
+      });
+    }
+
+    const [departmentResult, teamResult] = await Promise.all([
+      this.client
+        .from('service_department_assignments')
+        .select('id,department_id,department_code,responsibility_role')
+        .eq('service_id', serviceId),
+      this.client
+        .from('service_team_assignments')
+        .select('id,team_id,team_code,department_code,responsibility_role')
+        .eq('service_id', serviceId),
+    ]);
+
+    if (departmentResult.error) {
+      this.databaseFailure(
+        'SERVICE_DEPARTMENT_RESPONSIBILITY_LOOKUP_FAILED',
+        'Không thể truy vấn phòng ban phụ trách dịch vụ.',
+        departmentResult.error,
+      );
+    }
+    if (teamResult.error) {
+      this.databaseFailure(
+        'SERVICE_TEAM_RESPONSIBILITY_LOOKUP_FAILED',
+        'Không thể truy vấn team phụ trách dịch vụ.',
+        teamResult.error,
+      );
+    }
+
+    const departments = departmentResult.data ?? [];
+    const teams = teamResult.data ?? [];
+    const ownerDepartment = departments.find(
+      (row: any) => row.responsibility_role === 'owner',
+    );
+    const ownerTeam = teams.find(
+      (row: any) => row.responsibility_role === 'owner',
+    );
+
+    return {
+      serviceId: service.id,
+      serviceCode: service.service_code,
+      serviceName: service.name,
+      ownerDepartment: ownerDepartment
+        ? {
+            id: ownerDepartment.department_id,
+            code: ownerDepartment.department_code,
+          }
+        : null,
+      ownerTeam: ownerTeam
+        ? {
+            id: ownerTeam.team_id,
+            code: ownerTeam.team_code,
+            departmentCode: ownerTeam.department_code,
+          }
+        : null,
+      collaboratingDepartments: departments
+        .filter((row: any) => row.responsibility_role === 'collaborator')
+        .map((row: any) => ({
+          id: row.department_id,
+          code: row.department_code,
+        })),
+      collaboratingTeams: teams
+        .filter((row: any) => row.responsibility_role === 'collaborator')
+        .map((row: any) => ({
+          id: row.team_id,
+          code: row.team_code,
+          departmentCode: row.department_code,
+        })),
+    };
+  }
+
+  async updateServiceResponsibilities(
+    serviceId: string,
+    dto: UpdateServiceResponsibilityDto,
+    actorUserId: string,
+  ) {
+    await this.getServiceResponsibilities(serviceId);
+
+    const collaboratorDepartmentIds = [
+      ...new Set(dto.collaboratorDepartmentIds),
+    ].filter((id) => id !== dto.ownerDepartmentId);
+    const collaboratorTeamIds = [...new Set(dto.collaboratorTeamIds)].filter(
+      (id) => id !== dto.ownerTeamId,
+    );
+
+    const departmentIds = [
+      dto.ownerDepartmentId,
+      ...collaboratorDepartmentIds,
+    ];
+    const { data: departments, error: departmentError } = await this.client
+      .from('departments')
+      .select('id,department_code,is_active')
+      .in('id', departmentIds);
+
+    if (
+      departmentError ||
+      !departments ||
+      departments.length !== departmentIds.length ||
+      departments.some((department: any) => !department.is_active)
+    ) {
+      throw new BadRequestException({
+        code: 'SERVICE_RESPONSIBILITY_INVALID_DEPARTMENT',
+        message: 'Phòng ban phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
+      });
+    }
+
+    const teamIds = [
+      ...(dto.ownerTeamId ? [dto.ownerTeamId] : []),
+      ...collaboratorTeamIds,
+    ];
+    let teams: any[] = [];
+    if (teamIds.length > 0) {
+      const { data, error } = await this.client
+        .from('teams')
+        .select('id,team_code,department_id,is_active')
+        .in('id', teamIds);
+
+      if (
+        error ||
+        !data ||
+        data.length !== teamIds.length ||
+        data.some((team: any) => !team.is_active)
+      ) {
+        throw new BadRequestException({
+          code: 'SERVICE_RESPONSIBILITY_INVALID_TEAM',
+          message: 'Team phụ trách/phối hợp không hợp lệ hoặc đã ngưng hoạt động.',
+        });
+      }
+      teams = data;
+    }
+
+    if (dto.ownerTeamId) {
+      const ownerTeam = teams.find((team: any) => team.id === dto.ownerTeamId);
+      if (ownerTeam?.department_id !== dto.ownerDepartmentId) {
+        throw new BadRequestException({
+          code: 'SERVICE_OWNER_TEAM_DEPARTMENT_MISMATCH',
+          message: 'Owner Team phải thuộc Owner Department của dịch vụ.',
+        });
+      }
+    }
+
+    const allowedTeamDepartmentIds = new Set(departmentIds);
+    const invalidCollaboratorTeam = teams.find(
+      (team: any) =>
+        team.id !== dto.ownerTeamId &&
+        !allowedTeamDepartmentIds.has(team.department_id),
+    );
+    if (invalidCollaboratorTeam) {
+      throw new BadRequestException({
+        code: 'SERVICE_COLLABORATOR_TEAM_DEPARTMENT_MISMATCH',
+        message:
+          'Team phối hợp phải thuộc Owner Department hoặc một Collaborating Department.',
+      });
+    }
+
+    const [oldDepartmentResult, oldTeamResult] = await Promise.all([
+      this.client
+        .from('service_department_assignments')
+        .select('*')
+        .eq('service_id', serviceId),
+      this.client
+        .from('service_team_assignments')
+        .select('*')
+        .eq('service_id', serviceId),
+    ]);
+    if (oldDepartmentResult.error || oldTeamResult.error) {
+      this.databaseFailure(
+        'SERVICE_RESPONSIBILITY_SNAPSHOT_FAILED',
+        'Không thể lưu trạng thái trách nhiệm hiện tại.',
+        oldDepartmentResult.error ?? oldTeamResult.error,
+      );
+    }
+
+    const rollback = async () => {
+      await this.client
+        .from('service_team_assignments')
+        .delete()
+        .eq('service_id', serviceId);
+      await this.client
+        .from('service_department_assignments')
+        .delete()
+        .eq('service_id', serviceId);
+
+      if ((oldDepartmentResult.data ?? []).length > 0) {
+        await this.client
+          .from('service_department_assignments')
+          .insert(oldDepartmentResult.data ?? []);
+      }
+      if ((oldTeamResult.data ?? []).length > 0) {
+        await this.client
+          .from('service_team_assignments')
+          .insert(oldTeamResult.data ?? []);
+      }
+    };
+
+    const { error: deleteTeamsError } = await this.client
+      .from('service_team_assignments')
+      .delete()
+      .eq('service_id', serviceId);
+    if (deleteTeamsError) {
+      this.databaseFailure(
+        'SERVICE_TEAM_RESPONSIBILITY_UPDATE_FAILED',
+        'Không thể cập nhật Team phụ trách dịch vụ.',
+        deleteTeamsError,
+      );
+    }
+
+    const { error: deleteDepartmentsError } = await this.client
+      .from('service_department_assignments')
+      .delete()
+      .eq('service_id', serviceId);
+    if (deleteDepartmentsError) {
+      await rollback();
+      this.databaseFailure(
+        'SERVICE_DEPARTMENT_RESPONSIBILITY_UPDATE_FAILED',
+        'Không thể cập nhật phòng ban phụ trách dịch vụ.',
+        deleteDepartmentsError,
+      );
+    }
+
+    const departmentRows = [
+      {
+        service_id: serviceId,
+        department_id: dto.ownerDepartmentId,
+        responsibility_role: 'owner',
+        created_by: actorUserId,
+        updated_by: actorUserId,
+      },
+      ...collaboratorDepartmentIds.map((departmentId) => ({
+        service_id: serviceId,
+        department_id: departmentId,
+        responsibility_role: 'collaborator',
+        created_by: actorUserId,
+        updated_by: actorUserId,
+      })),
+    ];
+
+    const { error: insertDepartmentsError } = await this.client
+      .from('service_department_assignments')
+      .insert(departmentRows);
+    if (insertDepartmentsError) {
+      await rollback();
+      this.databaseFailure(
+        'SERVICE_DEPARTMENT_RESPONSIBILITY_UPDATE_FAILED',
+        'Không thể cập nhật phòng ban phụ trách dịch vụ.',
+        insertDepartmentsError,
+      );
+    }
+
+    const teamRows = [
+      ...(dto.ownerTeamId
+        ? [
+            {
+              service_id: serviceId,
+              team_id: dto.ownerTeamId,
+              responsibility_role: 'owner',
+              created_by: actorUserId,
+              updated_by: actorUserId,
+            },
+          ]
+        : []),
+      ...collaboratorTeamIds.map((teamId) => ({
+        service_id: serviceId,
+        team_id: teamId,
+        responsibility_role: 'collaborator',
+        created_by: actorUserId,
+        updated_by: actorUserId,
+      })),
+    ];
+
+    if (teamRows.length > 0) {
+      const { error: insertTeamsError } = await this.client
+        .from('service_team_assignments')
+        .insert(teamRows);
+      if (insertTeamsError) {
+        await rollback();
+        this.databaseFailure(
+          'SERVICE_TEAM_RESPONSIBILITY_UPDATE_FAILED',
+          'Không thể cập nhật Team phụ trách dịch vụ.',
+          insertTeamsError,
+        );
+      }
+    }
+
+    return this.getServiceResponsibilities(serviceId);
+  }
+
+  // ============================================================
   // SERVICE DELIVERY ITEMS (Standard Template Items)
   // ============================================================
 
@@ -437,6 +748,7 @@ export class ServicesService {
         name: dto.name,
         description: dto.description ?? null,
         sort_order: dto.sortOrder ?? 0,
+        is_required: dto.isRequired ?? true,
         active: dto.active ?? true,
         created_by: actorUserId,
         updated_by: actorUserId,
@@ -487,6 +799,7 @@ export class ServicesService {
     if (dto.description !== undefined)
       payload.description = dto.description ?? null;
     if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+    if (dto.isRequired !== undefined) payload.is_required = dto.isRequired;
     if (dto.active !== undefined) payload.active = dto.active;
 
     const { data, error } = await this.client

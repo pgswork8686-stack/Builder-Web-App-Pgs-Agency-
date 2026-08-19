@@ -23,10 +23,38 @@ export interface ServiceDeliveryItem {
   name: string;
   description?: string | null;
   sort_order: number;
+  is_required: boolean;
+  isRequired?: boolean;
   active: boolean;
   is_active?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+
+export interface ServiceResponsibilityRef {
+  id: string;
+  code?: string | null;
+  departmentCode?: string | null;
+}
+
+export interface ServiceResponsibilities {
+  serviceId: string;
+  serviceCode?: string | null;
+  serviceName: string;
+  ownerDepartment: ServiceResponsibilityRef | null;
+  ownerTeam: ServiceResponsibilityRef | null;
+  collaboratingDepartments: ServiceResponsibilityRef[];
+  collaboratingTeams: ServiceResponsibilityRef[];
+}
+
+export interface ServiceResponsibilityAssignment {
+  id: string;
+  department_id?: string;
+  department_code?: string | null;
+  team_id?: string;
+  team_code?: string | null;
+  responsibility_role: "owner" | "collaborator";
 }
 
 export interface ServiceCatalogItem {
@@ -45,6 +73,8 @@ export interface ServiceCatalogItem {
     name: string;
   } | null;
   delivery_items?: ServiceDeliveryItem[];
+  department_assignments?: ServiceResponsibilityAssignment[];
+  team_assignments?: ServiceResponsibilityAssignment[];
   sort_order?: number;
   active: boolean;
   created_at: string;
@@ -97,6 +127,7 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      isRequired?: boolean;
       active?: boolean;
       isActive?: boolean;
     }>,
@@ -106,6 +137,7 @@ export const servicesApi = {
     if (data.name !== undefined) payload.name = data.name;
     if (data.description !== undefined) payload.description = data.description;
     if (data.sortOrder !== undefined) payload.sortOrder = data.sortOrder;
+    if (data.isRequired !== undefined) payload.isRequired = data.isRequired;
     if (data.active !== undefined) payload.active = data.active;
     else if (data.isActive !== undefined) payload.active = data.isActive;
 
@@ -184,6 +216,30 @@ export const servicesApi = {
     });
   },
 
+  getResponsibilities(serviceId: string) {
+    return request<ServiceResponsibilities>(
+      `/admin/services/${serviceId}/responsibilities`,
+    );
+  },
+
+  updateResponsibilities(
+    serviceId: string,
+    data: {
+      ownerDepartmentId: string;
+      ownerTeamId?: string | null;
+      collaboratorDepartmentIds?: string[];
+      collaboratorTeamIds?: string[];
+    },
+  ) {
+    return request<ServiceResponsibilities>(
+      `/admin/services/${serviceId}/responsibilities`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      },
+    );
+  },
+
   // Delivery Items (Standard Templates)
   listDeliveryItems(serviceId: string) {
     return request<ServiceDeliveryItem[]>(
@@ -197,6 +253,7 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      isRequired?: boolean;
       active?: boolean;
       isActive?: boolean;
     },
@@ -209,6 +266,7 @@ export const servicesApi = {
           name: data.name,
           description: data.description,
           sortOrder: data.sortOrder,
+          isRequired: data.isRequired,
           active: data.active !== undefined ? data.active : data.isActive,
         }),
       },
@@ -222,6 +280,7 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      isRequired?: boolean;
       active?: boolean;
       isActive?: boolean;
     }>,
@@ -230,6 +289,7 @@ export const servicesApi = {
     if (data.name !== undefined) payload.name = data.name;
     if (data.description !== undefined) payload.description = data.description;
     if (data.sortOrder !== undefined) payload.sortOrder = data.sortOrder;
+    if (data.isRequired !== undefined) payload.isRequired = data.isRequired;
     if (data.active !== undefined) payload.active = data.active;
     else if (data.isActive !== undefined) payload.active = data.isActive;
 

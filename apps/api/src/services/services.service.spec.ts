@@ -236,6 +236,7 @@ describe('ServicesService', () => {
           name: 'Khảo sát yêu cầu',
           description: 'Lấy yêu cầu khách hàng',
           sortOrder: 1,
+          isRequired: true,
           active: true,
         },
         'admin-1',

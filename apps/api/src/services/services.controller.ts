@@ -26,6 +26,7 @@ import {
   ServiceListQuerySchema,
   UpdateServiceSchema,
 } from './dto/service.dto';
+import { UpdateServiceResponsibilitySchema } from './dto/service-responsibility.dto';
 import { ServicesService } from './services.service';
 
 @Controller('admin/services')
@@ -82,6 +83,36 @@ export class ServicesController {
     @CurrentUser() user: RequestUser,
   ) {
     return this.servicesService.deactivateService(id, user.profileId);
+  }
+
+  // ============================================================
+  // SERVICE RESPONSIBILITY
+  // ============================================================
+
+  @Get(':serviceId/responsibilities')
+  async getServiceResponsibilities(
+    @Param('serviceId', ParseUUIDPipe) serviceId: string,
+  ) {
+    return this.servicesService.getServiceResponsibilities(serviceId);
+  }
+
+  @Patch(':serviceId/responsibilities')
+  async updateServiceResponsibilities(
+    @Param('serviceId', ParseUUIDPipe) serviceId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = UpdateServiceResponsibilitySchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+    return this.servicesService.updateServiceResponsibilities(
+      serviceId,
+      result.data,
+      user.profileId,
+    );
   }
 
   // ============================================================
