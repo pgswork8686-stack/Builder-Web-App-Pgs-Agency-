@@ -102,3 +102,11 @@ export const AssignUserProjectsSchema = z.object({
 });
 
 export type AssignUserProjectsDto = z.infer<typeof AssignUserProjectsSchema>;
+
+export const UpdateOwnProfileSchema = z.object({
+  fullName: z.string().trim().min(2, 'Họ tên tối thiểu 2 ký tự').optional(),
+  phone: z.string().trim().optional().nullable(),
+  avatarUrl: z.string().trim().optional().nullable(),
+});
+
+export type UpdateOwnProfileDto = z.infer<typeof UpdateOwnProfileSchema>;

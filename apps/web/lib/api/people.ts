@@ -10,6 +10,18 @@ export const peopleApi = {
     return fetchWithAuth("/me/organization");
   },
 
+  // Update own personal profile
+  async updateMyProfile(data: {
+    fullName?: string;
+    phone?: string | null;
+    avatarUrl?: string | null;
+  }) {
+    return fetchWithAuth("/me/profile", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
   // Team members (for Team Leader)
   async getTeamMembers() {
     return fetchWithAuth("/team/members");

@@ -22,6 +22,7 @@ import {
   UpdateEmploymentSchema,
   UpdatePersonFullSchema,
   AssignUserProjectsSchema,
+  UpdateOwnProfileSchema,
 } from './dto/employment.dto';
 import { PeopleService } from './people.service';
 
@@ -82,6 +83,21 @@ export class PeopleController {
       user.authUserId,
       user.role as string,
     );
+  }
+
+  // --- OWN PROFILE UPDATE ---
+  @Patch('me/profile')
+  async updateMyProfile(
+    @CurrentUser('authUserId') userId: string,
+    @Body() body: unknown,
+  ) {
+    const result = UpdateOwnProfileSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+    return this.peopleService.updateOwnProfile(userId, result.data);
   }
 
   // --- TEAM LEADER SCOPE ---

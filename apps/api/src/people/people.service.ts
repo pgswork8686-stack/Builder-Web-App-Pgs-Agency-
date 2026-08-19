@@ -12,6 +12,7 @@ import {
   UpdateEmploymentDto,
   UpdatePersonFullDto,
   AssignUserProjectsDto,
+  UpdateOwnProfileDto,
 } from './dto/employment.dto';
 
 @Injectable()
@@ -1080,5 +1081,44 @@ export class PeopleService {
     }
 
     return this.getUserProjects(userId);
+  }
+
+  // --- OWN PROFILE UPDATE ---
+  async updateOwnProfile(userId: string, dto: UpdateOwnProfileDto) {
+    const client = this.supabaseService.getSystemClient();
+    const now = new Date().toISOString();
+    const updates: any = { updated_at: now };
+    if (dto.fullName !== undefined) updates.full_name = dto.fullName.trim();
+    if (dto.phone !== undefined)
+      updates.phone = dto.phone ? dto.phone.trim() : null;
+    if (dto.avatarUrl !== undefined)
+      updates.avatar_url = dto.avatarUrl ? dto.avatarUrl.trim() : null;
+
+    const { data, error } = await client
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select('id, email, full_name, avatar_url, phone, account_status, role')
+      .single();
+
+    if (error) {
+      this.logger.error(
+        `Failed to update own profile for ${userId}: ${error.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'PROFILE_UPDATE_FAILED',
+        message: 'Không thể cập nhật thông tin cá nhân.',
+      });
+    }
+
+    return {
+      id: data.id,
+      email: data.email,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      phone: data.phone,
+      accountStatus: data.account_status,
+      role: data.role,
+    };
   }
 }

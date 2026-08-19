@@ -14,6 +14,9 @@ import {
   Briefcase,
   Award,
   CheckCircle,
+  Pencil,
+  Phone,
+  Camera,
 } from "lucide-react";
 import { getMe } from "../../../lib/api/auth";
 import { peopleApi } from "../../../lib/api/people";
@@ -21,6 +24,8 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { Dialog } from "@/components/ui/dialog";
 
 interface UserData {
   user: {
@@ -28,6 +33,7 @@ interface UserData {
     email: string | null;
     fullName: string | null;
     avatarUrl: string | null;
+    phone?: string | null;
   };
   account: {
     status: string;
@@ -70,6 +76,15 @@ export default function UserProfilePage() {
   const [orgContext, setOrgContext] = useState<OrgContext | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Edit Modal State
+  const [editOpen, setEditOpen] = useState(false);
+  const [editFullName, setEditFullName] = useState("");
+  const [editAvatarUrl, setEditAvatarUrl] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -92,13 +107,65 @@ export default function UserProfilePage() {
     fetchProfile();
   }, [fetchProfile]);
 
+  const handleOpenEdit = () => {
+    if (!userProfile) return;
+    setEditFullName(userProfile.user.fullName || "");
+    setEditAvatarUrl(userProfile.user.avatarUrl || "");
+    setEditPhone(userProfile.user.phone || "");
+    setSaveError(null);
+    setEditOpen(true);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editFullName.trim()) return;
+
+    try {
+      setSaving(true);
+      setSaveError(null);
+
+      await peopleApi.updateMyProfile({
+        fullName: editFullName.trim(),
+        avatarUrl: editAvatarUrl.trim() || null,
+        phone: editPhone.trim() || null,
+      });
+
+      setSuccessMsg("Cập nhật thông tin hồ sơ cá nhân thành công!");
+      setTimeout(() => setSuccessMsg(null), 4000);
+      setEditOpen(false);
+      await fetchProfile();
+    } catch (err: any) {
+      setSaveError(err.message || "Không thể cập nhật hồ sơ");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
         title="Hồ Sơ Cá Nhân"
         description="Thông tin tài khoản, vai trò hệ thống và thông tin nhân sự / doanh nghiệp liên kết."
+        action={
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Pencil className="w-4 h-4" />}
+            onClick={handleOpenEdit}
+            className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+          >
+            Chỉnh sửa hồ sơ
+          </Button>
+        }
       />
+
+      {successMsg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+          {successMsg}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
@@ -120,17 +187,22 @@ export default function UserProfilePage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Account Profile Card */}
-          <Card className="p-6 text-center self-start space-y-4">
-            <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] flex items-center justify-center text-[#4F75FF] font-bold overflow-hidden mx-auto shadow-xs">
-              {userProfile.user.avatarUrl ? (
-                <img
-                  src={userProfile.user.avatarUrl}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User2 className="w-8 h-8 text-[#4F75FF]" />
-              )}
+          <Card className="p-6 text-center self-start space-y-4 relative">
+            <div className="relative inline-block mx-auto">
+              <Avatar
+                src={userProfile.user.avatarUrl}
+                name={userProfile.user.fullName || userProfile.user.email}
+                size="xl"
+                className="ring-4 ring-[#EEF2FF] shadow-sm"
+              />
+              <button
+                type="button"
+                onClick={handleOpenEdit}
+                title="Thay đổi ảnh đại diện"
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#4F75FF] text-white hover:bg-[#3D61E6] shadow-md transition-colors"
+              >
+                <Camera className="w-3.5 h-3.5" />
+              </button>
             </div>
             <div>
               <h3 className="text-base font-extrabold text-[#0F172A]">
@@ -140,7 +212,23 @@ export default function UserProfilePage() {
                 <Mail className="w-3 h-3 text-[#94A3B8]" />
                 {userProfile.user.email}
               </p>
+              {userProfile.user.phone && (
+                <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-1">
+                  <Phone className="w-3 h-3 text-[#94A3B8]" />
+                  {userProfile.user.phone}
+                </p>
+              )}
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Pencil className="w-3.5 h-3.5" />}
+              onClick={handleOpenEdit}
+              className="w-full text-xs font-semibold text-[#0F172A]"
+            >
+              Chỉnh sửa thông tin
+            </Button>
 
             <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
               <div className="flex justify-between items-center">
@@ -335,6 +423,93 @@ export default function UserProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Edit Profile Dialog */}
+      <Dialog
+        isOpen={editOpen}
+        onClose={() => !saving && setEditOpen(false)}
+        maxWidth="md"
+        title="Chỉnh sửa thông tin cá nhân"
+        description="Cập nhật họ và tên hiển thị, ảnh đại diện và số điện thoại liên hệ của bạn."
+      >
+        <form onSubmit={handleSaveProfile} className="space-y-4 pt-2">
+          {saveError && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+              {saveError}
+            </div>
+          )}
+
+          {/* Avatar Preview & URL Input */}
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7]">
+            <Avatar
+              src={editAvatarUrl.trim() || undefined}
+              name={editFullName || userProfile?.user.email || "Avatar"}
+              size="lg"
+              className="ring-2 ring-[#4F75FF]/30 shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <label className="block text-xs font-bold text-[#0F172A] mb-1">
+                Ảnh đại diện (Avatar URL)
+              </label>
+              <input
+                type="text"
+                value={editAvatarUrl}
+                onChange={(e) => setEditAvatarUrl(e.target.value)}
+                placeholder="Dán đường dẫn ảnh (VD: https://...)"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Họ và tên đầy đủ *
+            </label>
+            <input
+              type="text"
+              required
+              value={editFullName}
+              onChange={(e) => setEditFullName(e.target.value)}
+              placeholder="Nhập họ và tên đầy đủ..."
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Số điện thoại
+            </label>
+            <input
+              type="tel"
+              value={editPhone}
+              onChange={(e) => setEditPhone(e.target.value)}
+              placeholder="0988xxxxxx"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={saving}
+              onClick={() => setEditOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={saving}
+              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            >
+              Lưu thay đổi
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }
