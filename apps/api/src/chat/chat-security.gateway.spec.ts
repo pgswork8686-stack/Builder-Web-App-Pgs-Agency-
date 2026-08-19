@@ -98,7 +98,10 @@ describe('WebSocket & Realtime Security — Real Gateways with Supabase Mocked',
         WorkspaceAccessService,
         WorkspaceRealtimeGateway,
         ChatService,
-        { provide: NotificationsService, useValue: { createForUser: jest.fn() } },
+        {
+          provide: NotificationsService,
+          useValue: { createForUser: jest.fn() },
+        },
         { provide: SupabaseService, useValue: mockSupabaseService },
       ],
     }).compile();

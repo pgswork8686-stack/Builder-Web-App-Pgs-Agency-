@@ -39,7 +39,11 @@ function mockQueryChain(response: { data: any; error: any; count?: number }) {
     or: jest.fn().mockReturnThis(),
     lt: jest.fn().mockReturnThis(),
     order: jest.fn().mockReturnThis(),
-    range: jest.fn().mockResolvedValue({ data: response.data ?? [], error: response.error, count: response.count ?? 0 }),
+    range: jest.fn().mockResolvedValue({
+      data: response.data ?? [],
+      error: response.error,
+      count: response.count ?? 0,
+    }),
     maybeSingle: jest.fn().mockResolvedValue(response),
     single: jest.fn().mockResolvedValue(response),
     then: (resolve: (value: any) => any, reject?: (err: any) => any) =>

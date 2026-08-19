@@ -96,7 +96,10 @@ describe('Storage Security — Real FilesService with Mocked Supabase', () => {
       providers: [
         FilesService,
         WorkspaceAccessService,
-        { provide: WorkspaceRealtimeGateway, useValue: { emitProjectEvent: jest.fn() } },
+        {
+          provide: WorkspaceRealtimeGateway,
+          useValue: { emitProjectEvent: jest.fn() },
+        },
         { provide: SupabaseService, useValue: mockSupabaseService },
       ],
     }).compile();

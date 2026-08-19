@@ -422,7 +422,10 @@ describe('WorkspaceAccessService + FilesService — Real Authorization Logic (Su
           FilesService,
           WorkspaceAccessService,
           { provide: SupabaseService, useValue: mockSupabaseService },
-          { provide: WorkspaceRealtimeGateway, useValue: { emitProjectEvent: jest.fn() } },
+          {
+            provide: WorkspaceRealtimeGateway,
+            useValue: { emitProjectEvent: jest.fn() },
+          },
         ],
       }).compile();
 
