@@ -57,12 +57,29 @@ export function ProjectBoardView({ mode }: { mode: WorkspaceMode }) {
   );
 }
 
-function ProjectBoardContent({
+/** Embeddable version — accepts explicit projectId, no page wrapper */
+export function EmbeddedBoardView({
   mode,
   projectId,
 }: {
   mode: WorkspaceMode;
   projectId: string;
+}) {
+  return (
+    <ProjectWorkspaceRealtimeProvider projectId={projectId}>
+      <ProjectBoardContent mode={mode} projectId={projectId} embedded />
+    </ProjectWorkspaceRealtimeProvider>
+  );
+}
+
+function ProjectBoardContent({
+  mode,
+  projectId,
+  embedded = false,
+}: {
+  mode: WorkspaceMode;
+  projectId: string;
+  embedded?: boolean;
 }) {
   const { revision } = useProjectWorkspaceRealtime();
   const [project, setProject] = useState<Project | null>(null);
@@ -224,6 +241,137 @@ function ProjectBoardContent({
     mode === "admin" || project?.currentProjectRole === "project_manager";
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
+  const inner = (
+    <div className="space-y-4">
+      <section className="grid gap-3 rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
+        <label className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <input
+            value={filters.q}
+            onChange={(event) =>
+              setFilters({ ...filters, q: event.target.value })
+            }
+            placeholder="Tìm theo tên công việc"
+            aria-label="Tìm công việc"
+            className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] py-2 pl-9 pr-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          />
+        </label>
+        <select
+          value={filters.priority}
+          onChange={(event) =>
+            setFilters({
+              ...filters,
+              priority: event.target.value as "" | TaskPriority,
+            })
+          }
+          aria-label="Lọc mức ưu tiên"
+          className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+        >
+          <option value="">Mọi ưu tiên</option>
+          {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
+            (value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ),
+          )}
+        </select>
+        <select
+          value={filters.assigneeUserId}
+          onChange={(event) =>
+            setFilters({ ...filters, assigneeUserId: event.target.value })
+          }
+          aria-label="Lọc người phụ trách"
+          className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+        >
+          <option value="">Mọi người phụ trách</option>
+          {assignees.map(([id, name]) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filters.status}
+          onChange={(event) =>
+            setFilters({
+              ...filters,
+              status: event.target.value as "" | BoardStatus,
+            })
+          }
+          aria-label="Lọc trạng thái"
+          className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+        >
+          <option value="">Mọi trạng thái</option>
+          {columns.map((column) => (
+            <option key={column.status} value={column.status}>
+              {column.label}
+            </option>
+          ))}
+        </select>
+      </section>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+          {error}
+        </div>
+      )}
+      {board?.truncated && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+          Dự án có {board.total} công việc đang hoạt động. Kanban hiển thị{" "}
+          {board.limit} công việc đầu tiên; hãy dùng bộ lọc để thu hẹp.
+        </div>
+      )}
+      {!board?.canReorder && board && (
+        <p className="text-xs text-[#64748B]">
+          Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
+          chỉ dành cho Admin và quản lý dự án.
+        </p>
+      )}
+
+      {loading && !board ? (
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+          Đang tải Kanban…
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex min-w-full gap-4 overflow-x-auto pb-4">
+            {columns.map((column) => (
+              <BoardColumn
+                key={column.status}
+                status={column.status}
+                label={column.label}
+                tasks={(board?.[column.key] as BoardTask[] | undefined) ?? []}
+                canReorder={board?.canReorder ?? false}
+                canCreate={canCreateTask}
+                taskHref={(taskId) => `${base}/${projectId}/tasks/${taskId}`}
+                saving={saving}
+                onStatus={updateStatus}
+                onCreate={() => setCreateStatus(column.status)}
+              />
+            ))}
+          </div>
+        </DndContext>
+      )}
+
+      <ProjectTaskCreateDialog
+        isOpen={createStatus !== null}
+        onClose={() => setCreateStatus(null)}
+        onCreated={load}
+        projectId={projectId}
+        projectName={project?.name}
+        projectCode={project?.projectCode}
+        defaultStatus={createStatus ?? "todo"}
+      />
+    </div>
+  );
+
+  if (embedded) return inner;
+
   return (
     <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-[1600px] space-y-6">
@@ -234,131 +382,7 @@ function ProjectBoardContent({
           projectCode={project?.projectCode}
           active="board"
         />
-
-        <section className="grid gap-3 rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
-          <label className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
-            <input
-              value={filters.q}
-              onChange={(event) =>
-                setFilters({ ...filters, q: event.target.value })
-              }
-              placeholder="Tìm theo tên công việc"
-              aria-label="Tìm công việc"
-              className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] py-2 pl-9 pr-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-            />
-          </label>
-          <select
-            value={filters.priority}
-            onChange={(event) =>
-              setFilters({
-                ...filters,
-                priority: event.target.value as "" | TaskPriority,
-              })
-            }
-            aria-label="Lọc mức ưu tiên"
-            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-          >
-            <option value="">Mọi ưu tiên</option>
-            {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
-              (value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ),
-            )}
-          </select>
-          <select
-            value={filters.assigneeUserId}
-            onChange={(event) =>
-              setFilters({ ...filters, assigneeUserId: event.target.value })
-            }
-            aria-label="Lọc người phụ trách"
-            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-          >
-            <option value="">Mọi người phụ trách</option>
-            {assignees.map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filters.status}
-            onChange={(event) =>
-              setFilters({
-                ...filters,
-                status: event.target.value as "" | BoardStatus,
-              })
-            }
-            aria-label="Lọc trạng thái"
-            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-          >
-            <option value="">Mọi trạng thái</option>
-            {columns.map((column) => (
-              <option key={column.status} value={column.status}>
-                {column.label}
-              </option>
-            ))}
-          </select>
-        </section>
-
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-            {error}
-          </div>
-        )}
-        {board?.truncated && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-            Dự án có {board.total} công việc đang hoạt động. Kanban hiển thị{" "}
-            {board.limit} công việc đầu tiên; hãy dùng bộ lọc để thu hẹp.
-          </div>
-        )}
-        {!board?.canReorder && board && (
-          <p className="text-xs text-[#64748B]">
-            Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
-            chỉ dành cho Admin và quản lý dự án.
-          </p>
-        )}
-
-        {loading && !board ? (
-          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
-            Đang tải Kanban…
-          </div>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex min-w-full gap-4 overflow-x-auto pb-4">
-              {columns.map((column) => (
-                <BoardColumn
-                  key={column.status}
-                  status={column.status}
-                  label={column.label}
-                  tasks={(board?.[column.key] as BoardTask[] | undefined) ?? []}
-                  canReorder={board?.canReorder ?? false}
-                  canCreate={canCreateTask}
-                  taskHref={(taskId) => `${base}/${projectId}/tasks/${taskId}`}
-                  saving={saving}
-                  onStatus={updateStatus}
-                  onCreate={() => setCreateStatus(column.status)}
-                />
-              ))}
-            </div>
-          </DndContext>
-        )}
-
-        <ProjectTaskCreateDialog
-          isOpen={createStatus !== null}
-          onClose={() => setCreateStatus(null)}
-          onCreated={load}
-          projectId={projectId}
-          projectName={project?.name}
-          projectCode={project?.projectCode}
-          defaultStatus={createStatus ?? "todo"}
-        />
+        {inner}
       </div>
     </main>
   );

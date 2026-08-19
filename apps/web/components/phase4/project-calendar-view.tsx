@@ -42,12 +42,29 @@ export function ProjectCalendarView({ mode }: { mode: WorkspaceMode }) {
   );
 }
 
-function ProjectCalendarContent({
+/** Embeddable version — accepts explicit projectId, no page wrapper */
+export function EmbeddedCalendarView({
   mode,
   projectId,
 }: {
   mode: WorkspaceMode;
   projectId: string;
+}) {
+  return (
+    <ProjectWorkspaceRealtimeProvider projectId={projectId}>
+      <ProjectCalendarContent mode={mode} projectId={projectId} embedded />
+    </ProjectWorkspaceRealtimeProvider>
+  );
+}
+
+function ProjectCalendarContent({
+  mode,
+  projectId,
+  embedded = false,
+}: {
+  mode: WorkspaceMode;
+  projectId: string;
+  embedded?: boolean;
 }) {
   const { revision } = useProjectWorkspaceRealtime();
   const [month, setMonth] = useState(() => {
@@ -98,6 +115,134 @@ function ProjectCalendarContent({
     mode === "admin" || project?.currentProjectRole === "project_manager";
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
+  const inner = (
+    <div className="space-y-4">
+      {canCreateTask && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setCreateDate(dateKey(new Date()))}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3D61E6] cursor-pointer transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Tạo công việc
+          </button>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
+        <button
+          type="button"
+          onClick={() => changeMonth(-1)}
+          aria-label="Tháng trước"
+          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <h2 className="font-bold text-[#0F172A] text-base">
+          Tháng {month.getUTCMonth() + 1}/{month.getUTCFullYear()}
+        </h2>
+        <button
+          type="button"
+          onClick={() => changeMonth(1)}
+          aria-label="Tháng sau"
+          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+          {error}
+        </div>
+      )}
+      {loading ? (
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+          Đang tải lịch công việc…
+        </div>
+      ) : (
+        <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#F8FAFC]">
+            {weekdayLabels.map((label) => (
+              <div
+                key={label}
+                className="p-3 text-center text-xs font-bold text-[#64748B]"
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+          <div className="grid min-w-[900px] grid-cols-7">
+            {days.map((day) => {
+              const key = dateKey(day);
+              const dayTasks = tasks.filter((task) => {
+                const start = task.startDate ?? task.dueDate;
+                const end = task.dueDate ?? task.startDate;
+                return Boolean(start && end && key >= start && key <= end);
+              });
+              const currentMonth = day.getUTCMonth() === month.getUTCMonth();
+              return (
+                <div
+                  key={key}
+                  onClick={() => {
+                    if (canCreateTask) setCreateDate(key);
+                  }}
+                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60 ${
+                    canCreateTask ? "cursor-pointer" : ""
+                  }`}
+                  title={
+                    canCreateTask ? `Tạo công việc ngày ${key}` : undefined
+                  }
+                >
+                  <p
+                    className={`mb-2 text-xs font-bold ${
+                      currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
+                    }`}
+                  >
+                    {day.getUTCDate()}
+                  </p>
+                  <div className="space-y-1">
+                    {dayTasks.map((task) => (
+                      <Link
+                        key={task.taskId}
+                        href={`${base}/${projectId}/tasks/${task.taskId}`}
+                        onClick={(event) => event.stopPropagation()}
+                        className="block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
+                        title={task.title}
+                      >
+                        {task.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+      {!loading && tasks.length === 0 && (
+        <p className="text-center text-xs text-[#94A3B8]">
+          Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
+        </p>
+      )}
+
+      <ProjectTaskCreateDialog
+        isOpen={createDate !== null}
+        onClose={() => setCreateDate(null)}
+        onCreated={load}
+        projectId={projectId}
+        projectName={project?.name}
+        projectCode={project?.projectCode}
+        defaultStatus="todo"
+        defaultStartDate={createDate ?? ""}
+        defaultDueDate={createDate ?? ""}
+      />
+    </div>
+  );
+
+  if (embedded) return inner;
+
   return (
     <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-[1500px] space-y-6">
@@ -108,127 +253,7 @@ function ProjectCalendarContent({
           projectCode={project?.projectCode}
           active="calendar"
         />
-
-        {canCreateTask && (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setCreateDate(dateKey(new Date()))}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3D61E6] cursor-pointer transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Tạo công việc
-            </button>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
-          <button
-            type="button"
-            onClick={() => changeMonth(-1)}
-            aria-label="Tháng trước"
-            className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <h2 className="font-bold text-[#0F172A] text-base">
-            Tháng {month.getUTCMonth() + 1}/{month.getUTCFullYear()}
-          </h2>
-          <button
-            type="button"
-            onClick={() => changeMonth(1)}
-            aria-label="Tháng sau"
-            className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-            {error}
-          </div>
-        )}
-        {loading ? (
-          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
-            Đang tải lịch công việc…
-          </div>
-        ) : (
-          <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
-            <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#F8FAFC]">
-              {weekdayLabels.map((label) => (
-                <div
-                  key={label}
-                  className="p-3 text-center text-xs font-bold text-[#64748B]"
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-            <div className="grid min-w-[900px] grid-cols-7">
-              {days.map((day) => {
-                const key = dateKey(day);
-                const dayTasks = tasks.filter((task) => {
-                  const start = task.startDate ?? task.dueDate;
-                  const end = task.dueDate ?? task.startDate;
-                  return Boolean(start && end && key >= start && key <= end);
-                });
-                const currentMonth = day.getUTCMonth() === month.getUTCMonth();
-                return (
-                  <div
-                    key={key}
-                    onClick={() => {
-                      if (canCreateTask) setCreateDate(key);
-                    }}
-                    className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60 ${
-                      canCreateTask ? "cursor-pointer" : ""
-                    }`}
-                    title={
-                      canCreateTask ? `Tạo công việc ngày ${key}` : undefined
-                    }
-                  >
-                    <p
-                      className={`mb-2 text-xs font-bold ${
-                        currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
-                      }`}
-                    >
-                      {day.getUTCDate()}
-                    </p>
-                    <div className="space-y-1">
-                      {dayTasks.map((task) => (
-                        <Link
-                          key={task.taskId}
-                          href={`${base}/${projectId}/tasks/${task.taskId}`}
-                          onClick={(event) => event.stopPropagation()}
-                          className="block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
-                          title={task.title}
-                        >
-                          {task.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-        {!loading && tasks.length === 0 && (
-          <p className="text-center text-xs text-[#94A3B8]">
-            Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
-          </p>
-        )}
-
-        <ProjectTaskCreateDialog
-          isOpen={createDate !== null}
-          onClose={() => setCreateDate(null)}
-          onCreated={load}
-          projectId={projectId}
-          projectName={project?.name}
-          projectCode={project?.projectCode}
-          defaultStatus="todo"
-          defaultStartDate={createDate ?? ""}
-          defaultDueDate={createDate ?? ""}
-        />
+        {inner}
       </div>
     </main>
   );

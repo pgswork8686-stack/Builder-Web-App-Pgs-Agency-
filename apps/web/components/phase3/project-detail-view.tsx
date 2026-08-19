@@ -60,9 +60,12 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { EmbeddedBoardView } from "@/components/phase4/project-board-view";
+import { EmbeddedCalendarView } from "@/components/phase4/project-calendar-view";
 
 type Mode = "admin" | "internal" | "client";
 type Tab = "overview" | "members" | "services" | "tasks";
+type TaskView = "list" | "kanban" | "calendar";
 
 const statuses: ProjectStatus[] = [
   "draft",
@@ -89,6 +92,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [people, setPeople] = useState<any[]>([]);
   const [tab, setTab] = useState<Tab>("overview");
+  const [taskView, setTaskView] = useState<TaskView>("list");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -775,14 +779,35 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         </div>
       )}
 
-      {/* Tab 4: Tasks */}
+      {/* Tab 4: Tasks — with Danh sách / Kanban / Lịch sub-tabs */}
       {tab === "tasks" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#0F172A]">
-              Danh sách công việc ({tasks.length})
-            </h3>
-            {mode !== "client" && (
+          {/* Sub-tab switcher */}
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-1 bg-[#F1F5F9] rounded-xl p-1">
+              {(
+                [
+                  { value: "list" as TaskView, label: "☰ Danh sách" },
+                  { value: "kanban" as TaskView, label: "⬛ Kanban" },
+                  { value: "calendar" as TaskView, label: "📅 Lịch" },
+                ] as const
+              ).map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTaskView(value)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    taskView === value
+                      ? "bg-white text-[#4F75FF] shadow-sm border border-[#EDF2F7]"
+                      : "text-[#64748B] hover:text-[#0F172A]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {taskView === "list" && mode !== "client" && (
               <Button
                 variant="primary"
                 size="sm"
@@ -794,72 +819,91 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             )}
           </div>
 
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>Tên công việc</TableHeaderCell>
-                  <TableHeaderCell>Người phụ trách</TableHeaderCell>
-                  <TableHeaderCell>Ưu tiên</TableHeaderCell>
-                  <TableHeaderCell>Trạng thái</TableHeaderCell>
-                  <TableHeaderCell>Hạn chót</TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks.length === 0 ? (
+          {/* Sub-view: Danh sách */}
+          {taskView === "list" && (
+            <TableContainer>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center text-[#64748B] py-8"
-                    >
-                      Chưa có công việc nào trong dự án này.
-                    </TableCell>
+                    <TableHeaderCell>Tên công việc</TableHeaderCell>
+                    <TableHeaderCell>Người phụ trách</TableHeaderCell>
+                    <TableHeaderCell>Ưu tiên</TableHeaderCell>
+                    <TableHeaderCell>Trạng thái</TableHeaderCell>
+                    <TableHeaderCell>Hạn chót</TableHeaderCell>
                   </TableRow>
-                ) : (
-                  tasks.map((t) => (
-                    <TableRow key={t.id}>
-                      <TableCell className="font-bold text-[#0F172A]">
-                        <Link
-                          href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/tasks/${t.id}`}
-                          className="hover:text-[#4F75FF] transition-colors"
-                        >
-                          {t.title}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
-                        {t.assignee?.full_name ||
-                          t.assignee?.email ||
-                          "Chưa gán"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            t.priority === "urgent" || t.priority === "high"
-                              ? "danger"
-                              : "default"
-                          }
-                          size="sm"
-                        >
-                          {t.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={t.status === "done" ? "success" : "blue"}
-                          size="sm"
-                        >
-                          {t.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
-                        {t.due_date || "—"}
+                </TableHead>
+                <TableBody>
+                  {tasks.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center text-[#64748B] py-8"
+                      >
+                        Chưa có công việc nào trong dự án này.
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ) : (
+                    tasks.map((t) => (
+                      <TableRow key={t.id}>
+                        <TableCell className="font-bold text-[#0F172A]">
+                          <Link
+                            href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/tasks/${t.id}`}
+                            className="hover:text-[#4F75FF] transition-colors"
+                          >
+                            {t.title}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-xs text-[#64748B]">
+                          {t.assignee?.full_name ||
+                            t.assignee?.email ||
+                            "Chưa gán"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              t.priority === "urgent" || t.priority === "high"
+                                ? "danger"
+                                : "default"
+                            }
+                            size="sm"
+                          >
+                            {t.priority}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={t.status === "done" ? "success" : "blue"}
+                            size="sm"
+                          >
+                            {t.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-[#64748B]">
+                          {t.due_date || "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+
+          {/* Sub-view: Kanban — Embedded drag-and-drop board with direct task creation */}
+          {taskView === "kanban" && (
+            <EmbeddedBoardView
+              mode={mode === "admin" ? "admin" : "internal"}
+              projectId={projectId}
+            />
+          )}
+
+          {/* Sub-view: Lịch — Embedded calendar with click-to-create task on date cells */}
+          {taskView === "calendar" && (
+            <EmbeddedCalendarView
+              mode={mode === "admin" ? "admin" : "internal"}
+              projectId={projectId}
+            />
+          )}
         </div>
       )}
 
