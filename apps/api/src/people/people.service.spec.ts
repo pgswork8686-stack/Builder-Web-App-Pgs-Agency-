@@ -332,74 +332,30 @@ describe('PeopleService', () => {
     });
 
     it('should successfully permanently delete user from database and auth', async () => {
-      const deleteProfileMock = jest.fn().mockReturnThis();
-      const deleteEmpMock = jest.fn().mockReturnThis();
-      const updateDeptMock = jest.fn().mockReturnThis();
-      const updateTeamMock = jest.fn().mockReturnThis();
-      const deleteProjMock = jest.fn().mockReturnThis();
-      const deleteClientMock = jest.fn().mockReturnThis();
-      const deleteNotifMock = jest.fn().mockReturnThis();
-      const deletePrefMock = jest.fn().mockReturnThis();
+      const createChain = () => {
+        const chain: any = {
+          then: (resolve: any) => resolve({ data: null, error: null }),
+        };
+        for (const method of ['select', 'eq', 'update', 'delete']) {
+          chain[method] = jest.fn(() => chain);
+        }
+        chain.maybeSingle = jest.fn().mockResolvedValue({
+          data: {
+            id: 'user-1',
+            role: 'employee',
+            account_status: 'active',
+          },
+          error: null,
+        });
+        return chain;
+      };
 
+      const tableChains: Record<string, any> = {};
       mockSupabaseClient.from.mockImplementation((table: string) => {
-        if (table === 'profiles') {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({
-              data: {
-                id: 'user-1',
-                role: 'employee',
-                account_status: 'active',
-              },
-              error: null,
-            }),
-            delete: deleteProfileMock,
-          };
+        if (!tableChains[table]) {
+          tableChains[table] = createChain();
         }
-        if (table === 'employee_profiles') {
-          return {
-            delete: deleteEmpMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'departments') {
-          return {
-            update: updateDeptMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'teams') {
-          return {
-            update: updateTeamMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'project_memberships') {
-          return {
-            delete: deleteProjMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'client_memberships') {
-          return {
-            delete: deleteClientMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'notifications') {
-          return {
-            delete: deleteNotifMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        if (table === 'notification_preferences') {
-          return {
-            delete: deletePrefMock,
-            eq: jest.fn().mockResolvedValue({ error: null }),
-          };
-        }
-        return {};
+        return tableChains[table];
       });
 
       const res = await service.deletePerson('user-1', 'admin-1');
@@ -409,8 +365,8 @@ describe('PeopleService', () => {
         message:
           'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
       });
-      expect(deleteProfileMock).toHaveBeenCalled();
-      expect(deleteEmpMock).toHaveBeenCalled();
+      expect(tableChains['profiles'].delete).toHaveBeenCalled();
+      expect(tableChains['employee_profiles'].delete).toHaveBeenCalled();
     });
   });
 

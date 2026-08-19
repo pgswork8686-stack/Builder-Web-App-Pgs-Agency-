@@ -814,42 +814,171 @@ export class PeopleService {
 
     const now = new Date().toISOString();
 
-    // 1. Clean up Department Head / Team Leader positions if any
-    await client
-      .from('departments')
-      .update({
-        head_user_id: null,
-        updated_by: adminUserId,
-        updated_at: now,
-      })
-      .eq('head_user_id', userId);
+    // 1. Clear leadership / management / reviewer / assignee positions
+    await Promise.allSettled([
+      client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId),
+      client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId),
+      client
+        .from('employee_profiles')
+        .update({
+          reports_to_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('reports_to_user_id', userId),
+      client
+        .from('tasks')
+        .update({
+          assignee_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('tasks')
+        .update({
+          reporter_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('reporter_user_id', userId),
+      client
+        .from('projects')
+        .update({
+          project_manager_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('project_manager_user_id', userId),
+      client
+        .from('leave_requests')
+        .update({ reviewer_user_id: null, updated_at: now })
+        .eq('reviewer_user_id', userId),
+      client
+        .from('leave_requests')
+        .update({ approved_by: null, updated_at: now })
+        .eq('approved_by', userId),
+      client
+        .from('leave_requests')
+        .update({ cancelled_by: null, updated_at: now })
+        .eq('cancelled_by', userId),
+      client
+        .from('support_tickets')
+        .update({
+          assignee_user_id: null,
+          updated_by_user_id: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('calendar_events')
+        .update({
+          assignee_user_id: null,
+          updated_by_user_id: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('invoices')
+        .update({ approved_by_user_id: null, updated_at: now })
+        .eq('approved_by_user_id', userId),
+      client
+        .from('contracts')
+        .update({ approved_by_user_id: null, updated_at: now })
+        .eq('approved_by_user_id', userId),
+      client
+        .from('profiles')
+        .update({ approved_by: null, updated_at: now })
+        .eq('approved_by', userId),
+      client
+        .from('profiles')
+        .update({ rejected_by: null, updated_at: now })
+        .eq('rejected_by', userId),
+    ]);
 
-    await client
-      .from('teams')
-      .update({
-        leader_user_id: null,
-        updated_by: adminUserId,
-        updated_at: now,
-      })
-      .eq('leader_user_id', userId);
+    // 2. Remove all related dependent records that belong to this user
+    await Promise.allSettled([
+      client
+        .from('account_approval_events')
+        .delete()
+        .eq('target_user_id', userId),
+      client.from('account_approval_events').delete().eq('actor_id', userId),
+      client.from('project_memberships').delete().eq('user_id', userId),
+      client.from('client_memberships').delete().eq('user_id', userId),
+      client.from('employee_profiles').delete().eq('user_id', userId),
+      client.from('notification_preferences').delete().eq('user_id', userId),
+      client.from('notifications').delete().eq('recipient_user_id', userId),
+      client.from('notifications').delete().eq('created_by', userId),
+      client.from('payroll_records').delete().eq('user_id', userId),
+      client.from('attendance_records').delete().eq('user_id', userId),
+      client.from('leave_requests').delete().eq('user_id', userId),
+      client.from('expenses').delete().eq('submitted_by_user_id', userId),
+      client.from('reimbursements').delete().eq('submitted_by_user_id', userId),
+      client.from('support_tickets').delete().eq('sender_user_id', userId),
+      client.from('calendar_events').delete().eq('creator_user_id', userId),
+      client
+        .from('company_documents')
+        .delete()
+        .eq('uploaded_by_user_id', userId),
+      client
+        .from('task_attachments')
+        .delete()
+        .eq('uploaded_by_user_id', userId),
+      client.from('task_comments').delete().eq('user_id', userId),
+      client.from('task_activity_logs').delete().eq('actor_id', userId),
+      client.from('chat_messages').delete().eq('sender_user_id', userId),
+      client.from('chat_participants').delete().eq('user_id', userId),
+      client.from('chat_reads').delete().eq('user_id', userId),
+      client
+        .from('direct_conversations')
+        .delete()
+        .eq('direct_user_low', userId),
+      client
+        .from('direct_conversations')
+        .delete()
+        .eq('direct_user_high', userId),
+    ]);
 
-    // 2. Remove all related child records
-    await client.from('project_memberships').delete().eq('user_id', userId);
-    await client.from('client_memberships').delete().eq('user_id', userId);
-    await client.from('employee_profiles').delete().eq('user_id', userId);
-    await client
-      .from('notification_preferences')
-      .delete()
-      .eq('user_id', userId);
-    await client.from('notifications').delete().eq('recipient_user_id', userId);
+    // 3. Delete from Supabase Auth (which cascades to public.profiles)
+    let authDeleted = false;
+    try {
+      if (client.auth?.admin?.deleteUser) {
+        const { error: authErr } = await client.auth.admin.deleteUser(userId);
+        if (!authErr) {
+          authDeleted = true;
+        } else {
+          this.logger.warn(
+            `Auth deleteUser returned error: ${authErr.message}`,
+          );
+        }
+      }
+    } catch (authErr: any) {
+      this.logger.warn(
+        `Supabase auth deleteUser exception: ${authErr?.message || authErr}`,
+      );
+    }
 
-    // 3. Delete profile from database
+    // 4. If profile still exists in public.profiles, explicitly delete it
     const { error: deleteProfErr } = await client
       .from('profiles')
       .delete()
       .eq('id', userId);
 
-    if (deleteProfErr) {
+    if (deleteProfErr && !authDeleted) {
       this.logger.error(
         `Failed to delete user profile from database: ${deleteProfErr.message}`,
       );
@@ -857,17 +986,6 @@ export class PeopleService {
         code: 'USER_DELETION_FAILED',
         message: 'Không thể xóa tài khoản người dùng khỏi cơ sở dữ liệu.',
       });
-    }
-
-    // 4. Delete user permanently from Supabase Auth
-    try {
-      if (client.auth?.admin?.deleteUser) {
-        await client.auth.admin.deleteUser(userId);
-      }
-    } catch (authErr: any) {
-      this.logger.warn(
-        `Supabase auth deleteUser warning: ${authErr?.message || authErr}`,
-      );
     }
 
     return {
