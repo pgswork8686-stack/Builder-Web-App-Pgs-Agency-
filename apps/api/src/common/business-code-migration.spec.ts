@@ -150,5 +150,53 @@ describe('Business Code Generation and Migration Contracts', () => {
         'GRANT SELECT ON public.admin_account_approval_events TO authenticated, service_role;',
       );
     });
+
+    it('verifies 20260819100000_add_readable_companion_fk_codes.sql exists, adds companion columns, and defines triggers', () => {
+      const mCompanionPath = resolve(
+        migrationsDirectory,
+        '20260819100000_add_readable_companion_fk_codes.sql',
+      );
+      expect(existsSync(mCompanionPath)).toBe(true);
+      const content = readFileSync(mCompanionPath, 'utf8');
+
+      // Check key companion columns
+      expect(content).toContain('target_user_code');
+      expect(content).toContain('actor_user_code');
+      expect(content).toContain('department_code');
+      expect(content).toContain('team_code');
+      expect(content).toContain('reports_to_user_code');
+      expect(content).toContain('client_code');
+      expect(content).toContain('project_manager_code');
+      expect(content).toContain('assignee_user_code');
+      expect(content).toContain('reporter_user_code');
+      expect(content).toContain('parent_task_code');
+      expect(content).toContain('author_user_code');
+      expect(content).toContain('uploaded_by_code');
+      expect(content).toContain('contract_code');
+      expect(content).toContain('invoice_code');
+      expect(content).toContain('recorded_by_code');
+      expect(content).toContain('recipient_user_code');
+      expect(content).toContain('direct_user_low_code');
+      expect(content).toContain('direct_user_high_code');
+      expect(content).toContain('leader_user_code');
+
+      // Check security search_path in trigger functions
+      expect(content).toContain("SET search_path = ''");
+
+      // Check triggers attached
+      expect(content).toContain(
+        'trg_sync_companion_codes_account_approval_events',
+      );
+      expect(content).toContain('trg_sync_companion_codes_employee_profiles');
+      expect(content).toContain('trg_sync_companion_codes_client_memberships');
+      expect(content).toContain('trg_sync_companion_codes_projects');
+      expect(content).toContain('trg_sync_companion_codes_tasks');
+      expect(content).toContain('trg_sync_companion_codes_contracts');
+      expect(content).toContain('trg_sync_companion_codes_invoices');
+      expect(content).toContain('trg_sync_companion_codes_attendance_records');
+      expect(content).toContain('trg_sync_companion_codes_leave_requests');
+      expect(content).toContain('trg_sync_companion_codes_notifications');
+      expect(content).toContain('trg_sync_companion_codes_automation_rules');
+    });
   });
 });
