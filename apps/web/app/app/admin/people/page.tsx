@@ -469,13 +469,31 @@ export default function AdminPeopleDirectoryPage() {
             <TableBody>
               {people.map((person) => {
                 const ep = person.employeeProfile;
+                const statusLabel =
+                  person.accountStatus === "terminated" ||
+                  ep?.employmentStatus === "terminated"
+                    ? "ĐÃ THÔI VIỆC"
+                    : ep?.employmentStatus === "probation"
+                      ? "THỬ VIỆC / TTS"
+                      : ep?.employmentStatus === "active"
+                        ? "CHÍNH THỨC"
+                        : ep?.employmentStatus === "on_leave"
+                          ? "NGHỈ PHÉP"
+                          : person.accountStatus === "pending"
+                            ? "CHỜ DUYỆT"
+                            : person.accountStatus === "active"
+                              ? "CHÍNH THỨC"
+                              : person.accountStatus.toUpperCase();
+
                 return (
                   <TableRow key={person.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar
+                          src={person.avatarUrl}
                           name={person.fullName || person.email || "?"}
                           size="md"
+                          className="ring-1 ring-[#EDF2F7]"
                         />
                         <div>
                           <p className="font-bold text-[#0F172A]">
@@ -522,8 +540,14 @@ export default function AdminPeopleDirectoryPage() {
                       )}
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
-                      {ep?.jobTitle || "—"}
+                    <TableCell className="text-xs">
+                      {ep?.jobTitle ? (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#4F75FF] font-bold text-xs">
+                          {ep.jobTitle}
+                        </span>
+                      ) : (
+                        <span className="text-[#94A3B8]">—</span>
+                      )}
                     </TableCell>
 
                     <TableCell>
@@ -541,9 +565,7 @@ export default function AdminPeopleDirectoryPage() {
                         }
                         size="sm"
                       >
-                        {person.accountStatus === "terminated"
-                          ? "ĐÃ KHÓA"
-                          : ep?.employmentStatus || person.accountStatus}
+                        {statusLabel}
                       </Badge>
                     </TableCell>
 
@@ -825,10 +847,12 @@ export default function AdminPeopleDirectoryPage() {
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-white text-xs font-semibold text-[#24304A] focus:border-[#5D87FF] outline-none"
                 >
                   <option value="active">Chính thức (Active)</option>
-                  <option value="probation">Thử việc (Probation)</option>
+                  <option value="probation">
+                    Thử việc / Thực tập sinh (Probation / Intern)
+                  </option>
                   <option value="on_leave">Nghỉ phép dài hạn (On Leave)</option>
                   <option value="terminated">
-                    Đã chấm dứt hợp đồng (Terminated)
+                    Đã thôi việc / Chấm dứt hợp đồng (Terminated)
                   </option>
                 </select>
               </div>
