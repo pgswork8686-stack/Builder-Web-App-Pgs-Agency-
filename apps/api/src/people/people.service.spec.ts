@@ -331,13 +331,15 @@ describe('PeopleService', () => {
       );
     });
 
-    it('should successfully lock/terminate user with role: null and account_status: rejected', async () => {
-      const updateProfileMock = jest.fn().mockReturnThis();
-      const updateEmpMock = jest.fn().mockReturnThis();
+    it('should successfully permanently delete user from database and auth', async () => {
+      const deleteProfileMock = jest.fn().mockReturnThis();
+      const deleteEmpMock = jest.fn().mockReturnThis();
       const updateDeptMock = jest.fn().mockReturnThis();
       const updateTeamMock = jest.fn().mockReturnThis();
       const deleteProjMock = jest.fn().mockReturnThis();
       const deleteClientMock = jest.fn().mockReturnThis();
+      const deleteNotifMock = jest.fn().mockReturnThis();
+      const deletePrefMock = jest.fn().mockReturnThis();
 
       mockSupabaseClient.from.mockImplementation((table: string) => {
         if (table === 'profiles') {
@@ -352,12 +354,12 @@ describe('PeopleService', () => {
               },
               error: null,
             }),
-            update: updateProfileMock,
+            delete: deleteProfileMock,
           };
         }
         if (table === 'employee_profiles') {
           return {
-            update: updateEmpMock,
+            delete: deleteEmpMock,
             eq: jest.fn().mockResolvedValue({ error: null }),
           };
         }
@@ -385,6 +387,18 @@ describe('PeopleService', () => {
             eq: jest.fn().mockResolvedValue({ error: null }),
           };
         }
+        if (table === 'notifications') {
+          return {
+            delete: deleteNotifMock,
+            eq: jest.fn().mockResolvedValue({ error: null }),
+          };
+        }
+        if (table === 'notification_preferences') {
+          return {
+            delete: deletePrefMock,
+            eq: jest.fn().mockResolvedValue({ error: null }),
+          };
+        }
         return {};
       });
 
@@ -392,15 +406,11 @@ describe('PeopleService', () => {
 
       expect(res).toEqual({
         success: true,
-        message: 'Đã khóa và chấm dứt tài khoản thành công.',
+        message:
+          'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
       });
-      expect(updateProfileMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          account_status: 'rejected',
-          role: null,
-          rejected_by: 'admin-1',
-        }),
-      );
+      expect(deleteProfileMock).toHaveBeenCalled();
+      expect(deleteEmpMock).toHaveBeenCalled();
     });
   });
 

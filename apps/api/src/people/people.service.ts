@@ -808,47 +808,13 @@ export class PeopleService {
     if (target.id === adminUserId) {
       throw new BadRequestException({
         code: 'CANNOT_TERMINATE_SELF',
-        message: 'Không thể tự khóa hoặc thôi việc tài khoản của chính mình.',
+        message: 'Không thể tự xóa tài khoản của chính mình.',
       });
     }
 
     const now = new Date().toISOString();
 
-    // Terminate and deactivate profile in compliance with Postgres constraint check_role_status_consistency
-    const { error } = await client
-      .from('profiles')
-      .update({
-        account_status: 'rejected',
-        role: null,
-        approved_at: null,
-        approved_by: null,
-        rejected_at: now,
-        rejected_by: adminUserId,
-        rejection_reason: 'Khóa tài khoản / Thôi việc bởi Quản trị viên',
-        updated_at: now,
-      })
-      .eq('id', userId);
-
-    if (error) {
-      this.logger.error(`Failed to terminate user: ${error.message}`);
-      throw new InternalServerErrorException({
-        code: 'USER_TERMINATION_FAILED',
-        message: 'Không thể khóa hoặc thôi việc tài khoản này.',
-      });
-    }
-
-    // Set employee status to terminated
-    await client
-      .from('employee_profiles')
-      .update({
-        employment_status: 'terminated',
-        left_date: now.split('T')[0],
-        updated_by: adminUserId,
-        updated_at: now,
-      })
-      .eq('user_id', userId);
-
-    // Clean up Department Head / Team Leader positions if any
+    // 1. Clean up Department Head / Team Leader positions if any
     await client
       .from('departments')
       .update({
@@ -867,13 +833,47 @@ export class PeopleService {
       })
       .eq('leader_user_id', userId);
 
-    // Remove active project & client memberships
+    // 2. Remove all related child records
     await client.from('project_memberships').delete().eq('user_id', userId);
     await client.from('client_memberships').delete().eq('user_id', userId);
+    await client.from('employee_profiles').delete().eq('user_id', userId);
+    await client
+      .from('notification_preferences')
+      .delete()
+      .eq('user_id', userId);
+    await client.from('notifications').delete().eq('recipient_user_id', userId);
+
+    // 3. Delete profile from database
+    const { error: deleteProfErr } = await client
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
+
+    if (deleteProfErr) {
+      this.logger.error(
+        `Failed to delete user profile from database: ${deleteProfErr.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'USER_DELETION_FAILED',
+        message: 'Không thể xóa tài khoản người dùng khỏi cơ sở dữ liệu.',
+      });
+    }
+
+    // 4. Delete user permanently from Supabase Auth
+    try {
+      if (client.auth?.admin?.deleteUser) {
+        await client.auth.admin.deleteUser(userId);
+      }
+    } catch (authErr: any) {
+      this.logger.warn(
+        `Supabase auth deleteUser warning: ${authErr?.message || authErr}`,
+      );
+    }
 
     return {
       success: true,
-      message: 'Đã khóa và chấm dứt tài khoản thành công.',
+      message:
+        'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
     };
   }
 

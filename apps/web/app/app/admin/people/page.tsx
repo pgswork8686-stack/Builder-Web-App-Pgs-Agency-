@@ -255,7 +255,7 @@ export default function AdminPeopleDirectoryPage() {
     }
   };
 
-  // Delete / Terminate Person
+  // Delete / Permanently Remove Person
   const handleConfirmDelete = async () => {
     if (!deletingPerson) return;
     try {
@@ -265,13 +265,13 @@ export default function AdminPeopleDirectoryPage() {
       await peopleApi.deletePerson(deletingPerson.id);
 
       setSuccessMsg(
-        `Đã chấm dứt / khóa tài khoản ${deletingPerson.fullName || deletingPerson.email} thành công!`,
+        `Đã xóa vĩnh viễn tài khoản ${deletingPerson.fullName || deletingPerson.email} khỏi hệ thống thành công!`,
       );
       setTimeout(() => setSuccessMsg(null), 4000);
       setDeletingPerson(null);
       fetchDirectory();
     } catch (err: any) {
-      setError(err.message || "Không thể khóa tài khoản nhân sự");
+      setError(err.message || "Không thể xóa tài khoản nhân sự");
     } finally {
       setSubmitting(false);
     }
@@ -941,13 +941,13 @@ export default function AdminPeopleDirectoryPage() {
         </div>
       </Dialog>
 
-      {/* MODAL 3: XÁC NHẬN KHÓA / CHẤM DỨT THÀNH VIÊN */}
+      {/* MODAL 3: XÁC NHẬN XÓA VĨNH VIỄN NHÂN SỰ */}
       <DeleteConfirmDialog
         isOpen={Boolean(deletingPerson)}
         onClose={() => !submitting && setDeletingPerson(null)}
         onConfirm={handleConfirmDelete}
-        title="Khóa / Chấm dứt tài khoản nhân sự"
-        description={`Bạn có chắc chắn muốn khóa và chấm dứt tài khoản của "${deletingPerson?.fullName || deletingPerson?.email}"? Nhân sự này sẽ bị tước quyền truy cập các dự án và hệ thống.`}
+        title="Xóa vĩnh viễn tài khoản nhân sự"
+        description={`Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản của "${deletingPerson?.fullName || deletingPerson?.email}"? Tài khoản và toàn bộ dữ liệu hồ sơ liên quan sẽ bị xóa hoàn toàn khỏi cơ sở dữ liệu và không thể khôi phục.`}
         isLoading={submitting}
       />
     </div>
