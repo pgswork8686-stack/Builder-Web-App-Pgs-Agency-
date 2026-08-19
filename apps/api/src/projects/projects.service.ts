@@ -292,40 +292,46 @@ export class ProjectsService {
       await this.validateProjectManager(dto.projectManagerUserId);
     }
 
-    const { data: existing, error: existingError } = await this.client
-      .from('projects')
-      .select('id')
-      .eq('project_code', dto.projectCode)
-      .maybeSingle();
-    if (existingError) {
-      this.databaseFailure(
-        'PROJECT_CODE_LOOKUP_FAILED',
-        'Không thể kiểm tra mã dự án.',
-        existingError,
-      );
+    if (dto.projectCode) {
+      const { data: existing, error: existingError } = await this.client
+        .from('projects')
+        .select('id')
+        .eq('project_code', dto.projectCode)
+        .maybeSingle();
+      if (existingError) {
+        this.databaseFailure(
+          'PROJECT_CODE_LOOKUP_FAILED',
+          'Không thể kiểm tra mã dự án.',
+          existingError,
+        );
+      }
+      if (existing) {
+        throw new ConflictException({
+          code: 'PROJECT_CODE_ALREADY_EXISTS',
+          message: 'Mã dự án đã tồn tại.',
+        });
+      }
     }
-    if (existing) {
-      throw new ConflictException({
-        code: 'PROJECT_CODE_ALREADY_EXISTS',
-        message: 'Mã dự án đã tồn tại.',
-      });
+
+    const payload: Record<string, unknown> = {
+      client_company_id: dto.clientCompanyId,
+      name: dto.name,
+      description: dto.description ?? null,
+      status: dto.status,
+      priority: dto.priority,
+      project_manager_user_id: dto.projectManagerUserId ?? null,
+      start_date: dto.startDate ?? null,
+      due_date: dto.dueDate ?? null,
+      created_by: actorUserId,
+      updated_by: actorUserId,
+    };
+    if (dto.projectCode) {
+      payload.project_code = dto.projectCode;
     }
 
     const { data, error } = await this.client
       .from('projects')
-      .insert({
-        project_code: dto.projectCode,
-        client_company_id: dto.clientCompanyId,
-        name: dto.name,
-        description: dto.description ?? null,
-        status: dto.status,
-        priority: dto.priority,
-        project_manager_user_id: dto.projectManagerUserId ?? null,
-        start_date: dto.startDate ?? null,
-        due_date: dto.dueDate ?? null,
-        created_by: actorUserId,
-        updated_by: actorUserId,
-      })
+      .insert(payload)
       .select()
       .single();
 

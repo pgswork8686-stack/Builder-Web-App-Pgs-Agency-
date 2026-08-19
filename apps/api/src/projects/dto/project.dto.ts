@@ -79,9 +79,12 @@ export const CreateProjectSchema = z
     projectCode: z
       .string()
       .trim()
-      .min(2)
-      .max(40)
-      .transform((value) => value.toUpperCase()),
+      .transform((value) => value.toUpperCase())
+      .refine((value) => !value || /^DA_[0-9]{2,}$/.test(value), {
+        message:
+          'Mã dự án phải có định dạng DA_XX (ví dụ: DA_01) hoặc để trống để tự sinh.',
+      })
+      .optional(),
     clientCompanyId: z.string().uuid(),
     name: z.string().trim().min(2).max(200),
     description: nullableText(5000),

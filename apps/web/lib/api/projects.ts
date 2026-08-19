@@ -113,7 +113,7 @@ export const projectsApi = {
   },
 
   createProject(data: {
-    projectCode: string;
+    projectCode?: string;
     clientCompanyId: string;
     name: string;
     description?: string | null;

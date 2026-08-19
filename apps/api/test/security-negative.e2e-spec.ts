@@ -247,7 +247,7 @@ describe('Comprehensive Security & Negative Authorization Matrix (e2e)', () => {
         .post('/api/v1/admin/projects')
         .set(authHeader())
         .send({
-          projectCode: 'PGS-ADMIN',
+          projectCode: 'DA_01',
           clientCompanyId: '11111111-1111-4111-8111-111111111111',
           name: 'Admin Project',
         })

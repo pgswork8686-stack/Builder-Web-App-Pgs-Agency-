@@ -57,7 +57,12 @@ export function ProjectCreateWizardDialog({
   const validateStep1 = () => {
     if (!form.clientCompanyId) return "Vui lòng chọn khách hàng doanh nghiệp.";
     if (!form.name.trim()) return "Vui lòng nhập tên dự án.";
-    if (!form.projectCode.trim()) return "Vui lòng nhập mã dự án.";
+    if (
+      form.projectCode.trim() &&
+      !/^DA_[0-9]{2,}$/i.test(form.projectCode.trim())
+    ) {
+      return "Mã dự án phải theo định dạng chuẩn DA_XX (ví dụ: DA_01) hoặc để trống để hệ thống tự cấp.";
+    }
     return null;
   };
 
@@ -100,7 +105,9 @@ export function ProjectCreateWizardDialog({
     setError(null);
     try {
       await projectsApi.createProject({
-        projectCode: form.projectCode.trim().toUpperCase(),
+        projectCode: form.projectCode.trim()
+          ? form.projectCode.trim().toUpperCase()
+          : undefined,
         name: form.name.trim(),
         clientCompanyId: form.clientCompanyId,
         description: form.description.trim() || undefined,
@@ -249,10 +256,10 @@ export function ProjectCreateWizardDialog({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-              <div className="sm:col-span-4">
+              <div className="sm:col-span-5">
                 <Input
-                  label="Mã dự án (Project Code) *"
-                  placeholder="VD: PGS-PRJ-2026"
+                  label="Mã dự án (Tùy chọn: DA_XX)"
+                  placeholder="VD: DA_01 (để trống tự cấp)"
                   value={form.projectCode}
                   onChange={(e) =>
                     setForm({
@@ -260,11 +267,11 @@ export function ProjectCreateWizardDialog({
                       projectCode: e.target.value.toUpperCase(),
                     })
                   }
-                  helperText="Mã định danh duy nhất"
+                  helperText="Định dạng DA_XX hoặc để trống tự sinh"
                 />
               </div>
 
-              <div className="sm:col-span-8">
+              <div className="sm:col-span-7">
                 <Input
                   label="Tên dự án *"
                   placeholder="VD: Xây dựng hệ thống thương mại điện tử"
