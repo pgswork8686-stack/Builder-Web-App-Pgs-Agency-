@@ -5,6 +5,7 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
     delivery_item_code: string;
     name: string;
     sort_order: number;
+    is_required: boolean;
     active: boolean;
   }
 
@@ -15,6 +16,7 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
     source_delivery_item_id: string;
     name: string;
     sort_order: number;
+    is_required: boolean;
     status: 'planned' | 'in_progress' | 'blocked' | 'done' | 'cancelled';
   }
 
@@ -33,16 +35,17 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
         source_delivery_item_id: t.id,
         name: t.name,
         sort_order: t.sort_order,
+        is_required: t.is_required,
         status: 'planned' as const,
       }));
   }
 
-  it('guarantees project snapshot invariance when templates are modified later', () => {
+  it('guarantees project snapshot invariance and preserves is_required when templates are modified later', () => {
     const SERVICE_ID = 'svc-website-design';
     const PROJECT_1_ID = 'proj-alpha';
     const PROJECT_2_ID = 'proj-beta';
 
-    // Step 1: Initial Service Templates A, B, C
+    // Step 1: Initial Service Templates A (required), B (optional), C (required)
     const templatesTable: ServiceDeliveryItemTemplate[] = [
       {
         id: 'tmpl-A',
@@ -50,6 +53,7 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
         delivery_item_code: 'HMDV_01',
         name: 'Item A: Khảo sát yêu cầu',
         sort_order: 1,
+        is_required: true,
         active: true,
       },
       {
@@ -58,6 +62,7 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
         delivery_item_code: 'HMDV_02',
         name: 'Item B: Thiết kế UI Wireframe',
         sort_order: 2,
+        is_required: false,
         active: true,
       },
       {
@@ -66,6 +71,7 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
         delivery_item_code: 'HMDV_03',
         name: 'Item C: Lập trình Frontend & Backend',
         sort_order: 3,
+        is_required: true,
         active: true,
       },
     ];
@@ -81,22 +87,28 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
       templatesTable,
     );
 
-    // Assert Project 1 has items [A, B, C]
+    // Assert Project 1 has items [A, B, C] with correct is_required
     expect(project1Items).toHaveLength(3);
     expect(project1Items.map((i) => i.name)).toEqual([
       'Item A: Khảo sát yêu cầu',
       'Item B: Thiết kế UI Wireframe',
       'Item C: Lập trình Frontend & Backend',
     ]);
+    expect(project1Items.map((i) => i.is_required)).toEqual([
+      true,
+      false,
+      true,
+    ]);
     expect(project1Items.every((i) => i.status === 'planned')).toBe(true);
 
-    // Step 3: Add new template D to Service templates
+    // Step 3: Add new template D (optional) to Service templates
     templatesTable.push({
       id: 'tmpl-D',
       service_id: SERVICE_ID,
       delivery_item_code: 'HMDV_04',
       name: 'Item D: Triển khai Hosting & Bàn giao',
       sort_order: 4,
+      is_required: false,
       active: true,
     });
 
@@ -106,6 +118,11 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
       'Item A: Khảo sát yêu cầu',
       'Item B: Thiết kế UI Wireframe',
       'Item C: Lập trình Frontend & Backend',
+    ]);
+    expect(project1Items.map((i) => i.is_required)).toEqual([
+      true,
+      false,
+      true,
     ]);
 
     // Step 4: Add Service to Project 2 -> Trigger fires snapshot with current templates (A, B, C, D)
@@ -126,6 +143,12 @@ describe('Service Delivery Item Snapshot Invariance Contract', () => {
       'Item B: Thiết kế UI Wireframe',
       'Item C: Lập trình Frontend & Backend',
       'Item D: Triển khai Hosting & Bàn giao',
+    ]);
+    expect(project2Items.map((i) => i.is_required)).toEqual([
+      true,
+      false,
+      true,
+      false,
     ]);
 
     // Step 5: Deactivate Template B

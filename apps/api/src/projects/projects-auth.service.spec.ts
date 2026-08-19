@@ -34,6 +34,9 @@ function mockQueryChain(response: { data: any; error: any; count?: number }) {
     order: jest.fn().mockReturnThis(),
     range: jest.fn().mockReturnThis(),
     limit: jest.fn().mockReturnThis(),
+    insert: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    delete: jest.fn().mockReturnThis(),
     single: jest.fn().mockResolvedValue(response),
     maybeSingle: jest.fn().mockResolvedValue(response),
   };
@@ -41,6 +44,9 @@ function mockQueryChain(response: { data: any; error: any; count?: number }) {
   chain.range = jest
     .fn()
     .mockResolvedValue({ ...response, count: response.count ?? 0 });
+  // Enable direct await on query builder chain
+  chain.then = (resolve: any, reject: any) =>
+    Promise.resolve(response).then(resolve, reject);
   return chain;
 }
 
@@ -236,6 +242,312 @@ describe('ProjectsService — Real Authorization Logic (Supabase Transport Mocke
       await expect(
         service.getClientProjectById(CLIENT_A, 'non-existent-project-id'),
       ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // =========================================================================
+  // getProjectServiceItems — Multi-role and Foreign Scope tests
+  // =========================================================================
+  describe('getProjectServiceItems Authorization', () => {
+    const projectRow = {
+      id: PROJECT_A,
+      client_company_id: COMPANY_A,
+    };
+    const itemsRow = [
+      {
+        id: 'item-1',
+        project_id: PROJECT_A,
+        name: 'Item 1',
+        status: 'planned',
+      },
+    ];
+
+    it('Admin + Project A → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(
+          mockQueryChain({ data: itemsRow, error: null, count: 1 }),
+        ); // items query
+
+      const res = await service.getProjectServiceItems(
+        'admin-user',
+        'admin',
+        PROJECT_A,
+      );
+      expect(res).toEqual(itemsRow);
+    });
+
+    it('Employee member of Project A → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'pm-1', project_role: 'member' },
+            error: null,
+          }),
+        ) // membership check
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(
+          mockQueryChain({ data: itemsRow, error: null, count: 1 }),
+        ); // items query
+
+      const res = await service.getProjectServiceItems(
+        EMPLOYEE_A,
+        'employee',
+        PROJECT_A,
+      );
+      expect(res).toEqual(itemsRow);
+    });
+
+    it('Employee NOT member of Project A → FAIL with PROJECT_ACCESS_DENIED', async () => {
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null })); // membership check returns null
+
+      await expect(
+        service.getProjectServiceItems(EMPLOYEE_A, 'employee', PROJECT_A),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_ACCESS_DENIED' },
+      });
+    });
+
+    it('Team Leader member of Project A → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'pm-1', project_role: 'project_manager' },
+            error: null,
+          }),
+        ) // membership check
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(
+          mockQueryChain({ data: itemsRow, error: null, count: 1 }),
+        ); // items query
+
+      const res = await service.getProjectServiceItems(
+        'leader-user',
+        'team_leader',
+        PROJECT_A,
+      );
+      expect(res).toEqual(itemsRow);
+    });
+
+    it('Accountant member of Project A → PASS read', async () => {
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'pm-1', project_role: 'viewer' },
+            error: null,
+          }),
+        ) // membership check
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(
+          mockQueryChain({ data: itemsRow, error: null, count: 1 }),
+        ); // items query
+
+      const res = await service.getProjectServiceItems(
+        'accountant-user',
+        'accountant',
+        PROJECT_A,
+      );
+      expect(res).toEqual(itemsRow);
+    });
+
+    it('Client belonging to client company of Project A → PASS read', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(
+          mockQueryChain({ data: { id: 'cm-1' }, error: null }),
+        ) // client_memberships check
+        .mockReturnValueOnce(
+          mockQueryChain({ data: itemsRow, error: null, count: 1 }),
+        ); // items query
+
+      const res = await service.getProjectServiceItems(
+        CLIENT_A,
+        'client',
+        PROJECT_A,
+      );
+      expect(res).toEqual(itemsRow);
+    });
+
+    it('Client from another company → FAIL with PROJECT_NOT_FOUND', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: null, error: null })); // client_memberships check returns null
+
+      await expect(
+        service.getProjectServiceItems(CLIENT_A, 'client', PROJECT_A),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_NOT_FOUND' },
+      });
+    });
+
+    it('Foreign projectServiceId not belonging to projectId → FAIL with PROJECT_SERVICE_NOT_FOUND', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: null, error: null })); // project_services lookup returns null
+
+      await expect(
+        service.getProjectServiceItems(
+          'admin-user',
+          'admin',
+          PROJECT_A,
+          'foreign-project-service-id',
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_SERVICE_NOT_FOUND' },
+      });
+    });
+  });
+
+  // =========================================================================
+  // updateProjectServiceItem — Write Authorization and Scope tests
+  // =========================================================================
+  describe('updateProjectServiceItem Authorization', () => {
+    const projectRow = {
+      id: PROJECT_A,
+      client_company_id: COMPANY_A,
+    };
+    const itemRow = {
+      id: 'item-1',
+      project_id: PROJECT_A,
+      name: 'Item 1',
+      status: 'planned',
+    };
+
+    it('Admin → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: itemRow, error: null })) // find item in project
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { ...itemRow, status: 'done' },
+            error: null,
+          }),
+        ); // update single
+
+      const res = await service.updateProjectServiceItem(
+        'admin-user',
+        'admin',
+        PROJECT_A,
+        'item-1',
+        { status: 'done' },
+      );
+      expect(res.status).toBe('done');
+    });
+
+    it('Employee member of Project A → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'pm-1', project_role: 'member' },
+            error: null,
+          }),
+        ) // membership check
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: itemRow, error: null })) // find item in project
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { ...itemRow, status: 'in_progress' },
+            error: null,
+          }),
+        ); // update single
+
+      const res = await service.updateProjectServiceItem(
+        EMPLOYEE_A,
+        'employee',
+        PROJECT_A,
+        'item-1',
+        { status: 'in_progress' },
+      );
+      expect(res.status).toBe('in_progress');
+    });
+
+    it('Team Leader member of Project A → PASS', async () => {
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'pm-1', project_role: 'project_manager' },
+            error: null,
+          }),
+        ) // membership check
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: itemRow, error: null })) // find item in project
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { ...itemRow, status: 'blocked' },
+            error: null,
+          }),
+        ); // update single
+
+      const res = await service.updateProjectServiceItem(
+        'leader-user',
+        'team_leader',
+        PROJECT_A,
+        'item-1',
+        { status: 'blocked' },
+      );
+      expect(res.status).toBe('blocked');
+    });
+
+    it('Employee non-member → FAIL with PROJECT_ACCESS_DENIED', async () => {
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null })); // membership check returns null
+
+      await expect(
+        service.updateProjectServiceItem(
+          EMPLOYEE_A,
+          'employee',
+          PROJECT_A,
+          'item-1',
+          { status: 'done' },
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_ACCESS_DENIED' },
+      });
+    });
+
+    it('Client → FAIL with PROJECT_ACCESS_DENIED (no write access)', async () => {
+      await expect(
+        service.updateProjectServiceItem(
+          CLIENT_A,
+          'client',
+          PROJECT_A,
+          'item-1',
+          { status: 'done' },
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_ACCESS_DENIED' },
+      });
+    });
+
+    it('Accountant → FAIL with PROJECT_ACCESS_DENIED (no write access)', async () => {
+      await expect(
+        service.updateProjectServiceItem(
+          'accountant-user',
+          'accountant',
+          PROJECT_A,
+          'item-1',
+          { status: 'done' },
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_ACCESS_DENIED' },
+      });
+    });
+
+    it('Foreign item from Project B → FAIL with PROJECT_SERVICE_ITEM_NOT_FOUND', async () => {
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: projectRow, error: null })) // getProjectRow
+        .mockReturnValueOnce(mockQueryChain({ data: null, error: null })); // item lookup in PROJECT_A returns null
+
+      await expect(
+        service.updateProjectServiceItem(
+          'admin-user',
+          'admin',
+          PROJECT_A,
+          'item-from-project-b',
+          { status: 'done' },
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'PROJECT_SERVICE_ITEM_NOT_FOUND' },
+      });
     });
   });
 });

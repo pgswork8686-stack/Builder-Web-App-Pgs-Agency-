@@ -253,6 +253,18 @@ describe('Business Code Generation and Migration Contracts', () => {
       expect(content).toContain('project_services_code_seq');
       expect(content).toContain('project_service_items_code_seq');
 
+      // Check prefixes
+      expect(content).toContain('NHDV');
+      expect(content).toContain('HMDV');
+      expect(content).toContain('DVDA');
+      expect(content).toContain('HMDA');
+
+      // Check legacy delivery item code sync
+      expect(content).toContain('NEW.code := NEW.delivery_item_code');
+
+      // Check is_required in snapshot
+      expect(content).toContain('COALESCE(sdi.is_required, TRUE)');
+
       // Check format check constraints
       expect(content).toContain('service_categories_code_format');
       expect(content).toContain('service_delivery_items_code_format');
@@ -268,6 +280,26 @@ describe('Business Code Generation and Migration Contracts', () => {
         'validate_task_project_service_item_and_sync_code',
       );
       expect(content).toContain('trg_tasks_validate_project_service_item');
+
+      // Check department sort order backfill
+      expect(content).toContain('sort_order INTEGER NOT NULL DEFAULT 0');
+      expect(content).toContain("PB_01' OR code = 'ACCOUNT_SALES'");
+    });
+
+    it('verifies backend ProjectsService does NOT contain duplicate manual snapshot logic', () => {
+      const projectsServicePath = resolve(
+        __dirname,
+        '../projects/projects.service.ts',
+      );
+      const content = readFileSync(projectsServicePath, 'utf8');
+
+      // createProjectService must NOT manually query service_delivery_items or insert into project_service_items
+      expect(content).not.toMatch(
+        /createProjectService[\s\S]*?from\('service_delivery_items'\)/,
+      );
+      expect(content).not.toMatch(
+        /createProjectService[\s\S]*?from\('project_service_items'\)\s*\.insert/,
+      );
     });
 
     it('formats 99 -> 100 transition correctly for NHDV, HMDV, DVDA, HMDA', () => {

@@ -24,8 +24,10 @@ import {
   ProjectListQuerySchema,
   UpdateProjectMembershipSchema,
   UpdateProjectSchema,
+  UpdateProjectServiceItemSchema,
   UpdateProjectServiceSchema,
 } from './dto/project.dto';
+import type { AppRole } from '../auth/auth.types';
 import { ProjectsService } from './projects.service';
 
 const ScopedListQuerySchema = z.object({
@@ -191,9 +193,13 @@ export class ProjectsController {
   @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
   async getProjectServiceItems(
     @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
     @Query('projectServiceId') projectServiceId?: string,
   ) {
     return this.projectsService.getProjectServiceItems(
+      userId,
+      role,
       projectId,
       projectServiceId,
     );
@@ -204,8 +210,12 @@ export class ProjectsController {
   async getProjectServiceItemsByService(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('projectServiceId', ParseUUIDPipe) projectServiceId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
   ) {
     return this.projectsService.getProjectServiceItems(
+      userId,
+      role,
       projectId,
       projectServiceId,
     );
@@ -218,12 +228,16 @@ export class ProjectsController {
     @Param('itemId', ParseUUIDPipe) itemId: string,
     @Body() body: unknown,
     @CurrentUser('profileId') actorUserId: string,
+    @CurrentUser('role') role: AppRole,
   ) {
+    const parsed = UpdateProjectServiceItemSchema.safeParse(body);
+    if (!parsed.success) invalidRequest(parsed.error);
     return this.projectsService.updateProjectServiceItem(
+      actorUserId,
+      role,
       projectId,
       itemId,
-      body as any,
-      actorUserId,
+      parsed.data,
     );
   }
 

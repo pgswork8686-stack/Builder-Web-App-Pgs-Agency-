@@ -5,12 +5,12 @@
 --   Forward-only reconciliation migration from production source state:
 --   1. Reconciles service_categories: NHDV_XX codes, sequence, companions, format check, immutability.
 --   2. Reconciles services: companion service_category_code, created_by_code, updated_by_code.
---   3. Reconciles service_delivery_items: HMDV_XX codes, sequence, companions, active column convention.
+--   3. Reconciles service_delivery_items: HMDV_XX codes, legacy code auto-population, is_required, sequence, companions, active column convention.
 --   4. Reconciles project_services: DVDA_XX codes, sequence, companions.
---   5. Reconciles project_service_items: HMDA_XX codes, sequence, companions, status enum.
+--   5. Reconciles project_service_items: HMDA_XX codes, sequence, companions, status enum, is_required.
 --   6. Reconciles tasks: companion project_service_item_code, cross-project link rejection trigger.
 --   7. Reconciles departments: sort_order backfilled PB_01=1..PB_09=9.
---   8. Single DB Trigger owner for snapshotting delivery items upon project_service insertion.
+--   8. Single DB Trigger owner for snapshotting delivery items upon project_service insertion copying is_required.
 -- ============================================================
 
 -- ============================================================
@@ -187,16 +187,25 @@ CREATE TRIGGER trg_services_sync_category_code
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_services_category_code();
 
--- Backfill services companions
+-- Backfill services companions using safe subqueries
 UPDATE public.services s
 SET
-  service_category_code = sc.service_category_code,
-  created_by_code = p_c.account_code,
-  updated_by_code = p_u.account_code
-FROM public.service_categories sc
-LEFT JOIN public.profiles p_c ON p_c.id = s.created_by
-LEFT JOIN public.profiles p_u ON p_u.id = s.updated_by
-WHERE s.service_category_id = sc.id;
+  service_category_code = (
+    SELECT sc.service_category_code
+    FROM public.service_categories sc
+    WHERE sc.id = s.service_category_id
+  ),
+  created_by_code = (
+    SELECT p.account_code
+    FROM public.profiles p
+    WHERE p.id = s.created_by
+  ),
+  updated_by_code = (
+    SELECT p.account_code
+    FROM public.profiles p
+    WHERE p.id = s.updated_by
+  )
+WHERE s.service_category_id IS NOT NULL;
 
 
 -- ============================================================
@@ -205,12 +214,14 @@ WHERE s.service_category_id = sc.id;
 
 CREATE TABLE IF NOT EXISTS public.service_delivery_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code TEXT NOT NULL,
   delivery_item_code TEXT,
   service_id UUID NOT NULL REFERENCES public.services(id) ON DELETE CASCADE,
   service_code TEXT,
   name TEXT NOT NULL,
   description TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0,
+  is_required BOOLEAN NOT NULL DEFAULT TRUE,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   updated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -222,6 +233,7 @@ CREATE TABLE IF NOT EXISTS public.service_delivery_items (
 
 ALTER TABLE public.service_delivery_items
   ADD COLUMN IF NOT EXISTS delivery_item_code TEXT,
+  ADD COLUMN IF NOT EXISTS is_required BOOLEAN NOT NULL DEFAULT TRUE,
   ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE,
   ADD COLUMN IF NOT EXISTS service_code TEXT,
   ADD COLUMN IF NOT EXISTS created_by_code TEXT,
@@ -232,7 +244,7 @@ ALTER TABLE public.service_delivery_items ENABLE ROW LEVEL SECURITY;
 CREATE SEQUENCE IF NOT EXISTS public.service_delivery_items_code_seq
   START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
--- Auto-generation trigger for HMDV_XX
+-- Auto-generation trigger for HMDV_XX ensuring both delivery_item_code and legacy code are populated
 CREATE OR REPLACE FUNCTION public.set_service_delivery_item_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -246,6 +258,11 @@ BEGIN
       nextval('public.service_delivery_items_code_seq')
     );
   END IF;
+
+  IF NEW.code IS NULL OR btrim(NEW.code) = '' THEN
+    NEW.code := NEW.delivery_item_code;
+  END IF;
+
   RETURN NEW;
 END;
 $$;
@@ -314,7 +331,9 @@ BEGIN
     WHERE delivery_item_code IS NULL OR delivery_item_code !~ '^HMDV_[0-9]{2,}$'
   )
   UPDATE public.service_delivery_items sdi
-  SET delivery_item_code = public.format_business_code('HMDV', n.rn)
+  SET
+    delivery_item_code = public.format_business_code('HMDV', n.rn),
+    code = COALESCE(sdi.code, public.format_business_code('HMDV', n.rn))
   FROM numbered n
   WHERE sdi.id = n.id;
 
@@ -455,8 +474,12 @@ CREATE TABLE IF NOT EXISTS public.project_service_items (
   source_delivery_item_code TEXT,
   name TEXT NOT NULL,
   description TEXT,
-  status TEXT NOT NULL DEFAULT 'planned',
   sort_order INTEGER NOT NULL DEFAULT 0,
+  is_required BOOLEAN NOT NULL DEFAULT TRUE,
+  status TEXT NOT NULL DEFAULT 'planned',
+  started_at TIMESTAMPTZ,
+  due_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
   created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   updated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_by_code TEXT,
@@ -471,6 +494,10 @@ ALTER TABLE public.project_service_items
   ADD COLUMN IF NOT EXISTS project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
   ADD COLUMN IF NOT EXISTS project_code TEXT,
   ADD COLUMN IF NOT EXISTS source_delivery_item_code TEXT,
+  ADD COLUMN IF NOT EXISTS is_required BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS started_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS due_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS created_by_code TEXT,
   ADD COLUMN IF NOT EXISTS updated_by_code TEXT;
 
@@ -654,7 +681,7 @@ $$;
 
 DROP TRIGGER IF EXISTS trg_tasks_validate_project_service_item ON public.tasks;
 CREATE TRIGGER trg_tasks_validate_project_service_item
-  BEFORE INSERT OR UPDATE ON public.tasks
+  BEFORE INSERT OR UPDATE OF project_id, project_service_item_id ON public.tasks
   FOR EACH ROW
   EXECUTE FUNCTION public.validate_task_project_service_item_and_sync_code();
 
@@ -698,6 +725,7 @@ BEGIN
     name,
     description,
     sort_order,
+    is_required,
     status,
     created_by,
     updated_by
@@ -709,6 +737,7 @@ BEGIN
     sdi.name,
     sdi.description,
     sdi.sort_order,
+    COALESCE(sdi.is_required, TRUE),
     'planned',
     NEW.created_by,
     NEW.created_by
