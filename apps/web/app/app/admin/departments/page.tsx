@@ -72,9 +72,13 @@ export default function AdminDepartmentsPage() {
       ]);
       setDepartments(deptsData);
 
-      // Filter only internal employees
+      // Filter only internal active employees
       const internalStaff = (peopleData.items || [])
-        .filter((p: any) => p.role !== "client")
+        .filter(
+          (p: any) =>
+            p.role !== "client" &&
+            (p.accountStatus === "active" || p.account_status === "active"),
+        )
         .map((p: any) => ({
           id: p.id,
           fullName: p.fullName || p.full_name || "Nhân viên",

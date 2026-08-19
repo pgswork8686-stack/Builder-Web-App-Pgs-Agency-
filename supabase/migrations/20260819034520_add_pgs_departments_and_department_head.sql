@@ -62,4 +62,4 @@ SET
   is_active = EXCLUDED.is_active;
 
 -- Update departments sequence to 10 (next is PB_10)
-PERFORM setval('public.departments_code_seq', 10, false);
+SELECT setval('public.departments_code_seq', 10, false);

@@ -15,7 +15,7 @@ export const CreateServiceCategorySchema = z
       .max(160, 'Tên nhóm dịch vụ tối đa 160 ký tự'),
     description: z.string().trim().max(5000).nullable().optional(),
     sortOrder: z.coerce.number().int().min(0).optional().default(0),
-    isActive: z.boolean().optional().default(true),
+    active: z.boolean().optional().default(true),
   })
   .strict();
 
@@ -35,7 +35,7 @@ export const UpdateServiceCategorySchema = z
     name: z.string().trim().min(2).max(160).optional(),
     description: z.string().trim().max(5000).nullable().optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
-    isActive: z.boolean().optional(),
+    active: z.boolean().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {
@@ -48,7 +48,7 @@ export type UpdateServiceCategoryDto = z.infer<
 
 export const ServiceCategoryQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
-  isActive: z
+  active: z
     .enum(['true', 'false'])
     .transform((value) => value === 'true')
     .optional(),

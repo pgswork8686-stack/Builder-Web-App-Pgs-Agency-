@@ -794,39 +794,6 @@ export class ProjectsService {
       );
     }
 
-    // Snapshot active template items into project_service_items
-    const { data: deliveryTemplates } = await this.client
-      .from('service_delivery_items')
-      .select('*')
-      .eq('service_id', dto.serviceId)
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: true });
-
-    if (deliveryTemplates && deliveryTemplates.length > 0) {
-      const itemSnapshots = deliveryTemplates.map((template: any) => ({
-        project_service_id: data.id,
-        project_id: projectId,
-        source_delivery_item_id: template.id,
-        name: template.name,
-        description: template.description,
-        sort_order: template.sort_order,
-        status: 'planned',
-        created_by: actorUserId,
-        updated_by: actorUserId,
-      }));
-
-      const { error: snapshotError } = await this.client
-        .from('project_service_items')
-        .insert(itemSnapshots);
-
-      if (snapshotError) {
-        this.logger.error(
-          `Failed to snapshot delivery items for project service ${data.id}: ${snapshotError.message}`,
-        );
-      }
-    }
-
     return data;
   }
 

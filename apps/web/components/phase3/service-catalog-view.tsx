@@ -581,7 +581,7 @@ export function ServiceCatalogView() {
                             name: cat.name,
                             description: cat.description ?? "",
                             sortOrder: cat.sortOrder,
-                            isActive: cat.isActive,
+                            isActive: cat.active ?? cat.isActive ?? true,
                           });
                           setShowCategoryModal(true);
                         }}
@@ -952,7 +952,7 @@ export function ServiceCatalogView() {
                             name: item.name,
                             description: item.description ?? "",
                             sortOrder: item.sort_order,
-                            isActive: item.is_active,
+                            isActive: item.active ?? item.is_active ?? true,
                           });
                           setShowItemForm(true);
                         }}

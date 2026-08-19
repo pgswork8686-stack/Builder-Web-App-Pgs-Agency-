@@ -8,7 +8,7 @@ export type ProjectMemberRole =
 export type ProjectServiceStatus =
   "planned" | "active" | "paused" | "completed" | "cancelled";
 export type ProjectServiceItemStatus =
-  "planned" | "in_progress" | "completed" | "cancelled";
+  "planned" | "in_progress" | "blocked" | "done" | "cancelled";
 
 export interface ProjectServiceItem {
   id: string;

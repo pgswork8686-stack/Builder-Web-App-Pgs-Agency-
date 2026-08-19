@@ -59,7 +59,7 @@ describe('ServicesService', () => {
           name: 'Website & SEO',
           description: 'Website and SEO services',
           sort_order: 1,
-          is_active: true,
+          active: true,
           services: [{ count: 6 }],
           created_at: '2026-08-19T00:00:00Z',
           updated_at: '2026-08-19T00:00:00Z',
@@ -68,7 +68,7 @@ describe('ServicesService', () => {
 
       client.from.mockReturnValueOnce(queryResult({ data: mockCategories }));
 
-      const result = await service.getCategories({ isActive: true });
+      const result = await service.getCategories({ active: true });
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         id: 'cat-1',
@@ -76,6 +76,7 @@ describe('ServicesService', () => {
         code: 'WEBSITE_SEO',
         name: 'Website & SEO',
         servicesCount: 6,
+        active: true,
       });
     });
 
@@ -101,7 +102,7 @@ describe('ServicesService', () => {
           code: 'PERFORMANCE',
           name: 'Performance',
           sortOrder: 2,
-          isActive: true,
+          active: true,
         },
         'admin-1',
       );
@@ -120,7 +121,7 @@ describe('ServicesService', () => {
             code: 'PERFORMANCE',
             name: 'Performance Duplicate',
             sortOrder: 2,
-            isActive: true,
+            active: true,
           },
           'admin-1',
         ),
@@ -235,7 +236,7 @@ describe('ServicesService', () => {
           name: 'Khảo sát yêu cầu',
           description: 'Lấy yêu cầu khách hàng',
           sortOrder: 1,
-          isActive: true,
+          active: true,
         },
         'admin-1',
       );
@@ -259,7 +260,7 @@ describe('ServicesService', () => {
         .mockReturnValueOnce(
           queryResult(
             {
-              data: { id: 'item-1', service_id: 'svc-1', is_active: true },
+              data: { id: 'item-1', service_id: 'svc-1', active: true },
             },
             'maybeSingle',
           ),
@@ -267,7 +268,7 @@ describe('ServicesService', () => {
         .mockReturnValueOnce(
           queryResult(
             {
-              data: { id: 'item-1', is_active: false },
+              data: { id: 'item-1', active: false },
             },
             'single',
           ),
@@ -278,7 +279,7 @@ describe('ServicesService', () => {
         'item-1',
         'admin-1',
       );
-      expect(res).toMatchObject({ is_active: false });
+      expect(res).toMatchObject({ active: false });
     });
   });
 });

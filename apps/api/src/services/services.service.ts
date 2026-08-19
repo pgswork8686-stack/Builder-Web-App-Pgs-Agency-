@@ -47,8 +47,8 @@ export class ServicesService {
       .order('sort_order', { ascending: true })
       .order('service_category_code', { ascending: true });
 
-    if (filters?.isActive !== undefined) {
-      query = query.eq('is_active', filters.isActive);
+    if (filters?.active !== undefined) {
+      query = query.eq('active', filters.active);
     }
     if (filters?.q) {
       const term = filters.q.trim();
@@ -73,7 +73,7 @@ export class ServicesService {
       name: cat.name,
       description: cat.description,
       sortOrder: cat.sort_order,
-      isActive: cat.is_active,
+      active: cat.active,
       servicesCount: cat.services?.[0]?.count ?? 0,
       createdAt: cat.created_at,
       updatedAt: cat.updated_at,
@@ -108,7 +108,7 @@ export class ServicesService {
       name: data.name,
       description: data.description,
       sortOrder: data.sort_order,
-      isActive: data.is_active,
+      active: data.active,
       servicesCount: data.services?.[0]?.count ?? 0,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
@@ -135,8 +135,8 @@ export class ServicesService {
         code: dto.code,
         name: dto.name,
         description: dto.description ?? null,
-        sort_order: dto.sortOrder,
-        is_active: dto.isActive,
+        sort_order: dto.sortOrder ?? 0,
+        active: dto.active ?? true,
         created_by: actorUserId,
         updated_by: actorUserId,
       })
@@ -173,7 +173,7 @@ export class ServicesService {
     if (dto.description !== undefined)
       payload.description = dto.description ?? null;
     if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
-    if (dto.isActive !== undefined) payload.is_active = dto.isActive;
+    if (dto.active !== undefined) payload.active = dto.active;
 
     const { data, error } = await this.client
       .from('service_categories')
@@ -200,7 +200,7 @@ export class ServicesService {
   }
 
   async deactivateCategory(categoryId: string, actorUserId: string) {
-    return this.updateCategory(categoryId, { isActive: false }, actorUserId);
+    return this.updateCategory(categoryId, { active: false }, actorUserId);
   }
 
   // ============================================================
@@ -212,7 +212,7 @@ export class ServicesService {
     let query = this.client
       .from('services')
       .select(
-        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(id,delivery_item_code,name,sort_order,is_active)',
+        '*, category:service_categories!services_service_category_id_fkey(id,code,service_category_code,name), delivery_items:service_delivery_items(id,delivery_item_code,name,sort_order,active)',
         { count: 'exact' },
       );
 
@@ -290,7 +290,6 @@ export class ServicesService {
   }
 
   async createService(dto: CreateServiceDto, actorUserId: string) {
-    // If categoryId is provided, verify it exists
     if (dto.categoryId) {
       await this.getCategoryById(dto.categoryId);
     }
@@ -437,8 +436,8 @@ export class ServicesService {
         service_id: service.id,
         name: dto.name,
         description: dto.description ?? null,
-        sort_order: dto.sortOrder,
-        is_active: dto.isActive,
+        sort_order: dto.sortOrder ?? 0,
+        active: dto.active ?? true,
         created_by: actorUserId,
         updated_by: actorUserId,
       })
@@ -462,7 +461,6 @@ export class ServicesService {
     dto: UpdateServiceDeliveryItemDto,
     actorUserId: string,
   ) {
-    // Verify item exists and belongs to this service
     const { data: item, error: itemError } = await this.client
       .from('service_delivery_items')
       .select('*')
@@ -489,7 +487,7 @@ export class ServicesService {
     if (dto.description !== undefined)
       payload.description = dto.description ?? null;
     if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
-    if (dto.isActive !== undefined) payload.is_active = dto.isActive;
+    if (dto.active !== undefined) payload.active = dto.active;
 
     const { data, error } = await this.client
       .from('service_delivery_items')
@@ -514,18 +512,16 @@ export class ServicesService {
     itemId: string,
     actorUserId: string,
   ) {
-    // Check if item has been snapshot into any project_service_items
     const { count, error: countErr } = await this.client
       .from('project_service_items')
       .select('*', { count: 'exact', head: true })
       .eq('source_delivery_item_id', itemId);
 
     if (!countErr && count && count > 0) {
-      // Soft deactivate instead of physical deletion to protect history
       return this.updateDeliveryItem(
         serviceId,
         itemId,
-        { isActive: false },
+        { active: false },
         actorUserId,
       );
     }

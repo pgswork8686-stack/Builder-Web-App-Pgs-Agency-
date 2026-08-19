@@ -1,47 +1,32 @@
 -- ============================================================
--- Migration: Service Catalog & Delivery Items Foundation
--- Timestamp: 20260819032116_service_catalog_delivery_foundation.sql
+-- Migration: Reconcile Service Catalog Business Codes & Snapshots
+-- Timestamp: 20260819140000_reconcile_service_catalog_business_codes.sql
 -- Description:
---   1. Creates service_categories table (NHDV_01...) with 6 official categories.
---   2. Links services to service_categories and seeds 26 official services (DV_01..DV_26).
---   3. Creates service_delivery_items table (HMDV_01...) for standard service templates.
---   4. Enhances project_services with DVDA_01... business codes.
---   5. Creates project_service_items table (HMDA_01...) for instance/snapshot items.
---   6. Adds project_service_item_id and project_service_item_code (HMDA_XX) to tasks
---      with cross-project linking validation trigger.
---   7. Configures sequences, format constraints, immutability, and companion code sync triggers.
+--   Forward-only reconciliation migration from production source state:
+--   1. Reconciles service_categories: NHDV_XX codes, sequence, companions, format check, immutability.
+--   2. Reconciles services: companion service_category_code, created_by_code, updated_by_code.
+--   3. Reconciles service_delivery_items: HMDV_XX codes, sequence, companions, active column convention.
+--   4. Reconciles project_services: DVDA_XX codes, sequence, companions.
+--   5. Reconciles project_service_items: HMDA_XX codes, sequence, companions, status enum.
+--   6. Reconciles tasks: companion project_service_item_code, cross-project link rejection trigger.
+--   7. Reconciles departments: sort_order backfilled PB_01=1..PB_09=9.
+--   8. Single DB Trigger owner for snapshotting delivery items upon project_service insertion.
 -- ============================================================
 
 -- ============================================================
--- 1. TABLE: service_categories (NHDV_XX)
+-- 1. SERVICE CATEGORIES (NHDV_XX)
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS public.service_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_category_code TEXT NOT NULL UNIQUE,
-  code TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  description TEXT,
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  updated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  created_by_code TEXT,
-  updated_by_code TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT service_categories_code_format
-    CHECK (service_category_code ~ '^NHDV_[0-9]{2,}$'),
-  CONSTRAINT service_categories_name_not_blank
-    CHECK (length(btrim(name)) >= 2)
-);
-
-ALTER TABLE public.service_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.service_categories
+  ADD COLUMN IF NOT EXISTS service_category_code TEXT,
+  ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS created_by_code TEXT,
+  ADD COLUMN IF NOT EXISTS updated_by_code TEXT;
 
 CREATE SEQUENCE IF NOT EXISTS public.service_categories_code_seq
   START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
--- Auto-generate NHDV_XX
+-- Auto-generation trigger for NHDV_XX
 CREATE OR REPLACE FUNCTION public.set_service_category_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -71,43 +56,99 @@ CREATE TRIGGER trg_service_categories_code_immutable
   FOR EACH ROW
   EXECUTE FUNCTION public.prevent_business_code_column_update('service_category_code');
 
-DROP TRIGGER IF EXISTS trg_service_categories_updated_at ON public.service_categories;
-CREATE TRIGGER trg_service_categories_updated_at
-  BEFORE UPDATE ON public.service_categories
+-- Companion sync for service_categories
+CREATE OR REPLACE FUNCTION public.sync_service_categories_companions()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  IF NEW.created_by IS NOT NULL THEN
+    SELECT p.account_code INTO NEW.created_by_code FROM public.profiles p WHERE p.id = NEW.created_by;
+  ELSE
+    NEW.created_by_code := NULL;
+  END IF;
+
+  IF NEW.updated_by IS NOT NULL THEN
+    SELECT p.account_code INTO NEW.updated_by_code FROM public.profiles p WHERE p.id = NEW.updated_by;
+  ELSE
+    NEW.updated_by_code := NULL;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_service_categories_sync_companions ON public.service_categories;
+CREATE TRIGGER trg_service_categories_sync_companions
+  BEFORE INSERT OR UPDATE ON public.service_categories
   FOR EACH ROW
-  EXECUTE FUNCTION public.set_updated_at();
+  EXECUTE FUNCTION public.sync_service_categories_companions();
 
--- Seed 6 Official Service Categories
-INSERT INTO public.service_categories (service_category_code, code, name, sort_order, is_active)
-VALUES
-  ('NHDV_01', 'WEBSITE_SEO', 'Website & SEO', 1, TRUE),
-  ('NHDV_02', 'PERFORMANCE', 'Performance', 2, TRUE),
-  ('NHDV_03', 'SOCIAL_MEDIA', 'Social Media', 3, TRUE),
-  ('NHDV_04', 'ECOMMERCE', 'E-Commerce', 4, TRUE),
-  ('NHDV_05', 'CONTENT_PR', 'Content & PR', 5, TRUE),
-  ('NHDV_06', 'VIDEO_AI', 'Video & AI', 6, TRUE)
-ON CONFLICT (service_category_code) DO UPDATE
-SET
-  code = EXCLUDED.code,
-  name = EXCLUDED.name,
-  sort_order = EXCLUDED.sort_order,
-  is_active = EXCLUDED.is_active;
+-- Deterministic backfill of 6 official categories
+DO $$
+BEGIN
+  UPDATE public.service_categories SET service_category_code = 'NHDV_01' WHERE code = 'WEBSITE_SEO' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_01');
+  UPDATE public.service_categories SET service_category_code = 'NHDV_02' WHERE code = 'PERFORMANCE' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_02');
+  UPDATE public.service_categories SET service_category_code = 'NHDV_03' WHERE code = 'SOCIAL_MEDIA' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_03');
+  UPDATE public.service_categories SET service_category_code = 'NHDV_04' WHERE code = 'ECOMMERCE' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_04');
+  UPDATE public.service_categories SET service_category_code = 'NHDV_05' WHERE code = 'CONTENT_PR' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_05');
+  UPDATE public.service_categories SET service_category_code = 'NHDV_06' WHERE code = 'VIDEO_AI' AND (service_category_code IS NULL OR service_category_code <> 'NHDV_06');
 
-SELECT setval('public.service_categories_code_seq', 7, false);
+  -- Backfill any others if present
+  WITH numbered AS (
+    SELECT id, (ROW_NUMBER() OVER (ORDER BY created_at ASC, id ASC) + 6) AS rn
+    FROM public.service_categories
+    WHERE service_category_code IS NULL OR service_category_code !~ '^NHDV_[0-9]{2,}$'
+  )
+  UPDATE public.service_categories sc
+  SET service_category_code = public.format_business_code('NHDV', n.rn)
+  FROM numbered n
+  WHERE sc.id = n.id;
+
+  PERFORM setval(
+    'public.service_categories_code_seq',
+    GREATEST(
+      (SELECT COALESCE(MAX(NULLIF(regexp_replace(service_category_code, '^NHDV_', ''), '')::bigint), 0) FROM public.service_categories),
+      6
+    ) + 1,
+    false
+  );
+END $$;
+
+ALTER TABLE public.service_categories
+  ALTER COLUMN service_category_code SET NOT NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'service_categories_code_format'
+  ) THEN
+    ALTER TABLE public.service_categories
+      ADD CONSTRAINT service_categories_code_format
+      CHECK (service_category_code ~ '^NHDV_[0-9]{2,}$');
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'service_categories_service_category_code_key'
+  ) THEN
+    ALTER TABLE public.service_categories
+      ADD CONSTRAINT service_categories_service_category_code_key
+      UNIQUE (service_category_code);
+  END IF;
+END $$;
 
 
 -- ============================================================
--- 2. TABLE: services (DV_XX) ENHANCEMENT & 26 OFFICIAL SERVICES
+-- 2. SERVICES (DV_XX)
 -- ============================================================
 
 ALTER TABLE public.services
-  ADD COLUMN IF NOT EXISTS service_category_id UUID REFERENCES public.service_categories(id) ON DELETE RESTRICT,
   ADD COLUMN IF NOT EXISTS service_category_code TEXT,
-  ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS created_by_code TEXT,
   ADD COLUMN IF NOT EXISTS updated_by_code TEXT;
 
--- Sync service_category_code trigger
 CREATE OR REPLACE FUNCTION public.sync_services_category_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -146,104 +187,52 @@ CREATE TRIGGER trg_services_sync_category_code
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_services_category_code();
 
--- Seed 26 Official Services
-DO $$
-DECLARE
-  cat_web_id UUID;
-  cat_perf_id UUID;
-  cat_soc_id UUID;
-  cat_ecom_id UUID;
-  cat_cont_id UUID;
-  cat_video_id UUID;
-BEGIN
-  SELECT id INTO cat_web_id FROM public.service_categories WHERE service_category_code = 'NHDV_01';
-  SELECT id INTO cat_perf_id FROM public.service_categories WHERE service_category_code = 'NHDV_02';
-  SELECT id INTO cat_soc_id FROM public.service_categories WHERE service_category_code = 'NHDV_03';
-  SELECT id INTO cat_ecom_id FROM public.service_categories WHERE service_category_code = 'NHDV_04';
-  SELECT id INTO cat_cont_id FROM public.service_categories WHERE service_category_code = 'NHDV_05';
-  SELECT id INTO cat_video_id FROM public.service_categories WHERE service_category_code = 'NHDV_06';
-
-  -- 01 WEBSITE & SEO
-  INSERT INTO public.services (service_code, code, name, service_category_id, sort_order, active)
-  VALUES
-    ('DV_01', 'DV_01_WEB_DESIGN', 'Thiết kế Website', cat_web_id, 1, TRUE),
-    ('DV_02', 'DV_02_LANDING_PAGE', 'Landing Page', cat_web_id, 2, TRUE),
-    ('DV_03', 'DV_03_WEB_CARE', 'Chăm sóc Website', cat_web_id, 3, TRUE),
-    ('DV_04', 'DV_04_SEO_OVERALL', 'SEO Tổng Thể', cat_web_id, 4, TRUE),
-    ('DV_05', 'DV_05_CONTENT_WEB', 'Content Website', cat_web_id, 5, TRUE),
-    ('DV_06', 'DV_06_GOOGLE_BUSINESS', 'Google Business', cat_web_id, 6, TRUE),
-
-  -- 02 PERFORMANCE
-    ('DV_07', 'DV_07_GOOGLE_ADS', 'Google Ads', cat_perf_id, 7, TRUE),
-    ('DV_08', 'DV_08_FB_ADS', 'Facebook Ads', cat_perf_id, 8, TRUE),
-    ('DV_09', 'DV_09_TIKTOK_ADS', 'TikTok Ads', cat_perf_id, 9, TRUE),
-
-  -- 03 SOCIAL MEDIA
-    ('DV_10', 'DV_10_FANPAGE_OPS', 'Vận hành Fanpage', cat_soc_id, 10, TRUE),
-    ('DV_11', 'DV_11_INSTAGRAM', 'Instagram', cat_soc_id, 11, TRUE),
-    ('DV_12', 'DV_12_TIKTOK_CHANNEL', 'Xây kênh TikTok', cat_soc_id, 12, TRUE),
-    ('DV_13', 'DV_13_FANPAGE_BLUE_TICK', 'Tick xanh Fanpage', cat_soc_id, 13, TRUE),
-    ('DV_14', 'DV_14_FANPAGE_TRADE', 'Mua bán Fanpage', cat_soc_id, 14, TRUE),
-
-  -- 04 E-COMMERCE
-    ('DV_15', 'DV_15_TIKTOK_SHOP_SETUP', 'Setup TikTok Shop', cat_ecom_id, 15, TRUE),
-    ('DV_16', 'DV_16_TIKTOK_SHOP_OPS', 'Vận hành TikTok Shop', cat_ecom_id, 16, TRUE),
-    ('DV_17', 'DV_17_SHOPEE_OPS', 'Vận hành Shopee', cat_ecom_id, 17, TRUE),
-
-  -- 05 CONTENT & PR
-    ('DV_18', 'DV_18_CONTENT_SOCIAL', 'Content Social', cat_cont_id, 18, TRUE),
-    ('DV_19', 'DV_19_PR_PRESS', 'PR Báo chí', cat_cont_id, 19, TRUE),
-
-  -- 06 VIDEO & AI
-    ('DV_20', 'DV_20_VIDEO_TIKTOK', 'Video TikTok', cat_video_id, 20, TRUE),
-    ('DV_21', 'DV_21_VIDEO_ADS', 'Video Quảng Cáo', cat_video_id, 21, TRUE),
-    ('DV_22', 'DV_22_REVIEW_PROD', 'Review Sản Phẩm', cat_video_id, 22, TRUE),
-    ('DV_23', 'DV_23_REVIEW_LOC', 'Review Địa Điểm', cat_video_id, 23, TRUE),
-    ('DV_24', 'DV_24_VIDEO_AI', 'Video AI', cat_video_id, 24, TRUE),
-    ('DV_25', 'DV_25_VEO_3', 'VEO 3', cat_video_id, 25, TRUE),
-    ('DV_26', 'DV_26_GROK', 'Grok', cat_video_id, 26, TRUE)
-  ON CONFLICT (service_code) DO UPDATE
-  SET
-    name = EXCLUDED.name,
-    service_category_id = EXCLUDED.service_category_id,
-    sort_order = EXCLUDED.sort_order,
-    active = EXCLUDED.active;
-
-  PERFORM setval('public.services_code_seq', 27, false);
-END $$;
+-- Backfill services companions
+UPDATE public.services s
+SET
+  service_category_code = sc.service_category_code,
+  created_by_code = p_c.account_code,
+  updated_by_code = p_u.account_code
+FROM public.service_categories sc
+LEFT JOIN public.profiles p_c ON p_c.id = s.created_by
+LEFT JOIN public.profiles p_u ON p_u.id = s.updated_by
+WHERE s.service_category_id = sc.id;
 
 
 -- ============================================================
--- 3. TABLE: service_delivery_items (HMDV_XX)
+-- 3. SERVICE DELIVERY ITEMS (HMDV_XX)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS public.service_delivery_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  delivery_item_code TEXT NOT NULL UNIQUE,
+  delivery_item_code TEXT,
   service_id UUID NOT NULL REFERENCES public.services(id) ON DELETE CASCADE,
   service_code TEXT,
   name TEXT NOT NULL,
   description TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
   created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   updated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_by_code TEXT,
   updated_by_code TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT service_delivery_items_code_format
-    CHECK (delivery_item_code ~ '^HMDV_[0-9]{2,}$'),
-  CONSTRAINT service_delivery_items_name_not_blank
-    CHECK (length(btrim(name)) >= 1)
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE public.service_delivery_items
+  ADD COLUMN IF NOT EXISTS delivery_item_code TEXT,
+  ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS service_code TEXT,
+  ADD COLUMN IF NOT EXISTS created_by_code TEXT,
+  ADD COLUMN IF NOT EXISTS updated_by_code TEXT;
 
 ALTER TABLE public.service_delivery_items ENABLE ROW LEVEL SECURITY;
 
 CREATE SEQUENCE IF NOT EXISTS public.service_delivery_items_code_seq
   START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
--- Auto-generate HMDV_XX
+-- Auto-generation trigger for HMDV_XX
 CREATE OR REPLACE FUNCTION public.set_service_delivery_item_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -273,7 +262,7 @@ CREATE TRIGGER trg_service_delivery_items_code_immutable
   FOR EACH ROW
   EXECUTE FUNCTION public.prevent_business_code_column_update('delivery_item_code');
 
--- Sync companions for service_delivery_items
+-- Companion sync for service_delivery_items
 CREATE OR REPLACE FUNCTION public.sync_service_delivery_items_companions()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -309,19 +298,65 @@ CREATE TRIGGER trg_service_delivery_items_sync_companions
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_service_delivery_items_companions();
 
-DROP TRIGGER IF EXISTS trg_service_delivery_items_updated_at ON public.service_delivery_items;
-CREATE TRIGGER trg_service_delivery_items_updated_at
-  BEFORE UPDATE ON public.service_delivery_items
-  FOR EACH ROW
-  EXECUTE FUNCTION public.set_updated_at();
+-- Backfill delivery_item_code if any exist
+DO $$
+DECLARE
+  max_num bigint := 0;
+BEGIN
+  SELECT COALESCE(MAX(NULLIF(regexp_replace(delivery_item_code, '^HMDV_', ''), '')::bigint), 0)
+  INTO max_num
+  FROM public.service_delivery_items
+  WHERE delivery_item_code ~ '^HMDV_[0-9]+$';
+
+  WITH numbered AS (
+    SELECT id, (ROW_NUMBER() OVER (ORDER BY created_at ASC, id ASC) + max_num) AS rn
+    FROM public.service_delivery_items
+    WHERE delivery_item_code IS NULL OR delivery_item_code !~ '^HMDV_[0-9]{2,}$'
+  )
+  UPDATE public.service_delivery_items sdi
+  SET delivery_item_code = public.format_business_code('HMDV', n.rn)
+  FROM numbered n
+  WHERE sdi.id = n.id;
+
+  PERFORM setval(
+    'public.service_delivery_items_code_seq',
+    GREATEST(
+      (SELECT COALESCE(MAX(NULLIF(regexp_replace(delivery_item_code, '^HMDV_', ''), '')::bigint), 0) FROM public.service_delivery_items),
+      0
+    ) + 1,
+    false
+  );
+END $$;
+
+ALTER TABLE public.service_delivery_items
+  ALTER COLUMN delivery_item_code SET NOT NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'service_delivery_items_code_format'
+  ) THEN
+    ALTER TABLE public.service_delivery_items
+      ADD CONSTRAINT service_delivery_items_code_format
+      CHECK (delivery_item_code ~ '^HMDV_[0-9]{2,}$');
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'service_delivery_items_delivery_item_code_key'
+  ) THEN
+    ALTER TABLE public.service_delivery_items
+      ADD CONSTRAINT service_delivery_items_delivery_item_code_key
+      UNIQUE (delivery_item_code);
+  END IF;
+END $$;
 
 
 -- ============================================================
--- 4. TABLE: project_services (DVDA_XX) ENHANCEMENT
+-- 4. PROJECT SERVICES (DVDA_XX)
 -- ============================================================
 
 ALTER TABLE public.project_services
-  ADD COLUMN IF NOT EXISTS project_service_code TEXT UNIQUE;
+  ADD COLUMN IF NOT EXISTS project_service_code TEXT;
 
 CREATE SEQUENCE IF NOT EXISTS public.project_services_code_seq
   START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
@@ -355,7 +390,7 @@ CREATE TRIGGER trg_project_services_code_immutable
   FOR EACH ROW
   EXECUTE FUNCTION public.prevent_business_code_column_update('project_service_code');
 
--- Backfill existing project_services if any
+-- Backfill project_services code if any exist
 DO $$
 DECLARE
   max_num bigint := 0;
@@ -385,14 +420,33 @@ BEGIN
   );
 END $$;
 
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_services_code_format'
+  ) THEN
+    ALTER TABLE public.project_services
+      ADD CONSTRAINT project_services_code_format
+      CHECK (project_service_code IS NULL OR project_service_code ~ '^DVDA_[0-9]{2,}$');
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_services_project_service_code_key'
+  ) THEN
+    ALTER TABLE public.project_services
+      ADD CONSTRAINT project_services_project_service_code_key
+      UNIQUE (project_service_code);
+  END IF;
+END $$;
+
 
 -- ============================================================
--- 5. TABLE: project_service_items (HMDA_XX)
+-- 5. PROJECT SERVICE ITEMS (HMDA_XX)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS public.project_service_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_service_item_code TEXT NOT NULL UNIQUE,
+  project_service_item_code TEXT,
   project_service_id UUID NOT NULL REFERENCES public.project_services(id) ON DELETE CASCADE,
   project_service_code TEXT,
   project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
@@ -408,19 +462,24 @@ CREATE TABLE IF NOT EXISTS public.project_service_items (
   created_by_code TEXT,
   updated_by_code TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT project_service_items_code_format
-    CHECK (project_service_item_code ~ '^HMDA_[0-9]{2,}$'),
-  CONSTRAINT project_service_items_name_not_blank
-    CHECK (length(btrim(name)) >= 1)
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE public.project_service_items
+  ADD COLUMN IF NOT EXISTS project_service_item_code TEXT,
+  ADD COLUMN IF NOT EXISTS project_service_code TEXT,
+  ADD COLUMN IF NOT EXISTS project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
+  ADD COLUMN IF NOT EXISTS project_code TEXT,
+  ADD COLUMN IF NOT EXISTS source_delivery_item_code TEXT,
+  ADD COLUMN IF NOT EXISTS created_by_code TEXT,
+  ADD COLUMN IF NOT EXISTS updated_by_code TEXT;
 
 ALTER TABLE public.project_service_items ENABLE ROW LEVEL SECURITY;
 
 CREATE SEQUENCE IF NOT EXISTS public.project_service_items_code_seq
   START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
--- Auto-generate HMDA_XX
+-- Auto-generation trigger for HMDA_XX
 CREATE OR REPLACE FUNCTION public.set_project_service_item_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -450,7 +509,7 @@ CREATE TRIGGER trg_project_service_items_code_immutable
   FOR EACH ROW
   EXECUTE FUNCTION public.prevent_business_code_column_update('project_service_item_code');
 
--- Sync companions for project_service_items
+-- Companion sync for project_service_items
 CREATE OR REPLACE FUNCTION public.sync_project_service_items_companions()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -458,7 +517,6 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  -- Sync project_service_code and project_id from project_services
   IF NEW.project_service_id IS NOT NULL THEN
     SELECT ps.project_service_code, ps.project_id, ps.project_code
     INTO NEW.project_service_code, NEW.project_id, NEW.project_code
@@ -466,7 +524,6 @@ BEGIN
     WHERE ps.id = NEW.project_service_id;
   END IF;
 
-  -- Sync source_delivery_item_code
   IF NEW.source_delivery_item_id IS NOT NULL THEN
     SELECT sdi.delivery_item_code
     INTO NEW.source_delivery_item_code
@@ -476,14 +533,12 @@ BEGIN
     NEW.source_delivery_item_code := NULL;
   END IF;
 
-  -- Sync created_by_code
   IF NEW.created_by IS NOT NULL THEN
     SELECT p.account_code INTO NEW.created_by_code FROM public.profiles p WHERE p.id = NEW.created_by;
   ELSE
     NEW.created_by_code := NULL;
   END IF;
 
-  -- Sync updated_by_code
   IF NEW.updated_by IS NOT NULL THEN
     SELECT p.account_code INTO NEW.updated_by_code FROM public.profiles p WHERE p.id = NEW.updated_by;
   ELSE
@@ -500,22 +555,67 @@ CREATE TRIGGER trg_project_service_items_sync_companions
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_project_service_items_companions();
 
-DROP TRIGGER IF EXISTS trg_project_service_items_updated_at ON public.project_service_items;
-CREATE TRIGGER trg_project_service_items_updated_at
-  BEFORE UPDATE ON public.project_service_items
-  FOR EACH ROW
-  EXECUTE FUNCTION public.set_updated_at();
+-- Backfill project_service_items code if any exist
+DO $$
+DECLARE
+  max_num bigint := 0;
+BEGIN
+  SELECT COALESCE(MAX(NULLIF(regexp_replace(project_service_item_code, '^HMDA_', ''), '')::bigint), 0)
+  INTO max_num
+  FROM public.project_service_items
+  WHERE project_service_item_code ~ '^HMDA_[0-9]+$';
+
+  WITH numbered AS (
+    SELECT id, (ROW_NUMBER() OVER (ORDER BY created_at ASC, id ASC) + max_num) AS rn
+    FROM public.project_service_items
+    WHERE project_service_item_code IS NULL OR project_service_item_code !~ '^HMDA_[0-9]{2,}$'
+  )
+  UPDATE public.project_service_items psi
+  SET project_service_item_code = public.format_business_code('HMDA', n.rn)
+  FROM numbered n
+  WHERE psi.id = n.id;
+
+  PERFORM setval(
+    'public.project_service_items_code_seq',
+    GREATEST(
+      (SELECT COALESCE(MAX(NULLIF(regexp_replace(project_service_item_code, '^HMDA_', ''), '')::bigint), 0) FROM public.project_service_items),
+      0
+    ) + 1,
+    false
+  );
+END $$;
+
+ALTER TABLE public.project_service_items
+  ALTER COLUMN project_service_item_code SET NOT NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_service_items_code_format'
+  ) THEN
+    ALTER TABLE public.project_service_items
+      ADD CONSTRAINT project_service_items_code_format
+      CHECK (project_service_item_code ~ '^HMDA_[0-9]{2,}$');
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_service_items_project_service_item_code_key'
+  ) THEN
+    ALTER TABLE public.project_service_items
+      ADD CONSTRAINT project_service_items_project_service_item_code_key
+      UNIQUE (project_service_item_code);
+  END IF;
+END $$;
 
 
 -- ============================================================
--- 6. TABLE: tasks (CV_XX) ENHANCEMENT & CROSS-PROJECT VALIDATION
+-- 6. TASKS (CV_XX) & CROSS-PROJECT VALIDATION
 -- ============================================================
 
 ALTER TABLE public.tasks
   ADD COLUMN IF NOT EXISTS project_service_item_id UUID REFERENCES public.project_service_items(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS project_service_item_code TEXT;
 
--- Trigger to validate cross-project linking and sync companion code
 CREATE OR REPLACE FUNCTION public.validate_task_project_service_item_and_sync_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -558,9 +658,71 @@ CREATE TRIGGER trg_tasks_validate_project_service_item
   FOR EACH ROW
   EXECUTE FUNCTION public.validate_task_project_service_item_and_sync_code();
 
--- Indexes for optimal lookup
-CREATE INDEX IF NOT EXISTS idx_services_category_id ON public.services(service_category_id);
-CREATE INDEX IF NOT EXISTS idx_service_delivery_items_service_id ON public.service_delivery_items(service_id);
-CREATE INDEX IF NOT EXISTS idx_project_service_items_project_id ON public.project_service_items(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_service_items_ps_id ON public.project_service_items(project_service_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_project_service_item_id ON public.tasks(project_service_item_id);
+
+-- ============================================================
+-- 7. DEPARTMENTS: sort_order BACKFILL
+-- ============================================================
+
+ALTER TABLE public.departments
+  ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0;
+
+DO $$
+BEGIN
+  UPDATE public.departments SET sort_order = 1 WHERE department_code = 'PB_01' OR code = 'ACCOUNT_SALES';
+  UPDATE public.departments SET sort_order = 2 WHERE department_code = 'PB_02' OR code = 'WEB_TECH';
+  UPDATE public.departments SET sort_order = 3 WHERE department_code = 'PB_03' OR code = 'SEO_LOCAL';
+  UPDATE public.departments SET sort_order = 4 WHERE department_code = 'PB_04' OR code = 'PERFORMANCE_MKT';
+  UPDATE public.departments SET sort_order = 5 WHERE department_code = 'PB_05' OR code = 'SOCIAL_CONTENT';
+  UPDATE public.departments SET sort_order = 6 WHERE department_code = 'PB_06' OR code = 'CREATIVE_AI';
+  UPDATE public.departments SET sort_order = 7 WHERE department_code = 'PB_07' OR code = 'ECOMMERCE';
+  UPDATE public.departments SET sort_order = 8 WHERE department_code = 'PB_08' OR code = 'HR_ADMIN';
+  UPDATE public.departments SET sort_order = 9 WHERE department_code = 'PB_09' OR code = 'FINANCE_ACC';
+END $$;
+
+
+-- ============================================================
+-- 8. SNAPSHOT TRIGGER ON project_services (SINGLE SOURCE OF TRUTH)
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.snapshot_project_service_delivery_items()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  INSERT INTO public.project_service_items (
+    project_service_id,
+    project_id,
+    source_delivery_item_id,
+    name,
+    description,
+    sort_order,
+    status,
+    created_by,
+    updated_by
+  )
+  SELECT
+    NEW.id,
+    NEW.project_id,
+    sdi.id,
+    sdi.name,
+    sdi.description,
+    sdi.sort_order,
+    'planned',
+    NEW.created_by,
+    NEW.created_by
+  FROM public.service_delivery_items sdi
+  WHERE sdi.service_id = NEW.service_id
+    AND sdi.active = TRUE
+  ORDER BY sdi.sort_order ASC, sdi.created_at ASC;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_snapshot_project_service_delivery_items ON public.project_services;
+CREATE TRIGGER trg_snapshot_project_service_delivery_items
+  AFTER INSERT ON public.project_services
+  FOR EACH ROW
+  EXECUTE FUNCTION public.snapshot_project_service_delivery_items();

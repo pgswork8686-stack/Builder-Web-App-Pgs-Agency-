@@ -12,7 +12,11 @@ export const CreateDepartmentSchema = z.object({
     .max(120, 'Tên phòng ban tối đa 120 ký tự'),
   description: z.string().optional().nullable(),
   sortOrder: z.coerce.number().int().min(0).optional(),
-  headUserId: z.string().uuid('Trưởng phòng không hợp lệ').nullable().optional(),
+  headUserId: z
+    .string()
+    .uuid('Trưởng phòng không hợp lệ')
+    .nullable()
+    .optional(),
 });
 
 export type CreateDepartmentDto = z.infer<typeof CreateDepartmentSchema>;
@@ -25,7 +29,11 @@ export const UpdateDepartmentSchema = z.object({
     .optional(),
   description: z.string().optional().nullable(),
   sortOrder: z.coerce.number().int().min(0).optional(),
-  headUserId: z.string().uuid('Trưởng phòng không hợp lệ').nullable().optional(),
+  headUserId: z
+    .string()
+    .uuid('Trưởng phòng không hợp lệ')
+    .nullable()
+    .optional(),
   isActive: z.boolean().optional(),
 });
 

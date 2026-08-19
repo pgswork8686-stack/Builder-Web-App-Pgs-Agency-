@@ -238,5 +238,50 @@ describe('Business Code Generation and Migration Contracts', () => {
       expect(content).toContain('trg_sync_companion_codes_chat_messages');
       expect(content).toContain('trg_sync_companion_codes_leave_balances');
     });
+
+    it('verifies 20260819140000_reconcile_service_catalog_business_codes.sql exists and reconciles NHDV, HMDV, DVDA, HMDA', () => {
+      const mReconcilePath = resolve(
+        migrationsDirectory,
+        '20260819140000_reconcile_service_catalog_business_codes.sql',
+      );
+      expect(existsSync(mReconcilePath)).toBe(true);
+      const content = readFileSync(mReconcilePath, 'utf8');
+
+      // Check entity codes and sequences
+      expect(content).toContain('service_categories_code_seq');
+      expect(content).toContain('service_delivery_items_code_seq');
+      expect(content).toContain('project_services_code_seq');
+      expect(content).toContain('project_service_items_code_seq');
+
+      // Check format check constraints
+      expect(content).toContain('service_categories_code_format');
+      expect(content).toContain('service_delivery_items_code_format');
+      expect(content).toContain('project_services_code_format');
+      expect(content).toContain('project_service_items_code_format');
+
+      // Check single owner snapshot trigger
+      expect(content).toContain('snapshot_project_service_delivery_items');
+      expect(content).toContain('trg_snapshot_project_service_delivery_items');
+
+      // Check cross-project task validation trigger
+      expect(content).toContain(
+        'validate_task_project_service_item_and_sync_code',
+      );
+      expect(content).toContain('trg_tasks_validate_project_service_item');
+    });
+
+    it('formats 99 -> 100 transition correctly for NHDV, HMDV, DVDA, HMDA', () => {
+      expect(formatBusinessCode('NHDV', 99)).toBe('NHDV_99');
+      expect(formatBusinessCode('NHDV', 100)).toBe('NHDV_100');
+
+      expect(formatBusinessCode('HMDV', 99)).toBe('HMDV_99');
+      expect(formatBusinessCode('HMDV', 100)).toBe('HMDV_100');
+
+      expect(formatBusinessCode('DVDA', 99)).toBe('DVDA_99');
+      expect(formatBusinessCode('DVDA', 100)).toBe('DVDA_100');
+
+      expect(formatBusinessCode('HMDA', 99)).toBe('HMDA_99');
+      expect(formatBusinessCode('HMDA', 100)).toBe('HMDA_100');
+    });
   });
 });

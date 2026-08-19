@@ -8,7 +8,8 @@ export interface ServiceCategory {
   name: string;
   description?: string | null;
   sortOrder: number;
-  isActive: boolean;
+  active: boolean;
+  isActive?: boolean;
   servicesCount?: number;
   createdAt: string;
   updatedAt: string;
@@ -22,7 +23,8 @@ export interface ServiceDeliveryItem {
   name: string;
   description?: string | null;
   sort_order: number;
-  is_active: boolean;
+  active: boolean;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -51,11 +53,14 @@ export interface ServiceCatalogItem {
 
 export const servicesApi = {
   // Categories
-  listCategories(filters: { q?: string; isActive?: boolean } = {}) {
+  listCategories(
+    filters: { q?: string; active?: boolean; isActive?: boolean } = {},
+  ) {
     const params = new URLSearchParams();
     if (filters.q) params.set("q", filters.q);
-    if (filters.isActive !== undefined)
-      params.set("isActive", String(filters.isActive));
+    const activeVal =
+      filters.active !== undefined ? filters.active : filters.isActive;
+    if (activeVal !== undefined) params.set("active", String(activeVal));
     return request<ServiceCategory[]>(
       `/admin/service-categories?${params.toString()}`,
     );
@@ -70,11 +75,18 @@ export const servicesApi = {
     name: string;
     description?: string | null;
     sortOrder?: number;
+    active?: boolean;
     isActive?: boolean;
   }) {
     return request<ServiceCategory>("/admin/service-categories", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        code: data.code,
+        name: data.name,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        active: data.active !== undefined ? data.active : data.isActive,
+      }),
     });
   },
 
@@ -85,12 +97,21 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      active?: boolean;
       isActive?: boolean;
     }>,
   ) {
+    const payload: Record<string, unknown> = {};
+    if (data.code !== undefined) payload.code = data.code;
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.description !== undefined) payload.description = data.description;
+    if (data.sortOrder !== undefined) payload.sortOrder = data.sortOrder;
+    if (data.active !== undefined) payload.active = data.active;
+    else if (data.isActive !== undefined) payload.active = data.isActive;
+
     return request<ServiceCategory>(`/admin/service-categories/${id}`, {
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -176,6 +197,7 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      active?: boolean;
       isActive?: boolean;
     },
   ) {
@@ -183,7 +205,12 @@ export const servicesApi = {
       `/admin/services/${serviceId}/delivery-items`,
       {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+          sortOrder: data.sortOrder,
+          active: data.active !== undefined ? data.active : data.isActive,
+        }),
       },
     );
   },
@@ -195,14 +222,22 @@ export const servicesApi = {
       name: string;
       description?: string | null;
       sortOrder?: number;
+      active?: boolean;
       isActive?: boolean;
     }>,
   ) {
+    const payload: Record<string, unknown> = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.description !== undefined) payload.description = data.description;
+    if (data.sortOrder !== undefined) payload.sortOrder = data.sortOrder;
+    if (data.active !== undefined) payload.active = data.active;
+    else if (data.isActive !== undefined) payload.active = data.isActive;
+
     return request<ServiceDeliveryItem>(
       `/admin/services/${serviceId}/delivery-items/${itemId}`,
       {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       },
     );
   },

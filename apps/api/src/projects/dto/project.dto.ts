@@ -29,7 +29,8 @@ export const ProjectServiceStatusSchema = z.enum([
 export const ProjectServiceItemStatusSchema = z.enum([
   'planned',
   'in_progress',
-  'completed',
+  'blocked',
+  'done',
   'cancelled',
 ]);
 
