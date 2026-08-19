@@ -239,27 +239,29 @@ export default function AccountantDashboardPage() {
         </div>
       </div>
 
-      {/* Full-Width Section: Kiểm tra và chốt bảng công */}
-      <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight">
-              Kiểm tra và chốt bảng công
+      {/* Full-Width Section: Chấm công & Kiểm tra ngày công */}
+      <div className="rounded-3xl bg-white border border-[#EDF2F7] p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#5D87FF]" />
+              Chấm công & Quản lý ngày công toàn công ty
             </h3>
-            <p className="text-xs text-[#7C879D] mt-0.5">
-              Đối soát dữ liệu chấm công GPS của toàn bộ nhân sự trước khi tính
-              lương.
+            <p className="text-xs text-[#7C879D]">
+              Điểm danh ca làm việc cá nhân và đối soát dữ liệu chấm công GPS của toàn bộ nhân sự phục vụ tính lương.
             </p>
           </div>
-          <Link href="/app/attendance">
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<Clock className="w-4 h-4" />}
-            >
-              Mở bảng công
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/app/accountant/attendance">
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Clock className="w-4 h-4" />}
+              >
+                Mở bảng chấm công
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
