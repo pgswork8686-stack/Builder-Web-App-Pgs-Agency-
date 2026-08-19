@@ -198,5 +198,45 @@ describe('Business Code Generation and Migration Contracts', () => {
       expect(content).toContain('trg_sync_companion_codes_notifications');
       expect(content).toContain('trg_sync_companion_codes_automation_rules');
     });
+
+    it('verifies 20260819110000_add_additional_business_codes_and_companions.sql exists and adds TDH, HT, LNP codes', () => {
+      const mAdditionalPath = resolve(
+        migrationsDirectory,
+        '20260819110000_add_additional_business_codes_and_companions.sql',
+      );
+      expect(existsSync(mAdditionalPath)).toBe(true);
+      const content = readFileSync(mAdditionalPath, 'utf8');
+
+      // Check entity codes
+      expect(content).toContain('automation_rule_code');
+      expect(content).toContain('conversation_code');
+      expect(content).toContain('leave_type_code');
+
+      // Check companion codes
+      expect(content).toContain('rule_code');
+
+      // Check sequences
+      expect(content).toContain('automation_rules_code_seq');
+      expect(content).toContain('chat_conversations_code_seq');
+      expect(content).toContain('leave_types_code_seq');
+
+      // Check format check constraints
+      expect(content).toContain('check_automation_rule_code_format');
+      expect(content).toContain('check_conversation_code_format');
+      expect(content).toContain('check_leave_type_code_format');
+
+      // Check immutability triggers
+      expect(content).toContain('trg_immutable_automation_rule_code');
+      expect(content).toContain('trg_immutable_chat_conversation_code');
+      expect(content).toContain('trg_immutable_leave_type_code');
+
+      // Check companion triggers
+      expect(content).toContain(
+        'trg_sync_companion_codes_automation_executions',
+      );
+      expect(content).toContain('trg_sync_companion_codes_chat_members');
+      expect(content).toContain('trg_sync_companion_codes_chat_messages');
+      expect(content).toContain('trg_sync_companion_codes_leave_balances');
+    });
   });
 });
