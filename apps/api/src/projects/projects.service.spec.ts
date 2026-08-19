@@ -351,7 +351,8 @@ describe('ProjectsService', () => {
       .mockReturnValueOnce(queryResult({ data: { id: 'service-id' } }))
       .mockReturnValueOnce(
         queryResult({ data: { id: 'assignment-id' } }, 'single'),
-      );
+      )
+      .mockReturnValueOnce(queryResult({ data: [] }));
 
     await expect(
       service.createProjectService(

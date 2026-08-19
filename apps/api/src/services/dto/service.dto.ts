@@ -7,9 +7,12 @@ export const CreateServiceSchema = z
       .trim()
       .min(2)
       .max(40)
-      .transform((value) => value.toUpperCase()),
+      .transform((value) => value.toUpperCase())
+      .optional(),
     name: z.string().trim().min(2).max(160),
     description: z.string().trim().max(5000).nullable().optional(),
+    categoryId: z.string().uuid('Danh mục dịch vụ không hợp lệ').optional(),
+    sortOrder: z.coerce.number().int().min(0).default(0),
     active: z.boolean().default(true),
   })
   .strict();
@@ -27,6 +30,12 @@ export const UpdateServiceSchema = z
       .optional(),
     name: z.string().trim().min(2).max(160).optional(),
     description: z.string().trim().max(5000).nullable().optional(),
+    categoryId: z
+      .string()
+      .uuid('Danh mục dịch vụ không hợp lệ')
+      .nullable()
+      .optional(),
+    sortOrder: z.coerce.number().int().min(0).optional(),
     active: z.boolean().optional(),
   })
   .strict()
@@ -38,6 +47,7 @@ export type UpdateServiceDto = z.infer<typeof UpdateServiceSchema>;
 
 export const ServiceListQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
+  categoryId: z.string().uuid().optional(),
   active: z
     .enum(['true', 'false'])
     .transform((value) => value === 'true')

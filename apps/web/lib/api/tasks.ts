@@ -9,6 +9,8 @@ export interface ProjectTask {
   id: string;
   project_id: string;
   parent_task_id?: string | null;
+  project_service_item_id?: string | null;
+  project_service_item_code?: string | null;
   task_code?: string | null;
   taskCode?: string | null;
   title: string;
@@ -37,6 +39,7 @@ export const tasksApi = {
       priority?: TaskPriority;
       assigneeUserId?: string;
       parentTaskId?: string;
+      projectServiceItemId?: string;
       page?: number;
       pageSize?: number;
     } = {},
@@ -61,6 +64,7 @@ export const tasksApi = {
       priority?: TaskPriority;
       assigneeUserId?: string | null;
       parentTaskId?: string | null;
+      projectServiceItemId?: string | null;
       startDate?: string | null;
       dueDate?: string | null;
       sortOrder?: number;
@@ -81,6 +85,7 @@ export const tasksApi = {
       priority?: TaskPriority;
       assigneeUserId?: string | null;
       parentTaskId?: string | null;
+      projectServiceItemId?: string | null;
       startDate?: string | null;
       dueDate?: string | null;
       sortOrder?: number;

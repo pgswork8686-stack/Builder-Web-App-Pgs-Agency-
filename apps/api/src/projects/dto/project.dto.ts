@@ -26,6 +26,12 @@ export const ProjectServiceStatusSchema = z.enum([
   'completed',
   'cancelled',
 ]);
+export const ProjectServiceItemStatusSchema = z.enum([
+  'planned',
+  'in_progress',
+  'completed',
+  'cancelled',
+]);
 
 const DateSchema = z
   .string()
@@ -175,4 +181,20 @@ export const UpdateProjectServiceSchema = z
 
 export type UpdateProjectServiceDto = z.infer<
   typeof UpdateProjectServiceSchema
+>;
+
+export const UpdateProjectServiceItemSchema = z
+  .object({
+    name: z.string().trim().min(1).max(255).optional(),
+    description: nullableText(5000),
+    status: ProjectServiceItemStatusSchema.optional(),
+    sortOrder: z.coerce.number().int().min(0).optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'PATCH_EMPTY',
+  });
+
+export type UpdateProjectServiceItemDto = z.infer<
+  typeof UpdateProjectServiceItemSchema
 >;

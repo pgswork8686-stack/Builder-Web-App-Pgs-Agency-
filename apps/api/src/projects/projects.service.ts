@@ -623,7 +623,9 @@ export class ProjectsService {
     await this.getProjectRow(projectId);
     const { data, error } = await this.client
       .from('project_services')
-      .select('*, service:services(id,code,name,description,active)')
+      .select(
+        '*, service:services(id,code,service_code,name,description,active), items:project_service_items(*)',
+      )
       .eq('project_id', projectId)
       .order('created_at', { ascending: true });
     if (error) {
@@ -633,7 +635,101 @@ export class ProjectsService {
         error,
       );
     }
+    // Sort items by sort_order
+    (data ?? []).forEach((ps: any) => {
+      if (ps.items && Array.isArray(ps.items)) {
+        ps.items.sort(
+          (a: any, b: any) =>
+            (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+            (a.project_service_item_code ?? '').localeCompare(
+              b.project_service_item_code ?? '',
+            ),
+        );
+      }
+    });
     return data ?? [];
+  }
+
+  async getProjectServiceItems(projectId: string, projectServiceId?: string) {
+    await this.getProjectRow(projectId);
+    let query = this.client
+      .from('project_service_items')
+      .select('*')
+      .eq('project_id', projectId);
+
+    if (projectServiceId) {
+      query = query.eq('project_service_id', projectServiceId);
+    }
+
+    const { data, error } = await query
+      .order('sort_order', { ascending: true })
+      .order('project_service_item_code', { ascending: true });
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEMS_LOOKUP_FAILED',
+        'Không thể truy vấn hạng mục dịch vụ dự án.',
+        error,
+      );
+    }
+    return data ?? [];
+  }
+
+  async updateProjectServiceItem(
+    projectId: string,
+    itemId: string,
+    dto: {
+      name?: string;
+      description?: string | null;
+      status?: 'planned' | 'in_progress' | 'completed' | 'cancelled';
+      sortOrder?: number;
+    },
+    actorUserId: string,
+  ) {
+    await this.getProjectRow(projectId);
+    const { data: existing, error: lookupError } = await this.client
+      .from('project_service_items')
+      .select('*')
+      .eq('project_id', projectId)
+      .eq('id', itemId)
+      .maybeSingle();
+
+    if (lookupError) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_LOOKUP_FAILED',
+        'Không thể kiểm tra hạng mục dự án.',
+        lookupError,
+      );
+    }
+    if (!existing) {
+      throw new NotFoundException({
+        code: 'PROJECT_SERVICE_ITEM_NOT_FOUND',
+        message: 'Không tìm thấy hạng mục dịch vụ dự án.',
+      });
+    }
+
+    const payload: Record<string, unknown> = { updated_by: actorUserId };
+    if (dto.name !== undefined) payload.name = dto.name;
+    if (dto.description !== undefined)
+      payload.description = dto.description ?? null;
+    if (dto.status !== undefined) payload.status = dto.status;
+    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+
+    const { data, error } = await this.client
+      .from('project_service_items')
+      .update(payload)
+      .eq('id', itemId)
+      .select()
+      .single();
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_UPDATE_FAILED',
+        'Không thể cập nhật hạng mục dịch vụ dự án.',
+        error,
+      );
+    }
+    return data;
   }
 
   private async requireService(serviceId: string) {
@@ -697,6 +793,40 @@ export class ProjectsService {
         error,
       );
     }
+
+    // Snapshot active template items into project_service_items
+    const { data: deliveryTemplates } = await this.client
+      .from('service_delivery_items')
+      .select('*')
+      .eq('service_id', dto.serviceId)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
+
+    if (deliveryTemplates && deliveryTemplates.length > 0) {
+      const itemSnapshots = deliveryTemplates.map((template: any) => ({
+        project_service_id: data.id,
+        project_id: projectId,
+        source_delivery_item_id: template.id,
+        name: template.name,
+        description: template.description,
+        sort_order: template.sort_order,
+        status: 'planned',
+        created_by: actorUserId,
+        updated_by: actorUserId,
+      }));
+
+      const { error: snapshotError } = await this.client
+        .from('project_service_items')
+        .insert(itemSnapshots);
+
+      if (snapshotError) {
+        this.logger.error(
+          `Failed to snapshot delivery items for project service ${data.id}: ${snapshotError.message}`,
+        );
+      }
+    }
+
     return data;
   }
 

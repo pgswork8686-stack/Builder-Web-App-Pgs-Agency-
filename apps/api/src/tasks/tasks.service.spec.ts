@@ -742,5 +742,35 @@ describe('TasksService', () => {
         response: { code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER' },
       });
     });
+
+    it('rejects cross-project projectServiceItemId linking on task creation', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'project_service_items')
+          return queryResult({
+            data: { id: 'item-foreign', project_id: OTHER_PROJECT_ID },
+          });
+        return queryResult({});
+      });
+
+      await expect(
+        service.createTask(
+          PROJECT_ID,
+          {
+            title: 'Task with Foreign Delivery Item',
+            status: 'todo',
+            priority: 'medium',
+            projectServiceItemId: 'item-foreign',
+            sortOrder: 0,
+          },
+          user('admin'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'TASK_PROJECT_SERVICE_ITEM_INVALID' },
+      });
+    });
   });
 });

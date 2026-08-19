@@ -267,9 +267,53 @@ export class TasksService {
     }
   }
 
+  private async validateProjectServiceItem(
+    projectId: string,
+    projectServiceItemId?: string | null,
+  ) {
+    if (!projectServiceItemId) return;
+    const { data, error } = await this.client
+      .from('project_service_items')
+      .select('id,project_id')
+      .eq('id', projectServiceItemId)
+      .maybeSingle();
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_LOOKUP_FAILED',
+        'Không thể kiểm tra hạng mục triển khai.',
+        error,
+      );
+    }
+    if (!data) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_NOT_FOUND',
+        message: 'Không tìm thấy hạng mục triển khai dịch vụ.',
+      });
+    }
+    if (data.project_id !== projectId) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_INVALID',
+        message: 'Hạng mục triển khai phải thuộc cùng dự án.',
+      });
+    }
+  }
+
   private mapWriteError(error: any): never {
     const message = error?.message ?? '';
     const code = error?.code ?? '';
+    if (
+      message.includes('TASK_PROJECT_SERVICE_ITEM_INVALID') ||
+      message.includes('Cross-project linking') ||
+      code === 'P3001' ||
+      code === 'P3002'
+    ) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_INVALID',
+        message:
+          'Hạng mục triển khai không hợp lệ hoặc không thuộc cùng dự án.',
+      });
+    }
     if (message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER')) {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
@@ -349,6 +393,8 @@ export class TasksService {
       query = query.eq('assignee_user_id', filters.assigneeUserId);
     if (filters.parentTaskId)
       query = query.eq('parent_task_id', filters.parentTaskId);
+    if (filters.projectServiceItemId)
+      query = query.eq('project_service_item_id', filters.projectServiceItemId);
 
     const { data, count, error } = await query
       .order('sort_order', { ascending: true })
@@ -404,11 +450,18 @@ export class TasksService {
     if (dto.parentTaskId) {
       await this.validateParent(projectId, dto.parentTaskId);
     }
+    if (dto.projectServiceItemId) {
+      await this.validateProjectServiceItem(
+        projectId,
+        dto.projectServiceItemId,
+      );
+    }
     const { data, error } = await this.client
       .from('tasks')
       .insert({
         project_id: projectId,
         parent_task_id: dto.parentTaskId ?? null,
+        project_service_item_id: dto.projectServiceItemId ?? null,
         title: dto.title,
         description: dto.description ?? null,
         status: dto.status,
@@ -476,6 +529,13 @@ export class TasksService {
     if (dto.parentTaskId) {
       await this.validateParent(projectId, dto.parentTaskId, taskId);
     }
+    if (dto.projectServiceItemId !== undefined) {
+      await this.validateProjectServiceItem(
+        projectId,
+        dto.projectServiceItemId,
+      );
+    }
+
     const effectiveStart =
       dto.startDate !== undefined ? dto.startDate : existing.start_date;
     const effectiveDue =
@@ -516,15 +576,28 @@ export class TasksService {
         },
       );
       if (error) this.mapWriteError(error);
-      data = (Array.isArray(statusData) ? statusData[0] : statusData) as Record<
-        string,
-        any
-      > | null;
+
+      if (dto.projectServiceItemId !== undefined) {
+        const { data: itemUpdated, error: itemErr } = await this.client
+          .from('tasks')
+          .update({ project_service_item_id: dto.projectServiceItemId })
+          .eq('id', taskId)
+          .select()
+          .single();
+        if (itemErr) this.mapWriteError(itemErr);
+        if (itemUpdated) data = itemUpdated as Record<string, any>;
+      } else {
+        data = (
+          Array.isArray(statusData) ? statusData[0] : statusData
+        ) as Record<string, any> | null;
+      }
     } else {
       // CASE A: status is NOT provided, perform normal tasks table update
       const payload: Record<string, unknown> = { updated_by: user.profileId };
       if (dto.parentTaskId !== undefined)
         payload.parent_task_id = dto.parentTaskId;
+      if (dto.projectServiceItemId !== undefined)
+        payload.project_service_item_id = dto.projectServiceItemId;
       if (dto.title !== undefined) payload.title = dto.title;
       if (dto.description !== undefined)
         payload.description = dto.description ?? null;

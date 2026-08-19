@@ -2,46 +2,126 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Pencil, Plus, Search, Wrench } from "lucide-react";
-import { servicesApi, type ServiceCatalogItem } from "@/lib/api/services";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  FolderKanban,
+  Layers,
+  ListOrdered,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Wrench,
+} from "lucide-react";
+import {
+  servicesApi,
+  type ServiceCatalogItem,
+  type ServiceCategory,
+  type ServiceDeliveryItem,
+} from "@/lib/api/services";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui/table";
 
-const emptyForm = {
+const emptyServiceForm = {
   code: "",
   name: "",
   description: "",
+  categoryId: "",
+  sortOrder: 0,
   active: true,
 };
 
+const emptyCategoryForm = {
+  code: "",
+  name: "",
+  description: "",
+  sortOrder: 0,
+  isActive: true,
+};
+
+const emptyItemForm = {
+  name: "",
+  description: "",
+  sortOrder: 0,
+  isActive: true,
+};
+
 export function ServiceCatalogView() {
-  const [items, setItems] = useState<ServiceCatalogItem[]>([]);
+  const [activeTab, setActiveTab] = useState<"services" | "categories">(
+    "services",
+  );
+
+  // Categories state
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [categoryForm, setCategoryForm] = useState(emptyCategoryForm);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null,
+  );
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+  // Services state
+  const [services, setServices] = useState<ServiceCatalogItem[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [q, setQ] = useState("");
-  const [active, setActive] = useState<"" | "true" | "false">("");
-  const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<"" | "true" | "false">("");
+
+  const [serviceForm, setServiceForm] = useState(emptyServiceForm);
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+
+  // Delivery items modal state
+  const [activeServiceForItems, setActiveServiceForItems] =
+    useState<ServiceCatalogItem | null>(null);
+  const [deliveryItems, setDeliveryItems] = useState<ServiceDeliveryItem[]>([]);
+  const [loadingItems, setLoadingItems] = useState(false);
+  const [itemForm, setItemForm] = useState(emptyItemForm);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [showItemForm, setShowItemForm] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  // Load Categories
+  const loadCategories = useCallback(async () => {
+    try {
+      const data = await servicesApi.listCategories();
+      setCategories(data);
+    } catch (err: any) {
+      console.error("Failed to load service categories:", err);
+    }
+  }, []);
+
+  // Load Services
+  const loadServices = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const result = await servicesApi.list({
         q: q || undefined,
-        active: active ? active === "true" : undefined,
+        categoryId: selectedCategoryId || undefined,
+        active: activeFilter ? activeFilter === "true" : undefined,
         page,
-        pageSize: 20,
+        pageSize: 50,
       });
-      setItems(result.items);
+      setServices(result.items);
       setTotal(result.total);
       setTotalPages(result.totalPages);
     } catch (caught) {
@@ -53,208 +133,576 @@ export function ServiceCatalogView() {
     } finally {
       setLoading(false);
     }
-  }, [active, page, q]);
+  }, [activeFilter, page, q, selectedCategoryId]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => void load(), 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [load]);
+    loadCategories();
+  }, [loadCategories]);
 
-  const resetForm = () => {
-    setForm(emptyForm);
-    setEditingId(null);
-    setShowForm(false);
+  useEffect(() => {
+    if (activeTab === "services") {
+      loadServices();
+    }
+  }, [activeTab, loadServices]);
+
+  // Delivery Items loader
+  const openDeliveryItemsModal = async (service: ServiceCatalogItem) => {
+    setActiveServiceForItems(service);
+    setLoadingItems(true);
+    setShowItemForm(false);
+    setItemForm(emptyItemForm);
+    setEditingItemId(null);
+    try {
+      const items = await servicesApi.listDeliveryItems(service.id);
+      setDeliveryItems(items);
+    } catch (err: any) {
+      console.error("Failed to load delivery items:", err);
+    } finally {
+      setLoadingItems(false);
+    }
   };
 
-  const startEdit = (service: ServiceCatalogItem) => {
-    setEditingId(service.id);
-    setForm({
-      code: service.code,
-      name: service.name,
-      description: service.description ?? "",
-      active: service.active,
-    });
-    setShowForm(true);
-  };
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  // Category CRUD
+  const handleSaveCategory = async (e: FormEvent) => {
+    e.preventDefault();
     setSaving(true);
     setError(null);
     try {
-      const payload = {
-        code: form.code.trim(),
-        name: form.name.trim(),
-        description: form.description.trim() || undefined,
-        active: form.active,
-      };
-      if (editingId) {
-        await servicesApi.update(editingId, payload);
+      if (editingCategoryId) {
+        await servicesApi.updateCategory(editingCategoryId, {
+          name: categoryForm.name.trim(),
+          description: categoryForm.description?.trim() || null,
+          sortOrder: categoryForm.sortOrder,
+          isActive: categoryForm.isActive,
+        });
       } else {
-        await servicesApi.create(payload);
+        await servicesApi.createCategory({
+          code: categoryForm.code.trim().toUpperCase(),
+          name: categoryForm.name.trim(),
+          description: categoryForm.description?.trim() || null,
+          sortOrder: categoryForm.sortOrder,
+          isActive: categoryForm.isActive,
+        });
       }
-      resetForm();
-      await load();
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Không thể lưu dịch vụ. Vui lòng kiểm tra lại mã dịch vụ.",
-      );
+      setShowCategoryModal(false);
+      setEditingCategoryId(null);
+      setCategoryForm(emptyCategoryForm);
+      await loadCategories();
+    } catch (err: any) {
+      setError(err.message || "Không thể lưu nhóm dịch vụ.");
     } finally {
       setSaving(false);
     }
   };
 
-  const toggleActive = async (service: ServiceCatalogItem) => {
+  // Service CRUD
+  const handleSaveService = async (e: FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
     setError(null);
     try {
-      await servicesApi.update(service.id, { active: !service.active });
-      await load();
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Không thể đổi trạng thái dịch vụ.",
+      const payload = {
+        name: serviceForm.name.trim(),
+        description: serviceForm.description?.trim() || null,
+        categoryId: serviceForm.categoryId || undefined,
+        sortOrder: serviceForm.sortOrder,
+        active: serviceForm.active,
+      };
+      if (editingServiceId) {
+        await servicesApi.update(editingServiceId, payload);
+      } else {
+        await servicesApi.create({
+          ...payload,
+          code: serviceForm.code.trim().toUpperCase() || undefined,
+        });
+      }
+      setShowServiceModal(false);
+      setEditingServiceId(null);
+      setServiceForm(emptyServiceForm);
+      await loadServices();
+    } catch (err: any) {
+      setError(err.message || "Không thể lưu dịch vụ.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Delivery Item CRUD
+  const handleSaveItem = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!activeServiceForItems) return;
+    setSaving(true);
+    try {
+      if (editingItemId) {
+        await servicesApi.updateDeliveryItem(
+          activeServiceForItems.id,
+          editingItemId,
+          {
+            name: itemForm.name.trim(),
+            description: itemForm.description?.trim() || null,
+            sortOrder: itemForm.sortOrder,
+            isActive: itemForm.isActive,
+          },
+        );
+      } else {
+        await servicesApi.createDeliveryItem(activeServiceForItems.id, {
+          name: itemForm.name.trim(),
+          description: itemForm.description?.trim() || null,
+          sortOrder: itemForm.sortOrder,
+          isActive: itemForm.isActive,
+        });
+      }
+      setShowItemForm(false);
+      setEditingItemId(null);
+      setItemForm(emptyItemForm);
+      const items = await servicesApi.listDeliveryItems(
+        activeServiceForItems.id,
       );
+      setDeliveryItems(items);
+    } catch (err: any) {
+      alert(err.message || "Không thể lưu hạng mục.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!activeServiceForItems) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa/ngưng kích hoạt hạng mục này?"))
+      return;
+    try {
+      await servicesApi.deleteDeliveryItem(activeServiceForItems.id, itemId);
+      const items = await servicesApi.listDeliveryItems(
+        activeServiceForItems.id,
+      );
+      setDeliveryItems(items);
+    } catch (err: any) {
+      alert(err.message || "Không thể xóa hạng mục.");
     }
   };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <SectionHeader
-        title="Danh mục Dịch vụ"
-        description="Quản lý các gói và dịch vụ chuẩn hóa được sử dụng trong hợp đồng và báo giá."
-        badge={`${total} Dịch vụ`}
+        title="Quản Lý Dịch Vụ & Hạng Mục Triển Khai"
+        description="Quản trị 6 nhóm dịch vụ, 26 dịch vụ chuẩn và danh mục hạng mục triển khai mẫu."
+        badge={`${categories.length} Nhóm | ${total} Dịch vụ`}
         action={
           <div className="flex items-center gap-3">
             <Link href="/app/admin">
               <Button
                 variant="secondary"
                 size="sm"
-                leftIcon={<ArrowLeft className="h-4 w-4" />}
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
               >
-                Quay lại
+                Quản trị
               </Button>
             </Link>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setEditingId(null);
-                setForm(emptyForm);
-                setShowForm((value) => !value);
-              }}
-              leftIcon={<Plus className="h-4 w-4" />}
-            >
-              Thêm dịch vụ
-            </Button>
+            {activeTab === "categories" ? (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setEditingCategoryId(null);
+                  setCategoryForm(emptyCategoryForm);
+                  setShowCategoryModal(true);
+                }}
+                leftIcon={<Plus className="w-4 h-4" />}
+              >
+                Thêm nhóm dịch vụ
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setEditingServiceId(null);
+                  setServiceForm(emptyServiceForm);
+                  setShowServiceModal(true);
+                }}
+                leftIcon={<Plus className="w-4 h-4" />}
+              >
+                Thêm dịch vụ mới
+              </Button>
+            )}
           </div>
         }
       />
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
-          <input
-            value={q}
-            onChange={(event) => setQ(event.target.value)}
-            placeholder="Tìm theo mã hoặc tên dịch vụ..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-          />
-        </div>
-        <select
-          value={active}
-          onChange={(event) =>
-            setActive(event.target.value as "" | "true" | "false")
-          }
-          className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+      {/* Tabs */}
+      <div className="flex items-center gap-2 border-b border-[#E2E8F0]">
+        <button
+          onClick={() => setActiveTab("services")}
+          className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === "services"
+              ? "border-[#4F75FF] text-[#4F75FF]"
+              : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+          }`}
         >
-          <option value="">-- Mọi trạng thái --</option>
-          <option value="true">Đang hoạt động</option>
-          <option value="false">Đã tắt</option>
-        </select>
+          <Layers className="w-4 h-4" />
+          Danh mục dịch vụ ({total})
+        </button>
+        <button
+          onClick={() => setActiveTab("categories")}
+          className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === "categories"
+              ? "border-[#4F75FF] text-[#4F75FF]"
+              : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+          }`}
+        >
+          <FolderKanban className="w-4 h-4" />
+          Nhóm dịch vụ ({categories.length})
+        </button>
       </div>
 
-      {showForm && (
-        <Card className="p-6">
-          <h3 className="font-extrabold text-[#0F172A] text-sm mb-4">
-            {editingId ? "Cập nhật dịch vụ" : "Thêm dịch vụ mới"}
-          </h3>
-          <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="block text-xs font-semibold text-[#64748B] mb-1">
-                Mã dịch vụ *
-              </label>
-              <input
-                required
-                minLength={2}
-                maxLength={40}
-                value={form.code}
-                onChange={(event) =>
-                  setForm({ ...form, code: event.target.value.toUpperCase() })
-                }
-                placeholder="VD: SEO-AUDIT"
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
-              />
-            </div>
+      {error ? (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center justify-between">
+          <span>{error}</span>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={activeTab === "services" ? loadServices : loadCategories}
+          >
+            Thử lại
+          </Button>
+        </div>
+      ) : null}
 
+      {/* TAB 1: SERVICES */}
+      {activeTab === "services" && (
+        <div className="space-y-4">
+          {/* Filters Bar */}
+          <Card className="p-3 bg-white border border-[#E2E8F0] shadow-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[240px]">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                <input
+                  type="text"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Tìm kiếm dịch vụ theo tên, mã..."
+                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none focus:border-[#4F75FF] focus:bg-white"
+                />
+              </div>
+
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="py-1.5 px-3 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+              >
+                <option value="">Tất cả nhóm dịch vụ</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.serviceCategoryCode}: {cat.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={activeFilter}
+                onChange={(e) => setActiveFilter(e.target.value as any)}
+                className="py-1.5 px-3 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+              >
+                <option value="">Tất cả trạng thái</option>
+                <option value="true">Đang hoạt động</option>
+                <option value="false">Tạm ngưng</option>
+              </select>
+            </div>
+          </Card>
+
+          {/* Services Table */}
+          <Card className="p-0 overflow-hidden">
+            {loading ? (
+              <div className="py-20 text-center text-xs text-[#64748B]">
+                Đang tải danh mục dịch vụ...
+              </div>
+            ) : services.length === 0 ? (
+              <EmptyState
+                icon={<Wrench className="w-8 h-8 text-[#4F75FF]" />}
+                title="Chưa có dịch vụ nào"
+                description="Thêm dịch vụ đầu tiên để bắt đầu triển khai cho các dự án."
+                actionLabel="Thêm dịch vụ"
+                onAction={() => {
+                  setEditingServiceId(null);
+                  setServiceForm(emptyServiceForm);
+                  setShowServiceModal(true);
+                }}
+              />
+            ) : (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>Mã DV</TableHeaderCell>
+                      <TableHeaderCell>Tên dịch vụ</TableHeaderCell>
+                      <TableHeaderCell>Nhóm dịch vụ</TableHeaderCell>
+                      <TableHeaderCell>Hạng mục chuẩn</TableHeaderCell>
+                      <TableHeaderCell>Trạng thái</TableHeaderCell>
+                      <TableHeaderCell className="text-right">
+                        Thao tác
+                      </TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {services.map((svc) => (
+                      <TableRow key={svc.id}>
+                        <TableCell className="font-mono font-bold text-[#4F75FF]">
+                          {svc.service_code || svc.serviceCode || svc.code}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-semibold text-[#0F172A]">
+                            {svc.name}
+                          </div>
+                          {svc.description && (
+                            <div className="text-xs text-[#64748B] line-clamp-1 max-w-sm">
+                              {svc.description}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {svc.category ? (
+                            <Badge variant="default" size="sm">
+                              {svc.category.service_category_code ||
+                                svc.category.code}
+                              : {svc.category.name}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-[#94A3B8]">
+                              Chưa gán
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openDeliveryItemsModal(svc)}
+                            leftIcon={<ListOrdered className="w-3.5 h-3.5" />}
+                          >
+                            Hạng mục (
+                            {svc.delivery_items ? svc.delivery_items.length : 0}
+                            )
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={svc.active ? "success" : "default"}
+                            size="sm"
+                          >
+                            {svc.active ? "Đang hoạt động" : "Tạm ngưng"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingServiceId(svc.id);
+                              setServiceForm({
+                                code: svc.code,
+                                name: svc.name,
+                                description: svc.description ?? "",
+                                categoryId: svc.service_category_id ?? "",
+                                sortOrder: svc.sort_order ?? 0,
+                                active: svc.active,
+                              });
+                              setShowServiceModal(true);
+                            }}
+                            leftIcon={<Pencil className="w-3.5 h-3.5" />}
+                          >
+                            Sửa
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {/* TAB 2: CATEGORIES */}
+      {activeTab === "categories" && (
+        <Card className="p-0 overflow-hidden">
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>Mã nhóm (NHDV)</TableHeaderCell>
+                  <TableHeaderCell>Mã định danh</TableHeaderCell>
+                  <TableHeaderCell>Tên nhóm dịch vụ</TableHeaderCell>
+                  <TableHeaderCell>Số dịch vụ trực thuộc</TableHeaderCell>
+                  <TableHeaderCell>Thứ tự</TableHeaderCell>
+                  <TableHeaderCell>Trạng thái</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Thao tác
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {categories.map((cat) => (
+                  <TableRow key={cat.id}>
+                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      {cat.serviceCategoryCode}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
+                      {cat.code}
+                    </TableCell>
+                    <TableCell className="font-bold text-[#0F172A]">
+                      {cat.name}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="blue" size="sm">
+                        {cat.servicesCount ?? 0} dịch vụ
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs font-mono text-[#64748B]">
+                      {cat.sortOrder}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={cat.isActive ? "success" : "default"}
+                        size="sm"
+                      >
+                        {cat.isActive ? "Đang hoạt động" : "Tạm ngưng"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingCategoryId(cat.id);
+                          setCategoryForm({
+                            code: cat.code,
+                            name: cat.name,
+                            description: cat.description ?? "",
+                            sortOrder: cat.sortOrder,
+                            isActive: cat.isActive,
+                          });
+                          setShowCategoryModal(true);
+                        }}
+                        leftIcon={<Pencil className="w-3.5 h-3.5" />}
+                      >
+                        Sửa
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Card>
+      )}
+
+      {/* Modal: Service Form */}
+      {showServiceModal && (
+        <Dialog
+          isOpen={showServiceModal}
+          onClose={() => setShowServiceModal(false)}
+          maxWidth="md"
+          title={editingServiceId ? "Chỉnh sửa dịch vụ" : "Tạo dịch vụ mới"}
+          description="Thiết lập thông tin dịch vụ và liên kết với Nhóm dịch vụ phù hợp."
+        >
+          <form onSubmit={handleSaveService} className="space-y-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                 Tên dịch vụ *
               </label>
               <input
+                type="text"
                 required
-                minLength={2}
-                maxLength={160}
-                value={form.name}
-                onChange={(event) =>
-                  setForm({ ...form, name: event.target.value })
+                value={serviceForm.name}
+                onChange={(e) =>
+                  setServiceForm({ ...serviceForm, name: e.target.value })
                 }
-                placeholder="VD: Dịch vụ Audit & Tối ưu SEO Onpage"
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                placeholder="VD: Thiết kế Website, Google Ads..."
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-[#64748B] mb-1">
-                Mô tả chi tiết
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Nhóm dịch vụ (Category)
+              </label>
+              <select
+                value={serviceForm.categoryId}
+                onChange={(e) =>
+                  setServiceForm({ ...serviceForm, categoryId: e.target.value })
+                }
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chọn nhóm dịch vụ --</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.serviceCategoryCode}: {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mã kỹ thuật (Tùy chọn)
+              </label>
+              <input
+                type="text"
+                value={serviceForm.code}
+                onChange={(e) =>
+                  setServiceForm({
+                    ...serviceForm,
+                    code: e.target.value.toUpperCase(),
+                  })
+                }
+                placeholder="VD: WEB_DESIGN (Hệ thống tự sinh DV_XX)"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mô tả dịch vụ
               </label>
               <textarea
-                maxLength={5000}
-                value={form.description}
-                onChange={(event) =>
-                  setForm({ ...form, description: event.target.value })
+                rows={3}
+                value={serviceForm.description}
+                onChange={(e) =>
+                  setServiceForm({
+                    ...serviceForm,
+                    description: e.target.value,
+                  })
                 }
-                placeholder="Mô tả phạm vi thực hiện và deliverable..."
-                className="min-h-24 w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                placeholder="Mô tả phạm vi, quy cách cung cấp dịch vụ..."
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
-            <div className="flex items-center gap-2 md:col-span-2">
-              <input
-                type="checkbox"
-                id="formServiceActive"
-                checked={form.active}
-                onChange={(event) =>
-                  setForm({ ...form, active: event.target.checked })
-                }
-                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
-              />
-              <label
-                htmlFor="formServiceActive"
-                className="text-xs text-[#0F172A] cursor-pointer select-none"
-              >
-                Đang kích hoạt sử dụng
+            <div className="flex items-center gap-4 pt-1">
+              <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={serviceForm.active}
+                  onChange={(e) =>
+                    setServiceForm({
+                      ...serviceForm,
+                      active: e.target.checked,
+                    })
+                  }
+                  className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+                />
+                Dịch vụ đang hoạt động
               </label>
             </div>
 
-            <div className="flex justify-end gap-2 md:col-span-2 pt-2 border-t border-[#EDF2F7]">
+            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={resetForm}
+                onClick={() => setShowServiceModal(false)}
               >
                 Hủy
               </Button>
@@ -265,106 +713,277 @@ export function ServiceCatalogView() {
                 disabled={saving}
                 isLoading={saving}
               >
-                {editingId ? "Lưu thay đổi" : "Tạo dịch vụ"}
+                Lưu dịch vụ
               </Button>
             </div>
           </form>
-        </Card>
+        </Dialog>
       )}
 
-      {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-          {error}
-        </div>
-      )}
+      {/* Modal: Category Form */}
+      {showCategoryModal && (
+        <Dialog
+          isOpen={showCategoryModal}
+          onClose={() => setShowCategoryModal(false)}
+          maxWidth="md"
+          title={
+            editingCategoryId
+              ? "Chỉnh sửa nhóm dịch vụ"
+              : "Tạo nhóm dịch vụ mới"
+          }
+          description="Thiết lập nhóm dịch vụ chuẩn để phân loại các dịch vụ trong hệ thống."
+        >
+          <form onSubmit={handleSaveCategory} className="space-y-4 pt-2">
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mã nhóm (Code) *
+              </label>
+              <input
+                type="text"
+                required
+                disabled={!!editingCategoryId}
+                value={categoryForm.code}
+                onChange={(e) =>
+                  setCategoryForm({
+                    ...categoryForm,
+                    code: e.target.value.toUpperCase(),
+                  })
+                }
+                placeholder="VD: WEBSITE_SEO, PERFORMANCE..."
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+              />
+            </div>
 
-      <Card className="p-6 space-y-4">
-        {loading ? (
-          <p className="p-8 text-center text-xs text-[#64748B]">Đang tải…</p>
-        ) : items.length === 0 ? (
-          <EmptyState
-            icon={<Wrench className="w-8 h-8 text-[#4F75FF]" />}
-            title="Chưa có dịch vụ phù hợp"
-            description="Chưa tìm thấy dịch vụ nào theo tiêu chí lọc."
-          />
-        ) : (
-          <div className="divide-y divide-[#EDF2F7]">
-            {items.map((service) => (
-              <article
-                key={service.id}
-                className="grid gap-4 py-4 first:pt-0 last:pb-0 md:grid-cols-[1fr_auto] md:items-center"
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Tên nhóm dịch vụ *
+              </label>
+              <input
+                type="text"
+                required
+                value={categoryForm.name}
+                onChange={(e) =>
+                  setCategoryForm({ ...categoryForm, name: e.target.value })
+                }
+                placeholder="VD: Website & SEO"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mô tả nhóm
+              </label>
+              <textarea
+                rows={3}
+                value={categoryForm.description}
+                onChange={(e) =>
+                  setCategoryForm({
+                    ...categoryForm,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Mô tả phạm vi nhóm dịch vụ..."
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+              />
+            </div>
+
+            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowCategoryModal(false)}
               >
-                <div className="flex gap-3">
-                  <div className="mt-1 rounded-xl bg-[#EEF2FF] p-2.5 text-[#4F75FF] shrink-0 h-fit">
-                    <Wrench className="h-4 w-4" />
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={saving}
+                isLoading={saving}
+              >
+                Lưu nhóm dịch vụ
+              </Button>
+            </div>
+          </form>
+        </Dialog>
+      )}
+
+      {/* Modal: Service Delivery Items (Hạng mục chuẩn) */}
+      {activeServiceForItems && (
+        <Dialog
+          isOpen={!!activeServiceForItems}
+          onClose={() => setActiveServiceForItems(null)}
+          maxWidth="lg"
+          title={`Hạng mục triển khai chuẩn: ${activeServiceForItems.name}`}
+          description={`Các hạng mục mẫu sẽ tự động được sao chép sang dự án khi dịch vụ (${activeServiceForItems.service_code || activeServiceForItems.code}) được gán vào dự án.`}
+        >
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#64748B]">
+                Danh sách hạng mục ({deliveryItems.length})
+              </span>
+              {!showItemForm && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    setEditingItemId(null);
+                    setItemForm(emptyItemForm);
+                    setShowItemForm(true);
+                  }}
+                  leftIcon={<Plus className="w-3.5 h-3.5" />}
+                >
+                  Thêm hạng mục mẫu
+                </Button>
+              )}
+            </div>
+
+            {/* Inline Add / Edit Form */}
+            {showItemForm && (
+              <Card className="p-4 bg-[#F8FAFC] border border-[#CBD5E1]">
+                <form onSubmit={handleSaveItem} className="space-y-3">
+                  <div className="font-semibold text-xs text-[#0F172A]">
+                    {editingItemId
+                      ? "Chỉnh sửa hạng mục mẫu"
+                      : "Thêm hạng mục triển khai mẫu"}
                   </div>
                   <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-[#4F75FF]">
-                        {service.code}
-                      </span>
-                      <Badge
-                        variant={service.active ? "success" : "default"}
-                        size="sm"
-                      >
-                        {service.active ? "Hoạt động" : "Đã tắt"}
-                      </Badge>
-                    </div>
-                    <h4 className="font-bold text-[#0F172A] text-sm mt-0.5">
-                      {service.name}
-                    </h4>
-                    <p className="mt-0.5 text-xs text-[#64748B]">
-                      {service.description || "Chưa có mô tả."}
-                    </p>
+                    <label className="block text-xs text-[#64748B] mb-1">
+                      Tên hạng mục *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={itemForm.name}
+                      onChange={(e) =>
+                        setItemForm({ ...itemForm, name: e.target.value })
+                      }
+                      placeholder="VD: Khảo sát yêu cầu, Thiết kế wireframe..."
+                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
+                    />
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => startEdit(service)}
-                    leftIcon={<Pencil className="h-3.5 w-3.5" />}
-                  >
-                    Sửa
-                  </Button>
-                  <Button
-                    variant={service.active ? "secondary" : "primary"}
-                    size="sm"
-                    onClick={() => void toggleActive(service)}
-                  >
-                    {service.active ? "Tắt" : "Bật"}
-                  </Button>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+                  <div>
+                    <label className="block text-xs text-[#64748B] mb-1">
+                      Mô tả / Hướng dẫn triển khai
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={itemForm.description}
+                      onChange={(e) =>
+                        setItemForm({
+                          ...itemForm,
+                          description: e.target.value,
+                        })
+                      }
+                      placeholder="Nội dung, tiêu chuẩn đầu ra của hạng mục..."
+                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF] resize-none"
+                    />
+                  </div>
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setShowItemForm(false)}
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="sm"
+                      disabled={saving}
+                      isLoading={saving}
+                    >
+                      Lưu hạng mục
+                    </Button>
+                  </div>
+                </form>
+              </Card>
+            )}
 
-        <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
-          <span>{total} dịch vụ</span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Trước
-            </Button>
-            <span className="font-bold text-[#0F172A]">
-              Trang {page} / {Math.max(1, totalPages)}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage((value) => value + 1)}
-            >
-              Sau
-            </Button>
+            {/* Delivery Items List */}
+            {loadingItems ? (
+              <div className="py-8 text-center text-xs text-[#64748B]">
+                Đang tải hạng mục...
+              </div>
+            ) : deliveryItems.length === 0 ? (
+              <div className="py-8 text-center text-xs text-[#64748B] bg-[#F8FAFC] rounded-xl border border-dashed border-[#CBD5E1]">
+                Chưa có hạng mục mẫu nào cho dịch vụ này.
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                {deliveryItems.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className="p-3 bg-white rounded-xl border border-[#E2E8F0] flex items-center justify-between hover:border-[#CBD5E1] transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-[#0F172A]">
+                            {item.name}
+                          </span>
+                          <span className="font-mono text-[10px] text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">
+                            {item.delivery_item_code}
+                          </span>
+                        </div>
+                        {item.description && (
+                          <div className="text-xs text-[#64748B] mt-0.5">
+                            {item.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingItemId(item.id);
+                          setItemForm({
+                            name: item.name,
+                            description: item.description ?? "",
+                            sortOrder: item.sort_order,
+                            isActive: item.is_active,
+                          });
+                          setShowItemForm(true);
+                        }}
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#64748B]" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteItem(item.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-[#EDF2F7] pt-3 flex justify-end">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setActiveServiceForItems(null)}
+              >
+                Đóng
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Dialog>
+      )}
     </div>
   );
 }

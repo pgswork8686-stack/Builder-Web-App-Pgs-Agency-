@@ -187,6 +187,46 @@ export class ProjectsController {
     );
   }
 
+  @Get('projects/:projectId/service-items')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectServiceItems(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Query('projectServiceId') projectServiceId?: string,
+  ) {
+    return this.projectsService.getProjectServiceItems(
+      projectId,
+      projectServiceId,
+    );
+  }
+
+  @Get('projects/:projectId/services/:projectServiceId/items')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectServiceItemsByService(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('projectServiceId', ParseUUIDPipe) projectServiceId: string,
+  ) {
+    return this.projectsService.getProjectServiceItems(
+      projectId,
+      projectServiceId,
+    );
+  }
+
+  @Patch('projects/:projectId/service-items/:itemId')
+  @Roles('admin', 'team_leader', 'employee')
+  async updateProjectServiceItem(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Body() body: unknown,
+    @CurrentUser('profileId') actorUserId: string,
+  ) {
+    return this.projectsService.updateProjectServiceItem(
+      projectId,
+      itemId,
+      body as any,
+      actorUserId,
+    );
+  }
+
   @Get('projects')
   @Roles('team_leader', 'employee', 'accountant')
   async getInternalProjects(

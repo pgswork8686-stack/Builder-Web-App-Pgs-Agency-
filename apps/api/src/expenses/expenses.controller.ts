@@ -29,10 +29,7 @@ export class ExpensesController {
 
   @Get()
   @Roles('admin', 'accountant', 'team_leader', 'employee')
-  async list(
-    @Query() rawQuery: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async list(@Query() rawQuery: unknown, @CurrentUser() user: RequestUser) {
     const result = ExpenseQuerySchema.safeParse(rawQuery);
     if (!result.success) {
       throw new BadRequestException(
@@ -53,10 +50,7 @@ export class ExpensesController {
 
   @Post()
   @Roles('admin', 'accountant', 'team_leader', 'employee')
-  async create(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async create(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = CreateExpenseSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(

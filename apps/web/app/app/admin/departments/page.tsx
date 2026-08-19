@@ -9,8 +9,14 @@ import {
   Loader2,
   Edit3,
   AlertTriangle,
+  UserCheck,
+  UserX,
 } from "lucide-react";
-import { organizationApi } from "../../../../lib/api/organization";
+import {
+  organizationApi,
+  type Department,
+} from "../../../../lib/api/organization";
+import { peopleApi } from "../../../../lib/api/people";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,17 +33,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface Department {
+interface EmployeeOption {
   id: string;
-  code: string;
-  name: string;
-  description: string | null;
-  is_active: boolean;
-  created_at: string;
+  fullName: string;
+  email: string;
+  employeeCode?: string;
+  role: string;
 }
 
 export default function AdminDepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,18 +52,37 @@ export default function AdminDepartmentsPage() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [headUserId, setHeadUserId] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Edit states
   const [editingDept, setEditingDept] = useState<Department | null>(null);
+  const [editHeadUserId, setEditHeadUserId] = useState<string>("");
 
-  const fetchDepts = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await organizationApi.getDepartments();
-      setDepartments(data);
+      const [deptsData, peopleData] = await Promise.all([
+        organizationApi.getDepartments(),
+        peopleApi
+          .getPeopleDirectory({ pageSize: 100 })
+          .catch(() => ({ items: [] })),
+      ]);
+      setDepartments(deptsData);
+
+      // Filter only internal employees
+      const internalStaff = (peopleData.items || [])
+        .filter((p: any) => p.role !== "client")
+        .map((p: any) => ({
+          id: p.id,
+          fullName: p.fullName || p.full_name || "Nhân viên",
+          email: p.email,
+          employeeCode: p.employeeCode || p.employee_code,
+          role: p.role,
+        }));
+      setEmployees(internalStaff);
     } catch (err: any) {
       setError(err.message || "Không thể tải danh sách phòng ban");
     } finally {
@@ -66,7 +91,7 @@ export default function AdminDepartmentsPage() {
   };
 
   useEffect(() => {
-    fetchDepts();
+    fetchData();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -88,12 +113,14 @@ export default function AdminDepartmentsPage() {
         code: code.trim().toUpperCase(),
         name: name.trim(),
         description: description.trim() || undefined,
+        headUserId: headUserId || null,
       });
       setDepartments((prev) => [...prev, newDept]);
       setShowAddForm(false);
       setCode("");
       setName("");
       setDescription("");
+      setHeadUserId("");
     } catch (err: any) {
       setFormError(err.message || "Tạo phòng ban thất bại");
     } finally {
@@ -104,16 +131,20 @@ export default function AdminDepartmentsPage() {
   const handleUpdateStatus = async (dept: Department) => {
     try {
       const updated = await organizationApi.updateDepartment(dept.id, {
-        isActive: !dept.is_active,
+        isActive: !dept.isActive,
       });
       setDepartments((prev) =>
-        prev.map((d) =>
-          d.id === dept.id ? { ...d, is_active: updated.is_active } : d,
-        ),
+        prev.map((d) => (d.id === dept.id ? updated : d)),
       );
     } catch (err: any) {
       alert(err.message || "Thay đổi trạng thái thất bại");
     }
+  };
+
+  const openEditModal = (dept: Department) => {
+    setEditingDept(dept);
+    setEditHeadUserId(dept.headUserId || "");
+    setFormError(null);
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -134,7 +165,8 @@ export default function AdminDepartmentsPage() {
       const updated = await organizationApi.updateDepartment(editingDept.id, {
         name: editingDept.name.trim(),
         description: editingDept.description?.trim() || null,
-        isActive: editingDept.is_active,
+        headUserId: editHeadUserId || null,
+        isActive: editingDept.isActive,
       });
       setDepartments((prev) =>
         prev.map((d) => (d.id === updated.id ? updated : d)),
@@ -151,8 +183,8 @@ export default function AdminDepartmentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Quản Lý Phòng Ban"
-        description="Quản trị cơ cấu phòng ban và mã định danh tổ chức."
+        title="Cơ Cấu Phòng Ban & Trưởng Phòng"
+        description="Quản trị 9 phòng ban chính thức của PGS Agency và bổ nhiệm Trưởng phòng."
         badge={`${departments.length} Phòng ban`}
         action={
           <div className="flex items-center gap-3">
@@ -170,6 +202,7 @@ export default function AdminDepartmentsPage() {
               size="sm"
               onClick={() => {
                 setEditingDept(null);
+                setHeadUserId("");
                 setShowAddForm(true);
               }}
               leftIcon={<Plus className="w-4 h-4" />}
@@ -186,7 +219,7 @@ export default function AdminDepartmentsPage() {
             <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
             <span>{error}</span>
           </div>
-          <Button variant="danger" size="sm" onClick={fetchDepts}>
+          <Button variant="danger" size="sm" onClick={fetchData}>
             Thử lại
           </Button>
         </div>
@@ -214,11 +247,14 @@ export default function AdminDepartmentsPage() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell>Mã phòng ban</TableHeaderCell>
+                  <TableHeaderCell>Mã PB</TableHeaderCell>
+                  <TableHeaderCell>Mã định danh</TableHeaderCell>
                   <TableHeaderCell>Tên phòng ban</TableHeaderCell>
-                  <TableHeaderCell>Mô tả nhiệm vụ</TableHeaderCell>
+                  <TableHeaderCell>
+                    Trưởng phòng (Department Head)
+                  </TableHeaderCell>
+                  <TableHeaderCell>Mô tả chức năng</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
-                  <TableHeaderCell>Ngày tạo</TableHeaderCell>
                   <TableHeaderCell className="text-right">
                     Thao tác
                   </TableHeaderCell>
@@ -228,10 +264,36 @@ export default function AdminDepartmentsPage() {
                 {departments.map((dept) => (
                   <TableRow key={dept.id}>
                     <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      {dept.departmentCode}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
                       {dept.code}
                     </TableCell>
                     <TableCell className="font-bold text-[#0F172A]">
                       {dept.name}
+                    </TableCell>
+                    <TableCell>
+                      {dept.head ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] flex items-center justify-center font-bold text-xs">
+                            {dept.head.fullName.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-xs text-[#0F172A]">
+                              {dept.head.fullName}
+                            </div>
+                            <div className="text-[10px] text-[#64748B] font-mono">
+                              {dept.headUserCode ||
+                                dept.head.employeeCode ||
+                                dept.head.email}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <Badge variant="default" size="sm">
+                          Chưa bổ nhiệm
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-xs text-[#64748B] max-w-xs truncate">
                       {dept.description || "—"}
@@ -242,24 +304,21 @@ export default function AdminDepartmentsPage() {
                         className="cursor-pointer"
                       >
                         <Badge
-                          variant={dept.is_active ? "success" : "default"}
+                          variant={dept.isActive ? "success" : "default"}
                           size="sm"
                         >
-                          {dept.is_active ? "Đang hoạt động" : "Tạm ngưng"}
+                          {dept.isActive ? "Đang hoạt động" : "Tạm ngưng"}
                         </Badge>
                       </button>
-                    </TableCell>
-                    <TableCell className="text-xs font-mono text-[#94A3B8]">
-                      {new Date(dept.created_at).toLocaleDateString("vi-VN")}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingDept(dept)}
+                        onClick={() => openEditModal(dept)}
                         leftIcon={<Edit3 className="w-3.5 h-3.5" />}
                       >
-                        Sửa
+                        Sửa / Bổ nhiệm
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -317,6 +376,24 @@ export default function AdminDepartmentsPage() {
 
             <div>
               <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Trưởng phòng (Tùy chọn)
+              </label>
+              <select
+                value={headUserId}
+                onChange={(e) => setHeadUserId(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chưa bổ nhiệm --</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.fullName} ({emp.employeeCode || emp.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
                 Mô tả chức năng
               </label>
               <textarea
@@ -357,8 +434,8 @@ export default function AdminDepartmentsPage() {
           isOpen={!!editingDept}
           onClose={() => setEditingDept(null)}
           maxWidth="md"
-          title="Chỉnh sửa phòng ban"
-          description={`Cập nhật thông tin phòng ban: ${editingDept.code}`}
+          title="Chỉnh sửa & Bổ nhiệm Trưởng phòng"
+          description={`Phòng ban: ${editingDept.departmentCode} - ${editingDept.code}`}
         >
           <form onSubmit={handleEditSubmit} className="space-y-4 pt-2">
             {formError && (
@@ -375,7 +452,7 @@ export default function AdminDepartmentsPage() {
               <input
                 type="text"
                 disabled
-                value={editingDept.code}
+                value={`${editingDept.departmentCode} (${editingDept.code})`}
                 className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
               />
             </div>
@@ -393,6 +470,24 @@ export default function AdminDepartmentsPage() {
                 }
                 className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Bổ nhiệm Trưởng phòng
+              </label>
+              <select
+                value={editHeadUserId}
+                onChange={(e) => setEditHeadUserId(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chưa bổ nhiệm (Trống) --</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.fullName} ({emp.employeeCode || emp.email})
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -416,11 +511,11 @@ export default function AdminDepartmentsPage() {
               <input
                 type="checkbox"
                 id="edit_is_active"
-                checked={editingDept.is_active}
+                checked={editingDept.isActive}
                 onChange={(e) =>
                   setEditingDept({
                     ...editingDept,
-                    is_active: e.target.checked,
+                    isActive: e.target.checked,
                   })
                 }
                 className="w-4 h-4 accent-[#4F75FF] cursor-pointer"

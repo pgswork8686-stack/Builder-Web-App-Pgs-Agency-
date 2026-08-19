@@ -28,10 +28,7 @@ export class PayrollController {
 
   @Get('runs')
   @Roles('admin', 'accountant')
-  async listRuns(
-    @Query() rawQuery: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async listRuns(@Query() rawQuery: unknown, @CurrentUser() user: RequestUser) {
     const result = PayrollRunQuerySchema.safeParse(rawQuery);
     if (!result.success) {
       throw new BadRequestException(
@@ -52,10 +49,7 @@ export class PayrollController {
 
   @Post('runs/generate')
   @Roles('admin', 'accountant')
-  async generateRun(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async generateRun(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = GeneratePayrollRunSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(

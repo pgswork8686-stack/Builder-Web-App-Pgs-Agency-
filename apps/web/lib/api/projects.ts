@@ -7,6 +7,47 @@ export type ProjectMemberRole =
   "project_manager" | "member" | "client_contact" | "viewer";
 export type ProjectServiceStatus =
   "planned" | "active" | "paused" | "completed" | "cancelled";
+export type ProjectServiceItemStatus =
+  "planned" | "in_progress" | "completed" | "cancelled";
+
+export interface ProjectServiceItem {
+  id: string;
+  project_service_item_code: string; // HMDA_01...
+  project_service_id: string;
+  project_service_code?: string;
+  project_id: string;
+  project_code?: string;
+  source_delivery_item_id?: string | null;
+  source_delivery_item_code?: string | null;
+  name: string;
+  description?: string | null;
+  status: ProjectServiceItemStatus;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectService {
+  id: string;
+  project_service_code?: string; // DVDA_01...
+  project_id: string;
+  service_id: string;
+  status: ProjectServiceStatus;
+  notes?: string | null;
+  started_at?: string | null;
+  ended_at?: string | null;
+  service?: {
+    id: string;
+    code: string;
+    service_code?: string;
+    name: string;
+    description?: string | null;
+    active: boolean;
+  };
+  items?: ProjectServiceItem[];
+  created_at: string;
+  updated_at: string;
+}
 
 export interface Project {
   id: string;
@@ -30,7 +71,7 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   members?: unknown[];
-  services?: unknown[];
+  services?: ProjectService[];
   currentProjectRole?: ProjectMemberRole;
 }
 
@@ -124,7 +165,7 @@ export const projectsApi = {
   },
 
   getProjectServices(projectId: string) {
-    return request<any[]>(`/admin/projects/${projectId}/services`);
+    return request<ProjectService[]>(`/admin/projects/${projectId}/services`);
   },
   addProjectService(
     projectId: string,
@@ -153,6 +194,32 @@ export const projectsApi = {
     return request(
       `/admin/projects/${projectId}/services/${projectServiceId}`,
       { method: "DELETE" },
+    );
+  },
+
+  getProjectServiceItems(projectId: string, projectServiceId?: string) {
+    const params = new URLSearchParams();
+    if (projectServiceId) params.set("projectServiceId", projectServiceId);
+    return request<ProjectServiceItem[]>(
+      `/projects/${projectId}/service-items?${params.toString()}`,
+    );
+  },
+  updateProjectServiceItem(
+    projectId: string,
+    itemId: string,
+    data: Partial<{
+      name: string;
+      description?: string | null;
+      status: ProjectServiceItemStatus;
+      sortOrder: number;
+    }>,
+  ) {
+    return request<ProjectServiceItem>(
+      `/projects/${projectId}/service-items/${itemId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      },
     );
   },
 

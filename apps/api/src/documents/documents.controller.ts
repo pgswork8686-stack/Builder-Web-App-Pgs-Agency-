@@ -30,10 +30,7 @@ export class DocumentsController {
 
   @Get()
   @Roles('admin', 'accountant', 'team_leader', 'employee', 'client')
-  async list(
-    @Query() rawQuery: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async list(@Query() rawQuery: unknown, @CurrentUser() user: RequestUser) {
     const result = DocumentQuerySchema.safeParse(rawQuery);
     if (!result.success) {
       throw new BadRequestException(
@@ -60,10 +57,7 @@ export class DocumentsController {
 
   @Post('finalize')
   @Roles('admin', 'accountant', 'team_leader', 'employee')
-  async finalize(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async finalize(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = FinalizeDocumentSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(

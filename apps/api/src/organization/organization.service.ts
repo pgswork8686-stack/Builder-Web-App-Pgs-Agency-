@@ -18,12 +18,46 @@ export class OrganizationService {
 
   // --- DEPARTMENTS ---
 
+  private async validateDepartmentHead(headUserId: string) {
+    const client = this.supabaseService.getSystemClient();
+    const { data: profile, error } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', headUserId)
+      .maybeSingle();
+
+    if (error || !profile) {
+      throw new BadRequestException({
+        code: 'INVALID_DEPARTMENT_HEAD_NOT_FOUND',
+        message: 'Tài khoản được chỉ định làm Trưởng phòng không tồn tại.',
+      });
+    }
+
+    if (profile.role === 'client') {
+      throw new BadRequestException({
+        code: 'CLIENT_CANNOT_BE_DEPARTMENT_HEAD',
+        message: 'Khách hàng không thể được bổ nhiệm làm Trưởng phòng.',
+      });
+    }
+
+    if (profile.account_status !== 'active') {
+      throw new BadRequestException({
+        code: 'INACTIVE_USER_CANNOT_BE_DEPARTMENT_HEAD',
+        message:
+          'Chỉ tài khoản nội bộ đang hoạt động mới có thể làm Trưởng phòng.',
+      });
+    }
+  }
+
   async getDepartments() {
     const client = this.supabaseService.getSystemClient();
     const { data, error } = await client
       .from('departments')
-      .select('*')
-      .order('code', { ascending: true });
+      .select(
+        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles(employee_code))',
+      )
+      .order('sort_order', { ascending: true })
+      .order('department_code', { ascending: true });
 
     if (error) {
       this.logger.error(`Failed to get departments: ${error.message}`);
@@ -33,14 +67,39 @@ export class OrganizationService {
       });
     }
 
-    return data || [];
+    return (data || []).map((dep: any) => ({
+      id: dep.id,
+      departmentCode: dep.department_code,
+      code: dep.code,
+      name: dep.name,
+      description: dep.description,
+      sortOrder: dep.sort_order,
+      isActive: dep.is_active,
+      headUserId: dep.head_user_id,
+      headUserCode: dep.head_user_code,
+      head: dep.head
+        ? {
+            id: dep.head.id,
+            fullName: dep.head.full_name,
+            email: dep.head.email,
+            avatarUrl: dep.head.avatar_url,
+            employeeCode:
+              dep.head.employee_profile?.[0]?.employee_code ??
+              dep.head_user_code,
+          }
+        : null,
+      createdAt: dep.created_at,
+      updatedAt: dep.updated_at,
+    }));
   }
 
   async getDepartmentById(id: string) {
     const client = this.supabaseService.getSystemClient();
     const { data, error } = await client
       .from('departments')
-      .select('*')
+      .select(
+        '*, head:profiles!departments_head_user_id_fkey(id,full_name,email,avatar_url,role,account_status,employee_profile:employee_profiles(employee_code))',
+      )
       .eq('id', id)
       .maybeSingle();
 
@@ -59,7 +118,30 @@ export class OrganizationService {
       });
     }
 
-    return data;
+    return {
+      id: data.id,
+      departmentCode: data.department_code,
+      code: data.code,
+      name: data.name,
+      description: data.description,
+      sortOrder: data.sort_order,
+      isActive: data.is_active,
+      headUserId: data.head_user_id,
+      headUserCode: data.head_user_code,
+      head: data.head
+        ? {
+            id: data.head.id,
+            fullName: data.head.full_name,
+            email: data.head.email,
+            avatarUrl: data.head.avatar_url,
+            employeeCode:
+              data.head.employee_profile?.[0]?.employee_code ??
+              data.head_user_code,
+          }
+        : null,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
   }
 
   async createDepartment(dto: CreateDepartmentDto, adminUserId: string) {
@@ -79,12 +161,18 @@ export class OrganizationService {
       });
     }
 
+    if (dto.headUserId) {
+      await this.validateDepartmentHead(dto.headUserId);
+    }
+
     const { data, error } = await client
       .from('departments')
       .insert({
         code: dto.code.trim().toUpperCase(),
         name: dto.name.trim(),
         description: dto.description?.trim() || null,
+        sort_order: dto.sortOrder ?? 0,
+        head_user_id: dto.headUserId ?? null,
         created_by: adminUserId,
         updated_by: adminUserId,
       })
@@ -99,7 +187,7 @@ export class OrganizationService {
       });
     }
 
-    return data;
+    return this.getDepartmentById(data.id);
   }
 
   async updateDepartment(
@@ -110,6 +198,10 @@ export class OrganizationService {
     // Check if exists
     await this.getDepartmentById(id);
 
+    if (dto.headUserId !== undefined && dto.headUserId !== null) {
+      await this.validateDepartmentHead(dto.headUserId);
+    }
+
     const client = this.supabaseService.getSystemClient();
     const updatePayload: any = {
       updated_by: adminUserId,
@@ -118,6 +210,9 @@ export class OrganizationService {
     if (dto.name !== undefined) updatePayload.name = dto.name.trim();
     if (dto.description !== undefined)
       updatePayload.description = dto.description?.trim() || null;
+    if (dto.sortOrder !== undefined) updatePayload.sort_order = dto.sortOrder;
+    if (dto.headUserId !== undefined)
+      updatePayload.head_user_id = dto.headUserId;
     if (dto.isActive !== undefined) updatePayload.is_active = dto.isActive;
 
     const { data, error } = await client
@@ -135,7 +230,7 @@ export class OrganizationService {
       });
     }
 
-    return data;
+    return this.getDepartmentById(data.id);
   }
 
   // --- TEAMS ---

@@ -32,10 +32,7 @@ export class SettingsController {
 
   @Post()
   @Roles('admin')
-  async updateSingle(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async updateSingle(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = UpdateSystemSettingSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(
@@ -47,10 +44,7 @@ export class SettingsController {
 
   @Patch('bulk')
   @Roles('admin')
-  async bulkUpdate(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async bulkUpdate(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = BulkUpdateSettingsSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(

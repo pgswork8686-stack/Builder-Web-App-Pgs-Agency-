@@ -55,10 +55,7 @@ export class SupportController {
 
   @Post('tickets')
   @Roles('admin', 'team_leader', 'employee', 'client')
-  async createTicket(
-    @Body() body: unknown,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async createTicket(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = CreateSupportTicketSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(
