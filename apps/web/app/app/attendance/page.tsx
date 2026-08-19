@@ -259,17 +259,17 @@ export default function EmployeeAttendancePage() {
       {/* Main Check-in Action Box */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="p-6 lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#EDF2F7] pb-4 gap-2">
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
                 Điểm danh ca làm việc
               </h3>
               <p className="text-xs text-[#64748B]">
-                Hệ thống tự động đối chiếu tọa độ văn phòng công ty.
+                Văn phòng: <span className="font-medium text-[#0F172A]">Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn Phúc, Hà Đông, Hà Nội</span>
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] self-start sm:self-auto">
               <MapPin
                 className={`w-4 h-4 ${
                   geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
