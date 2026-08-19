@@ -94,6 +94,25 @@ export class ProjectsController {
     return this.projectsService.getMemberships(projectId);
   }
 
+  @Get('projects/:projectId/members')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectMembers(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+  ) {
+    if (role === 'client') {
+      await this.projectsService.getClientProjectById(userId, projectId);
+    } else if (role !== 'admin') {
+      await this.projectsService.getInternalProjectById(
+        userId,
+        projectId,
+        role,
+      );
+    }
+    return this.projectsService.getMemberships(projectId);
+  }
+
   @Post('admin/projects/:projectId/members')
   @Roles('admin')
   async createMembership(

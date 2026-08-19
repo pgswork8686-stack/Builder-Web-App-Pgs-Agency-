@@ -137,7 +137,9 @@ export const projectsApi = {
   },
 
   getMembers(projectId: string) {
-    return request<any[]>(`/admin/projects/${projectId}/members`);
+    return request<any[]>(`/projects/${projectId}/members`).catch(() => {
+      return request<any[]>(`/admin/projects/${projectId}/members`);
+    });
   },
   addMember(
     projectId: string,

@@ -138,7 +138,37 @@ export function ChatWorkspace() {
   const [userRoleFilter, setUserRoleFilter] = useState("all");
   const [projectSearchQuery, setProjectSearchQuery] = useState("");
 
+  // Project Members & Direct Chat inside Project states
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(
+    null,
+  );
+  const [projectMembersMap, setProjectMembersMap] = useState<
+    Record<string, any[]>
+  >({});
+  const [loadingMembersForProject, setLoadingMembersForProject] = useState<
+    string | null
+  >(null);
+  const [viewingProjectMembersModal, setViewingProjectMembersModal] =
+    useState(false);
+
   const isClient = account?.role === "client";
+
+  const loadProjectMembers = useCallback(
+    async (projId: string) => {
+      if (projectMembersMap[projId]) return projectMembersMap[projId];
+      setLoadingMembersForProject(projId);
+      try {
+        const members = await projectsApi.getMembers(projId);
+        setProjectMembersMap((prev) => ({ ...prev, [projId]: members }));
+        return members;
+      } catch {
+        return [];
+      } finally {
+        setLoadingMembersForProject(null);
+      }
+    },
+    [projectMembersMap],
+  );
 
   const connectionLabel = useMemo(() => {
     const labels: Record<ConnectionState, string> = {
@@ -766,14 +796,32 @@ export function ChatWorkspace() {
               </div>
             </div>
             {selected ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={loadingMessages}
-                onClick={() => void loadMessages(selected.id)}
-              >
-                Tải lại
-              </Button>
+              <div className="flex items-center gap-2">
+                {selected.type === "project" && selected.projectId && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#CBD5E1] text-[#0F172A] hover:border-[#4F75FF] hover:text-[#4F75FF] text-xs font-semibold"
+                    onClick={async () => {
+                      if (selected.projectId) {
+                        await loadProjectMembers(selected.projectId);
+                      }
+                      setViewingProjectMembersModal(true);
+                    }}
+                    leftIcon={<Users className="w-3.5 h-3.5 text-[#4F75FF]" />}
+                  >
+                    Thành viên & Khách hàng
+                  </Button>
+                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={loadingMessages}
+                  onClick={() => void loadMessages(selected.id)}
+                >
+                  Tải lại
+                </Button>
+              </div>
             ) : null}
           </div>
 
@@ -1060,67 +1108,164 @@ export function ChatWorkspace() {
               </div>
 
               {/* Project List */}
-              <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+              <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
                 {filteredProjects.length === 0 ? (
                   <div className="py-10 text-center text-xs text-[#94A3B8] border border-dashed border-[#CBD5E1] rounded-2xl">
                     Không tìm thấy dự án nào.
                   </div>
                 ) : (
-                  filteredProjects.map((proj) => (
-                    <div
-                      key={proj.id}
-                      onClick={() => void openProjectChat(proj.id)}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center shrink-0">
-                          <FolderOpen className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
-                              {proj.name}
-                            </span>
-                            <span className="text-[10px] font-mono font-bold text-[#4F75FF] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
-                              {proj.projectCode}
-                            </span>
-                          </div>
-                          {proj.clientCompany?.name && (
-                            <div className="text-[11px] text-[#64748B] flex items-center gap-1 mt-0.5">
-                              <Building className="w-3 h-3 text-[#94A3B8]" />
-                              {proj.clientCompany.name}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                  filteredProjects.map((proj) => {
+                    const isExpanded = expandedProjectId === proj.id;
+                    const members = projectMembersMap[proj.id] || [];
+                    const isLoadingThis = loadingMembersForProject === proj.id;
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Badge
-                          variant={
-                            proj.status === "active"
-                              ? "success"
-                              : proj.status === "completed"
-                                ? "blue"
-                                : "default"
-                          }
-                          size="sm"
-                        >
-                          {proj.status === "active"
-                            ? "Đang chạy"
-                            : proj.status === "completed"
-                              ? "Hoàn thành"
-                              : proj.status}
-                        </Badge>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          Vào phòng
-                        </Button>
+                    return (
+                      <div
+                        key={proj.id}
+                        className="rounded-2xl border border-[#EDF2F7] bg-white overflow-hidden shadow-xs transition-all hover:border-[#4F75FF]/30"
+                      >
+                        {/* Project Header Bar */}
+                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8FAFC]/50">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center shrink-0">
+                              <FolderOpen className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-[#0F172A] truncate">
+                                  {proj.name}
+                                </span>
+                                <span className="text-[10px] font-mono font-bold text-[#4F75FF] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
+                                  {proj.projectCode}
+                                </span>
+                              </div>
+                              {proj.clientCompany?.name && (
+                                <div className="text-[11px] text-[#64748B] flex items-center gap-1 mt-0.5">
+                                  <Building className="w-3 h-3 text-[#94A3B8]" />
+                                  Khách hàng: {proj.clientCompany.name}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons: Group Chat vs Direct 1-on-1 */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 text-xs font-semibold border-[#CBD5E1] hover:border-[#4F75FF] hover:text-[#4F75FF]"
+                              onClick={() => {
+                                if (isExpanded) {
+                                  setExpandedProjectId(null);
+                                } else {
+                                  setExpandedProjectId(proj.id);
+                                  void loadProjectMembers(proj.id);
+                                }
+                              }}
+                              leftIcon={<Users className="w-3.5 h-3.5" />}
+                            >
+                              {isExpanded
+                                ? "Thu gọn"
+                                : "Khách hàng & Thành viên"}
+                            </Button>
+
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="h-8 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                              onClick={() => void openProjectChat(proj.id)}
+                              leftIcon={
+                                <MessageCircle className="w-3.5 h-3.5" />
+                              }
+                            >
+                              Chat chung dự án
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Expanded Members & Clients list for 1-on-1 Direct Chat */}
+                        {isExpanded && (
+                          <div className="p-3.5 bg-white border-t border-[#EDF2F7] space-y-2">
+                            <div className="flex items-center justify-between pb-1">
+                              <span className="text-[11px] font-bold text-[#0F172A] uppercase tracking-wide">
+                                Chọn người để Chat riêng (1-on-1):
+                              </span>
+                              <span className="text-[10px] text-[#64748B]">
+                                {members.length} thành viên / khách hàng
+                              </span>
+                            </div>
+
+                            {isLoadingThis ? (
+                              <div className="py-4 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+                                <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+                                Đang tải danh sách thành viên...
+                              </div>
+                            ) : members.length === 0 ? (
+                              <div className="py-4 text-center text-xs text-[#94A3B8] border border-dashed border-[#CBD5E1] rounded-xl">
+                                Chưa có danh sách thành viên trong dự án này.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {members.map((member: any) => {
+                                  const profile = member.profile;
+                                  const roleName =
+                                    member.projectRole === "client_contact"
+                                      ? "Khách hàng đại diện"
+                                      : member.projectRole === "project_manager"
+                                        ? "Quản lý dự án (PM)"
+                                        : member.projectRole === "viewer"
+                                          ? "Người xem"
+                                          : "Thành viên dự án";
+
+                                  return (
+                                    <div
+                                      key={member.id}
+                                      onClick={() => {
+                                        if (profile?.id) {
+                                          void createDirect(profile.id);
+                                        }
+                                      }}
+                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                                    >
+                                      <div className="flex items-center gap-2.5 min-w-0">
+                                        <Avatar
+                                          src={profile?.avatar_url || undefined}
+                                          name={
+                                            profile?.full_name ||
+                                            profile?.email ||
+                                            "Thành viên"
+                                          }
+                                          size="sm"
+                                        />
+                                        <div className="min-w-0">
+                                          <div className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
+                                            {profile?.full_name ||
+                                              profile?.email ||
+                                              "Chưa đặt tên"}
+                                          </div>
+                                          <div className="text-[10px] text-[#64748B] truncate font-medium">
+                                            {roleName}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        className="h-6 text-[10px] px-2 bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-90 group-hover:opacity-100 shrink-0"
+                                      >
+                                        Nhắn riêng
+                                      </Button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -1131,6 +1276,114 @@ export function ChatWorkspace() {
               variant="secondary"
               size="sm"
               onClick={() => setNewChatModalOpen(false)}
+            >
+              Đóng
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Active Project Members & Clients Dialog */}
+      <Dialog
+        isOpen={viewingProjectMembersModal}
+        onClose={() => setViewingProjectMembersModal(false)}
+        maxWidth="md"
+        title="Thành viên & Khách hàng dự án"
+        description={
+          selected?.project?.name
+            ? `Danh sách khách hàng và nhân sự trong dự án: ${selected.project.name}`
+            : "Danh sách người tham gia dự án."
+        }
+      >
+        <div className="space-y-4 pt-2">
+          {selected?.projectId &&
+          loadingMembersForProject === selected.projectId ? (
+            <div className="py-10 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+              Đang tải danh sách...
+            </div>
+          ) : selected?.projectId &&
+            (projectMembersMap[selected.projectId]?.length ?? 0) === 0 ? (
+            <div className="py-8 text-center text-xs text-[#94A3B8] border border-dashed border-[#CBD5E1] rounded-2xl">
+              Chưa có thông tin thành viên dự án.
+            </div>
+          ) : (
+            <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+              {(selected?.projectId
+                ? projectMembersMap[selected.projectId] || []
+                : []
+              ).map((member: any) => {
+                const profile = member.profile;
+                const roleName =
+                  member.projectRole === "client_contact"
+                    ? "Khách hàng đại diện"
+                    : member.projectRole === "project_manager"
+                      ? "Quản lý dự án (PM)"
+                      : member.projectRole === "viewer"
+                        ? "Người xem"
+                        : "Thành viên dự án";
+
+                return (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#F8FAFC] transition-all"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar
+                        src={profile?.avatar_url || undefined}
+                        name={
+                          profile?.full_name || profile?.email || "Thành viên"
+                        }
+                        size="md"
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#0F172A] truncate">
+                            {profile?.full_name ||
+                              profile?.email ||
+                              "Chưa đặt tên"}
+                          </span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                              member.projectRole === "client_contact"
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                : "bg-slate-100 text-[#475569]"
+                            }`}
+                          >
+                            {roleName}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-[#64748B] font-mono truncate">
+                          {profile?.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white shrink-0 font-bold"
+                      onClick={() => {
+                        if (profile?.id) {
+                          setViewingProjectMembersModal(false);
+                          void createDirect(profile.id);
+                        }
+                      }}
+                      leftIcon={<MessageCircle className="w-3.5 h-3.5" />}
+                    >
+                      Nhắn riêng (1-1)
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex justify-end pt-3 border-t border-[#EDF2F7]">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setViewingProjectMembersModal(false)}
             >
               Đóng
             </Button>
