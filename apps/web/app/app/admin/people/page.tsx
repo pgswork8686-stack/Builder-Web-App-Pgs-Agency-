@@ -712,13 +712,25 @@ export default function AdminPeopleDirectoryPage() {
                 <div>
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
                     Mã nhân viên (Employee Code)
+                    {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
+                      <span className="text-[10px] text-[#7C879D] font-normal ml-1">
+                        (Mã định danh bất biến)
+                      </span>
+                    )}
                   </label>
                   <input
                     type="text"
                     value={editEmployeeCode}
+                    disabled={Boolean(
+                      editingPerson?.employeeProfile?.employeeCode,
+                    )}
                     onChange={(e) => setEditEmployeeCode(e.target.value)}
                     placeholder="VD: NV-001"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-white text-xs font-mono font-bold text-[#5D87FF] focus:border-[#5D87FF] outline-none"
+                    className={`w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] text-xs font-mono font-bold outline-none ${
+                      editingPerson?.employeeProfile?.employeeCode
+                        ? "bg-[#EDF2F7] text-[#64748B] cursor-not-allowed"
+                        : "bg-white text-[#5D87FF] focus:border-[#5D87FF]"
+                    }`}
                   />
                 </div>
 

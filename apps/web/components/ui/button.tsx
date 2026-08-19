@@ -64,13 +64,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
         {...props}
       >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-        ) : (
-          leftIcon
+        {isLoading && <Loader2 className="w-4 h-4 animate-spin shrink-0" />}
+        {!isLoading && leftIcon && (
+          <span className="inline-flex shrink-0">{leftIcon}</span>
         )}
-        {children}
-        {!isLoading && rightIcon}
+        {children !== undefined && children !== null && (
+          <span className="inline-flex items-center">{children}</span>
+        )}
+        {!isLoading && rightIcon && (
+          <span className="inline-flex shrink-0">{rightIcon}</span>
+        )}
       </button>
     );
   },

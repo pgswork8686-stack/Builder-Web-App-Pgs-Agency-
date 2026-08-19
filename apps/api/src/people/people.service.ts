@@ -747,8 +747,6 @@ export class PeopleService {
           updated_at: now,
         };
 
-        if (dto.employeeCode)
-          empPayload.employee_code = dto.employeeCode.toUpperCase();
         if (dto.departmentId !== undefined)
           empPayload.department_id = dto.departmentId || null;
         if (dto.teamId !== undefined) empPayload.team_id = dto.teamId || null;
@@ -759,18 +757,19 @@ export class PeopleService {
         if (dto.joinedDate !== undefined)
           empPayload.joined_date = dto.joinedDate || null;
 
-        // Ensure employee_code exists if record is new
+        // Check if employee record already exists
         const { data: existingEmp } = await client
           .from('employee_profiles')
           .select('user_id, employee_code')
           .eq('user_id', userId)
           .maybeSingle();
 
-        if (!existingEmp && !empPayload.employee_code) {
-          empPayload.employee_code = `EMP-${userId.slice(0, 6).toUpperCase()}`;
-        }
         if (!existingEmp) {
           empPayload.created_by = adminUserId;
+          empPayload.employee_code =
+            dto.employeeCode && dto.employeeCode.trim()
+              ? dto.employeeCode.trim().toUpperCase()
+              : `EMP-${userId.slice(0, 6).toUpperCase()}`;
         }
 
         const { error: empErr } = await client
