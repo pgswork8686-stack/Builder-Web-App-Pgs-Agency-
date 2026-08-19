@@ -170,6 +170,29 @@ export default function AdminAttendancePage() {
 
   const totalPages = Math.ceil(total / pageSize);
 
+  const stats = React.useMemo(() => {
+    const incompleteCount = records.filter(
+      (r) => r.status === "incomplete" || !r.check_out_at,
+    ).length;
+    const deviationCount = records.filter(
+      (r) =>
+        r.status === "late" ||
+        r.status === "early_leave" ||
+        r.status === "late_and_early_leave",
+    ).length;
+    const onTimeCount = records.filter((r) => r.status === "present").length;
+    const readyCount = records.filter(
+      (r) => r.check_in_at && r.check_out_at,
+    ).length;
+
+    return {
+      incomplete: String(incompleteCount).padStart(2, "0"),
+      ready: String(readyCount).padStart(2, "0"),
+      deviation: String(deviationCount).padStart(2, "0"),
+      onTime: String(onTimeCount).padStart(2, "0"),
+    };
+  }, [records]);
+
   return (
     <div className="space-y-6">
       {/* Top Header matching Figma: Duyệt và chốt bảng công.png */}
@@ -190,31 +213,31 @@ export default function AdminAttendancePage() {
         }
       />
 
-      {/* 4 Pastel Metric Cards */}
+      {/* 4 Pastel Metric Cards - Real Live Attendance Counts */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           variant="gold"
-          title="Chờ Manager"
-          value="07"
-          subtitle="Cần duyệt"
+          title="Chờ duyệt ca"
+          value={stats.incomplete}
+          subtitle="Chưa check-out / Chưa hoàn tất"
         />
         <StatCard
           variant="blue"
-          title="Chờ Kế toán"
-          value="12"
-          subtitle="Đã qua Manager"
+          title="Đủ giờ vào - ra"
+          value={stats.ready}
+          subtitle="Đã có check-in & check-out"
         />
         <StatCard
           variant="rose"
-          title="Sai lệch"
-          value="03"
-          subtitle="Cần bổ sung"
+          title="Sai lệch giờ"
+          value={stats.deviation}
+          subtitle="Đi muộn / Về sớm"
         />
         <StatCard
           variant="green"
-          title="Đã khóa"
-          value="24"
-          subtitle="Tháng này"
+          title="Đúng giờ chuẩn"
+          value={stats.onTime}
+          subtitle="Hợp lệ tính công"
         />
       </div>
 

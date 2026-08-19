@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   User2,
@@ -17,6 +17,8 @@ import {
   Pencil,
   Phone,
   Camera,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import { getMe } from "../../../lib/api/auth";
 import { peopleApi } from "../../../lib/api/people";
@@ -85,6 +87,56 @@ export default function UserProfilePage() {
   const [editPhone, setEditPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setSaveError("Vui lòng chọn file hình ảnh (JPG, PNG, WebP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveError("Kích thước ảnh tối đa 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          setEditAvatarUrl(compressedDataUrl);
+          setSaveError(null);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -439,24 +491,86 @@ export default function UserProfilePage() {
             </div>
           )}
 
-          {/* Avatar Preview & URL Input */}
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7]">
-            <Avatar
-              src={editAvatarUrl.trim() || undefined}
-              name={editFullName || userProfile?.user.email || "Avatar"}
-              size="lg"
-              className="ring-2 ring-[#4F75FF]/30 shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <label className="block text-xs font-bold text-[#0F172A] mb-1">
-                Ảnh đại diện (Avatar URL)
+          {/* Hidden File Input for Computer Image Upload */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            className="hidden"
+          />
+
+          {/* Avatar Preview & Upload Options */}
+          <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="relative group shrink-0">
+                <Avatar
+                  src={editAvatarUrl.trim() || undefined}
+                  name={editFullName || userProfile?.user.email || "Avatar"}
+                  size="xl"
+                  className="ring-2 ring-[#4F75FF]/40 shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Chọn ảnh từ máy tính"
+                  className="absolute inset-0 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Camera className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 min-w-0 space-y-2">
+                <div>
+                  <label className="block text-xs font-bold text-[#0F172A]">
+                    Ảnh đại diện
+                  </label>
+                  <p className="text-[11px] text-[#64748B]">
+                    Tải trực tiếp ảnh từ máy tính hoặc dán URL ảnh có sẵn.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    leftIcon={<Upload className="w-3.5 h-3.5" />}
+                    className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white text-xs font-bold"
+                  >
+                    Tải ảnh từ máy tính
+                  </Button>
+                  {editAvatarUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditAvatarUrl("")}
+                      className="text-xs text-red-600 hover:bg-red-50"
+                    >
+                      Xóa ảnh
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#EDF2F7]">
+              <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
+                Hoặc dán đường dẫn ảnh (URL):
               </label>
               <input
                 type="text"
-                value={editAvatarUrl}
+                value={
+                  editAvatarUrl.startsWith("data:")
+                    ? "(Ảnh đã tải từ máy tính)"
+                    : editAvatarUrl
+                }
+                disabled={editAvatarUrl.startsWith("data:")}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
-                placeholder="Dán đường dẫn ảnh (VD: https://...)"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all"
+                placeholder="https://example.com/avatar.jpg"
+                className="w-full px-3.5 py-1.5 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all disabled:bg-slate-100 disabled:text-[#64748B]"
               />
             </div>
           </div>

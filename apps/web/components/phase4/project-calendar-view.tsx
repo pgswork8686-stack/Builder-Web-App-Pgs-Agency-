@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { workspaceApi, type CalendarTask } from "@/lib/api/workspace";
+import { ProjectTaskCreateDialog } from "./project-task-create-dialog";
 import {
   ProjectWorkspaceRealtimeProvider,
   useProjectWorkspaceRealtime,
@@ -57,6 +58,7 @@ function ProjectCalendarContent({
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [createDate, setCreateDate] = useState<string | null>(null);
   const days = useMemo(() => monthGrid(month), [month]);
 
   const load = useCallback(async () => {
@@ -92,6 +94,8 @@ function ProjectCalendarContent({
       ),
     );
   };
+  const canCreateTask =
+    mode === "admin" || project?.currentProjectRole === "project_manager";
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
   return (
@@ -104,6 +108,20 @@ function ProjectCalendarContent({
           projectCode={project?.projectCode}
           active="calendar"
         />
+
+        {canCreateTask && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setCreateDate(dateKey(new Date()))}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3D61E6] cursor-pointer transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Tạo công việc
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
           <button
             type="button"
@@ -158,7 +176,15 @@ function ProjectCalendarContent({
                 return (
                   <div
                     key={key}
-                    className="min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60"
+                    onClick={() => {
+                      if (canCreateTask) setCreateDate(key);
+                    }}
+                    className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60 ${
+                      canCreateTask ? "cursor-pointer" : ""
+                    }`}
+                    title={
+                      canCreateTask ? `Tạo công việc ngày ${key}` : undefined
+                    }
                   >
                     <p
                       className={`mb-2 text-xs font-bold ${
@@ -172,6 +198,7 @@ function ProjectCalendarContent({
                         <Link
                           key={task.taskId}
                           href={`${base}/${projectId}/tasks/${task.taskId}`}
+                          onClick={(event) => event.stopPropagation()}
                           className="block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
                           title={task.title}
                         >
@@ -190,6 +217,18 @@ function ProjectCalendarContent({
             Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
           </p>
         )}
+
+        <ProjectTaskCreateDialog
+          isOpen={createDate !== null}
+          onClose={() => setCreateDate(null)}
+          onCreated={load}
+          projectId={projectId}
+          projectName={project?.name}
+          projectCode={project?.projectCode}
+          defaultStatus="todo"
+          defaultStartDate={createDate ?? ""}
+          defaultDueDate={createDate ?? ""}
+        />
       </div>
     </main>
   );

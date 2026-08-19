@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { GripVertical, Search } from "lucide-react";
+import { GripVertical, Plus, Search } from "lucide-react";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { tasksApi, type TaskPriority } from "@/lib/api/tasks";
 import {
@@ -30,6 +30,7 @@ import {
   type BoardTask,
   type ProjectBoard,
 } from "@/lib/api/workspace";
+import { ProjectTaskCreateDialog } from "./project-task-create-dialog";
 import {
   ProjectWorkspaceRealtimeProvider,
   useProjectWorkspaceRealtime,
@@ -69,6 +70,7 @@ function ProjectBoardContent({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createStatus, setCreateStatus] = useState<BoardStatus | null>(null);
   const [filters, setFilters] = useState({
     q: "",
     priority: "" as "" | TaskPriority,
@@ -218,6 +220,8 @@ function ProjectBoardContent({
     }
   };
 
+  const canCreateTask =
+    mode === "admin" || project?.currentProjectRole === "project_manager";
   const base = mode === "admin" ? "/app/admin/projects" : "/app/projects";
 
   return (
@@ -335,14 +339,26 @@ function ProjectBoardContent({
                   label={column.label}
                   tasks={(board?.[column.key] as BoardTask[] | undefined) ?? []}
                   canReorder={board?.canReorder ?? false}
+                  canCreate={canCreateTask}
                   taskHref={(taskId) => `${base}/${projectId}/tasks/${taskId}`}
                   saving={saving}
                   onStatus={updateStatus}
+                  onCreate={() => setCreateStatus(column.status)}
                 />
               ))}
             </div>
           </DndContext>
         )}
+
+        <ProjectTaskCreateDialog
+          isOpen={createStatus !== null}
+          onClose={() => setCreateStatus(null)}
+          onCreated={load}
+          projectId={projectId}
+          projectName={project?.name}
+          projectCode={project?.projectCode}
+          defaultStatus={createStatus ?? "todo"}
+        />
       </div>
     </main>
   );
@@ -353,17 +369,21 @@ function BoardColumn({
   label,
   tasks,
   canReorder,
+  canCreate,
   taskHref,
   saving,
   onStatus,
+  onCreate,
 }: {
   status: BoardStatus;
   label: string;
   tasks: BoardTask[];
   canReorder: boolean;
+  canCreate: boolean;
   taskHref: (taskId: string) => string;
   saving: boolean;
   onStatus: (task: BoardTask, status: BoardStatus) => void;
+  onCreate: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `column:${status}`,
@@ -378,11 +398,23 @@ function BoardColumn({
           : "border-[#EDF2F7] bg-[#F1F5F9]/50"
       }`}
     >
-      <div className="mb-3 flex items-center justify-between px-1">
-        <h2 className="font-bold text-[#0F172A] text-sm">{label}</h2>
-        <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
-          {tasks.length}
-        </span>
+      <div className="mb-3 flex items-center justify-between gap-2 px-1">
+        <div className="flex items-center gap-2">
+          <h2 className="font-bold text-[#0F172A] text-sm">{label}</h2>
+          <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
+            {tasks.length}
+          </span>
+        </div>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={onCreate}
+            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-[11px] font-bold text-[#4F75FF] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
+          >
+            <Plus className="h-3 w-3" />
+            Tạo
+          </button>
+        )}
       </div>
       <SortableContext
         items={tasks.map((task) => `task:${task.id}`)}

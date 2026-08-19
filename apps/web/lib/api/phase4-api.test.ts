@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { request } from "./client";
 import { commentsApi } from "./comments";
 import { filesApi } from "./files";
+import { tasksApi } from "./tasks";
 import { workspaceApi } from "./workspace";
 
 vi.mock("./client", () => ({ request: vi.fn() }));
@@ -11,6 +12,29 @@ const requestMock = vi.mocked(request);
 describe("Phase 4 API clients", () => {
   beforeEach(() => {
     requestMock.mockReset();
+  });
+
+  it("creates a task through the current project-scoped endpoint", () => {
+    tasksApi.create("project-a", {
+      title: "Thiết kế Homepage",
+      status: "todo",
+      priority: "medium",
+      projectServiceItemId: "item-a",
+      startDate: "2026-08-20",
+      dueDate: "2026-08-23",
+    });
+
+    expect(requestMock).toHaveBeenCalledWith("/projects/project-a/tasks", {
+      method: "POST",
+      body: JSON.stringify({
+        title: "Thiết kế Homepage",
+        status: "todo",
+        priority: "medium",
+        projectServiceItemId: "item-a",
+        startDate: "2026-08-20",
+        dueDate: "2026-08-23",
+      }),
+    });
   });
 
   it("sends board filters and atomic move through NestJS", () => {
