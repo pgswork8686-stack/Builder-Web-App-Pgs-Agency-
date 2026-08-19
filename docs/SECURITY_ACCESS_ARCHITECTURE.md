@@ -122,20 +122,54 @@ Policy `profiles_select_own_policy` được khởi tạo tại migration `20260
 
 ## 4. BẢNG TỔNG HỢP LỖ HỔNG VÀ NGUY CƠ BẢO MẬT (SECURITY FINDINGS BY SEVERITY)
 
-Sau khi hoàn tất kiểm toán toàn diện mã nguồn, database triggers, realtime sockets và negative e2e tests:
+### 4.1. Critical Severity: **NONE** (Có Test Evidence)
 
-### 4.1. Critical Severity: **NONE**
+- **RCE / SQL Injection / Auth Bypass:** **NONE**
+  - _Test Evidence:_ `apps/api/test/security-negative.e2e-spec.ts`
+  - _Threat Model:_ Chặn bypass JWT token, chặn truy cập unauthenticated.
+- **Secret Key Exposure:** **NONE**
+  - _Test Evidence:_ Repo-wide env scan script (`node -e ...`) xác nhận `NEXT_PUBLIC_*` chỉ chứa URL và Publishable key; `SUPABASE_SECRET_KEY` chỉ xuất hiện tại backend API `.env`.
 
-- Không có lỗ hổng RCE, SQL Injection, Authentication Bypass, Secret Key Leakage hoặc Unauthenticated Admin Takeover nào.
+### 4.2. High Severity: **NONE** (Có Test Evidence)
 
-### 4.2. High Severity: **NONE**
+- **Cross-Project IDOR (Projects, Tasks, Files, Finance):** **NONE**
+  - _Test Evidence:_
+    - `apps/api/src/projects/projects-auth.service.spec.ts` (Employee/Client foreign project access throws `ForbiddenException`/`NotFoundException`).
+    - `apps/api/src/tasks/tasks-auth.service.spec.ts` (Foreign task / project-task mismatch throws `NotFoundException`, Developer role cannot create tasks or edit foreign tasks).
+    - `apps/api/src/finance/finance-auth.service.spec.ts` (Employee/Team Leader blocked from financial contracts/invoices; Client restricted strictly to own company contracts/invoices).
+    - `apps/api/src/workspace/files-auth.service.spec.ts` & `storage-security.service.spec.ts` (File/project mismatch and unauthorized file delete blocked).
+- **WebSocket & Realtime Spoofing / Unauthorized Join:** **NONE**
+  - _Test Evidence:_ `apps/api/src/chat/chat-security.gateway.spec.ts` (Unauthenticated socket disconnected, pending/rejected accounts blocked, foreign chat/workspace room join rejected).
 
-- Không có lỗ hổng IDOR, Privilege Escalation (nâng quyền trái phép), hoặc Data Tampering nào. Tất cả các endpoint quản trị đều có `RolesGuard`, `ActiveAccountGuard`, và kiểm tra ownership/membership chặt chẽ.
+### 4.3. Medium Severity: **NONE** (Có Test Evidence)
 
-### 4.3. Medium Severity: **NONE**
+- **File Upload / Storage Exploits (Path Traversal, MIME, Oversize, Expired Sessions):** **NONE**
+  - _Test Evidence:_ `apps/api/src/workspace/storage-security.service.spec.ts` (Sanitizes `../` and `..\` directory traversal, rejects illegal MIME types, rejects files > 25MB, blocks expired upload sessions).
 
-- Không có lỗi CORS Misconfiguration, Insecure Direct Object Reference trong File Upload/Download, hay WebSocket Message Spoofing.
+### 4.4. Low Severity & Infrastructure Hardening:
 
-### 4.4. Low Severity: **NONE**
+- **HTTP Security Headers & CORS Configuration:** **No known finding from static audit**
+  - _Audit Scope:_ Code review trên `main.ts` (Helmet, CORS whitelist), `HttpExceptionFilter` (Sanitization). Không có finding tồn đọng từ static code analysis.
 
-- Toàn bộ HTTP Security Headers (Helmet, CSP, HSTS, noSniff) và Exception Sanitization đã được cấu hình chặt chẽ trong `main.ts` và `HttpExceptionFilter`.
+---
+
+## 5. ĐÁNH GIÁ VÀ KẾ HOẠCH BẬT LEAKED PASSWORD PROTECTION TRÊN PRODUCTION
+
+### 5.1. Bối cảnh kỹ thuật
+
+Supabase Auth cung cấp tính năng **Leaked Password Protection** tích hợp với dịch vụ HaveIBeenPwned (HIBP) API (k-anonymity model). Khi người dùng đăng ký hoặc đổi mật khẩu, Supabase kiểm tra xem mật khẩu có nằm trong danh sách các vụ lộ lọt dữ liệu công khai hay không.
+
+### 5.2. Đánh giá Impact trên PGS Hub
+
+- **Rủi ro vận hành (Operational Impact):**
+  - Nếu mật khẩu của người dùng nội bộ nằm trong danh sách breached passwords, Supabase Auth sẽ từ chối `signUp` hoặc `updateUser({ password })` với mã lỗi `weak_password` / `pwned_password`.
+  - **Không ảnh hưởng** đến các tài khoản đang đăng nhập hoặc các phiên làm việc hiện tại (chỉ kích hoạt khi user tạo mới hoặc đổi mật khẩu).
+  - Frontend hiện tại đã sử dụng form chuẩn hóa tại `apps/web/app/auth/sign-up/page.tsx` và `update-password/page.tsx` với khả năng hiển thị thông báo lỗi từ Supabase Auth API.
+
+### 5.3. Kế hoạch kích hoạt trên Supabase Production (`umtgfaqjoqbsdzwpqizq`):
+
+- **Trạng thái:** **Remaining Production Action** (Thực hiện trên Supabase Management Console trước khi UAT toàn công ty).
+- **Các bước thực hiện:**
+  1. Đăng nhập Supabase Dashboard -> Project `umtgfaqjoqbsdzwpqizq` -> **Authentication** -> **Attack Protection**.
+  2. Bật tùy chọn **"Prevent use of leaked passwords"**.
+  3. Kiểm tra kiểm thử thủ công luồng Reset Password với một mật khẩu phổ biến (ví dụ: `password123`) để xác nhận thông báo lỗi thân thiện được hiển thị trên giao diện người dùng.
