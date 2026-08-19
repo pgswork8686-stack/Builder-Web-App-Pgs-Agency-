@@ -18,7 +18,13 @@ import {
   Clock,
   Briefcase,
   AlertCircle,
+  Paperclip,
+  Link as LinkIcon,
+  UploadCloud,
+  FileText,
+  X as CloseIcon,
 } from "lucide-react";
+import { filesApi, uploadToSignedUrl } from "@/lib/api/files";
 import { peopleApi } from "@/lib/api/people";
 import {
   type Project,
@@ -104,11 +110,23 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
     status: "planned" as ProjectServiceStatus,
     notes: "",
   });
-  const [taskForm, setTaskForm] = useState({
+  const [taskForm, setTaskForm] = useState<{
+    title: string;
+    description: string;
+    assigneeUserId: string;
+    priority: TaskPriority;
+    linkUrl: string;
+    file: File | null;
+  }>({
     title: "",
+    description: "",
     assigneeUserId: "",
-    priority: "medium" as TaskPriority,
+    priority: "medium",
+    linkUrl: "",
+    file: null,
   });
+  const [creatingTask, setCreatingTask] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const load = useCallback(async () => {
     if (!projectId) return;
@@ -240,21 +258,62 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
   const handleAddTask = async (e: FormEvent) => {
     e.preventDefault();
-    if (!project || !taskForm.title) return;
+    if (!project || !taskForm.title.trim()) return;
     setError(null);
+    setCreatingTask(true);
+    setUploadProgress(0);
     try {
-      await tasksApi.create(project.id, {
-        title: taskForm.title,
+      // 1. Build description combining notes and optional linkUrl
+      let finalDescription = taskForm.description.trim();
+      if (taskForm.linkUrl.trim()) {
+        const linkBlock = `📌 Tài liệu / Đường dẫn liên kết: ${taskForm.linkUrl.trim()}`;
+        finalDescription = finalDescription
+          ? `${finalDescription}\n\n${linkBlock}`
+          : linkBlock;
+      }
+
+      // 2. Create task
+      const createdTask = await tasksApi.create(project.id, {
+        title: taskForm.title.trim(),
+        description: finalDescription || null,
         priority: taskForm.priority,
         assigneeUserId: taskForm.assigneeUserId || null,
       });
+
+      // 3. If file is provided, upload and attach to this task
+      if (taskForm.file && createdTask?.id) {
+        const auth = await filesApi.requestUpload(
+          project.id,
+          taskForm.file,
+          createdTask.id,
+        );
+        await uploadToSignedUrl(auth, taskForm.file, (p) =>
+          setUploadProgress(p),
+        );
+        await filesApi.finalize(
+          project.id,
+          auth.uploadSessionId,
+          createdTask.id,
+        );
+      }
+
       setAddTaskOpen(false);
-      setTaskForm({ title: "", assigneeUserId: "", priority: "medium" });
+      setTaskForm({
+        title: "",
+        description: "",
+        assigneeUserId: "",
+        priority: "medium",
+        linkUrl: "",
+        file: null,
+      });
       await load();
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "Không thể tạo công việc.",
       );
+    } finally {
+      setCreatingTask(false);
+      setUploadProgress(0);
     }
   };
 
@@ -911,62 +970,191 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       {/* Dialogs: Add Task */}
       <Dialog
         isOpen={addTaskOpen}
-        onClose={() => setAddTaskOpen(false)}
-        maxWidth="sm"
-        title="Tạo công việc mới"
+        onClose={() => !creatingTask && setAddTaskOpen(false)}
+        maxWidth="md"
+        title={
+          <div className="flex items-center gap-2 text-base font-extrabold text-[#0F172A]">
+            <ListTodo className="w-5 h-5 text-[#4F75FF]" />
+            Tạo công việc mới
+          </div>
+        }
+        description="Thêm đầu việc mới vào dự án, phân công nhân sự, đính kèm tệp hoặc đường dẫn tài liệu."
       >
         <form onSubmit={handleAddTask} className="space-y-4 pt-2">
-          <Input
-            label="Tiêu đề công việc *"
-            required
-            placeholder="Nhập nội dung công việc..."
-            value={taskForm.title}
-            onChange={(e) =>
-              setTaskForm({ ...taskForm, title: e.target.value })
-            }
-          />
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Tiêu đề công việc *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="Nhập nội dung công việc..."
+              value={taskForm.title}
+              onChange={(e) =>
+                setTaskForm({ ...taskForm, title: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
 
-          <Select
-            label="Người phụ trách"
-            value={taskForm.assigneeUserId}
-            onChange={(e) =>
-              setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
-            }
-          >
-            <option value="">-- Chưa chỉ định --</option>
-            {people.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.fullName || p.email}
-              </option>
-            ))}
-          </Select>
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Mô tả chi tiết công việc (Tùy chọn)
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Nhập yêu cầu, checklist hoặc hướng dẫn thực thi công việc..."
+              value={taskForm.description}
+              onChange={(e) =>
+                setTaskForm({ ...taskForm, description: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
 
-          <Select
-            label="Mức độ ưu tiên"
-            value={taskForm.priority}
-            onChange={(e) =>
-              setTaskForm({
-                ...taskForm,
-                priority: e.target.value as TaskPriority,
-              })
-            }
-          >
-            <option value="low">Thấp</option>
-            <option value="medium">Vừa</option>
-            <option value="high">Cao</option>
-            <option value="urgent">Khẩn cấp</option>
-          </Select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Người phụ trách
+              </label>
+              <select
+                value={taskForm.assigneeUserId}
+                onChange={(e) =>
+                  setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
+                }
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              >
+                <option value="">-- Chưa chỉ định --</option>
+                {people.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.fullName || p.email}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Mức độ ưu tiên
+              </label>
+              <select
+                value={taskForm.priority}
+                onChange={(e) =>
+                  setTaskForm({
+                    ...taskForm,
+                    priority: e.target.value as TaskPriority,
+                  })
+                }
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              >
+                <option value="low">Thấp (Low)</option>
+                <option value="medium">Vừa (Medium)</option>
+                <option value="high">Cao (High)</option>
+                <option value="urgent">Khẩn cấp (Urgent)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Đường dẫn liên kết / Tài liệu (Link URL) */}
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
+              <LinkIcon className="w-3.5 h-3.5 text-[#4F75FF]" />
+              Đường dẫn liên kết / Tài liệu trực tuyến (Tùy chọn)
+            </label>
+            <input
+              type="text"
+              placeholder="VD: https://www.figma.com/file/... hoặc https://drive.google.com/..."
+              value={taskForm.linkUrl}
+              onChange={(e) =>
+                setTaskForm({ ...taskForm, linkUrl: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          {/* Tải lên tệp đính kèm (Upload File) */}
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
+              <Paperclip className="w-3.5 h-3.5 text-[#4F75FF]" />
+              Tệp tài liệu đính kèm (Upload File)
+            </label>
+
+            {taskForm.file ? (
+              <div className="flex items-center justify-between p-3 rounded-xl border border-[#4F75FF]/30 bg-[#EEF2FF] text-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <FileText className="w-4 h-4 text-[#4F75FF] shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-bold text-[#0F172A] truncate">
+                      {taskForm.file.name}
+                    </p>
+                    <p className="text-[11px] text-[#64748B]">
+                      {(taskForm.file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTaskForm({ ...taskForm, file: null })}
+                  className="p-1 rounded-lg text-[#64748B] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                >
+                  <CloseIcon className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
+                <UploadCloud className="w-6 h-6 text-[#94A3B8] mb-1" />
+                <span className="text-xs font-bold text-[#4F75FF]">
+                  Chọn tệp từ máy tính để tải lên
+                </span>
+                <span className="text-[11px] text-[#94A3B8] mt-0.5">
+                  Hỗ trợ PNG, JPG, PDF, ZIP, DOCX, XLSX (tối đa 50MB)
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setTaskForm({ ...taskForm, file: e.target.files[0] });
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Progress if uploading */}
+          {creatingTask && uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-[11px] text-[#64748B]">
+                <span>Đang tải tệp lên...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-[#EDF2F7] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#4F75FF] transition-all"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
             <Button
               type="button"
               variant="secondary"
               size="sm"
+              disabled={creatingTask}
               onClick={() => setAddTaskOpen(false)}
             >
               Hủy
             </Button>
-            <Button type="submit" variant="primary" size="sm">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={creatingTask}
+              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            >
               Tạo task
             </Button>
           </div>

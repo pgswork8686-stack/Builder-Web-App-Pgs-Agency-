@@ -84,6 +84,7 @@ export const peopleApi = {
     data: {
       fullName?: string;
       phone?: string | null;
+      avatarUrl?: string | null;
       role?: "admin" | "team_leader" | "employee" | "accountant" | "client";
       accountStatus?:
         "pending" | "active" | "suspended" | "terminated" | "rejected";

@@ -603,6 +603,7 @@ export class PeopleService {
     const profileUpdates: any = {};
     if (dto.fullName !== undefined) profileUpdates.full_name = dto.fullName;
     if (dto.phone !== undefined) profileUpdates.phone = dto.phone;
+    if (dto.avatarUrl !== undefined) profileUpdates.avatar_url = dto.avatarUrl;
 
     // Handle account status & role changes ensuring check_role_status_consistency
     const targetStatus = dto.accountStatus;

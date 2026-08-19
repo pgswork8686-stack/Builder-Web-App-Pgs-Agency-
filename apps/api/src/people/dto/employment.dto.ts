@@ -71,6 +71,7 @@ export type UpdateEmploymentDto = z.infer<typeof UpdateEmploymentSchema>;
 export const UpdatePersonFullSchema = z.object({
   fullName: z.string().trim().min(2, 'Họ tên tối thiểu 2 ký tự').optional(),
   phone: z.string().trim().optional().nullable(),
+  avatarUrl: z.string().trim().optional().nullable(),
   role: z
     .enum(['admin', 'team_leader', 'employee', 'accountant', 'client'])
     .optional(),

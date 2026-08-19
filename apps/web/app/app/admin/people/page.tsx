@@ -58,6 +58,7 @@ interface Person {
   email: string | null;
   fullName: string | null;
   phone?: string | null;
+  avatarUrl?: string | null;
   role: string;
   accountStatus: string;
   employeeProfile: {
@@ -100,6 +101,7 @@ export default function AdminPeopleDirectoryPage() {
   // Edit Form State
   const [editFullName, setEditFullName] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [editAvatarUrl, setEditAvatarUrl] = useState("");
   const [editRole, setEditRole] = useState<
     "admin" | "team_leader" | "employee" | "accountant" | "client"
   >("employee");
@@ -167,6 +169,7 @@ export default function AdminPeopleDirectoryPage() {
     setEditingPerson(person);
     setEditFullName(person.fullName || "");
     setEditPhone(person.phone || "");
+    setEditAvatarUrl(person.avatarUrl || "");
     setEditRole((person.role as any) || "employee");
     setEditAccountStatus((person.accountStatus as any) || "active");
     setEditEmployeeCode(person.employeeProfile?.employeeCode || "");
@@ -190,6 +193,7 @@ export default function AdminPeopleDirectoryPage() {
       await peopleApi.updatePersonFull(editingPerson.id, {
         fullName: editFullName.trim(),
         phone: editPhone.trim() || null,
+        avatarUrl: editAvatarUrl.trim() || null,
         role: editRole,
         accountStatus: editAccountStatus,
         employeeCode: editRole !== "client" ? editEmployeeCode.trim() : null,
@@ -629,6 +633,28 @@ export default function AdminPeopleDirectoryPage() {
         maxWidth="lg"
       >
         <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
+          {/* Ảnh đại diện & Preview */}
+          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7]">
+            <Avatar
+              src={editAvatarUrl.trim() || undefined}
+              name={editFullName || editingPerson?.email || "Avatar"}
+              size="lg"
+              className="ring-2 ring-[#4F75FF]/20 shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <label className="block text-xs font-bold text-[#24304A] mb-1">
+                Ảnh đại diện (Avatar URL)
+              </label>
+              <input
+                type="text"
+                value={editAvatarUrl}
+                onChange={(e) => setEditAvatarUrl(e.target.value)}
+                placeholder="Dán đường dẫn ảnh (VD: https://... hoặc ảnh lưu trữ)"
+                className="w-full px-3 py-2 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#24304A] focus:border-[#4F75FF] outline-none"
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-[#24304A] mb-1.5">
