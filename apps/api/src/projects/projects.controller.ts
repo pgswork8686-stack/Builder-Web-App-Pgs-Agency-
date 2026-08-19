@@ -242,9 +242,10 @@ export class ProjectsController {
   }
 
   @Get('projects')
-  @Roles('team_leader', 'employee', 'accountant')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
   async getInternalProjects(
     @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
     @Query() rawQuery: Record<string, string>,
   ) {
     const parsed = ScopedListQuerySchema.safeParse(rawQuery);
@@ -253,16 +254,18 @@ export class ProjectsController {
       userId,
       parsed.data.page,
       parsed.data.pageSize,
+      role,
     );
   }
 
   @Get('projects/:projectId')
-  @Roles('team_leader', 'employee', 'accountant')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
   async getInternalProject(
     @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
     @Param('projectId', ParseUUIDPipe) projectId: string,
   ) {
-    return this.projectsService.getInternalProjectById(userId, projectId);
+    return this.projectsService.getInternalProjectById(userId, projectId, role);
   }
 
   @Get('client/me/projects')

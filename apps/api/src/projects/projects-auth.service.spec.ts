@@ -144,6 +144,38 @@ describe('ProjectsService — Real Authorization Logic (Supabase Transport Mocke
       expect(result.currentProjectRole).toBe('developer');
     });
 
+    it('allows Admin to access any internal project without membership', async () => {
+      const projectRow = {
+        id: PROJECT_B,
+        client_company_id: COMPANY_A,
+        name: 'Project B',
+        project_code: 'DA_02',
+        status: 'active',
+        priority: 'high',
+        client_company: { id: COMPANY_A, code: 'KH_01', name: 'Client A' },
+        project_manager: null,
+        project_manager_user_id: null,
+        start_date: null,
+        due_date: null,
+        completed_at: null,
+        created_at: '2026-08-11T00:00:00.000Z',
+        updated_at: '2026-08-11T00:00:00.000Z',
+      };
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: projectRow, error: null }),
+      );
+
+      const result = await service.getInternalProjectById(
+        'admin-user-id',
+        PROJECT_B,
+        'admin',
+      );
+      expect(result.id).toBe(PROJECT_B);
+      expect(result.currentProjectRole).toBe('project_manager');
+      expect(fromMock).toHaveBeenCalledWith('projects');
+    });
+
     it('throws NotFoundException when project does not exist even with membership', async () => {
       const membershipRow = { id: 'm-1', project_role: 'developer' };
 

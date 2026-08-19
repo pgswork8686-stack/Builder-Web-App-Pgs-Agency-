@@ -1029,7 +1029,15 @@ export class ProjectsService {
     return data;
   }
 
-  async getInternalProjects(userId: string, page = 1, pageSize = 20) {
+  async getInternalProjects(
+    userId: string,
+    page = 1,
+    pageSize = 20,
+    role?: AppRole,
+  ) {
+    if (role === 'admin') {
+      return this.getAdminProjects({ page, pageSize });
+    }
     const offset = (page - 1) * pageSize;
     const { data, count, error } = await this.client
       .from('project_memberships')
@@ -1061,25 +1069,33 @@ export class ProjectsService {
     };
   }
 
-  async getInternalProjectById(userId: string, projectId: string) {
-    const { data: membership, error: membershipError } = await this.client
-      .from('project_memberships')
-      .select('id,project_role')
-      .eq('project_id', projectId)
-      .eq('user_id', userId)
-      .maybeSingle();
-    if (membershipError) {
-      this.databaseFailure(
-        'PROJECT_ACCESS_LOOKUP_FAILED',
-        'Không thể kiểm tra quyền dự án.',
-        membershipError,
-      );
-    }
-    if (!membership) {
-      throw new ForbiddenException({
-        code: 'PROJECT_ACCESS_DENIED',
-        message: 'Bạn không có quyền truy cập dự án này.',
-      });
+  async getInternalProjectById(
+    userId: string,
+    projectId: string,
+    role?: AppRole,
+  ) {
+    let currentRole = 'project_manager';
+    if (role !== 'admin') {
+      const { data: membership, error: membershipError } = await this.client
+        .from('project_memberships')
+        .select('id,project_role')
+        .eq('project_id', projectId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (membershipError) {
+        this.databaseFailure(
+          'PROJECT_ACCESS_LOOKUP_FAILED',
+          'Không thể kiểm tra quyền dự án.',
+          membershipError,
+        );
+      }
+      if (!membership) {
+        throw new ForbiddenException({
+          code: 'PROJECT_ACCESS_DENIED',
+          message: 'Bạn không có quyền truy cập dự án này.',
+        });
+      }
+      currentRole = membership.project_role;
     }
     const { data, error } = await this.client
       .from('projects')
@@ -1103,7 +1119,7 @@ export class ProjectsService {
     }
     return {
       ...this.mapProject(data),
-      currentProjectRole: membership.project_role,
+      currentProjectRole: currentRole,
     };
   }
 
