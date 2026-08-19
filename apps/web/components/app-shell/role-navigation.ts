@@ -491,7 +491,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             {
               index: "12",
               title: "Chấm công",
-              href: "/app/attendance",
+              href: "/app/accountant/attendance",
               icon: Clock,
             },
           ],

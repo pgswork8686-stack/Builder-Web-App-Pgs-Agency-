@@ -620,8 +620,9 @@ export class AttendanceService {
 
     const isAdmin = user.role === 'admin';
     const isLeader = user.role === 'team_leader';
+    const isAccountant = user.role === 'accountant';
 
-    if (!isAdmin && !isLeader) {
+    if (!isAdmin && !isLeader && !isAccountant) {
       throw new ForbiddenException({
         code: 'ATTENDANCE_ACCESS_DENIED',
         message: 'Bạn không có quyền truy cập danh sách chấm công nhân viên.',
@@ -732,8 +733,8 @@ export class AttendanceService {
 
       delete rowCopy.profile;
 
-      // Hide precise coordinates for non-self unless admin
-      if (!isAdmin) {
+      // Hide precise coordinates for non-self unless admin or accountant
+      if (!isAdmin && !isAccountant) {
         delete rowCopy.check_in_latitude;
         delete rowCopy.check_in_longitude;
         delete rowCopy.check_out_latitude;
