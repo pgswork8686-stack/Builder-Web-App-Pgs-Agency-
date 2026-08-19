@@ -43,6 +43,25 @@ describe("Phase 7 API clients", () => {
     );
   });
 
+  it("calls broadcast notification endpoint with payload", () => {
+    notificationsApi.broadcast({
+      title: "Thông báo toàn thể",
+      message: "Họp công ty",
+      type: "announcement",
+      actionUrl: "/app/calendar",
+    });
+
+    expect(requestMock).toHaveBeenCalledWith("/notifications/broadcast", {
+      method: "POST",
+      body: JSON.stringify({
+        title: "Thông báo toàn thể",
+        message: "Họp công ty",
+        type: "announcement",
+        actionUrl: "/app/calendar",
+      }),
+    });
+  });
+
   it("uses dedicated chat endpoints for membership-checked conversations", () => {
     chatApi.createDirect("peer-user");
     chatApi.getProjectConversation("project-a");

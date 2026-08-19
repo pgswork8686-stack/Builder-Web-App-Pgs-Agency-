@@ -5,6 +5,16 @@ export interface SectionHeaderProps {
   title: string;
   description?: string;
   badge?: string;
+  badgeVariant?:
+    | "default"
+    | "blue"
+    | "gold"
+    | "success"
+    | "warning"
+    | "danger"
+    | "purple"
+    | "cyan"
+    | "outline";
   action?: React.ReactNode;
   className?: string;
 }
@@ -13,6 +23,7 @@ export function SectionHeader({
   title,
   description,
   badge,
+  badgeVariant = "blue",
   action,
   className = "",
 }: SectionHeaderProps) {
@@ -26,7 +37,7 @@ export function SectionHeader({
             {title}
           </h2>
           {badge && (
-            <Badge variant="blue" size="sm">
+            <Badge variant={badgeVariant} size="sm">
               {badge}
             </Badge>
           )}

@@ -2,18 +2,30 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Bell, CheckCheck, Loader2, RefreshCw, Settings } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  Loader2,
+  RefreshCw,
+  Settings,
+  Megaphone,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import {
   type NotificationItem,
   type NotificationPreferences,
   notificationsApi,
 } from "@/lib/api/notifications";
+import { getMe } from "@/lib/api/auth";
 import { NotificationBell } from "./notification-bell";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Dialog } from "@/components/ui/dialog";
 
 function safeActionUrl(url: string | null) {
   if (!url || !url.startsWith("/app/")) return "/app/notifications";
@@ -38,6 +50,28 @@ export function NotificationsCenter() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Admin broadcast states
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastType, setBroadcastType] = useState("announcement");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastActionUrl, setBroadcastActionUrl] = useState("");
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [broadcastSuccessMsg, setBroadcastSuccessMsg] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    getMe()
+      .then((res) => {
+        if (res.account.role === "admin") {
+          setIsAdmin(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -124,6 +158,37 @@ export function NotificationsCenter() {
     }
   };
 
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
+
+    try {
+      setBroadcasting(true);
+      setError(null);
+      const res = await notificationsApi.broadcast({
+        title: broadcastTitle.trim(),
+        message: broadcastMessage.trim(),
+        type: broadcastType,
+        actionUrl: broadcastActionUrl.trim() || null,
+      });
+
+      setBroadcastSuccessMsg(
+        res.message || "Đã phát thông báo toàn thể thành công!",
+      );
+      setTimeout(() => setBroadcastSuccessMsg(null), 5000);
+      setIsBroadcastOpen(false);
+      setBroadcastTitle("");
+      setBroadcastMessage("");
+      setBroadcastActionUrl("");
+      setBroadcastType("announcement");
+      await load();
+    } catch (err: any) {
+      setError(err?.message || "Không thể phát thông báo.");
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <SectionHeader
@@ -131,6 +196,17 @@ export function NotificationsCenter() {
         description="Nhận tín hiệu từ công việc, bình luận, nghỉ phép, chấm công, tài chính, chat và thay đổi dự án."
         action={
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsBroadcastOpen(true)}
+                leftIcon={<Megaphone className="h-3.5 w-3.5" />}
+                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-semibold"
+              >
+                Gửi thông báo toàn công ty
+              </Button>
+            )}
             <Button
               variant="secondary"
               size="sm"
@@ -140,7 +216,7 @@ export function NotificationsCenter() {
               Tải lại
             </Button>
             <Button
-              variant="primary"
+              variant="outline"
               size="sm"
               disabled={saving === "all"}
               onClick={markAllRead}
@@ -157,6 +233,21 @@ export function NotificationsCenter() {
           </div>
         }
       />
+
+      {broadcastSuccessMsg && (
+        <div className="p-4 rounded-2xl bg-[#E6FBF5] border border-[#A7F3D0] text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-[#00B788] shrink-0" />
+            <span>{broadcastSuccessMsg}</span>
+          </div>
+          <button
+            onClick={() => setBroadcastSuccessMsg(null)}
+            className="text-emerald-600 hover:text-emerald-900 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Card className="p-6 space-y-4">
@@ -219,9 +310,17 @@ export function NotificationsCenter() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <h3 className="font-bold text-sm text-[#0F172A]">
-                            {item.title}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-sm text-[#0F172A]">
+                              {item.title}
+                            </h3>
+                            {item.metadata &&
+                              (item.metadata as any).isBroadcast && (
+                                <Badge variant="gold" size="sm">
+                                  Toàn thể công ty
+                                </Badge>
+                              )}
+                          </div>
                           <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">
                             {item.message}
                           </p>
@@ -239,14 +338,16 @@ export function NotificationsCenter() {
                             {item.entityType}
                           </Badge>
                         ) : null}
-                        <Link
-                          href={safeActionUrl(item.actionUrl)}
-                          onClick={() => void markRead(item)}
-                        >
-                          <Button variant="secondary" size="sm">
-                            Mở liên kết
-                          </Button>
-                        </Link>
+                        {item.actionUrl && (
+                          <Link
+                            href={safeActionUrl(item.actionUrl)}
+                            onClick={() => void markRead(item)}
+                          >
+                            <Button variant="secondary" size="sm">
+                              Mở liên kết
+                            </Button>
+                          </Link>
+                        )}
                         {!item.readAt ? (
                           <Button
                             variant="ghost"
@@ -290,6 +391,38 @@ export function NotificationsCenter() {
         </Card>
 
         <aside className="space-y-6">
+          {/* Admin Broadcast Card */}
+          {isAdmin && (
+            <Card className="p-6 space-y-3.5 border border-[#E0EAFF] bg-[#F8FAFF]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F75FF] text-white">
+                  <Megaphone className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-xs text-[#0F172A]">
+                    Thông báo toàn thể nhân viên
+                  </h3>
+                  <p className="text-[10px] text-[#4F75FF] font-semibold">
+                    Quyền hạn: Admin
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Gửi thông báo & tin tức quan trọng đến toàn bộ nhân sự đang hoạt
+                động trong doanh nghiệp.
+              </p>
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                onClick={() => setIsBroadcastOpen(true)}
+                leftIcon={<Megaphone className="h-3.5 w-3.5" />}
+              >
+                Gửi thông báo toàn thể
+              </Button>
+            </Card>
+          )}
+
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
@@ -373,6 +506,107 @@ export function NotificationsCenter() {
           </Card>
         </aside>
       </div>
+
+      {/* DIALOG GỬI THÔNG BÁO TOÀN THỂ NHÂN VIÊN */}
+      <Dialog
+        isOpen={isBroadcastOpen}
+        onClose={() => !broadcasting && setIsBroadcastOpen(false)}
+        title={
+          <div className="flex items-center gap-2.5 text-lg font-black text-[#0F172A]">
+            <Megaphone className="w-5 h-5 text-[#4F75FF]" />
+            Gửi thông báo đến toàn thể nhân viên
+          </div>
+        }
+        description="Thông báo này sẽ được gửi realtime và lưu vào danh sách thông báo của tất cả nhân sự đang hoạt động trong agency."
+        maxWidth="lg"
+      >
+        <form onSubmit={handleBroadcast} className="space-y-4 pt-2">
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Tiêu đề thông báo *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="VD: Thông báo nghỉ lễ Quốc Khánh / Họp toàn thể công ty"
+              value={broadcastTitle}
+              onChange={(e) => setBroadcastTitle(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Loại thông báo
+              </label>
+              <select
+                value={broadcastType}
+                onChange={(e) => setBroadcastType(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              >
+                <option value="announcement">
+                  Thông báo chung (Announcement)
+                </option>
+                <option value="urgent">Khẩn cấp (Urgent)</option>
+                <option value="event">Sự kiện công ty (Company Event)</option>
+                <option value="system">
+                  Cập nhật hệ thống (System Update)
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Đường dẫn liên kết (Tùy chọn)
+              </label>
+              <input
+                type="text"
+                placeholder="VD: /app/admin/documents hoặc /app/calendar"
+                value={broadcastActionUrl}
+                onChange={(e) => setBroadcastActionUrl(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Nội dung thông báo chi tiết *
+            </label>
+            <textarea
+              required
+              rows={4}
+              placeholder="Nhập nội dung thông báo gửi đến toàn thể nhân viên..."
+              value={broadcastMessage}
+              onChange={(e) => setBroadcastMessage(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={broadcasting}
+              onClick={() => setIsBroadcastOpen(false)}
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={broadcasting}
+              leftIcon={<Send className="w-3.5 h-3.5" />}
+              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            >
+              Phát thông báo ngay
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }
