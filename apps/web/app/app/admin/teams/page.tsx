@@ -92,12 +92,16 @@ export default function AdminTeamsPage() {
             : undefined;
 
       const [teamsData, deptsData, peopleData] = await Promise.all([
-        organizationApi.getTeams({
-          departmentId: filterDept || undefined,
-          isActive: filterActiveVal,
-        }),
-        organizationApi.getDepartments(),
-        peopleApi.getPeopleDirectory({ pageSize: 100 }),
+        organizationApi
+          .getTeams({
+            departmentId: filterDept || undefined,
+            isActive: filterActiveVal,
+          })
+          .catch(() => []),
+        organizationApi.getDepartments().catch(() => []),
+        peopleApi
+          .getPeopleDirectory({ pageSize: 100 })
+          .catch(() => ({ items: [] })),
       ]);
 
       setTeams(teamsData);

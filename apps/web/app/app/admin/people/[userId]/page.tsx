@@ -109,11 +109,15 @@ export default function AdminPersonDetailPage() {
       }
 
       // Load depts & teams for selectors
-      const deptsData = await organizationApi.getDepartments();
-      setDepartments(deptsData.filter((d: any) => d.is_active));
+      const deptsData = await organizationApi
+        .getDepartments()
+        .catch(() => []);
+      setDepartments(
+        deptsData.filter((d: any) => d.isActive ?? d.is_active ?? true),
+      );
 
-      const teamsData = await organizationApi.getTeams();
-      setTeams(teamsData.filter((t: any) => t.is_active));
+      const teamsData = await organizationApi.getTeams().catch(() => []);
+      setTeams(teamsData.filter((t: any) => t.isActive ?? t.is_active ?? true));
 
       // Load directory to find potential managers (excluding current user)
       const peopleList = await peopleApi.getPeopleDirectory({ pageSize: 100 });

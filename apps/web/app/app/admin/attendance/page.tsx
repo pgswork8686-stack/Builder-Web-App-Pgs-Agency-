@@ -70,11 +70,11 @@ export default function AdminAttendancePage() {
   const loadUserAndMetadata = async () => {
     try {
       const [deptsRes, teamsRes] = await Promise.all([
-        organizationApi.getDepartments(),
-        organizationApi.getTeams(),
+        organizationApi.getDepartments().catch(() => []),
+        organizationApi.getTeams().catch(() => []),
       ]);
-      setDepartments(deptsRes);
-      setTeams(teamsRes);
+      setDepartments(deptsRes || []);
+      setTeams(teamsRes || []);
     } catch (err: any) {
       console.error(err);
     }
