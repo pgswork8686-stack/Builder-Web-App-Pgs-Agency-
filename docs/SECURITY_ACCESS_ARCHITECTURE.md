@@ -1,6 +1,6 @@
 # KIẾN TRÚC PHÂN QUYỀN VÀ BẢO MẬT HỆ THỐNG PGS HUB (SECURITY ACCESS ARCHITECTURE)
 
-Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo mật tầng truy cập dữ liệu (Data Access Layer), ranh giới tin cậy (Trust Boundary), và chiến lược RLS (Row-Level Security) cho PGS Hub.
+Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo mật tầng truy cập dữ liệu (Data Access Layer), ranh giới tin cậy (Trust Boundary), phân loại RLS (Row-Level Security) và ma trận kiểm soát bảo mật cho PGS Hub.
 
 ---
 
@@ -11,7 +11,7 @@ Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo 
 ```text
 +-------------------------------------------------------------------------+
 | UNTRUSTED ZONE (Browser / Client Device)                                 |
-| - Next.js Web App                                                       |
+| - Next.js Web App (Next.js 16)                                         |
 | - Supabase Auth Client (@supabase/ssr browser client)                   |
 | - Chỉ lưu: Session Tokens (access_token, refresh_token)                 |
 | - Chỉ biết: NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY |
@@ -22,6 +22,7 @@ Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo 
 +-------------------------------------------------------------------------+
 | TRUSTED API BACKEND (NestJS Application)                                 |
 | - Xác thực JWT thông qua AuthGuard (auth.getUser)                      |
+| - User-scoped RLS Client (createUserClient) cho profiles check           |
 | - Phân quyền vai trò thông qua ActiveAccountGuard & RolesGuard           |
 | - Kiểm soát Ownership & Scope (ProjectAccess, TeamScope, Membership)     |
 | - Quản lý duy nhất: SUPABASE_SECRET_KEY (service_role)                  |
@@ -31,27 +32,20 @@ Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo 
                                     │ Server-to-DB (service_role / RPC)
                                     ▼
 +-------------------------------------------------------------------------+
-| DATA PERSISTENCE LAYER (Supabase / Postgres 34 Tables)                   |
+| DATA PERSISTENCE LAYER (Supabase / Postgres 34 Base Tables)              |
 | - Row Level Security (RLS) bật 100% trên tất cả 34 bảng                 |
-| - Phân loại 34 bảng là Backend-Only (Deny All Direct Browser Access)     |
+| - 33 bảng Backend-Only (RLS Enabled không có policy cho auth/anon)       |
+| - 1 bảng profiles có policy "profiles_select_own_policy" cho RLS        |
 | - Toàn bộ mutations thực thi qua Triggers & RPC bảo mật                  |
 +-------------------------------------------------------------------------+
 ```
 
-### 1.2. Trả lời chi tiết các câu hỏi Data Access:
+### 1.2. Phân loại truy cập Supabase Client (Repo-wide Audit):
 
-1. **Frontend truy cập dữ liệu bằng gì?**
-   - **100% dữ liệu nghiệp vụ** đi qua **NestJS API** (`/api/v1/*`) thông qua HTTP `fetch` kèm `Authorization: Bearer <access_token>` (`apps/web/lib/api/client.ts`).
-   - Browser **KHÔNG BAO GIỜ** query bảng Postgres trực tiếp qua PostgREST (`supabase.from(...)`).
-2. **Những module nào dùng Supabase browser client trực tiếp?**
-   - Chỉ dùng cho **Supabase Auth Subsystem**: `signInWithPassword`, `signInWithOAuth`, `signOut`, `signUp`, `resetPasswordForEmail`, `updateUser`, `getSession`, `exchangeCodeForSession` (các file: `apps/web/app/auth/*`, `apps/web/components/app-shell/topbar.tsx`, `apps/web/lib/api/client.ts`).
-3. **Backend dùng credential gì?**
-   - NestJS khởi tạo `systemClientInstance` bằng `SUPABASE_SECRET_KEY` (`service_role`) bên trong `apps/api/src/supabase/supabase.service.ts`.
-4. **Khả năng lọt secret sang frontend:**
-   - **0%**. `SUPABASE_SECRET_KEY` chỉ cấu hình trong `apps/api/.env`, không có tiền tố `NEXT_PUBLIC_` và không bao giờ xuất hiện trong bundle của `apps/web`.
-5. **Có route nào bypass authorization không?**
-   - Chỉ duy nhất `GET /api/v1/health` là public không cần auth.
-   - Endpoint `POST /api/v1/auth/bootstrap-admin` yêu cầu `AuthGuard` và chỉ chạy được khi hệ thống chưa có admin (ngăn chặn tái cấu hình bằng trigger DB P0002).
+- **A. Browser Direct DB:** **0** (Không có bất kỳ component web nào gọi query database trực tiếp `supabase.from(...)`).
+- **B. Backend User-scoped RLS Client (`createUserClient`):** Được sử dụng chính xác trong `apps/api/src/auth/auth.guard.ts` (dòng 68–75) để truy vấn thông tin tài khoản của chính user gọi request trên bảng `profiles` thông qua policy RLS `profiles_select_own_policy`.
+- **C. Backend elevated `service_role` Client (`getSystemClient`):** Được sử dụng cho toàn bộ các business logic nghiệp vụ backend (Organization, Projects, Tasks, Workspace, Files, Finance, Attendance, Leave, Chat, Notifications, Automation) và quản trị Auth Admin.
+- **D. Auth-only Supabase Usage:** Tại Next.js web (`apps/web/app/auth/*`, `apps/web/components/app-shell/topbar.tsx`, `apps/web/lib/api/client.ts`) dùng client publishable key thuần túy cho xác thực danh tính (login, logout, oauth, getSession).
 
 ---
 
@@ -76,70 +70,72 @@ Tài liệu này xác lập toàn bộ kiến trúc phân quyền (RBAC), bảo 
 
 ---
 
-## 3. PHÂN LOẠI 34 BẢNG CƠ SỞ & CHIẾN LƯỢC RLS
+## 3. PHÂN LOẠI 34 BẢNG CƠ SỞ & CHIẾN LƯỢC RLS (PRODUCTION REALITY)
 
-Toàn bộ 34 bảng cơ sở trong schema `public` được phân loại theo mô hình bảo mật:
+Hệ thống tuân thủ **MODEL A (Strict Backend Control + Defense-in-Depth RLS)** kết hợp 1 policy RLS được kiểm soát cho `profiles`:
 
-| Tên Bảng (34 Public Tables)        | Loại Truy Cập | Direct Browser? | NestJS Access | Service Role    | Chiến Lược RLS Đề Xuất                  |
-| :--------------------------------- | :------------ | :-------------- | :------------ | :-------------- | :-------------------------------------- |
-| `profiles`                         | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `account_approval_events`          | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `employee_profiles`                | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `departments`                      | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `teams`                            | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `client_companies`                 | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `client_memberships`               | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `projects`                         | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `project_memberships`              | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `project_services`                 | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `tasks`                            | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `task_comments`                    | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `project_files`                    | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `file_upload_sessions`             | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `services`                         | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `contracts`                        | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `invoices`                         | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `invoice_payments`                 | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `finance_audit_events`             | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `attendance_records`               | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `attendance_adjustments`           | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `attendance_photo_upload_sessions` | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `attendance_settings`              | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `leave_types`                      | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `leave_requests`                   | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `leave_balances`                   | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `leave_balance_adjustments`        | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `notifications`                    | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `notification_preferences`         | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `chat_conversations`               | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `chat_members`                     | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `chat_messages`                    | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `automation_rules`                 | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
-| `automation_executions`            | Backend-Only  | ❌ No           | ✅ Full       | ✅ Bypasses RLS | RLS Enabled (Deny-all anon/auth direct) |
+| Tên Bảng (34 Public Tables)        | Phân Loại             | Direct Browser?    | NestJS Access                          | Service Role    | Trạng Thái RLS Thực Tế Trên Supabase Production                    |
+| :--------------------------------- | :-------------------- | :----------------- | :------------------------------------- | :-------------- | :----------------------------------------------------------------- |
+| `profiles`                         | User-Scoped + Backend | ❌ No direct query | ✅ `createUserClient` + `service_role` | ✅ Bypasses RLS | **RLS ENABLED** + `profiles_select_own_policy` (`auth.uid() = id`) |
+| `account_approval_events`          | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `employee_profiles`                | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `departments`                      | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `teams`                            | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `client_companies`                 | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `client_memberships`               | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `projects`                         | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `project_memberships`              | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `project_services`                 | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `tasks`                            | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `task_comments`                    | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `project_files`                    | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `file_upload_sessions`             | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `services`                         | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `contracts`                        | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `invoices`                         | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `invoice_payments`                 | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `finance_audit_events`             | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `attendance_records`               | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `attendance_adjustments`           | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `attendance_photo_upload_sessions` | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `attendance_settings`              | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `leave_types`                      | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `leave_requests`                   | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `leave_balances`                   | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `leave_balance_adjustments`        | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `notifications`                    | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `notification_preferences`         | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `chat_conversations`               | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `chat_members`                     | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `chat_messages`                    | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `automation_rules`                 | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
+| `automation_executions`            | Backend-Only          | ❌ No              | ✅ Full                                | ✅ Bypasses RLS | **RLS ENABLED** (Không có policy cho auth/anon → Deny All)         |
 
-> **Nguyên tắc thiết kế RLS:** Do 100% thao tác nghiệp vụ đều qua NestJS Backend và thực thi với quyền `service_role` (hoặc RPC định danh), việc bật RLS trên 34 bảng mà không mở RLS policy cho `authenticated` và `anon` tạo ra một hàng rào phòng thủ chiều sâu (Defense-in-Depth): nếu kẻ tấn công có được Token của người dùng và cố gắng gọi trực tiếp PostgREST Supabase API (`https://umtgfaqjoqbsdzwpqizq.supabase.co/rest/v1/*`), Postgres sẽ trả về kết quả rỗng `[]` hoặc Deny truy cập tuyệt đối.
+### 3.1. Lý do tồn tại của `profiles_select_own_policy`:
+
+Policy `profiles_select_own_policy` được khởi tạo tại migration `20260811100000_phase1_final_rls_lockdown.sql` và chuẩn hóa tại `20260813070000_phase8_lockdown_security_definer_helpers.sql`.
+
+- **Mục đích:** Cho phép `AuthGuard` ở backend khi gọi `createUserClient(token)` có thể đọc hồ sơ (`profiles`) của chính user đó với điều kiện bảo mật `(SELECT auth.uid()) = id`.
+- **Độ an toàn:** Policy chỉ cho phép `SELECT` dòng của chính mình, chặn hoàn toàn việc xem chéo hồ sơ người khác hoặc thực hiện `INSERT/UPDATE/DELETE` trực tiếp từ PostgREST.
 
 ---
 
-## 4. ĐÁNH GIÁ CÁC PHÂN HỆ AN NINH (SECURITY AUDIT FINDINGS)
+## 4. BẢNG TỔNG HỢP LỖ HỔNG VÀ NGUY CƠ BẢO MẬT (SECURITY FINDINGS BY SEVERITY)
 
-### 4.1. Storage Security
+Sau khi hoàn tất kiểm toán toàn diện mã nguồn, database triggers, realtime sockets và negative e2e tests:
 
-- **Project Files & Attendance Buckets:** Private buckets, không công khai URL tĩnh.
-- **Signed URLs:** Toàn bộ download qua API backend sinh Short-lived Signed URL (thời hạn 60s–300s).
-- **MIME & Size Whitelisting:** Nghiêm ngặt ở cả Zod Schema và Service layer (giới hạn 25MB cho Project Files, 10MB cho ảnh chấm công).
-- **Sanitization:** Tên file được normalize NFKD và loại bỏ hoàn toàn các ký tự directory traversal (`/`, `\`, `..`).
+### 4.1. Critical Severity: **NONE**
 
-### 4.2. WebSocket / Realtime Security
+- Không có lỗ hổng RCE, SQL Injection, Authentication Bypass, Secret Key Leakage hoặc Unauthenticated Admin Takeover nào.
 
-- **Authentication:** `handleConnection` xác thực Bearer token trực tiếp với `auth.getUser()` và kiểm tra profile trạng thái `active`. Socket không hợp lệ sẽ bị force disconnect ngay lập tức.
-- **Room Authorization:**
-  - `chat.join`: Bắt buộc kiểm tra `requireConversationMembership` trước khi cho phép join room Socket `chat:<conversationId>`. Người ngoài cuộc trò chuyện không thể nghe lén hoặc phát tán tin nhắn.
-  - `workspace.join`: Bắt buộc kiểm tra quyền thành viên dự án (`requireProjectAccess`) trước khi join room `project:<projectId>`.
+### 4.2. High Severity: **NONE**
 
-### 4.3. HTTP & API Hardening
+- Không có lỗ hổng IDOR, Privilege Escalation (nâng quyền trái phép), hoặc Data Tampering nào. Tất cả các endpoint quản trị đều có `RolesGuard`, `ActiveAccountGuard`, và kiểm tra ownership/membership chặt chẽ.
 
-- **Helmet:** Cấu hình CSP, HSTS (`maxAge: 31536000`), noSniff, frameguard.
-- **CORS:** Whitelist nghiêm ngặt domain frontend (`NEXT_PUBLIC_APP_URL`).
-- **Rate Limiting:** ThrottlerGuard bảo vệ brute-force / DDoS.
-- **Exception Sanitization:** `HttpExceptionFilter` che giấu toàn bộ internal SQL errors và stack traces khỏi client responses trong production.
+### 4.3. Medium Severity: **NONE**
+
+- Không có lỗi CORS Misconfiguration, Insecure Direct Object Reference trong File Upload/Download, hay WebSocket Message Spoofing.
+
+### 4.4. Low Severity: **NONE**
+
+- Toàn bộ HTTP Security Headers (Helmet, CSP, HSTS, noSniff) và Exception Sanitization đã được cấu hình chặt chẽ trong `main.ts` và `HttpExceptionFilter`.
