@@ -3,9 +3,13 @@ import { z } from 'zod';
 export const CreateClientCompanySchema = z.object({
   code: z
     .string()
-    .min(2, 'Mã khách hàng phải từ 2 ký tự')
-    .max(30, 'Mã khách hàng tối đa 30 ký tự')
-    .toUpperCase(),
+    .trim()
+    .transform((v) => v.toUpperCase())
+    .refine((v) => !v || (v.length >= 2 && v.length <= 30), {
+      message: 'Mã khách hàng phải từ 2 đến 30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).',
+    })
+    .optional()
+    .nullable(),
   name: z.string().min(2, 'Tên khách hàng phải từ 2 ký tự'),
   taxCode: z.string().optional().nullable(),
   email: z

@@ -12,6 +12,7 @@ import {
   Trash2,
   Key,
   Star,
+  Edit2,
 } from "lucide-react";
 import { clientsApi } from "../../../../../lib/api/clients";
 import { peopleApi } from "../../../../../lib/api/people";
@@ -20,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface ClientCompany {
   id: string;
@@ -60,13 +62,26 @@ export default function AdminClientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Form states
+  // Add Member Form states
   const [showAddForm, setShowAddForm] = useState(false);
   const [userId, setUserId] = useState("");
   const [title, setTitle] = useState("");
   const [isPrimary, setIsPrimary] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Edit Company Form states
+  const [showEditCompany, setShowEditCompany] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editTaxCode, setEditTaxCode] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editWebsite, setEditWebsite] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editStatus, setEditStatus] = useState<"active" | "inactive">("active");
+  const [editNotes, setEditNotes] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const loadData = async () => {
     try {
@@ -163,6 +178,50 @@ export default function AdminClientDetailPage() {
     }
   };
 
+  const handleOpenEditCompany = () => {
+    if (!company) return;
+    setEditName(company.name || "");
+    setEditTaxCode(company.taxCode || "");
+    setEditEmail(company.email || "");
+    setEditPhone(company.phone || "");
+    setEditWebsite(company.website || "");
+    setEditAddress(company.address || "");
+    setEditStatus(company.status || "active");
+    setEditNotes(company.notes || "");
+    setEditError(null);
+    setShowEditCompany(true);
+  };
+
+  const handleSaveCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!company) return;
+    if (!editName.trim()) {
+      setEditError("Tên khách hàng không được để trống.");
+      return;
+    }
+
+    try {
+      setEditSubmitting(true);
+      setEditError(null);
+      await clientsApi.updateClientCompany(clientId, {
+        name: editName.trim(),
+        taxCode: editTaxCode.trim() || null,
+        email: editEmail.trim() || null,
+        phone: editPhone.trim() || null,
+        website: editWebsite.trim() || null,
+        address: editAddress.trim() || null,
+        status: editStatus,
+        notes: editNotes.trim() || null,
+      });
+      setShowEditCompany(false);
+      await loadData();
+    } catch (err: any) {
+      setEditError(err.message || "Cập nhật thông tin doanh nghiệp thất bại.");
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -170,15 +229,25 @@ export default function AdminClientDetailPage() {
         title={company ? company.name : "Chi Tiết Doanh Nghiệp"}
         description={`Mã doanh nghiệp: ${company?.code || "—"}`}
         action={
-          <Link href="/app/admin/clients">
+          <div className="flex items-center gap-2">
             <Button
-              variant="secondary"
+              variant="primary"
               size="sm"
-              leftIcon={<ArrowLeft className="w-4 h-4" />}
+              leftIcon={<Edit2 className="w-4 h-4" />}
+              onClick={handleOpenEditCompany}
             >
-              Danh sách khách hàng
+              Chỉnh sửa thông tin
             </Button>
-          </Link>
+            <Link href="/app/admin/clients">
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
+              >
+                Danh sách khách hàng
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -447,6 +516,116 @@ export default function AdminClientDetailPage() {
           </form>
         </Dialog>
       )}
+
+      {/* Edit Company Modal */}
+      <Dialog
+        isOpen={showEditCompany}
+        onClose={() => setShowEditCompany(false)}
+        maxWidth="lg"
+        title={`Chỉnh sửa doanh nghiệp: ${company?.name || ""}`}
+        description="Cập nhật chi tiết hồ sơ đối tác, thông tin liên hệ và trạng thái hoạt động."
+      >
+        <form onSubmit={handleSaveCompany} className="space-y-4 pt-2">
+          {editError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
+              {editError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <Input
+                label="Tên doanh nghiệp *"
+                placeholder="Nhập tên doanh nghiệp..."
+                required
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A] mb-1.5">
+                Trạng thái
+              </label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as "active" | "inactive")}
+                className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+              >
+                <option value="active">Đang hoạt động (Active)</option>
+                <option value="inactive">Tạm dừng (Inactive)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Mã số thuế"
+              placeholder="0101234567"
+              value={editTaxCode}
+              onChange={(e) => setEditTaxCode(e.target.value)}
+            />
+            <Input
+              label="Email liên hệ"
+              type="email"
+              placeholder="contact@company.com"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+            />
+            <Input
+              label="Số điện thoại"
+              placeholder="028 3822 xxxx"
+              value={editPhone}
+              onChange={(e) => setEditPhone(e.target.value)}
+            />
+          </div>
+
+          <Input
+            label="Website doanh nghiệp"
+            placeholder="https://company.com"
+            value={editWebsite}
+            onChange={(e) => setEditWebsite(e.target.value)}
+          />
+
+          <Input
+            label="Địa chỉ trụ sở"
+            placeholder="Cập nhật địa chỉ trụ sở..."
+            value={editAddress}
+            onChange={(e) => setEditAddress(e.target.value)}
+          />
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+              Ghi chú đối tác
+            </label>
+            <textarea
+              rows={2}
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              placeholder="Ghi chú quan trọng..."
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowEditCompany(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={editSubmitting}
+            >
+              Lưu thay đổi
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }

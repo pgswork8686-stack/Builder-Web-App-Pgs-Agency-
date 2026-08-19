@@ -49,7 +49,7 @@ export const clientsApi = {
   },
 
   async createClientCompany(data: {
-    code: string;
+    code?: string;
     name: string;
     taxCode?: string | null;
     email?: string | null;

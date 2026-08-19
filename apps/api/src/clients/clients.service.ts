@@ -117,12 +117,13 @@ export class ClientsService {
 
   async createClientCompany(dto: CreateClientCompanyDto, adminUserId: string) {
     const client = this.supabaseService.getSystemClient();
+    const effectiveCode = dto.code?.trim().toUpperCase() || `KH_${Date.now().toString().slice(-4)}`;
 
     // Check unique code
     const { data: existing } = await client
       .from('client_companies')
       .select('id')
-      .eq('code', dto.code.trim().toUpperCase())
+      .eq('code', effectiveCode)
       .maybeSingle();
 
     if (existing) {
@@ -135,7 +136,7 @@ export class ClientsService {
     const { data, error } = await client
       .from('client_companies')
       .insert({
-        code: dto.code.trim().toUpperCase(),
+        code: effectiveCode,
         name: dto.name.trim(),
         tax_code: dto.taxCode?.trim() || null,
         email: dto.email?.trim() || null,

@@ -42,7 +42,9 @@ interface ClientCompany {
   email: string | null;
   phone: string | null;
   website: string | null;
+  address?: string | null;
   status: "active" | "inactive";
+  notes?: string | null;
   membersCount: number;
 }
 
@@ -73,8 +75,15 @@ export default function AdminClientsPage() {
 
   // Edit states
   const [editingComp, setEditingComp] = useState<ClientCompany | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editTaxCode, setEditTaxCode] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editWebsite, setEditWebsite] = useState("");
   const [editAddress, setEditAddress] = useState("");
+  const [editStatus, setEditStatus] = useState<"active" | "inactive">("active");
   const [editNotes, setEditNotes] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
 
   const fetchClients = async () => {
     try {
@@ -104,19 +113,19 @@ export default function AdminClientsPage() {
     e.preventDefault();
     setFormError(null);
 
-    if (code.trim().length < 2 || code.trim().length > 30) {
-      setFormError("Mã khách hàng phải từ 2 đến 30 ký tự");
+    if (name.trim().length < 2) {
+      setFormError("Tên khách hàng phải từ 2 ký tự trở lên.");
       return;
     }
-    if (name.trim().length < 2) {
-      setFormError("Tên khách hàng phải từ 2 ký tự");
+    if (code.trim() && !/^[A-Z0-9_-]{2,30}$/i.test(code.trim())) {
+      setFormError("Mã khách hàng phải từ 2-30 ký tự (ví dụ: KH_01 hoặc PGS-VNG).");
       return;
     }
 
     try {
       setSubmitting(true);
       await clientsApi.createClientCompany({
-        code: code.trim().toUpperCase(),
+        code: code.trim() ? code.trim().toUpperCase() : `KH_${Date.now().toString().slice(-4)}`,
         name: name.trim(),
         status: "active",
         taxCode: taxCode.trim() || null,
@@ -146,24 +155,43 @@ export default function AdminClientsPage() {
 
   const handleEdit = (comp: ClientCompany) => {
     setEditingComp(comp);
-    setEditAddress("");
-    setEditNotes("");
+    setEditName(comp.name || "");
+    setEditTaxCode(comp.taxCode || "");
+    setEditEmail(comp.email || "");
+    setEditPhone(comp.phone || "");
+    setEditWebsite(comp.website || "");
+    setEditAddress(comp.address || "");
+    setEditStatus(comp.status || "active");
+    setEditNotes(comp.notes || "");
+    setEditError(null);
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingComp) return;
 
+    if (!editName.trim()) {
+      setEditError("Tên khách hàng không được để trống.");
+      return;
+    }
+
     try {
       setSubmitting(true);
+      setEditError(null);
       await clientsApi.updateClientCompany(editingComp.id, {
+        name: editName.trim(),
+        taxCode: editTaxCode.trim() || null,
+        email: editEmail.trim() || null,
+        phone: editPhone.trim() || null,
+        website: editWebsite.trim() || null,
         address: editAddress.trim() || null,
+        status: editStatus,
         notes: editNotes.trim() || null,
       });
       setEditingComp(null);
       fetchClients();
     } catch (err: any) {
-      alert(err.message || "Không thể cập nhật");
+      setEditError(err.message || "Không thể cập nhật thông tin khách hàng");
     } finally {
       setSubmitting(false);
     }
@@ -412,23 +440,23 @@ export default function AdminClientsPage() {
       >
         <form onSubmit={handleCreate} className="space-y-4 pt-2">
           {formError && (
-            <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/30 text-rose-300 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
               {formError}
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Mã khách hàng *"
-              placeholder="VD: PGS-VNG"
-              required
+              label="Mã khách hàng (Tùy chọn: KH_XX)"
+              placeholder="VD: KH_01 (để trống tự sinh)"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
+              helperText="Định dạng KH_XX hoặc để trống để tự sinh mã"
             />
 
             <Input
               label="Tên doanh nghiệp *"
-              placeholder="VD: Tập đoàn VNG"
+              placeholder="VD: Công ty TNHH Giải Pháp Công Nghệ ABC"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -471,7 +499,20 @@ export default function AdminClientsPage() {
             onChange={(e) => setAddress(e.target.value)}
           />
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#1C1C1E]">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+              Ghi chú đối tác
+            </label>
+            <textarea
+              rows={2}
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              placeholder="Ghi chú về khách hàng, yêu cầu đặc thù..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
             <Button
               type="button"
               variant="secondary"
@@ -496,25 +537,92 @@ export default function AdminClientsPage() {
       <Dialog
         isOpen={!!editingComp}
         onClose={() => setEditingComp(null)}
-        maxWidth="sm"
-        title={`Cập nhật thông tin: ${editingComp?.name}`}
+        maxWidth="lg"
+        title={`Cập nhật thông tin khách hàng: ${editingComp?.name}`}
+        description="Chỉnh sửa chi tiết thông tin pháp nhân và liên hệ đối tác."
       >
         <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
+          {editError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
+              {editError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <Input
+                label="Tên doanh nghiệp *"
+                placeholder="Nhập tên doanh nghiệp..."
+                required
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A] mb-1.5">
+                Trạng thái
+              </label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as "active" | "inactive")}
+                className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+              >
+                <option value="active">Đang hoạt động (Active)</option>
+                <option value="inactive">Tạm dừng (Inactive)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Mã số thuế"
+              placeholder="0101234567"
+              value={editTaxCode}
+              onChange={(e) => setEditTaxCode(e.target.value)}
+            />
+            <Input
+              label="Email liên hệ"
+              type="email"
+              placeholder="contact@company.com"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+            />
+            <Input
+              label="Số điện thoại"
+              placeholder="028 3822 xxxx"
+              value={editPhone}
+              onChange={(e) => setEditPhone(e.target.value)}
+            />
+          </div>
+
           <Input
-            label="Địa chỉ mới"
-            placeholder="Cập nhật địa chỉ..."
+            label="Website doanh nghiệp"
+            placeholder="https://company.com"
+            value={editWebsite}
+            onChange={(e) => setEditWebsite(e.target.value)}
+          />
+
+          <Input
+            label="Địa chỉ trụ sở"
+            placeholder="Cập nhật địa chỉ trụ sở..."
             value={editAddress}
             onChange={(e) => setEditAddress(e.target.value)}
           />
 
-          <Input
-            label="Ghi chú đối tác"
-            placeholder="Ghi chú quan trọng..."
-            value={editNotes}
-            onChange={(e) => setEditNotes(e.target.value)}
-          />
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+              Ghi chú đối tác
+            </label>
+            <textarea
+              rows={2}
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              placeholder="Ghi chú quan trọng..."
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+            />
+          </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#1C1C1E]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
             <Button
               type="button"
               variant="secondary"
