@@ -75,7 +75,7 @@ export const UpdatePersonFullSchema = z.object({
     .enum(['admin', 'team_leader', 'employee', 'accountant', 'client'])
     .optional(),
   accountStatus: z
-    .enum(['pending', 'active', 'suspended', 'terminated'])
+    .enum(['pending', 'active', 'suspended', 'terminated', 'rejected'])
     .optional(),
   employeeCode: z.string().trim().min(2).max(30).optional().nullable(),
   departmentId: z.string().uuid().optional().nullable(),

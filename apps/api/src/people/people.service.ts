@@ -586,16 +586,66 @@ export class PeopleService {
   ) {
     const client = this.supabaseService.getSystemClient();
 
-    // 1. Update Profile
+    const { data: currentProfile, error: profileErr } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileErr || !currentProfile) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Không tìm thấy tài khoản người dùng.',
+      });
+    }
+
+    const now = new Date().toISOString();
     const profileUpdates: any = {};
     if (dto.fullName !== undefined) profileUpdates.full_name = dto.fullName;
-    if (dto.role !== undefined) profileUpdates.role = dto.role;
-    if (dto.accountStatus !== undefined)
-      profileUpdates.account_status = dto.accountStatus;
     if (dto.phone !== undefined) profileUpdates.phone = dto.phone;
 
+    // Handle account status & role changes ensuring check_role_status_consistency
+    const targetStatus = dto.accountStatus;
+    const targetRole = dto.role !== undefined ? dto.role : currentProfile.role;
+
+    if (
+      targetStatus === 'suspended' ||
+      targetStatus === 'terminated' ||
+      targetStatus === 'rejected'
+    ) {
+      profileUpdates.account_status = 'rejected';
+      profileUpdates.role = null;
+      profileUpdates.approved_at = null;
+      profileUpdates.approved_by = null;
+      profileUpdates.rejected_at = now;
+      profileUpdates.rejected_by = adminUserId;
+      profileUpdates.rejection_reason = 'Khóa tài khoản bởi Quản trị viên';
+    } else if (targetStatus === 'pending') {
+      profileUpdates.account_status = 'pending';
+      profileUpdates.role = null;
+      profileUpdates.approved_at = null;
+      profileUpdates.approved_by = null;
+      profileUpdates.rejected_at = null;
+      profileUpdates.rejected_by = null;
+      profileUpdates.rejection_reason = null;
+    } else if (
+      targetStatus === 'active' ||
+      (dto.role && currentProfile.account_status !== 'active')
+    ) {
+      const activeRole = targetRole || 'employee';
+      profileUpdates.account_status = 'active';
+      profileUpdates.role = activeRole;
+      profileUpdates.approved_at = now;
+      profileUpdates.approved_by = adminUserId;
+      profileUpdates.rejected_at = null;
+      profileUpdates.rejected_by = null;
+      profileUpdates.rejection_reason = null;
+    } else if (dto.role !== undefined) {
+      profileUpdates.role = dto.role;
+    }
+
     if (Object.keys(profileUpdates).length > 0) {
-      profileUpdates.updated_at = new Date().toISOString();
+      profileUpdates.updated_at = now;
       const { error: profErr } = await client
         .from('profiles')
         .update(profileUpdates)
@@ -610,14 +660,78 @@ export class PeopleService {
       }
     }
 
-    // 2. Manage employee profile if not client
+    // 2. Manage employee profile if not client and not rejected/terminated
     const effectiveRole =
-      dto.role || (await this.getPersonByUserId(userId)).role;
+      profileUpdates.role !== undefined
+        ? profileUpdates.role
+        : currentProfile.role;
+    const isLocked = profileUpdates.account_status === 'rejected';
 
-    if (effectiveRole === 'client') {
-      // Remove employee profile if existing
+    if (isLocked) {
+      // Set employee status to terminated
+      await client
+        .from('employee_profiles')
+        .update({
+          employment_status: 'terminated',
+          left_date: now.split('T')[0],
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('user_id', userId);
+
+      // Clean up Department Head / Team Leader positions
+      await client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId);
+
+      await client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId);
+
+      await client.from('project_memberships').delete().eq('user_id', userId);
+      await client.from('client_memberships').delete().eq('user_id', userId);
+    } else if (effectiveRole === 'client') {
+      // Remove employee profile if changing to client
       await client.from('employee_profiles').delete().eq('user_id', userId);
+      await client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId);
+      await client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId);
     } else {
+      // If role changed from team_leader to something else, remove team leader assignment
+      if (effectiveRole !== 'team_leader') {
+        await client
+          .from('teams')
+          .update({
+            leader_user_id: null,
+            updated_by: adminUserId,
+            updated_at: now,
+          })
+          .eq('leader_user_id', userId);
+      }
+
       // Upsert employee profile if relevant fields provided
       if (
         dto.employeeCode !== undefined ||
@@ -630,7 +744,7 @@ export class PeopleService {
         const empPayload: any = {
           user_id: userId,
           updated_by: adminUserId,
-          updated_at: new Date().toISOString(),
+          updated_at: now,
         };
 
         if (dto.employeeCode)
@@ -677,26 +791,41 @@ export class PeopleService {
   async deletePerson(userId: string, adminUserId: string) {
     const client = this.supabaseService.getSystemClient();
 
-    // Check if target is admin
-    const { data: target } = await client
+    // Check if target exists
+    const { data: target, error: targetErr } = await client
       .from('profiles')
-      .select('id, role')
+      .select('id, role, account_status')
       .eq('id', userId)
       .maybeSingle();
 
-    if (!target) {
+    if (targetErr || !target) {
       throw new NotFoundException({
         code: 'USER_NOT_FOUND',
         message: 'Không tìm thấy tài khoản người dùng.',
       });
     }
 
-    // Terminate and deactivate profile
+    if (target.id === adminUserId) {
+      throw new BadRequestException({
+        code: 'CANNOT_TERMINATE_SELF',
+        message: 'Không thể tự khóa hoặc thôi việc tài khoản của chính mình.',
+      });
+    }
+
+    const now = new Date().toISOString();
+
+    // Terminate and deactivate profile in compliance with Postgres constraint check_role_status_consistency
     const { error } = await client
       .from('profiles')
       .update({
-        account_status: 'terminated',
-        updated_at: new Date().toISOString(),
+        account_status: 'rejected',
+        role: null,
+        approved_at: null,
+        approved_by: null,
+        rejected_at: now,
+        rejected_by: adminUserId,
+        rejection_reason: 'Khóa tài khoản / Thôi việc bởi Quản trị viên',
+        updated_at: now,
       })
       .eq('id', userId);
 
@@ -713,16 +842,39 @@ export class PeopleService {
       .from('employee_profiles')
       .update({
         employment_status: 'terminated',
-        left_date: new Date().toISOString().split('T')[0],
+        left_date: now.split('T')[0],
         updated_by: adminUserId,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
       .eq('user_id', userId);
 
-    // Remove active project memberships
-    await client.from('project_memberships').delete().eq('user_id', userId);
+    // Clean up Department Head / Team Leader positions if any
+    await client
+      .from('departments')
+      .update({
+        head_user_id: null,
+        updated_by: adminUserId,
+        updated_at: now,
+      })
+      .eq('head_user_id', userId);
 
-    return { success: true, message: 'Đã chấm dứt tài khoản thành công.' };
+    await client
+      .from('teams')
+      .update({
+        leader_user_id: null,
+        updated_by: adminUserId,
+        updated_at: now,
+      })
+      .eq('leader_user_id', userId);
+
+    // Remove active project & client memberships
+    await client.from('project_memberships').delete().eq('user_id', userId);
+    await client.from('client_memberships').delete().eq('user_id', userId);
+
+    return {
+      success: true,
+      message: 'Đã khóa và chấm dứt tài khoản thành công.',
+    };
   }
 
   async getUserProjects(userId: string) {

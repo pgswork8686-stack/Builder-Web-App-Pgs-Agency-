@@ -85,7 +85,8 @@ export const peopleApi = {
       fullName?: string;
       phone?: string | null;
       role?: "admin" | "team_leader" | "employee" | "accountant" | "client";
-      accountStatus?: "pending" | "active" | "suspended" | "terminated";
+      accountStatus?:
+        "pending" | "active" | "suspended" | "terminated" | "rejected";
       employeeCode?: string | null;
       departmentId?: string | null;
       teamId?: string | null;

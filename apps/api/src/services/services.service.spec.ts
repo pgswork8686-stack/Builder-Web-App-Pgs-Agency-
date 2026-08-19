@@ -431,7 +431,10 @@ describe('ServicesService', () => {
       client.from
         // 1. getServiceResponsibilities check
         .mockReturnValueOnce(
-          queryResult({ data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } }, 'maybeSingle'),
+          queryResult(
+            { data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } },
+            'maybeSingle',
+          ),
         )
         .mockReturnValueOnce(queryResult({ data: [] }))
         .mockReturnValueOnce(queryResult({ data: [] }))
@@ -448,8 +451,18 @@ describe('ServicesService', () => {
         .mockReturnValueOnce(
           queryResult({
             data: [
-              { id: teamDept1, team_code: 'TM_01', department_id: dept1, is_active: true },
-              { id: teamDept2, team_code: 'TM_02', department_id: dept2, is_active: true },
+              {
+                id: teamDept1,
+                team_code: 'TM_01',
+                department_id: dept1,
+                is_active: true,
+              },
+              {
+                id: teamDept2,
+                team_code: 'TM_02',
+                department_id: dept2,
+                is_active: true,
+              },
             ],
           }),
         )
@@ -464,21 +477,46 @@ describe('ServicesService', () => {
         .mockReturnValueOnce(queryResult({ data: null }))
         // 7. return updated responsibilities (getServiceResponsibilities)
         .mockReturnValueOnce(
-          queryResult({ data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } }, 'maybeSingle'),
+          queryResult(
+            { data: { id: serviceId, service_code: 'DV_01', name: 'SEO' } },
+            'maybeSingle',
+          ),
         )
         .mockReturnValueOnce(
           queryResult({
             data: [
-              { id: 'da-1', department_id: dept1, department_code: 'PB_02', responsibility_role: 'owner' },
-              { id: 'da-2', department_id: dept2, department_code: 'PB_03', responsibility_role: 'collaborator' },
+              {
+                id: 'da-1',
+                department_id: dept1,
+                department_code: 'PB_02',
+                responsibility_role: 'owner',
+              },
+              {
+                id: 'da-2',
+                department_id: dept2,
+                department_code: 'PB_03',
+                responsibility_role: 'collaborator',
+              },
             ],
           }),
         )
         .mockReturnValueOnce(
           queryResult({
             data: [
-              { id: 'ta-1', team_id: teamDept1, team_code: 'TM_01', department_code: 'PB_02', responsibility_role: 'owner' },
-              { id: 'ta-2', team_id: teamDept2, team_code: 'TM_02', department_code: 'PB_03', responsibility_role: 'collaborator' },
+              {
+                id: 'ta-1',
+                team_id: teamDept1,
+                team_code: 'TM_01',
+                department_code: 'PB_02',
+                responsibility_role: 'owner',
+              },
+              {
+                id: 'ta-2',
+                team_id: teamDept2,
+                team_code: 'TM_02',
+                department_code: 'PB_03',
+                responsibility_role: 'collaborator',
+              },
             ],
           }),
         );
