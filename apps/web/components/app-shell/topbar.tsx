@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
-  Search,
   LogOut,
   User,
   Shield,
@@ -88,7 +87,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
   return (
     <header className="h-[78px] border-b border-[#EDF2F7] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-      {/* Left side: Hamburger (mobile/tablet) + Search Field */}
+      {/* Left side: Hamburger (mobile/tablet) */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
@@ -98,16 +97,6 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         >
           <Menu className="w-5 h-5" />
         </button>
-
-        <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#7C879D] w-48 md:w-64 select-none opacity-80 cursor-not-allowed">
-          <Search className="w-3.5 h-3.5 shrink-0" />
-          <span className="text-xs text-[#7C879D] truncate flex-1">
-            Tìm kiếm...
-          </span>
-          <span className="hidden md:inline px-1.5 py-0.5 rounded bg-white text-[10px] text-[#7C879D] font-mono shadow-2xs border border-[#EDF2F7]">
-            Chưa hỗ trợ
-          </span>
-        </div>
       </div>
 
       {/* Center: Current Dashboard / Page Name */}
