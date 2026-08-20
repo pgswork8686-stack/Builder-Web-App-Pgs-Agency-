@@ -135,9 +135,31 @@ export default function ProtectedAppLayout({
             Đang kiểm tra quyền truy cập...
           </p>
           {error ? (
-            <p className="mt-3 max-w-md text-xs text-red-600 font-semibold">
-              {error}
-            </p>
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <p className="max-w-md text-xs font-semibold text-red-600">
+                {error}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-[#4F75FF] hover:bg-[#3d62ee] rounded-lg transition-colors cursor-pointer"
+                >
+                  Thử lại
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                    router.replace("/auth/login");
+                  }}
+                  className="px-3 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
           ) : null}
         </div>
       </div>

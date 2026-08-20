@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { workspaceApi, type CalendarTask } from "@/lib/api/workspace";
+import { workCalendarApi, type WorkCalendarDay } from "@/lib/api/work-calendar";
 import { ProjectTaskCreateDialog } from "./project-task-create-dialog";
 import {
   ProjectWorkspaceRealtimeProvider,
@@ -73,6 +74,11 @@ function ProjectCalendarContent({
   });
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
+  const [calendarDaysMap, setCalendarDaysMap] = useState<
+    Map<string, WorkCalendarDay>
+  >(new Map());
+  const [showTasks, setShowTasks] = useState(true);
+  const [showWorkSchedule, setShowWorkSchedule] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createDate, setCreateDate] = useState<string | null>(null);
@@ -82,14 +88,23 @@ function ProjectCalendarContent({
     setLoading(true);
     setError(null);
     try {
-      const [projectData, taskData] = await Promise.all([
+      const from = dateKey(days[0]);
+      const to = dateKey(days[41]);
+      const [projectData, taskData, calendarData] = await Promise.all([
         mode === "admin"
           ? projectsApi.getAdminProject(projectId)
           : projectsApi.getInternalProject(projectId),
-        workspaceApi.calendar(projectId, dateKey(days[0]), dateKey(days[41])),
+        workspaceApi.calendar(projectId, from, to),
+        workCalendarApi.range(from, to).catch(() => ({ days: [] })),
       ]);
       setProject(projectData);
       setTasks(taskData);
+
+      const map = new Map<string, WorkCalendarDay>();
+      calendarData.days.forEach((day) => {
+        map.set(day.date, day);
+      });
+      setCalendarDaysMap(map);
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "Không thể tải lịch.",
@@ -117,8 +132,52 @@ function ProjectCalendarContent({
 
   const inner = (
     <div className="space-y-4">
-      {canCreateTask && (
-        <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Legend and Toggles */}
+        <div className="flex flex-wrap items-center gap-4 text-xs">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#4F75FF]" /> Công
+              việc
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Ngày
+              làm việc
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+              <span className="h-2.5 w-2.5 rounded-full bg-slate-300" /> Ngày
+              nghỉ
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Ngày lễ
+            </span>
+          </div>
+
+          <div className="h-4 w-px bg-[#E2E8F0] hidden sm:block" />
+
+          <div className="flex items-center gap-3">
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#0F172A] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showTasks}
+                onChange={(e) => setShowTasks(e.target.checked)}
+                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+              />
+              <span>Công việc</span>
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#0F172A] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showWorkSchedule}
+                onChange={(e) => setShowWorkSchedule(e.target.checked)}
+                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+              />
+              <span>Lịch làm việc</span>
+            </label>
+          </div>
+        </div>
+
+        {canCreateTask && (
           <button
             type="button"
             onClick={() => setCreateDate(dateKey(new Date()))}
@@ -127,8 +186,8 @@ function ProjectCalendarContent({
             <Plus className="h-4 w-4" />
             Tạo công việc
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
         <button
@@ -182,39 +241,92 @@ function ProjectCalendarContent({
                 return Boolean(start && end && key >= start && key <= end);
               });
               const currentMonth = day.getUTCMonth() === month.getUTCMonth();
+              const workDay = calendarDaysMap.get(key);
+              const isNonWorking = workDay ? !workDay.isWorkingDay : false;
+              const isHoliday =
+                workDay?.reason === "public_holiday" ||
+                workDay?.eventType === "public_holiday";
+
+              // Cell styling based on work schedule toggle
+              let cellBg = "bg-white";
+              if (showWorkSchedule && isNonWorking) {
+                cellBg = isHoliday ? "bg-amber-50/40" : "bg-slate-50/80";
+              }
+
               return (
                 <div
                   key={key}
                   onClick={() => {
                     if (canCreateTask) setCreateDate(key);
                   }}
-                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors hover:bg-[#F8FAFC]/60 ${
+                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors ${cellBg} hover:bg-[#F8FAFC] ${
                     canCreateTask ? "cursor-pointer" : ""
                   }`}
                   title={
-                    canCreateTask ? `Tạo công việc ngày ${key}` : undefined
+                    canCreateTask
+                      ? `Tạo công việc ngày ${key}${workDay ? ` (${workDay.title})` : ""}`
+                      : workDay?.title
                   }
                 >
-                  <p
-                    className={`mb-2 text-xs font-bold ${
-                      currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
-                    }`}
-                  >
-                    {day.getUTCDate()}
-                  </p>
-                  <div className="space-y-1">
-                    {dayTasks.map((task) => (
-                      <Link
-                        key={task.taskId}
-                        href={`${base}/${projectId}/tasks/${task.taskId}`}
-                        onClick={(event) => event.stopPropagation()}
-                        className="block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
-                        title={task.title}
+                  <div className="mb-2 flex items-start justify-between">
+                    <p
+                      className={`text-xs font-bold ${
+                        currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
+                      }`}
+                    >
+                      {day.getUTCDate()}
+                    </p>
+
+                    {showWorkSchedule && workDay && (
+                      <span
+                        className={`inline-block truncate max-w-[85px] rounded px-1.5 py-0.5 text-[9px] font-semibold ${
+                          !workDay.isWorkingDay
+                            ? isHoliday
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-slate-200 text-slate-700"
+                            : "bg-emerald-50 text-emerald-700"
+                        }`}
+                        title={workDay.title}
                       >
-                        {task.title}
-                      </Link>
-                    ))}
+                        {workDay.title}
+                      </span>
+                    )}
                   </div>
+
+                  {showTasks && (
+                    <div className="space-y-1">
+                      {dayTasks.map((task) => {
+                        const isDeadlineDay = task.dueDate === key;
+                        const taskDueInfo = task.dueDate
+                          ? calendarDaysMap.get(task.dueDate)
+                          : null;
+                        const isDueOnNonWorking =
+                          taskDueInfo && !taskDueInfo.isWorkingDay;
+
+                        return (
+                          <Link
+                            key={task.taskId}
+                            href={`${base}/${projectId}/tasks/${task.taskId}`}
+                            onClick={(event) => event.stopPropagation()}
+                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
+                            title={task.title}
+                          >
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="truncate">{task.title}</span>
+                              {isDeadlineDay && isDueOnNonWorking && (
+                                <span
+                                  className="inline-flex items-center text-amber-600 shrink-0"
+                                  title="⚠ Deadline rơi vào ngày nghỉ"
+                                >
+                                  <AlertTriangle className="h-3 w-3" />
+                                </span>
+                              )}
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}

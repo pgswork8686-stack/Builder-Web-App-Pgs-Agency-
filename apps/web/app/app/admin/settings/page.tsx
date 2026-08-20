@@ -167,6 +167,32 @@ export default function AdminSettingsPage() {
           onSubmit={handleSave}
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
+          {/* Work Calendar Link Card */}
+          <Card className="p-6 space-y-4 border border-[#4F75FF]/30 bg-[#EEF2FF]/40 shadow-xs md:col-span-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#4F75FF] text-white flex items-center justify-center font-bold">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#0F172A]">
+                    Lịch Làm Việc Công Ty & Đồng Bộ Ngày Lễ
+                  </h4>
+                  <p className="text-xs text-[#64748B]">
+                    Cấu hình thứ 7 cách tuần, ngày lễ quốc gia, ngày làm bù và
+                    ngoại lệ lịch áp dụng toàn hệ thống.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/app/admin/settings/work-calendar"
+                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#4F75FF] hover:bg-[#3D61E6] rounded-xl transition-colors shrink-0 shadow-xs"
+              >
+                Quản lý lịch làm việc →
+              </a>
+            </div>
+          </Card>
+
           {/* Company Info */}
           <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
             <div className="flex items-center gap-3">

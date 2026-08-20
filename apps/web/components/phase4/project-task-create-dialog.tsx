@@ -3,8 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import { projectsApi, type ProjectServiceItem } from "@/lib/api/projects";
 import { tasksApi, type TaskPriority, type TaskStatus } from "@/lib/api/tasks";
+import { workCalendarApi, type WorkCalendarDay } from "@/lib/api/work-calendar";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { AlertTriangle } from "lucide-react";
 
 type BoardStatus = Exclude<TaskStatus, "cancelled">;
 
@@ -47,6 +49,10 @@ export function ProjectTaskCreateDialog({
   const [loadingOptions, setLoadingOptions] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [startDayInfo, setStartDayInfo] = useState<WorkCalendarDay | null>(
+    null,
+  );
+  const [dueDayInfo, setDueDayInfo] = useState<WorkCalendarDay | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -70,6 +76,8 @@ export function ProjectTaskCreateDialog({
       dueDate: defaultDueDate,
     });
     setError(null);
+    setStartDayInfo(null);
+    setDueDayInfo(null);
 
     let cancelled = false;
     const loadServiceItems = async () => {
@@ -91,6 +99,50 @@ export function ProjectTaskCreateDialog({
       cancelled = true;
     };
   }, [defaultDueDate, defaultStartDate, defaultStatus, isOpen, projectId]);
+
+  // Check work calendar status for startDate
+  useEffect(() => {
+    if (!form.startDate) {
+      setStartDayInfo(null);
+      return;
+    }
+    let cancelled = false;
+    workCalendarApi
+      .range(form.startDate, form.startDate)
+      .then((res) => {
+        if (!cancelled && res.days.length > 0) {
+          setStartDayInfo(res.days[0]);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setStartDayInfo(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.startDate]);
+
+  // Check work calendar status for dueDate
+  useEffect(() => {
+    if (!form.dueDate) {
+      setDueDayInfo(null);
+      return;
+    }
+    let cancelled = false;
+    workCalendarApi
+      .range(form.dueDate, form.dueDate)
+      .then((res) => {
+        if (!cancelled && res.days.length > 0) {
+          setDueDayInfo(res.days[0]);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setDueDayInfo(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.dueDate]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -273,6 +325,15 @@ export function ProjectTaskCreateDialog({
               }
               className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
             />
+            {startDayInfo && !startDayInfo.isWorkingDay && (
+              <div className="mt-1.5 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200 p-2 text-[11px] text-amber-800">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600 mt-0.5" />
+                <span>
+                  ⚠ <strong>{form.startDate}</strong> là ngày nghỉ công ty (
+                  {startDayInfo.title}).
+                </span>
+              </div>
+            )}
           </div>
 
           <div>
@@ -288,6 +349,15 @@ export function ProjectTaskCreateDialog({
               }
               className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
             />
+            {dueDayInfo && !dueDayInfo.isWorkingDay && (
+              <div className="mt-1.5 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200 p-2 text-[11px] text-amber-800">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600 mt-0.5" />
+                <span>
+                  ⚠ <strong>{form.dueDate}</strong> là ngày nghỉ công ty (
+                  {dueDayInfo.title}).
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

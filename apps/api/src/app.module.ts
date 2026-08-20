@@ -25,6 +25,7 @@ import { SupabaseModule } from './supabase/supabase.module';
 import { SupportModule } from './support/support.module';
 import { TasksModule } from './tasks/tasks.module';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { WorkCalendarModule } from './work-calendar/work-calendar.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 
 @Module({
@@ -63,6 +64,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     NotificationsModule,
     ChatModule,
     AutomationModule,
+    WorkCalendarModule,
   ],
   providers: [
     {
