@@ -2,34 +2,36 @@
 
 `
 ================================================================================
-
 WORKFLOW ENGINE V1 MIGRATION MANIFEST (SOURCE-ONLY)
 ================================================================================
-
-MIGRATION FILE: supabase/migrations/20260820120000_workflow_engine_v1_foundation.sql
+FOUNDATION MIGRATION: supabase/migrations/20260820120000_workflow_engine_v1_foundation.sql
+HARDENING MIGRATION:  supabase/migrations/20260820123000_workflow_engine_v1_hardening.sql
 STATUS: COMMITTED TO SOURCE ONLY (CHƯA VÀ KHÔNG APPLY TRÊN PRODUCTION DB)
-TARGET DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẸN)
-ROLLBACK PLAN: DROP TABLE IF EXISTS workflow_approval_requests, project_workflow_task_links, project_workflow_stage_items, project_workflow_stages, project_workflows, workflow_template_item_dependencies, workflow_template_stage_dependencies, workflow_template_stage_items, workflow_template_stages, workflow_templates CASCADE;
+TARGET PRODUCTION DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẸN — 0 WRITES)
+PHASE 10 STATUS: NOT APPLIED
 ================================================================================
-
 `
 
-## 1. MỤC TIÊU & CẤU TRÚC BẢNG (TABLES)
+## 1. MỤC TIÊU & CẤU TRÚC 13 BẢNG (COMPLETE TABLE LIST)
 
-1. workflow_templates: Định nghĩa quy trình chuẩn theo từng Dịch vụ (Versioned: draft ➔ published ➔ archived, immutable khi published).
-2. workflow_template_stages: Phân chia các giai đoạn trong quy trình mẫu (sort_order, sla_hours, is_required).
-3. workflow_template_stage_items: Ánh xạ các Hạng mục triển khai chuẩn (Service Delivery Items) vào từng giai đoạn.
-4. workflow_template_stage_dependencies: Ràng buộc thứ tự thực hiện giữa các giai đoạn (Finish-to-Start DAG, Cycle prevention).
-5. workflow_template_item_dependencies: Ràng buộc thứ tự thực hiện giữa các hạng mục.
-6. project_workflows: Snapshot quy trình thực tế khi dự án được gắn dịch vụ.
-7. project_workflow_stages: Các giai đoạn thực thi trong dự án (locked ➔ ready ➔ in_progress ➔ completed).
-8. project_workflow_stage_items: Các hạng mục thực thi thực tế trong dự án.
-9. project_workflow_task_links: Liên kết các Task công việc duy nhất vào hạng mục quy trình.
-10. workflow_approval_requests: Yêu cầu phê duyệt nội bộ và từ phía Khách hàng.
+1. workflow_templates: Định nghĩa quy trình chuẩn theo từng Dịch vụ (QTDV_xx, versioned, immutable khi published).
+2. workflow_template_stages: Phân chia giai đoạn mẫu (GDQT_xx, sort_order, sla_hours, is_required).
+3. workflow_template_stage_items: Ánh xạ Service Delivery Items vào từng giai đoạn.
+4. workflow_template_stage_dependencies: Ràng buộc thứ tự thực hiện giữa các giai đoạn mẫu (Finish-to-Start DAG).
+5. workflow_template_item_dependencies: Ràng buộc thứ tự thực hiện giữa các hạng mục mẫu.
+6. project_workflows: Snapshot quy trình thực tế của dự án (QTDA_xx, decoupled từ template v2).
+7. project_workflow_stages: Giai đoạn thực thi dự án (GDDA_xx: locked ➔ ready ➔ in_progress ➔ completed).
+8. project_workflow_stage_items: Hạng mục thực thi thực tế trong dự án.
+9. project_workflow_stage_dependencies: Snapshot runtime ràng buộc giai đoạn dự án.
+10. project_workflow_item_dependencies: Snapshot runtime ràng buộc hạng mục dự án.
+11. project_workflow_task_links: Liên kết Task công việc duy nhất (public.tasks) vào hạng mục quy trình.
+12. workflow_approval_requests: Yêu cầu phê duyệt nội bộ và khách hàng.
+13. workflow_audit_events: Lưu vết kiểm toán toàn diện (audit trail) cho mọi hành động trong quy trình.
 
-## 2. BẢO MẬT & PHÂN QUYỀN (RLS & SECURITY)
+## 2. BẢO MẬT & PHÂN QUYỀN (RLS & IMMUTABILITY)
 
-- Bật Row Level Security (RLS) trên toàn bộ 10 bảng mới.
-- Thu hồi toàn bộ quyền từ PUBLIC, non, uthenticated.
-- Chỉ cấp quyền cho service_role để NestJS API điều phối tập trung.
-- Tránh SECURITY DEFINER không an toàn.
+- Bật Row Level Security (RLS) trên toàn bộ 13 bảng.
+- Thu hồi toàn bộ quyền từ PUBLIC, anon, authenticated.
+- Chỉ cấp quyền cho service_role để NestJS Backend điều phối an toàn.
+- Mã nghiệp vụ (QTDV_xx, GDQT_xx, QTDA_xx, GDDA_xx) sinh tự động qua sequence và gắn trigger bất biến prevent_business_code_column_update().
+- Function RPC workflow_create_template được đặt SECURITY INVOKER và SET search_path = public, pg_temp.

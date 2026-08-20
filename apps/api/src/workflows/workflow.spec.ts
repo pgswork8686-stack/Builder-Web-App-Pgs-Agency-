@@ -5,12 +5,23 @@ describe('Workflow Engine V1 Tests', () => {
   let validation: WorkflowValidationService;
   let sla: WorkflowSlaService;
   let mockCalendarService: any;
+  let mockSupabaseService: any;
 
   beforeEach(() => {
     validation = new WorkflowValidationService();
     mockCalendarService = {
       resolveDay: jest.fn().mockImplementation((date: string) => {
-        // Sunday is non-working day
+        console.log('[TEST CALENDAR CHECK]', date);
+        if (date === '2026-08-22' || date === '2026-09-05') {
+          return Promise.resolve({
+            date,
+            isWorkingDay: false,
+            reason: 'alternate_saturday',
+            title: 'Nghỉ T7 cách tuần',
+            sourceType: 'rule',
+            eventType: null,
+          });
+        }
         const d = new Date(date);
         const isSunday = d.getUTCDay() === 0;
         return Promise.resolve({
@@ -23,7 +34,10 @@ describe('Workflow Engine V1 Tests', () => {
         });
       }),
     };
-    sla = new WorkflowSlaService(mockCalendarService);
+    mockSupabaseService = {
+      getSystemClient: jest.fn(),
+    };
+    sla = new WorkflowSlaService(mockCalendarService, mockSupabaseService);
   });
 
   describe('DAG Cycle Detection', () => {
@@ -53,13 +67,28 @@ describe('Workflow Engine V1 Tests', () => {
   });
 
   describe('Working Duration SLA', () => {
-    it('should calculate SLA skipping non-working days', async () => {
-      // Saturday morning 08:00 (working)
-      const start = new Date('2026-08-22T08:00:00.000Z');
-      // 16 working hours = 2 working days
-      const due = await sla.addWorkingHours(start, 16);
-      expect(due).toBeDefined();
-      expect(due.getTime()).toBeGreaterThan(start.getTime());
+    it('should return unconfigured when work hours are not defined', async () => {
+      const res = await sla.calculateDueAt(new Date(), 16, {
+        workday_start_time: null,
+        workday_end_time: null,
+      });
+      expect(res.configured).toBe(false);
+      expect(res.dueAt).toBeNull();
+      expect(res.reason).toBe('WORK_HOURS_NOT_CONFIGURED');
+    });
+
+    it('should correctly skip alternate Saturday 22/08 and Sunday 23/08', async () => {
+      const start = new Date('2026-08-21T01:00:00.000Z');
+      const settings = {
+        workday_start_time: '08:00',
+        workday_end_time: '17:00',
+        timezone: 'Asia/Ho_Chi_Minh',
+      };
+      const res = await sla.calculateDueAt(start, 12, settings);
+      console.log('[RESULT DUE AT]', res);
+      expect(res.configured).toBe(true);
+      expect(res.dueAt).toBeDefined();
+      expect(res.dueAt).toContain('2026-08-24');
     });
   });
 });

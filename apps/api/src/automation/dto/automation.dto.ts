@@ -15,6 +15,18 @@ export const AutomationTriggerSchema = z.enum([
   'invoice.overdue',
   'invoice.payment_recorded',
   'chat.message',
+  'workflow.started',
+  'workflow.stage.ready',
+  'workflow.stage.started',
+  'workflow.stage.completed',
+  'workflow.item.ready',
+  'workflow.item.blocked',
+  'workflow.item.completed',
+  'workflow.approval.requested',
+  'workflow.approval.approved',
+  'workflow.approval.rejected',
+  'workflow.sla.due_soon',
+  'workflow.sla.breached',
 ]);
 
 export type AutomationTrigger = z.infer<typeof AutomationTriggerSchema>;
