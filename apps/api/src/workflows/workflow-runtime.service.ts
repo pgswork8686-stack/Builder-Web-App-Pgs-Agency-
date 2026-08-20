@@ -658,7 +658,7 @@ export class WorkflowRuntimeService implements OnModuleInit {
 
   async startStage(projectId: string, stageId: string, user: RequestUser) {
     await this.requireProjectAccess(projectId, user, 'write');
-    let stage = await this.requireStage(projectId, stageId, true);
+    const stage = await this.requireStage(projectId, stageId, true);
     if (stage.status === 'in_progress') {
       const activationTime =
         typeof stage.started_at === 'string'
