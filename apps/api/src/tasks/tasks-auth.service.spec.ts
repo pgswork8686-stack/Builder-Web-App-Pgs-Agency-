@@ -55,13 +55,16 @@ function mockQueryChain(response: { data: any; error: any }) {
 describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)', () => {
   let service: TasksService;
   let fromMock: jest.Mock;
+  let rpcMock: jest.Mock;
 
   beforeEach(async () => {
     fromMock = jest.fn();
+    rpcMock = jest.fn();
 
     const mockSupabaseService = {
       getSystemClient: jest.fn().mockReturnValue({
         from: fromMock,
+        rpc: rpcMock,
       }),
     };
 
@@ -241,6 +244,67 @@ describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)'
       );
 
       expect(result.id).toBe('new-task-1');
+    });
+
+    it('allows a member designated on the Project to atomically create the Workflow primary Task', async () => {
+      const managerUser = makeUser({ role: 'employee' });
+      const workflowItemId = '55555555-5555-4555-8555-555555555555';
+      const projectServiceItemId = '66666666-6666-4666-8666-666666666666';
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: {
+              id: PROJECT_A,
+              project_manager_user_id: managerUser.profileId,
+            },
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(
+          mockQueryChain({ data: { project_role: 'member' }, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: projectServiceItemId, project_id: PROJECT_A },
+            error: null,
+          }),
+        );
+      rpcMock.mockResolvedValueOnce({
+        data: {
+          id: 'workflow-task-1',
+          project_id: PROJECT_A,
+          project_service_item_id: projectServiceItemId,
+          title: 'Workflow delivery item',
+          status: 'todo',
+          priority: 'medium',
+          assignee_user_id: null,
+          updated_at: '2026-08-20T00:00:00.000Z',
+          workflowLinkExisting: false,
+        },
+        error: null,
+      });
+
+      const result = await service.createTask(
+        PROJECT_A,
+        {
+          projectServiceItemId,
+          title: 'Workflow delivery item',
+          status: 'todo',
+          priority: 'medium',
+          sortOrder: 0,
+        },
+        managerUser,
+        { workflowStageItemId: workflowItemId },
+      );
+
+      expect(result.id).toBe('workflow-task-1');
+      expect(rpcMock).toHaveBeenCalledWith('workflow_create_primary_task', {
+        p_project_id: PROJECT_A,
+        p_workflow_stage_item_id: workflowItemId,
+        p_project_service_item_id: projectServiceItemId,
+        p_title: 'Workflow delivery item',
+        p_actor_id: managerUser.profileId,
+      });
     });
   });
 
