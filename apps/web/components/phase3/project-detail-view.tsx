@@ -22,13 +22,16 @@ import {
   Link as LinkIcon,
   UploadCloud,
   FileText,
+  GitBranch,
   X as CloseIcon,
 } from "lucide-react";
+import { getMe } from "@/lib/api/auth";
 import { filesApi, uploadToSignedUrl } from "@/lib/api/files";
 import { peopleApi } from "@/lib/api/people";
 import {
   type Project,
   type ProjectMemberRole,
+  type ProjectService,
   type ProjectServiceStatus,
   type ProjectStatus,
   projectsApi,
@@ -40,6 +43,7 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from "@/lib/api/tasks";
+import { ProjectWorkflowPanel } from "@/components/workflows/project-workflow-panel";
 import { ProjectLifecycleDialogs } from "./project-lifecycle-dialogs";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -64,7 +68,7 @@ import { EmbeddedBoardView } from "@/components/phase4/project-board-view";
 import { EmbeddedCalendarView } from "@/components/phase4/project-calendar-view";
 
 type Mode = "admin" | "internal" | "client";
-type Tab = "overview" | "members" | "services" | "tasks";
+type Tab = "overview" | "members" | "services" | "workflows" | "tasks";
 type TaskView = "list" | "kanban" | "calendar";
 
 const statuses: ProjectStatus[] = [
@@ -87,7 +91,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [members, setMembers] = useState<any[]>([]);
-  const [projectServices, setProjectServices] = useState<any[]>([]);
+  const [projectServices, setProjectServices] = useState<ProjectService[]>([]);
   const [catalog, setCatalog] = useState<ServiceCatalogItem[]>([]);
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [people, setPeople] = useState<any[]>([]);
@@ -95,6 +99,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   const [taskView, setTaskView] = useState<TaskView>("list");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // Lifecycle Modals
   const [completeOpen, setCompleteOpen] = useState(false);
@@ -203,6 +208,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (mode === "client") return;
+    void getMe()
+      .then((response) => setCurrentUserId(response.user.id))
+      .catch(() => setCurrentUserId(null));
+  }, [mode]);
 
   const updateProject = async (payload: Partial<Project>) => {
     if (!project) return;
@@ -342,6 +354,11 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           icon: Layers3,
           count: projectServices.length,
         },
+        {
+          value: "workflows",
+          label: "Quy trình",
+          icon: GitBranch,
+        },
       );
     }
     list.push({
@@ -357,6 +374,11 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
     mode === "admin"
       ? `/app/admin/projects/${projectId}/board`
       : `/app/projects/${projectId}/board`;
+
+  const canMutateWorkflow =
+    mode === "admin" ||
+    project?.currentProjectRole === "project_manager" ||
+    project?.projectManagerUserId === currentUserId;
 
   if (loading) {
     return (
@@ -779,7 +801,17 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         </div>
       )}
 
-      {/* Tab 4: Tasks — with Danh sách / Kanban / Lịch sub-tabs */}
+      {/* Internal/Admin only: project Workflow runtime */}
+      {tab === "workflows" && mode !== "client" && (
+        <ProjectWorkflowPanel
+          projectId={projectId}
+          projectServices={projectServices}
+          canMutate={canMutateWorkflow}
+          mode={mode}
+        />
+      )}
+
+      {/* Tasks — with Danh sách / Kanban / Lịch sub-tabs */}
       {tab === "tasks" && (
         <div className="space-y-4">
           {/* Sub-tab switcher */}
