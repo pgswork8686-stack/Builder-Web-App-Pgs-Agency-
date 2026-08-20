@@ -232,6 +232,7 @@ CREATE TABLE IF NOT EXISTS public.service_delivery_items (
 );
 
 ALTER TABLE public.service_delivery_items
+  ADD COLUMN IF NOT EXISTS code TEXT,
   ADD COLUMN IF NOT EXISTS delivery_item_code TEXT,
   ADD COLUMN IF NOT EXISTS is_required BOOLEAN NOT NULL DEFAULT TRUE,
   ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE,
