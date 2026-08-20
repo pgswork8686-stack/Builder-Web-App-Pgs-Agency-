@@ -3,21 +3,61 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
+  InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import type { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
-import { AutomationService } from '../automation/automation.service';
 import type {
-  CreateWorkflowTemplateDto,
-  UpdateWorkflowTemplateDto,
-  CreateTemplateStageDto,
-  UpdateTemplateStageDto,
-  MapStageItemDto,
+  CreateItemDependencyDto,
   CreateStageDependencyDto,
+  CreateTemplateStageDto,
+  CreateWorkflowTemplateDto,
+  MapStageItemDto,
+  UpdateMappedStageItemDto,
+  UpdateTemplateStageDto,
+  UpdateWorkflowTemplateDto,
 } from './dto/workflow.dto';
 import { WorkflowValidationService } from './workflow-validation.service';
+
+export interface WorkflowPublishValidation {
+  errors: string[];
+  warnings: string[];
+  stats: {
+    stages: number;
+    requiredItems: number;
+    mappedRequiredItems: number;
+    optionalItems: number;
+    mappedOptionalItems: number;
+  };
+}
+
+interface TemplateStageItemRow {
+  id: unknown;
+  service_delivery_item_id: unknown;
+  sla_hours?: unknown;
+  approval_scope?: unknown;
+  approval_required?: unknown;
+  completion_mode?: unknown;
+}
+
+interface TemplateStageRow {
+  id: unknown;
+  sort_order: unknown;
+  sla_hours?: unknown;
+  items?: TemplateStageItemRow[];
+}
+
+interface StageDependencyRow {
+  predecessor_stage_id: unknown;
+  successor_stage_id: unknown;
+}
+
+interface ItemDependencyRow {
+  predecessor_stage_item_id: unknown;
+  successor_stage_item_id: unknown;
+}
 
 @Injectable()
 export class WorkflowService {
@@ -26,14 +66,13 @@ export class WorkflowService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly validation: WorkflowValidationService,
-    private readonly automation?: AutomationService,
   ) {}
 
   private get client() {
     return this.supabase.getSystemClient();
   }
 
-  private assertAdmin(user: RequestUser) {
+  private assertAdmin(user: RequestUser): void {
     if (user.role !== 'admin') {
       throw new ForbiddenException({
         code: 'FORBIDDEN_OPERATION',
@@ -42,14 +81,31 @@ export class WorkflowService {
     }
   }
 
+  private databaseFailure(code: string, error: unknown): never {
+    const detail =
+      typeof error === 'object' && error && 'message' in error
+        ? String(error.message)
+        : 'unknown database error';
+    this.logger.error(`${code}: ${detail}`);
+    throw new InternalServerErrorException({
+      code,
+      message: 'Workflow database operation failed.',
+    });
+  }
+
   private async assertDraftTemplate(templateId: string) {
     const { data, error } = await this.client
       .from('workflow_templates')
-      .select('id, status, service_id')
+      .select('id,status,service_id')
       .eq('id', templateId)
       .maybeSingle();
-    if (error || !data)
-      throw new NotFoundException('Workflow template not found.');
+    if (error) this.databaseFailure('WORKFLOW_TEMPLATE_LOOKUP_FAILED', error);
+    if (!data) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_TEMPLATE_NOT_FOUND',
+        message: 'Workflow template not found.',
+      });
+    }
     if (data.status !== 'draft') {
       throw new ConflictException({
         code: 'WORKFLOW_TEMPLATE_IMMUTABLE',
@@ -60,18 +116,46 @@ export class WorkflowService {
     return data;
   }
 
+  private async templateIdForStage(stageId: string): Promise<string> {
+    const { data, error } = await this.client
+      .from('workflow_template_stages')
+      .select('workflow_template_id')
+      .eq('id', stageId)
+      .maybeSingle();
+    if (error) this.databaseFailure('WORKFLOW_STAGE_LOOKUP_FAILED', error);
+    if (!data) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_STAGE_NOT_FOUND',
+        message: 'Workflow stage not found.',
+      });
+    }
+    return String(data.workflow_template_id);
+  }
+
+  private async templateIdForItem(itemId: string): Promise<string> {
+    const { data, error } = await this.client
+      .from('workflow_template_stage_items')
+      .select('workflow_template_id')
+      .eq('id', itemId)
+      .maybeSingle();
+    if (error) this.databaseFailure('WORKFLOW_ITEM_LOOKUP_FAILED', error);
+    if (!data) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_ITEM_NOT_FOUND',
+        message: 'Workflow item not found.',
+      });
+    }
+    return String(data.workflow_template_id);
+  }
+
   async listTemplates(serviceId?: string) {
     let query = this.client
       .from('workflow_templates')
       .select('*, stages:workflow_template_stages(*)');
     if (serviceId) query = query.eq('service_id', serviceId);
     const { data, error } = await query.order('version', { ascending: false });
-    if (error)
-      throw new BadRequestException({
-        code: 'DB_ERROR',
-        message: 'Failed to list templates',
-      });
-    return data || [];
+    if (error) this.databaseFailure('WORKFLOW_TEMPLATE_LIST_FAILED', error);
+    return data ?? [];
   }
 
   async getTemplate(id: string) {
@@ -82,8 +166,13 @@ export class WorkflowService {
       )
       .eq('id', id)
       .maybeSingle();
-    if (error || !data)
-      throw new NotFoundException('Workflow template not found.');
+    if (error) this.databaseFailure('WORKFLOW_TEMPLATE_LOOKUP_FAILED', error);
+    if (!data) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_TEMPLATE_NOT_FOUND',
+        message: 'Workflow template not found.',
+      });
+    }
     return data;
   }
 
@@ -92,17 +181,10 @@ export class WorkflowService {
     const { data, error } = await this.client.rpc('workflow_create_template', {
       p_service_id: dto.serviceId,
       p_name: dto.name,
-      p_description: dto.description || null,
+      p_description: dto.description ?? null,
       p_actor_id: user.profileId,
     });
-
-    if (error) {
-      this.logger.error(`Failed to create workflow template: `);
-      throw new BadRequestException({
-        code: 'WORKFLOW_CREATE_FAILED',
-        message: 'Failed to create template',
-      });
-    }
+    if (error) this.databaseFailure('WORKFLOW_CREATE_FAILED', error);
     return data;
   }
 
@@ -113,118 +195,264 @@ export class WorkflowService {
   ) {
     this.assertAdmin(user);
     await this.assertDraftTemplate(id);
+    const payload: Record<string, unknown> = { updated_by: user.profileId };
+    if (dto.name !== undefined) payload.name = dto.name;
+    if (dto.description !== undefined) payload.description = dto.description;
     const { data, error } = await this.client
       .from('workflow_templates')
-      .update({
-        ...dto,
-        updated_by: user.profileId,
-        updated_at: new Date().toISOString(),
-      })
+      .update(payload)
       .eq('id', id)
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'UPDATE_FAILED',
-        message: 'Failed to update template',
-      });
+    if (error) this.databaseFailure('WORKFLOW_UPDATE_FAILED', error);
     return data;
   }
 
   async cloneTemplate(templateId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const source = await this.getTemplate(templateId);
-    const newTemplate = await this.createTemplate(
-      {
-        serviceId: source.service_id,
-        name: ` (Clone)`,
-        description: source.description,
-      },
-      user,
-    );
+    const { data, error } = await this.client.rpc('workflow_clone_template', {
+      p_template_id: templateId,
+      p_actor_id: user.profileId,
+    });
+    if (error) this.databaseFailure('WORKFLOW_CLONE_FAILED', error);
+    return this.getTemplate(String(data));
+  }
 
-    const stageMap = new Map<string, string>();
-    for (const stage of source.stages || []) {
-      const { data: newStage } = await this.client
-        .from('workflow_template_stages')
-        .insert({
-          workflow_template_id: newTemplate.id,
-          name: stage.name,
-          description: stage.description,
-          sort_order: stage.sort_order,
-          is_required: stage.is_required,
-          sla_hours: stage.sla_hours,
-        })
-        .select()
-        .single();
-      if (newStage) stageMap.set(stage.id, newStage.id);
+  async validateTemplateForPublish(
+    templateId: string,
+  ): Promise<WorkflowPublishValidation> {
+    const template = await this.getTemplate(templateId);
+    const stages: TemplateStageRow[] = Array.isArray(template.stages)
+      ? template.stages
+      : [];
+    const stageDependencies: StageDependencyRow[] = Array.isArray(
+      template.stage_deps,
+    )
+      ? template.stage_deps
+      : [];
+    const itemDependencies: ItemDependencyRow[] = Array.isArray(
+      template.item_deps,
+    )
+      ? template.item_deps
+      : [];
+    const items = stages.flatMap((stage: TemplateStageRow) =>
+      Array.isArray(stage.items) ? stage.items : [],
+    );
+    const errors = new Set<string>();
+    const warnings = new Set<string>();
+
+    const { data: deliveryItems, error: deliveryError } = await this.client
+      .from('service_delivery_items')
+      .select('id,service_id,is_required,active')
+      .eq('service_id', template.service_id)
+      .eq('active', true);
+    if (deliveryError) {
+      this.databaseFailure(
+        'WORKFLOW_DELIVERY_ITEM_LOOKUP_FAILED',
+        deliveryError,
+      );
     }
-    return newTemplate;
+
+    const serviceItems = deliveryItems ?? [];
+    const requiredItems = serviceItems.filter((item) => item.is_required);
+    const optionalItems = serviceItems.filter((item) => !item.is_required);
+    const mappedIds = items.map((item: TemplateStageItemRow) =>
+      String(item.service_delivery_item_id),
+    );
+    const mappedCounts = new Map<string, number>();
+    for (const id of mappedIds) {
+      mappedCounts.set(id, (mappedCounts.get(id) ?? 0) + 1);
+    }
+
+    if (stages.length === 0) errors.add('NO_STAGES');
+    for (const item of requiredItems) {
+      if (mappedCounts.get(String(item.id)) !== 1) {
+        errors.add('REQUIRED_ITEM_UNMAPPED');
+      }
+    }
+
+    const stageIds = new Set(
+      stages.map((stage: TemplateStageRow) => String(stage.id)),
+    );
+    const itemIds = new Set(
+      items.map((item: TemplateStageItemRow) => String(item.id)),
+    );
+    const sortOrders = new Set<number>();
+    for (const stage of stages) {
+      const order = Number(stage.sort_order);
+      if (sortOrders.has(order)) errors.add('DUPLICATE_STAGE_SORT_ORDER');
+      sortOrders.add(order);
+      if (stage.sla_hours !== null && Number(stage.sla_hours) <= 0) {
+        errors.add('INVALID_SLA');
+      }
+    }
+
+    for (const item of items) {
+      if (item.sla_hours !== null && Number(item.sla_hours) <= 0) {
+        errors.add('INVALID_SLA');
+      }
+      const validScope = ['internal', 'client', 'both'].includes(
+        String(item.approval_scope),
+      );
+      if (
+        (item.completion_mode === 'tasks_done_and_approval' &&
+          item.approval_required !== true) ||
+        (item.approval_required === true && !validScope)
+      ) {
+        errors.add('INVALID_APPROVAL_CONFIGURATION');
+      }
+    }
+
+    if (mappedIds.length > 0) {
+      const { data: mappedDeliveryItems, error: mappedError } =
+        await this.client
+          .from('service_delivery_items')
+          .select('id,service_id')
+          .in('id', [...new Set(mappedIds)]);
+      if (mappedError) {
+        this.databaseFailure(
+          'WORKFLOW_DELIVERY_ITEM_LOOKUP_FAILED',
+          mappedError,
+        );
+      }
+      const mappedServices = new Map(
+        (mappedDeliveryItems ?? []).map((item) => [
+          String(item.id),
+          String(item.service_id),
+        ]),
+      );
+      for (const id of mappedIds) {
+        if (mappedServices.get(id) !== String(template.service_id)) {
+          errors.add('CROSS_SERVICE_ITEM');
+        }
+      }
+    }
+
+    const normalizedStageDependencies = stageDependencies.map(
+      (dependency: StageDependencyRow) => ({
+        predecessorStageId: String(dependency.predecessor_stage_id),
+        successorStageId: String(dependency.successor_stage_id),
+      }),
+    );
+    for (const dependency of normalizedStageDependencies) {
+      if (
+        !stageIds.has(dependency.predecessorStageId) ||
+        !stageIds.has(dependency.successorStageId)
+      ) {
+        errors.add('DEPENDENCY_CROSS_TEMPLATE');
+      }
+      if (dependency.predecessorStageId === dependency.successorStageId) {
+        errors.add('STAGE_SELF_DEPENDENCY');
+      }
+    }
+    if (this.validation.detectStageCycles(normalizedStageDependencies)) {
+      errors.add('STAGE_DEPENDENCY_CYCLE');
+    }
+
+    const normalizedItemDependencies = itemDependencies.map(
+      (dependency: ItemDependencyRow) => ({
+        predecessorStageItemId: String(dependency.predecessor_stage_item_id),
+        successorStageItemId: String(dependency.successor_stage_item_id),
+      }),
+    );
+    for (const dependency of normalizedItemDependencies) {
+      if (
+        !itemIds.has(dependency.predecessorStageItemId) ||
+        !itemIds.has(dependency.successorStageItemId)
+      ) {
+        errors.add('DEPENDENCY_CROSS_TEMPLATE');
+      }
+      if (
+        dependency.predecessorStageItemId === dependency.successorStageItemId
+      ) {
+        errors.add('ITEM_SELF_DEPENDENCY');
+      }
+    }
+    if (this.validation.detectItemCycles(normalizedItemDependencies)) {
+      errors.add('ITEM_DEPENDENCY_CYCLE');
+    }
+
+    const mappedRequiredItems = requiredItems.filter(
+      (item) => mappedCounts.get(String(item.id)) === 1,
+    ).length;
+    const mappedOptionalItems = optionalItems.filter((item) =>
+      mappedCounts.has(String(item.id)),
+    ).length;
+    if (optionalItems.length > mappedOptionalItems) {
+      warnings.add('OPTIONAL_ITEMS_UNMAPPED');
+    }
+
+    return {
+      errors: [...errors],
+      warnings: [...warnings],
+      stats: {
+        stages: stages.length,
+        requiredItems: requiredItems.length,
+        mappedRequiredItems,
+        optionalItems: optionalItems.length,
+        mappedOptionalItems,
+      },
+    };
   }
 
   async publishTemplate(id: string, user: RequestUser) {
     this.assertAdmin(user);
     await this.assertDraftTemplate(id);
-    const template = await this.getTemplate(id);
-    const stages = template.stages || [];
-    if (stages.length === 0) {
+    const validation = await this.validateTemplateForPublish(id);
+    if (validation.errors.length > 0) {
       throw new BadRequestException({
         code: 'WORKFLOW_TEMPLATE_INVALID',
-        message: 'Workflow must contain at least one stage before publishing.',
-        errors: ['NO_STAGES'],
+        message: 'Workflow template cannot be published.',
+        errors: validation.errors,
+        warnings: validation.warnings,
+        stats: validation.stats,
       });
     }
-    if (this.validation.detectStageCycles(template.stage_deps || [])) {
-      throw new BadRequestException({
-        code: 'WORKFLOW_TEMPLATE_INVALID',
-        message: 'Workflow contains cyclic dependencies.',
-        errors: ['STAGE_DEPENDENCY_CYCLE'],
-      });
-    }
-
     const { data, error } = await this.client
       .from('workflow_templates')
       .update({
         status: 'published',
         published_at: new Date().toISOString(),
         published_by: user.profileId,
+        updated_by: user.profileId,
       })
       .eq('id', id)
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'PUBLISH_FAILED',
-        message: 'Failed to publish template',
-      });
+    if (error) this.databaseFailure('WORKFLOW_PUBLISH_FAILED', error);
     return data;
   }
 
   async setDefault(id: string, user: RequestUser) {
     this.assertAdmin(user);
+    const { data, error } = await this.client.rpc(
+      'workflow_set_default_template',
+      { p_template_id: id, p_actor_id: user.profileId },
+    );
+    if (error) this.databaseFailure('WORKFLOW_SET_DEFAULT_FAILED', error);
+    return data;
+  }
+
+  async archiveTemplate(id: string, user: RequestUser) {
+    this.assertAdmin(user);
     const template = await this.getTemplate(id);
     if (template.status !== 'published') {
-      throw new BadRequestException({
-        code: 'INVALID_STATE',
-        message: 'Only published templates can be set as default',
+      throw new ConflictException({
+        code: 'WORKFLOW_ARCHIVE_REQUIRES_PUBLISHED',
+        message: 'Only a published template can be archived.',
       });
     }
-    await this.client
-      .from('workflow_templates')
-      .update({ is_default: false })
-      .eq('service_id', template.service_id);
-
     const { data, error } = await this.client
       .from('workflow_templates')
-      .update({ is_default: true })
+      .update({
+        status: 'archived',
+        is_default: false,
+        updated_by: user.profileId,
+      })
       .eq('id', id)
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'SET_DEFAULT_FAILED',
-        message: 'Failed to set default',
-      });
+    if (error) this.databaseFailure('WORKFLOW_ARCHIVE_FAILED', error);
     return data;
   }
 
@@ -237,14 +465,17 @@ export class WorkflowService {
     await this.assertDraftTemplate(templateId);
     const { data, error } = await this.client
       .from('workflow_template_stages')
-      .insert({ workflow_template_id: templateId, ...dto })
+      .insert({
+        workflow_template_id: templateId,
+        name: dto.name,
+        description: dto.description ?? null,
+        sort_order: dto.sortOrder,
+        is_required: dto.isRequired,
+        sla_hours: dto.slaHours ?? null,
+      })
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'STAGE_CREATE_FAILED',
-        message: 'Failed to create stage',
-      });
+    if (error) this.databaseFailure('WORKFLOW_STAGE_CREATE_FAILED', error);
     return data;
   }
 
@@ -254,85 +485,114 @@ export class WorkflowService {
     user: RequestUser,
   ) {
     this.assertAdmin(user);
-    const { data: stage } = await this.client
-      .from('workflow_template_stages')
-      .select('workflow_template_id')
-      .eq('id', stageId)
-      .single();
-    if (stage) await this.assertDraftTemplate(stage.workflow_template_id);
+    await this.assertDraftTemplate(await this.templateIdForStage(stageId));
+    const payload: Record<string, unknown> = {};
+    if (dto.name !== undefined) payload.name = dto.name;
+    if (dto.description !== undefined) payload.description = dto.description;
+    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+    if (dto.isRequired !== undefined) payload.is_required = dto.isRequired;
+    if (dto.slaHours !== undefined) payload.sla_hours = dto.slaHours;
     const { data, error } = await this.client
       .from('workflow_template_stages')
-      .update(dto)
+      .update(payload)
       .eq('id', stageId)
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'STAGE_UPDATE_FAILED',
-        message: 'Failed to update stage',
-      });
+    if (error) this.databaseFailure('WORKFLOW_STAGE_UPDATE_FAILED', error);
     return data;
   }
 
   async deleteStage(stageId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: stage } = await this.client
-      .from('workflow_template_stages')
-      .select('workflow_template_id')
-      .eq('id', stageId)
-      .single();
-    if (stage) await this.assertDraftTemplate(stage.workflow_template_id);
-    await this.client
+    await this.assertDraftTemplate(await this.templateIdForStage(stageId));
+    const { error } = await this.client
       .from('workflow_template_stages')
       .delete()
       .eq('id', stageId);
+    if (error) this.databaseFailure('WORKFLOW_STAGE_DELETE_FAILED', error);
     return { success: true };
   }
 
   async mapItem(stageId: string, dto: MapStageItemDto, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: stage } = await this.client
-      .from('workflow_template_stages')
-      .select('workflow_template_id')
-      .eq('id', stageId)
-      .single();
-    if (stage) await this.assertDraftTemplate(stage.workflow_template_id);
+    const templateId = await this.templateIdForStage(stageId);
+    const template = await this.assertDraftTemplate(templateId);
+    const { data: deliveryItem, error: itemError } = await this.client
+      .from('service_delivery_items')
+      .select('id,service_id,delivery_item_code')
+      .eq('id', dto.serviceDeliveryItemId)
+      .maybeSingle();
+    if (itemError) {
+      this.databaseFailure('WORKFLOW_DELIVERY_ITEM_LOOKUP_FAILED', itemError);
+    }
+    if (!deliveryItem) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_DELIVERY_ITEM_NOT_FOUND',
+        message: 'Service delivery item not found.',
+      });
+    }
+    if (String(deliveryItem.service_id) !== String(template.service_id)) {
+      throw new BadRequestException({
+        code: 'WORKFLOW_CROSS_SERVICE_ITEM',
+        message: 'Delivery item belongs to another service.',
+      });
+    }
     const { data, error } = await this.client
       .from('workflow_template_stage_items')
       .insert({
-        stage_id: stageId,
+        workflow_template_stage_id: stageId,
+        workflow_template_id: templateId,
         service_delivery_item_id: dto.serviceDeliveryItemId,
-        ...dto,
+        service_delivery_item_code: deliveryItem.delivery_item_code,
+        sort_order: dto.sortOrder,
+        approval_required: dto.approvalRequired,
+        approval_scope: dto.approvalScope,
+        sla_hours: dto.slaHours ?? null,
+        auto_create_task: dto.autoCreateTask,
+        completion_mode: dto.completionMode,
       })
       .select()
       .single();
-    if (error)
-      throw new BadRequestException({
-        code: 'MAP_ITEM_FAILED',
-        message: 'Failed to map item',
-      });
+    if (error) this.databaseFailure('WORKFLOW_ITEM_MAP_FAILED', error);
+    return data;
+  }
+
+  async updateMappedItem(
+    itemId: string,
+    dto: UpdateMappedStageItemDto,
+    user: RequestUser,
+  ) {
+    this.assertAdmin(user);
+    await this.assertDraftTemplate(await this.templateIdForItem(itemId));
+    const payload: Record<string, unknown> = {};
+    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+    if (dto.approvalRequired !== undefined)
+      payload.approval_required = dto.approvalRequired;
+    if (dto.approvalScope !== undefined)
+      payload.approval_scope = dto.approvalScope;
+    if (dto.slaHours !== undefined) payload.sla_hours = dto.slaHours;
+    if (dto.autoCreateTask !== undefined)
+      payload.auto_create_task = dto.autoCreateTask;
+    if (dto.completionMode !== undefined)
+      payload.completion_mode = dto.completionMode;
+    const { data, error } = await this.client
+      .from('workflow_template_stage_items')
+      .update(payload)
+      .eq('id', itemId)
+      .select()
+      .single();
+    if (error) this.databaseFailure('WORKFLOW_ITEM_UPDATE_FAILED', error);
     return data;
   }
 
   async removeMappedItem(itemId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: item } = await this.client
-      .from('workflow_template_stage_items')
-      .select('stage_id')
-      .eq('id', itemId)
-      .single();
-    if (item?.stage_id) {
-      const { data: stage } = await this.client
-        .from('workflow_template_stages')
-        .select('workflow_template_id')
-        .eq('id', item.stage_id)
-        .single();
-      if (stage) await this.assertDraftTemplate(stage.workflow_template_id);
-    }
-    await this.client
+    await this.assertDraftTemplate(await this.templateIdForItem(itemId));
+    const { error } = await this.client
       .from('workflow_template_stage_items')
       .delete()
       .eq('id', itemId);
+    if (error) this.databaseFailure('WORKFLOW_ITEM_DELETE_FAILED', error);
     return { success: true };
   }
 
@@ -343,31 +603,163 @@ export class WorkflowService {
   ) {
     this.assertAdmin(user);
     await this.assertDraftTemplate(templateId);
+    const { data: stages, error: stageError } = await this.client
+      .from('workflow_template_stages')
+      .select('id')
+      .eq('workflow_template_id', templateId)
+      .in('id', [dto.predecessorStageId, dto.successorStageId]);
+    if (stageError)
+      this.databaseFailure('WORKFLOW_STAGE_LOOKUP_FAILED', stageError);
+    if ((stages ?? []).length !== 2) {
+      throw new BadRequestException({
+        code: 'WORKFLOW_DEPENDENCY_CROSS_TEMPLATE',
+        message: 'Both stages must belong to this template.',
+      });
+    }
+    const { data: existing, error: dependencyError } = await this.client
+      .from('workflow_template_stage_dependencies')
+      .select('predecessor_stage_id,successor_stage_id')
+      .eq('workflow_template_id', templateId);
+    if (dependencyError) {
+      this.databaseFailure(
+        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
+        dependencyError,
+      );
+    }
+    const candidate = [
+      ...(existing ?? []).map((dependency) => ({
+        predecessorStageId: String(dependency.predecessor_stage_id),
+        successorStageId: String(dependency.successor_stage_id),
+      })),
+      dto,
+    ];
+    if (this.validation.detectStageCycles(candidate)) {
+      throw new BadRequestException({
+        code: 'WORKFLOW_STAGE_DEPENDENCY_CYCLE',
+        message: 'Stage dependency would create a cycle.',
+      });
+    }
     const { data, error } = await this.client
       .from('workflow_template_stage_dependencies')
-      .insert({ workflow_template_id: templateId, ...dto })
+      .insert({
+        workflow_template_id: templateId,
+        predecessor_stage_id: dto.predecessorStageId,
+        successor_stage_id: dto.successorStageId,
+        lag_hours: dto.lagHours,
+      })
       .select()
       .single();
     if (error)
-      throw new BadRequestException({
-        code: 'STAGE_DEP_FAILED',
-        message: 'Failed to create stage dependency',
-      });
+      this.databaseFailure('WORKFLOW_STAGE_DEPENDENCY_CREATE_FAILED', error);
     return data;
   }
 
   async deleteStageDependency(dependencyId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: dep } = await this.client
+    const { data: dependency, error: lookupError } = await this.client
       .from('workflow_template_stage_dependencies')
       .select('workflow_template_id')
       .eq('id', dependencyId)
-      .single();
-    if (dep) await this.assertDraftTemplate(dep.workflow_template_id);
-    await this.client
+      .maybeSingle();
+    if (lookupError)
+      this.databaseFailure('WORKFLOW_DEPENDENCY_LOOKUP_FAILED', lookupError);
+    if (!dependency) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_DEPENDENCY_NOT_FOUND',
+        message: 'Workflow dependency not found.',
+      });
+    }
+    await this.assertDraftTemplate(String(dependency.workflow_template_id));
+    const { error } = await this.client
       .from('workflow_template_stage_dependencies')
       .delete()
       .eq('id', dependencyId);
+    if (error)
+      this.databaseFailure('WORKFLOW_STAGE_DEPENDENCY_DELETE_FAILED', error);
+    return { success: true };
+  }
+
+  async createItemDependency(
+    templateId: string,
+    dto: CreateItemDependencyDto,
+    user: RequestUser,
+  ) {
+    this.assertAdmin(user);
+    await this.assertDraftTemplate(templateId);
+    const targetIds = [dto.predecessorStageItemId, dto.successorStageItemId];
+    const { data: items, error: itemError } = await this.client
+      .from('workflow_template_stage_items')
+      .select('id')
+      .eq('workflow_template_id', templateId)
+      .in('id', targetIds);
+    if (itemError)
+      this.databaseFailure('WORKFLOW_ITEM_LOOKUP_FAILED', itemError);
+    if ((items ?? []).length !== 2) {
+      throw new BadRequestException({
+        code: 'WORKFLOW_DEPENDENCY_CROSS_TEMPLATE',
+        message: 'Both items must belong to this template.',
+      });
+    }
+    const { data: existing, error: dependencyError } = await this.client
+      .from('workflow_template_item_dependencies')
+      .select('predecessor_stage_item_id,successor_stage_item_id')
+      .eq('workflow_template_id', templateId);
+    if (dependencyError) {
+      this.databaseFailure(
+        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
+        dependencyError,
+      );
+    }
+    const candidate = [
+      ...(existing ?? []).map((dependency) => ({
+        predecessorStageItemId: String(dependency.predecessor_stage_item_id),
+        successorStageItemId: String(dependency.successor_stage_item_id),
+      })),
+      dto,
+    ];
+    if (this.validation.detectItemCycles(candidate)) {
+      throw new BadRequestException({
+        code: 'WORKFLOW_ITEM_DEPENDENCY_CYCLE',
+        message: 'Item dependency would create a cycle.',
+      });
+    }
+    const { data, error } = await this.client
+      .from('workflow_template_item_dependencies')
+      .insert({
+        workflow_template_id: templateId,
+        predecessor_stage_item_id: dto.predecessorStageItemId,
+        successor_stage_item_id: dto.successorStageItemId,
+        lag_hours: dto.lagHours,
+      })
+      .select()
+      .single();
+    if (error)
+      this.databaseFailure('WORKFLOW_ITEM_DEPENDENCY_CREATE_FAILED', error);
+    return data;
+  }
+
+  async deleteItemDependency(dependencyId: string, user: RequestUser) {
+    this.assertAdmin(user);
+    const { data: dependency, error: lookupError } = await this.client
+      .from('workflow_template_item_dependencies')
+      .select('workflow_template_id')
+      .eq('id', dependencyId)
+      .maybeSingle();
+    if (lookupError)
+      this.databaseFailure('WORKFLOW_DEPENDENCY_LOOKUP_FAILED', lookupError);
+    if (!dependency) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_DEPENDENCY_NOT_FOUND',
+        message: 'Workflow dependency not found.',
+      });
+    }
+    await this.assertDraftTemplate(String(dependency.workflow_template_id));
+    const { error } = await this.client
+      .from('workflow_template_item_dependencies')
+      .delete()
+      .eq('id', dependencyId);
+    if (error)
+      this.databaseFailure('WORKFLOW_ITEM_DEPENDENCY_DELETE_FAILED', error);
     return { success: true };
   }
 }

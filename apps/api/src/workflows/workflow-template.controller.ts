@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { z } from 'zod';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -23,8 +25,25 @@ import {
   UpdateTemplateStageSchema,
   MapStageItemSchema,
   CreateStageDependencySchema,
+  CreateItemDependencySchema,
+  UpdateMappedStageItemSchema,
 } from './dto/workflow.dto';
 import { WorkflowService } from './workflow.service';
+
+function parseBody<TSchema extends z.ZodTypeAny>(
+  schema: TSchema,
+  body: unknown,
+): z.infer<TSchema> {
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    throw new BadRequestException({
+      code: 'VALIDATION_ERROR',
+      message: 'Invalid workflow request.',
+      issues: result.error.issues,
+    });
+  }
+  return result.data;
+}
 
 @Controller('admin/workflows')
 @Roles('admin', 'team_leader', 'employee')
@@ -42,13 +61,18 @@ export class WorkflowTemplateController {
     return this.workflowService.getTemplate(id);
   }
 
+  @Get('templates/:id/validate')
+  async validateTemplate(@Param('id', ParseUUIDPipe) id: string) {
+    return this.workflowService.validateTemplateForPublish(id);
+  }
+
   @Post('templates')
   @Roles('admin')
   async createTemplate(
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = CreateWorkflowTemplateSchema.parse(body);
+    const parsed = parseBody(CreateWorkflowTemplateSchema, body);
     return this.workflowService.createTemplate(parsed, user);
   }
 
@@ -59,7 +83,7 @@ export class WorkflowTemplateController {
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = UpdateWorkflowTemplateSchema.parse(body);
+    const parsed = parseBody(UpdateWorkflowTemplateSchema, body);
     return this.workflowService.updateTemplate(id, parsed, user);
   }
 
@@ -90,6 +114,15 @@ export class WorkflowTemplateController {
     return this.workflowService.setDefault(id, user);
   }
 
+  @Post('templates/:id/archive')
+  @Roles('admin')
+  async archiveTemplate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.workflowService.archiveTemplate(id, user);
+  }
+
   @Post('templates/:id/stages')
   @Roles('admin')
   async createStage(
@@ -97,7 +130,7 @@ export class WorkflowTemplateController {
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = CreateTemplateStageSchema.parse(body);
+    const parsed = parseBody(CreateTemplateStageSchema, body);
     return this.workflowService.createStage(templateId, parsed, user);
   }
 
@@ -108,7 +141,7 @@ export class WorkflowTemplateController {
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = UpdateTemplateStageSchema.parse(body);
+    const parsed = parseBody(UpdateTemplateStageSchema, body);
     return this.workflowService.updateStage(stageId, parsed, user);
   }
 
@@ -128,8 +161,19 @@ export class WorkflowTemplateController {
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = MapStageItemSchema.parse(body);
+    const parsed = parseBody(MapStageItemSchema, body);
     return this.workflowService.mapItem(stageId, parsed, user);
+  }
+
+  @Patch('stage-items/:itemId')
+  @Roles('admin')
+  async updateMappedItem(
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const parsed = parseBody(UpdateMappedStageItemSchema, body);
+    return this.workflowService.updateMappedItem(itemId, parsed, user);
   }
 
   @Delete('stage-items/:itemId')
@@ -148,7 +192,7 @@ export class WorkflowTemplateController {
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
-    const parsed = CreateStageDependencySchema.parse(body);
+    const parsed = parseBody(CreateStageDependencySchema, body);
     return this.workflowService.createStageDependency(templateId, parsed, user);
   }
 
@@ -159,5 +203,25 @@ export class WorkflowTemplateController {
     @CurrentUser() user: RequestUser,
   ) {
     return this.workflowService.deleteStageDependency(id, user);
+  }
+
+  @Post('templates/:id/item-dependencies')
+  @Roles('admin')
+  async createItemDependency(
+    @Param('id', ParseUUIDPipe) templateId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const parsed = parseBody(CreateItemDependencySchema, body);
+    return this.workflowService.createItemDependency(templateId, parsed, user);
+  }
+
+  @Delete('item-dependencies/:id')
+  @Roles('admin')
+  async deleteItemDependency(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.workflowService.deleteItemDependency(id, user);
   }
 }

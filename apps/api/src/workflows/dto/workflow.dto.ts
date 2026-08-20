@@ -52,6 +52,15 @@ export const MapStageItemSchema = z
   })
   .strict();
 
+export const UpdateMappedStageItemSchema = MapStageItemSchema.omit({
+  serviceDeliveryItemId: true,
+})
+  .partial()
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'PATCH_EMPTY',
+  });
+
 export const CreateStageDependencySchema = z
   .object({
     predecessorStageId: z.string().uuid(),
@@ -75,6 +84,19 @@ export const CreateApprovalRequestSchema = z
     approvalType: z.enum(['internal', 'client']).default('internal'),
     requestNote: z.string().optional().nullable(),
   })
+  .strict()
+  .refine(
+    (value) =>
+      Number(value.stageItemId !== undefined) +
+        Number(value.stageId !== undefined) ===
+      1,
+    { message: 'WORKFLOW_APPROVAL_TARGET_INVALID' },
+  );
+
+export const OverrideDependencySchema = z
+  .object({
+    reason: z.string().trim().min(3).max(1000),
+  })
   .strict();
 
 export const RespondApprovalSchema = z
@@ -93,6 +115,9 @@ export type UpdateWorkflowTemplateDto = z.infer<
 export type CreateTemplateStageDto = z.infer<typeof CreateTemplateStageSchema>;
 export type UpdateTemplateStageDto = z.infer<typeof UpdateTemplateStageSchema>;
 export type MapStageItemDto = z.infer<typeof MapStageItemSchema>;
+export type UpdateMappedStageItemDto = z.infer<
+  typeof UpdateMappedStageItemSchema
+>;
 export type CreateStageDependencyDto = z.infer<
   typeof CreateStageDependencySchema
 >;
