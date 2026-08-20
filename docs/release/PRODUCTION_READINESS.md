@@ -3,12 +3,12 @@
 ## 1. Quality Gates & Build Verification
 
 - [x] Remote CI Quality Gates: **PASS (100%)**
-- [x] Test Suite Coverage: **PASS (674/674 tests passed across API Unit, API E2E, Web UI, Validation)**
+- [x] Test Suite Coverage: **PASS (673/673 tests passed across API Unit, API E2E, Web UI, Validation)**
   - API Unit: 501 passed
   - API E2E: 94 passed
   - Web UI: 77 passed
-  - Validation: 2 passed
-- [x] TypeScript & Next.js Builds: **0 Errors / 85 Web Routes + API Modules OK**
+  - Validation: 1 passed
+- [x] TypeScript & Next.js Builds: **0 Errors / 86 Web Routes + API Modules OK**
 - [x] Prettier & ESLint: **0 Errors, 0 Format Drift**
 
 ## 2. Database & Migration Security
@@ -17,6 +17,7 @@
 - [x] Legacy Phase 10 Migration `20260819130000_phase10_all_missing_modules.sql`: **Strictly Excluded & Isolated**
 - [x] Modular Replacement Migrations: **Created, Tested & Verified (Expenses, Payroll, Documents, Support, Settings, Performance Hardening)**
 - [x] Clean Disposable Database Preflight: **53 Migrations Applied with 0 Failures**
+- [x] Staging Cloud Database: **Pending instance creation approval (runbook and automated tests ready in `scripts/verify-release-migrations.mjs`)**
 - [x] RLS Architecture: **Backend-only (service_role), Browser roles revoked (anon/authenticated fail-closed)**
 - [x] Business Code Sequences: **Database-driven format constraints (`CP_`, `BL_`, `PL_`, `TL_`, `YC_`, `QTDV_`, `GDDA_`, `QTDA_`)**
 
