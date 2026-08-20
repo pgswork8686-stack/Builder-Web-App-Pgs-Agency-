@@ -2,14 +2,17 @@
 
 `
 ================================================================================
+
 WORKFLOW ENGINE V1 MIGRATION MANIFEST (SOURCE-ONLY)
 ================================================================================
+
 FOUNDATION MIGRATION: supabase/migrations/20260820120000_workflow_engine_v1_foundation.sql
-HARDENING MIGRATION:  supabase/migrations/20260820123000_workflow_engine_v1_hardening.sql
+HARDENING MIGRATION: supabase/migrations/20260820123000_workflow_engine_v1_hardening.sql
 STATUS: COMMITTED TO SOURCE ONLY (CHƯA VÀ KHÔNG APPLY TRÊN PRODUCTION DB)
 TARGET PRODUCTION DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẸN — 0 WRITES)
 PHASE 10 STATUS: NOT APPLIED
 ================================================================================
+
 `
 
 ## 1. MỤC TIÊU & CẤU TRÚC 13 BẢNG (COMPLETE TABLE LIST)
