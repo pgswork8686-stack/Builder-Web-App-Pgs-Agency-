@@ -13,6 +13,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r --if-present test",
     "test:workflow-migrations": "node scripts/verify-workflow-migrations.mjs",
+    "test:release-migrations": "node scripts/verify-release-migrations.mjs",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },

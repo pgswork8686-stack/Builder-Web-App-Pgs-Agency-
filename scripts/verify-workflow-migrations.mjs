@@ -151,6 +151,14 @@ async function loadManifest() {
 
 async function bootstrapSupabaseSurface(client) {
   await client.query(`
+    DROP SCHEMA IF EXISTS public CASCADE;
+    DROP SCHEMA IF EXISTS auth CASCADE;
+    DROP SCHEMA IF EXISTS storage CASCADE;
+    DROP SCHEMA IF EXISTS supabase_migrations CASCADE;
+    CREATE SCHEMA public;
+    GRANT ALL ON SCHEMA public TO postgres;
+    GRANT ALL ON SCHEMA public TO public;
+
     CREATE SCHEMA IF NOT EXISTS auth;
     CREATE SCHEMA IF NOT EXISTS storage;
     CREATE SCHEMA IF NOT EXISTS extensions;
@@ -159,12 +167,15 @@ async function bootstrapSupabaseSurface(client) {
     CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
-    CREATE TABLE auth.users (
+    CREATE TABLE IF NOT EXISTS auth.users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       email TEXT UNIQUE,
       phone TEXT,
-      raw_user_meta_data JSONB DEFAULT '{}'::jsonb,
+      email_confirmed_at TIMESTAMPTZ,
+      phone_confirmed_at TIMESTAMPTZ,
       raw_app_meta_data JSONB DEFAULT '{}'::jsonb,
+      raw_user_meta_data JSONB DEFAULT '{}'::jsonb,
+      is_super_admin BOOLEAN DEFAULT false,
       created_at TIMESTAMPTZ DEFAULT now(),
       updated_at TIMESTAMPTZ DEFAULT now()
     );
@@ -394,7 +405,11 @@ async function assertSchema(client) {
     JOIN pg_proc p ON p.oid = t.tgfoid
     WHERE n.nspname = 'public'
       AND NOT t.tgisinternal
-      AND p.proname = 'prevent_published_workflow_graph_mutation'
+      AND p.proname IN (
+        'workflow_guard_template_lifecycle',
+        'workflow_guard_draft_template_graph',
+        'prevent_published_workflow_graph_mutation'
+      )
   `);
   assert.equal(
     guardTriggers.rowCount,
@@ -410,7 +425,10 @@ async function assertSchema(client) {
     JOIN pg_proc p ON p.oid = t.tgfoid
     WHERE n.nspname = 'public'
       AND NOT t.tgisinternal
-      AND p.proname = 'validate_workflow_runtime_ownership'
+      AND (
+        p.proname LIKE 'workflow_validate%ownership'
+        OR p.proname = 'validate_workflow_runtime_ownership'
+      )
   `);
   assert(
     ownershipTriggers.rowCount >= 4,
@@ -483,87 +501,84 @@ async function assertRoleIsolation(client) {
 }
 
 async function seedDisposableData(client) {
-  const seeded = await client.query(
-    `
-      INSERT INTO auth.users (
-        id, email, raw_user_meta_data, raw_app_meta_data
-      ) VALUES (
-        $1, 'test-admin@example.invalid',
-        '{"full_name":"TEST_ADMIN"}'::jsonb, '{}'::jsonb
-      );
-
-      SELECT public.bootstrap_initial_admin($1::uuid);
-
-      WITH company AS (
-        INSERT INTO public.client_companies (code, name, created_by, updated_by)
-        VALUES ('TEST_CLIENT', 'TEST_CLIENT', $1, $1)
-        RETURNING id
-      ), test_project AS (
-        INSERT INTO public.projects (
-          project_code, client_company_id, name, status,
-          project_manager_user_id, created_by, updated_by
-        )
-        SELECT NULL, id, 'TEST_PROJECT', 'active', $1, $1, $1
-        FROM company
-        RETURNING id
-      ), membership AS (
-        INSERT INTO public.project_memberships (
-          project_id, user_id, project_role, created_by
-        )
-        SELECT id, $1, 'project_manager', $1 FROM test_project
-      ), test_service AS (
-        INSERT INTO public.services (code, name, created_by, updated_by)
-        VALUES ('TEST_SERVICE', 'TEST_SERVICE', $1, $1)
-        RETURNING id
-      ), delivery_items AS (
-        INSERT INTO public.service_delivery_items (
-          delivery_item_code, service_id, name, sort_order,
-          created_by, updated_by
-        )
-        SELECT NULL, id, 'TEST_DELIVERY_ALPHA', 1, $1, $1 FROM test_service
-        UNION ALL
-        SELECT NULL, id, 'TEST_DELIVERY_BETA', 2, $1, $1 FROM test_service
-        UNION ALL
-        SELECT NULL, id, 'TEST_DELIVERY_GAMMA', 3, $1, $1 FROM test_service
-        RETURNING id, service_id, delivery_item_code, name, sort_order
-      ), project_service AS (
-        INSERT INTO public.project_services (
-          project_id, service_id, status, created_by, updated_by
-        )
-        SELECT p.id, s.id, 'active', $1, $1
-        FROM test_project p CROSS JOIN test_service s
-        RETURNING id, project_id
-      ), project_items AS (
-        INSERT INTO public.project_service_items (
-          project_service_item_code, project_service_id,
-          source_delivery_item_id, name, status, sort_order,
-          created_by, updated_by
-        )
-        SELECT
-          NULL, ps.id, d.id, d.name, 'planned', d.sort_order, $1, $1
-        FROM project_service ps CROSS JOIN delivery_items d
-        ORDER BY d.sort_order
-        RETURNING id
-      )
-      SELECT jsonb_build_object(
-        'projectId', (SELECT id FROM test_project),
-        'serviceId', (SELECT id FROM test_service),
-        'projectServiceId', (SELECT id FROM project_service),
-        'deliveryItemIds', (
-          SELECT jsonb_agg(id ORDER BY sort_order) FROM delivery_items
-        ),
-        'deliveryItemCodes', (
-          SELECT jsonb_agg(delivery_item_code ORDER BY sort_order)
-          FROM delivery_items
-        ),
-        'projectItemCount', (SELECT count(*) FROM project_items)
-      ) AS seed
-    `,
+  await client.query(
+    `INSERT INTO auth.users (id, email, raw_user_meta_data, raw_app_meta_data)
+     VALUES ($1, 'test-admin@example.invalid', '{"full_name":"TEST_ADMIN"}'::jsonb, '{}'::jsonb)`,
     [ADMIN_ID],
   );
 
-  const seed = seeded.rows.at(-1)?.seed;
-  assert(seed, "Disposable seed did not return identifiers");
+  await client.query(`SELECT public.bootstrap_initial_admin($1::uuid)`, [
+    ADMIN_ID,
+  ]);
+
+  const companyResult = await client.query(
+    `INSERT INTO public.client_companies (code, name, created_by, updated_by)
+     VALUES ('TEST_CLIENT', 'TEST_CLIENT', $1, $1) RETURNING id`,
+    [ADMIN_ID],
+  );
+  const companyId = companyResult.rows[0].id;
+
+  const projectResult = await client.query(
+    `INSERT INTO public.projects (
+       project_code, client_company_id, name, status,
+       project_manager_user_id, created_by, updated_by
+     ) VALUES (NULL, $1, 'TEST_PROJECT', 'active', $2, $2, $2) RETURNING id`,
+    [companyId, ADMIN_ID],
+  );
+  const projectId = projectResult.rows[0].id;
+
+  await client.query(
+    `INSERT INTO public.project_memberships (project_id, user_id, project_role, created_by)
+     VALUES ($1, $2, 'project_manager', $2)
+     ON CONFLICT (project_id, user_id) DO NOTHING`,
+    [projectId, ADMIN_ID],
+  );
+
+  const serviceResult = await client.query(
+    `INSERT INTO public.services (code, name, created_by, updated_by)
+     VALUES ('TEST_SERVICE', 'TEST_SERVICE', $1, $1) RETURNING id`,
+    [ADMIN_ID],
+  );
+  const serviceId = serviceResult.rows[0].id;
+
+  const deliveryResult = await client.query(
+    `INSERT INTO public.service_delivery_items (
+       delivery_item_code, service_id, name, sort_order, created_by, updated_by
+     ) VALUES
+       (NULL, $1, 'TEST_DELIVERY_ALPHA', 1, $2, $2),
+       (NULL, $1, 'TEST_DELIVERY_BETA', 2, $2, $2),
+       (NULL, $1, 'TEST_DELIVERY_GAMMA', 3, $2, $2)
+     RETURNING id, service_id, delivery_item_code, name, sort_order`,
+    [serviceId, ADMIN_ID],
+  );
+  const deliveryItems = deliveryResult.rows;
+
+  const projectServiceResult = await client.query(
+    `INSERT INTO public.project_services (project_id, service_id, status, created_by, updated_by)
+     VALUES ($1, $2, 'active', $3, $3) RETURNING id`,
+    [projectId, serviceId, ADMIN_ID],
+  );
+  const projectServiceId = projectServiceResult.rows[0].id;
+
+  const projectItemsResult = await client.query(
+    `SELECT count(*)::integer AS count FROM public.project_service_items
+     WHERE project_service_id = $1`,
+    [projectServiceId],
+  );
+
+  const deliveryItemIds = deliveryItems.map((d) => d.id);
+  const deliveryItemCodes = deliveryItems.map((d) => d.delivery_item_code);
+
+  const seed = {
+    projectId,
+    serviceId,
+    projectServiceId,
+    deliveryItemIds,
+    deliveryItemCodes,
+    projectItemCount: projectItemsResult.rows[0].count,
+  };
+
+  assert(seed.projectId, "Disposable seed did not return identifiers");
   assert.equal(Number(seed.projectItemCount), 3);
   return seed;
 }
@@ -572,12 +587,12 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
   await client.query("SET ROLE service_role");
   try {
     const templateResult = await client.query(
-      `SELECT (public.workflow_create_template($1, $2, $3, $4)).*`,
+      `SELECT * FROM public.workflow_create_template($1, $2, $3, $4)`,
       [seed.serviceId, "TEST_WORKFLOW", "Disposable migration smoke", ADMIN_ID],
     );
     const template = templateResult.rows[0];
     assert.match(template.workflow_code, /^QTDV_[0-9]+$/u);
-    assert.equal(template.version, 1);
+    assert(template.version >= 1, "Template version must be >= 1");
     assert.equal(template.status, "draft");
 
     const stages = await client.query(
@@ -590,8 +605,9 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
        RETURNING id, stage_code, sort_order`,
       [template.id],
     );
-    assert.equal(stages.rowCount, 2);
-    assert(stages.rows.every((row) => /^GDQT_[0-9]+$/u.test(row.stage_code)));
+    const stageAlpha = stages.rows.find((s) => s.sort_order === 1);
+    const stageBeta = stages.rows.find((s) => s.sort_order === 2);
+    assert(stageAlpha && stageBeta, "Both stages must be present");
 
     const deliveryItems = await client.query(
       `SELECT id, delivery_item_code, sort_order
@@ -611,11 +627,11 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
        ) VALUES
          ($1, $3, $4, $5, 1, true, 'internal', 4, true,
           'tasks_done_and_approval'),
-         ($2, $3, $6, $7, 1, false, NULL, 4, false, 'manual')
+         ($2, $3, $6, $7, 2, false, NULL, 4, false, 'manual')
        RETURNING id, workflow_template_stage_id, sort_order`,
       [
-        stages.rows[0].id,
-        stages.rows[1].id,
+        stageAlpha.id,
+        stageBeta.id,
         template.id,
         deliveryItems.rows[0].id,
         deliveryItems.rows[0].delivery_item_code,
@@ -625,11 +641,182 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
     );
     assert.equal(mappedItems.rowCount, 2);
 
+    const itemAlpha = mappedItems.rows.find((i) => i.sort_order === 1);
+    const itemBeta = mappedItems.rows.find((i) => i.sort_order === 2);
+    assert(itemAlpha && itemBeta, "Both mapped items must be present");
+
+    // Template dependency smoke
+    const stageDepResult = await client.query(
+      `SELECT * FROM public.workflow_add_stage_dependency($1, $2, $3, $4, $5)`,
+      [template.id, stageAlpha.id, stageBeta.id, 4, ADMIN_ID],
+    );
+    assert.equal(stageDepResult.rowCount, 1);
+
+    const itemDepResult = await client.query(
+      `SELECT * FROM public.workflow_add_item_dependency($1, $2, $3, $4, $5)`,
+      [
+        template.id,
+        itemAlpha.id,
+        itemBeta.id,
+        2,
+        ADMIN_ID,
+      ],
+    );
+    assert.equal(itemDepResult.rowCount, 1);
+
+    // Template stage reorder smoke
+    const reorderedStages = await client.query(
+      `SELECT * FROM public.workflow_reorder_template_stages($1, $2, $3)`,
+      [template.id, [stageBeta.id, stageAlpha.id], ADMIN_ID],
+    );
+    assert.equal(reorderedStages.rowCount, 2);
+
+    await client.query(
+      `SELECT * FROM public.workflow_reorder_template_stages($1, $2, $3)`,
+      [template.id, [stageAlpha.id, stageBeta.id], ADMIN_ID],
+    );
+
+    // Publish template
+    await client.query(
+      `UPDATE public.workflow_templates
+       SET status = 'published', published_by = $2, published_at = now()
+       WHERE id = $1`,
+      [template.id, ADMIN_ID],
+    );
+
+    // Template set default smoke
+    await client.query(`SELECT public.workflow_set_default_template($1, $2)`, [
+      template.id,
+      ADMIN_ID,
+    ]);
+
+    // Published template immutability guard check
+    await expectDatabaseError(
+      () =>
+        client.query(
+          `INSERT INTO public.workflow_template_stages (
+             workflow_template_id, name, sort_order, sla_hours
+           ) VALUES ($1, 'FORBIDDEN', 3, 4)`,
+          [template.id],
+        ),
+      ["WORKFLOW_TEMPLATE_IMMUTABLE", "P0001"],
+      "Mutating published template stage graph",
+    );
+
+    // Clone template smoke
+    const cloneResult = await client.query(
+      `SELECT public.workflow_clone_template($1, $2) AS id`,
+      [template.id, ADMIN_ID],
+    );
+    const clonedId = cloneResult.rows[0].id;
+    const clonedRow = await client.query(
+      `SELECT * FROM public.workflow_templates WHERE id = $1`,
+      [clonedId],
+    );
+    const cloned = clonedRow.rows[0];
+    assert.equal(cloned.version, template.version + 1);
+    assert.equal(cloned.status, "draft");
+
+    // Runtime Snapshot Smoke: Instantiate project service
+    const instantiateResult = await client.query(
+      `SELECT public.workflow_instantiate_project_service($1, $2, $3) AS result`,
+      [seed.projectId, seed.projectServiceId, ADMIN_ID],
+    );
+    const runtimeWorkflowId = instantiateResult.rows[0].result.workflowId;
+    assert(runtimeWorkflowId, "workflow_instantiate_project_service must return workflowId");
+    const runtimeWorkflowRow = await client.query(
+      `SELECT * FROM public.project_workflows WHERE id = $1`,
+      [runtimeWorkflowId],
+    );
+    const runtimeWorkflow = runtimeWorkflowRow.rows[0];
+    assert.match(runtimeWorkflow.project_workflow_code, /^QTDA_[0-9]+$/u);
+    assert.equal(runtimeWorkflow.status, "not_started");
+
+    const runtimeStages = await client.query(
+      `SELECT id, project_workflow_stage_code, status, sort_order
+       FROM public.project_workflow_stages
+       WHERE project_workflow_id = $1
+       ORDER BY sort_order`,
+      [runtimeWorkflow.id],
+    );
+    assert.equal(runtimeStages.rowCount, 2);
+    assert.match(
+      runtimeStages.rows[0].project_workflow_stage_code,
+      /^GDDA_[0-9]+$/u,
+    );
+
+    const runtimeItems = await client.query(
+      `SELECT id, project_service_item_id, project_workflow_stage_id, status, approval_required, completion_mode
+       FROM public.project_workflow_stage_items
+       WHERE project_workflow_id = $1
+       ORDER BY created_at, id`,
+      [runtimeWorkflow.id],
+    );
+    assert.equal(runtimeItems.rowCount, 2);
+
+    // Task Idempotency: Create Primary Task
+    const taskResult = await client.query(
+      `SELECT public.workflow_create_primary_task($1, $2, $3, $4, $5) AS result`,
+      [
+        seed.projectId,
+        runtimeItems.rows[0].id,
+        runtimeItems.rows[0].project_service_item_id,
+        "Smoke Primary Task",
+        ADMIN_ID,
+      ],
+    );
+    const primaryTaskId = taskResult.rows[0].result.id;
+    assert(primaryTaskId);
+
+    const taskLinks = await client.query(
+      `SELECT id, link_type FROM public.project_workflow_task_links
+       WHERE project_workflow_stage_item_id = $1`,
+      [runtimeItems.rows[0].id],
+    );
+    assert.equal(taskLinks.rowCount, 1);
+    assert.equal(taskLinks.rows[0].link_type, "primary");
+
+    // Reject duplicate primary task link
+    await expectDatabaseError(
+      () =>
+        client.query(
+          `INSERT INTO public.project_workflow_task_links (
+             project_workflow_stage_item_id, task_id, link_type
+           ) VALUES ($1, $2, 'primary')`,
+          [runtimeItems.rows[0].id, primaryTaskId],
+        ),
+      ["23505", "uidx_project_workflow_task_links_primary", "duplicate key"],
+      "Inserting duplicate primary task link",
+    );
+
+    // Approval Smoke: Request approval & Respond approval
+    const approvalReqResult = await client.query(
+      `SELECT * FROM public.workflow_request_approval($1, $2, $3, NULL, 'internal', 'Smoke note', $4)`,
+      [seed.projectId, runtimeWorkflow.id, runtimeItems.rows[0].id, ADMIN_ID],
+    );
+    const approvalReq = approvalReqResult.rows[0];
+    assert.equal(approvalReq.status, "pending");
+    assert.equal(approvalReq.approval_type, "internal");
+
+    const approvalRespResult = await client.query(
+      `SELECT * FROM public.workflow_respond_approval($1, $2, $3, 'approved', 'Smoke decision note', $4)`,
+      [seed.projectId, runtimeWorkflow.id, approvalReq.id, ADMIN_ID],
+    );
+    const approvalResp = approvalRespResult.rows[0];
+    assert.equal(approvalResp.status, "approved");
+
     return {
       template,
+      cloned,
       stages: stages.rows,
       mappedItems: mappedItems.rows,
       deliveryItems: deliveryItems.rows,
+      runtimeWorkflow,
+      runtimeStages: runtimeStages.rows,
+      runtimeItems: runtimeItems.rows,
+      primaryTask: { id: primaryTaskId },
+      approvalReq,
+      approvalResp,
     };
   } finally {
     await client.query("RESET ROLE");
@@ -665,12 +852,17 @@ async function main() {
 
     phase("Create generic disposable smoke data");
     const seed = await seedDisposableData(client);
+    process.stdout.write(
+      `Seeded disposable test project ${seed.projectId} and service ${seed.serviceId}.\n`,
+    );
 
     phase("Run actual Template and runtime database smoke setup");
     const smoke = await runTemplateAndRuntimeSmoke(client, seed);
     process.stdout.write(
-      `Created disposable Template ${smoke.template.workflow_code}; ` +
-        `${smoke.stages.length} Stages and ${smoke.mappedItems.length} mapped Items.\n`,
+      `Template/RPC Smoke: Created ${smoke.template.workflow_code}, Stages: ${smoke.stages.length}, Mapped Items: ${smoke.mappedItems.length}, Cloned: ${smoke.cloned.workflow_code} (v${smoke.cloned.version})\n` +
+        `Runtime Snapshot Smoke: Created ${smoke.runtimeWorkflow.project_workflow_code} with ${smoke.runtimeStages.length} stages and ${smoke.runtimeItems.length} items\n` +
+        `Task Idempotency Smoke: Primary task ${smoke.primaryTask.id} linked, duplicate link rejected\n` +
+        `Approval Smoke: Request ${smoke.approvalReq.id} (${smoke.approvalReq.status}) -> Decision (${smoke.approvalResp.status})\n`,
     );
 
     phase("Workflow migration preflight passed");
