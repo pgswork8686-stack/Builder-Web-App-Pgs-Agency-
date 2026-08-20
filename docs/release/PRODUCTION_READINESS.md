@@ -35,11 +35,12 @@
 - **Main Branch Status:** **NOT YET MERGED / 82 COMMITS AHEAD IN PR #7**
 - **Production Database `umtgfaqjoqbsdzwpqizq`:** **100% UNTOUCHED / READ-ONLY (0 writes)**
 - **Current Pipeline Stage:** `READY FOR STAGING PROVISIONING`
-  *(NOT FULL UAT — NOT MAIN SYNCED — NOT READY FOR PRODUCTION APPLY UNTIL STAGING UAT IS PROVEN)*
+  _(NOT FULL UAT — NOT MAIN SYNCED — NOT READY FOR PRODUCTION APPLY UNTIL STAGING UAT IS PROVEN)_
 
 ---
 
 ## 5. Required Release Sequence (Strict Gate Order)
+
 1. **Provision Real Staging Database** (Submit cost/plan approval if enabling Supabase Branching).
 2. **Apply Release Migration Manifest to Staging** (53 clean migrations, NEVER monolithic Phase 10).
 3. **Deploy Staging App & Conduct Full Role UAT** (Admin, Team Leader, Employee, Accountant, Client).
