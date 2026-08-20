@@ -1,42 +1,50 @@
-# PGS HUB — MA TRẬN & BÁO CÁO NGHIỆM THU STAGING (DAY 1)
+# PGS HUB — BÁO CÁO NGHIỆM THU NGUỒN (SOURCE VERIFICATION)
 
 `
 ================================================================================
 
-STAGING DEPLOYMENT & SMOKE EVIDENCE HEADER
+SOURCE VERIFICATION & RELEASE READINESS HEADER
 ================================================================================
 
-STAGING WEB URL: [CHỜ THIẾT LẬP COOLIFY / CHƯA CÓ DOMAIN STAGING ĐỘC LẬP]
-STAGING API URL: [CHỜ THIẾT LẬP COOLIFY / CHƯA CÓ DOMAIN STAGING ĐỘC LẬP]
-COOLIFY PROJECT: [CHƯA KẾT NỐI API COOLIFY / CHƯA CẤU HÌNH WEBHOOK]
-WEB DEPLOYMENT ID: N/A (Chờ trigger từ Coolify / Staging Runner)
-API DEPLOYMENT ID: N/A (Chờ trigger từ Coolify / Staging Runner)
-DEPLOYED SHA: 210f2ef4257d3f68c2f554fa8dce663c861129f9
-DEPLOYED AT: 2026-08-20T02:29:03Z (Remote GitHub CI)
-STAGING DATABASE: [CHƯA CÓ ISOLATED STAGING DB - ĐANG CHỈ ĐỊNH READ-ONLY SAFEGUARD]
-PRODUCTION DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẰN - KHÔNG GHI)
+LAST CI VERIFIED SHA: 210f2ef4257d3f68c2f554fa8dce663c861129f9
+CURRENT SOURCE HEAD: ca473ad140bb58cac010500ba79e61d4aee4664a
 REMOTE CI RUN ID: 32324788838 (Status: SUCCESS, 556/556 Tests Passed)
+DEPLOYMENT: DEFERRED BY OWNER (USER SẼ TỰ DEPLOY SAU KHI HOÀN THIỆN)
+STAGING: NOT CONFIGURED — NOT REQUIRED FOR SOURCE COMPLETION
+PRODUCTION DEPLOY: DEFERRED
+PRODUCTION DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẸN — NO WRITES)
+PHASE 10 MIGRATION: NOT APPLIED (TUYỆT ĐỐI KHÔNG ÁP DỤNG)
 ================================================================================
 
 `
+
+---
 
 ## 1. THỰC TRẠNG CI & CHẤT LƯỢNG MÃ NGUỒN (CI FACTS)
 
 - **Remote CI Run**: [Run #32324788838](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/32324788838)
-- **Tổng số Tests**: **556/556 passed** (API Unit: 428, API E2E: 85, Web: 42, Validation: 1)
+- **Tổng số Tests**: **556/556 passed**
+  - **API Unit Tests**: 428/428 passed
+  - **API E2E Tests**: 85/85 passed
+  - **Web Tests**: 42/42 passed
+  - **Validation Package Tests**: 1/1 passed
 - **Lint Errors**: 0 errors
-- **Lint Warnings**: 203 warnings hiện hữu trong CI logs (14 ở Web, 189 ở API - không phải blocker Day 1).
+- **Lint Warnings**: 203 warnings hiện hữu trong CI logs (14 ở Web, 189 ở API — không phải blocker Day 1).
 - **TypeScript**: 0 errors across 7/7 workspaces.
 - **Build**: Next.js (85/85 routes) + NestJS API compile 100% thành công.
 
-## 2. NGUYÊN TẮC AN TOÀN DATABASE & PHÂN LOẠI EVIDENCE
+---
+
+## 2. NGUYÊN TẮC AN TOÀN DATABASE & BẢO VỆ DỮ LIỆU
 
 > [!IMPORTANT]
-> **AN TOÀN DỮ LIỆU**: Khi chưa có cơ sở dữ liệu Staging cô lập (Isolated Staging DB), toàn bộ các thao tác ghi (Write Tests) trên môi trường Staging/Production đều được **TẠM KHÓA (WRITE_SMOKE_BLOCKED_FOR_SAFETY = true)** để bảo vệ database umtgfaqjoqbsdzwpqizq.
+> **AN TOÀN DỮ LIỆU**: Toàn bộ database Production umtgfaqjoqbsdzwpqizq được bảo vệ nguyên vẹn. Không có thao tác ghi dữ liệu, không chạy migration production, không apply Phase 10.
 
-## 3. TỔNG KẾT GATE NGHIỆM THU DAY 1
+---
 
-- **Trạng thái**: **PARTIAL PASS — READ-ONLY STAGING & REMOTE CI VERIFIED**
+## 3. TỔNG KẾT GATE NGHIỆM THU NGUỒN
+
+- **Trạng thái**: **SOURCE VERIFICATION PASS — RUNTIME DEPLOYMENT DEFERRED**
 - **P0 Blockers**: **0**
 - **P1 Operational Bugs**: **0**
-- **Quyền hạn Dữ liệu Thật (Day 3 Authorized)**: **KHÔNG (NO) — Cần Admin cấu hình Staging Domain/DB riêng và phê duyệt trước khi onboarding dữ liệu thật**.
+- **Quyền hạn Dữ liệu Thật**: **KHÔNG (NO) — Không đưa dữ liệu người thật vào DB cho đến khi hoàn tất bàn giao**.

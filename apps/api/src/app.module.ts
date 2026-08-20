@@ -26,6 +26,7 @@ import { SupportModule } from './support/support.module';
 import { TasksModule } from './tasks/tasks.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { WorkCalendarModule } from './work-calendar/work-calendar.module';
+import { WorkflowModule } from './workflows/workflow.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 
 @Module({
@@ -65,6 +66,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     ChatModule,
     AutomationModule,
     WorkCalendarModule,
+    WorkflowModule,
   ],
   providers: [
     {
