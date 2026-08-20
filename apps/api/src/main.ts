@@ -65,12 +65,16 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
+      const isLocalDevelopmentOrigin =
+        !isProduction &&
+        typeof origin === 'string' &&
+        (origin.startsWith('http://localhost:') ||
+          origin.startsWith('http://127.0.0.1:'));
+
       if (
         !origin ||
-        !isProduction ||
         allowedOrigins.includes(origin) ||
-        origin.startsWith('http://localhost:') ||
-        origin.startsWith('http://127.0.0.1:')
+        isLocalDevelopmentOrigin
       ) {
         callback(null, true);
       } else {

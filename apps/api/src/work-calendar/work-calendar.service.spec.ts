@@ -354,6 +354,12 @@ describe('WorkCalendarService', () => {
   // Test 12: missing provider key returns controlled error
   it('12. should throw HOLIDAY_PROVIDER_NOT_CONFIGURED when API key is missing', async () => {
     configMock.calendarificApiKey = undefined;
+    jest.spyOn(service, 'getSettings').mockResolvedValue({
+      id: 'settings-1',
+      holiday_provider: 'calendarific',
+      timezone: 'Asia/Ho_Chi_Minh',
+      holiday_country_code: 'VN',
+    } as any);
 
     await expect(
       service.syncHolidays({ year: 2026 }, mockAdminUser),

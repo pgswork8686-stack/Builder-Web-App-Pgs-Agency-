@@ -39,34 +39,25 @@ export interface WorkCalendarEvent {
     "public_holiday" | "company_holiday" | "makeup_workday" | "special_workday";
   title: string;
   is_working_day: boolean;
-  source_type: "manual" | "api" | "system";
+  source_type: "manual" | "api" | "government_notice" | "system";
   source_provider: string | null;
   notes: string | null;
-  status: "active" | "inactive" | "cancelled";
+  status: "pending" | "active" | "ignored";
   created_at: string;
   updated_at: string;
 }
 
 export const workCalendarApi = {
-  /**
-   * Fetch work calendar range (accessible to all internal users)
-   */
   range: (from: string, to: string): Promise<WorkCalendarRangeResponse> => {
     return request<WorkCalendarRangeResponse>(
       `/work-calendar?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
     );
   },
 
-  /**
-   * Admin: Get settings
-   */
   getSettings: (): Promise<WorkCalendarSettings> => {
     return request<WorkCalendarSettings>("/admin/work-calendar/settings");
   },
 
-  /**
-   * Admin: Update settings
-   */
   updateSettings: (
     data: Partial<{
       timezone: string;
@@ -86,9 +77,6 @@ export const workCalendarApi = {
     });
   },
 
-  /**
-   * Admin: Get events
-   */
   getEvents: (from?: string, to?: string): Promise<WorkCalendarEvent[]> => {
     const params = new URLSearchParams();
     if (from) params.set("from", from);
@@ -99,9 +87,6 @@ export const workCalendarApi = {
     );
   },
 
-  /**
-   * Admin: Create event
-   */
   createEvent: (data: {
     eventDate: string;
     eventType:
@@ -119,9 +104,6 @@ export const workCalendarApi = {
     });
   },
 
-  /**
-   * Admin: Update event
-   */
   updateEvent: (
     eventId: string,
     data: Partial<{
@@ -134,7 +116,7 @@ export const workCalendarApi = {
       title: string;
       isWorkingDay: boolean;
       notes: string | null;
-      status: "active" | "inactive" | "cancelled";
+      status: "pending" | "active" | "ignored";
     }>,
   ): Promise<WorkCalendarEvent> => {
     return request<WorkCalendarEvent>(
@@ -146,9 +128,6 @@ export const workCalendarApi = {
     );
   },
 
-  /**
-   * Admin: Delete event
-   */
   deleteEvent: (
     eventId: string,
   ): Promise<{ success: boolean; deletedEvent: WorkCalendarEvent }> => {
@@ -160,9 +139,6 @@ export const workCalendarApi = {
     );
   },
 
-  /**
-   * Admin: Sync holidays
-   */
   syncHolidays: (
     year?: number,
   ): Promise<{

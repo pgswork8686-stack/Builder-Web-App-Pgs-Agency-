@@ -223,7 +223,7 @@ export default function AdminWorkCalendarPage() {
     { day: 4, label: "T5" },
     { day: 5, label: "T6" },
     { day: 6, label: "T7" },
-    { day: 0, label: "CN" },
+    { day: 7, label: "CN" },
   ];
 
   return (
@@ -519,8 +519,8 @@ export default function AdminWorkCalendarPage() {
               {events.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-[#94A3B8]">
-                    Chưa có ngoại lệ lịch nào. Bấm &quot;Thêm ngoại lệ&quot; để tạo ngày
-                    nghỉ/làm bù mới.
+                    Chưa có ngoại lệ lịch nào. Bấm &quot;Thêm ngoại lệ&quot; để
+                    tạo ngày nghỉ/làm bù mới.
                   </td>
                 </tr>
               ) : (

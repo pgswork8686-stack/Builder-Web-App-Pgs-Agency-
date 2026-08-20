@@ -47,13 +47,20 @@ export function ProjectCalendarView({ mode }: { mode: WorkspaceMode }) {
 export function EmbeddedCalendarView({
   mode,
   projectId,
+  initialMonth,
 }: {
   mode: WorkspaceMode;
   projectId: string;
+  initialMonth?: string;
 }) {
   return (
     <ProjectWorkspaceRealtimeProvider projectId={projectId}>
-      <ProjectCalendarContent mode={mode} projectId={projectId} embedded />
+      <ProjectCalendarContent
+        mode={mode}
+        projectId={projectId}
+        embedded
+        initialMonth={initialMonth}
+      />
     </ProjectWorkspaceRealtimeProvider>
   );
 }
@@ -62,13 +69,19 @@ function ProjectCalendarContent({
   mode,
   projectId,
   embedded = false,
+  initialMonth,
 }: {
   mode: WorkspaceMode;
   projectId: string;
   embedded?: boolean;
+  initialMonth?: string;
 }) {
   const { revision } = useProjectWorkspaceRealtime();
   const [month, setMonth] = useState(() => {
+    if (initialMonth && /^\d{4}-\d{2}$/.test(initialMonth)) {
+      const [year, monthNumber] = initialMonth.split("-").map(Number);
+      return new Date(Date.UTC(year, monthNumber - 1, 1));
+    }
     const now = new Date();
     return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
   });

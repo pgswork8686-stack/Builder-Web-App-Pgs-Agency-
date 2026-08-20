@@ -1,9 +1,10 @@
 -- ============================================================
 -- Migration: Company Work Calendar API Helpers
 -- Timestamp: 20260819102242_company_work_calendar_api_helpers.sql
--- Description:
---   Creates resolve_company_workday and get_company_work_calendar RPC functions
---   with set search_path = '' and deterministic priority resolution.
+-- Purpose:
+--   Reconciled with Production. Functions are SECURITY INVOKER and executable
+--   only by service_role. Government makeup/special workdays are ignored unless
+--   apply_government_makeup_days is enabled in company settings.
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION public.resolve_company_workday(p_date DATE)
@@ -16,98 +17,120 @@ RETURNS TABLE (
   source_type TEXT
 )
 LANGUAGE plpgsql
-STABLE
-SECURITY DEFINER
-SET search_path = ''
+SECURITY INVOKER
+SET search_path TO 'public', 'pg_temp'
 AS $$
 DECLARE
-  v_settings RECORD;
-  v_event RECORD;
-  v_dow INT;
-  v_days_diff INT;
-  v_is_even_cycle BOOLEAN;
-  v_is_working_sat BOOLEAN;
+  v_settings public.company_work_calendar_settings%ROWTYPE;
+  v_event public.company_work_calendar_events%ROWTYPE;
+  v_isodow INTEGER;
+  v_week_offset INTEGER;
 BEGIN
-  -- 1. Fetch settings
-  SELECT * INTO v_settings FROM public.company_work_calendar_settings LIMIT 1;
-  IF v_settings IS NULL THEN
-    -- Fallback default: Mon-Fri working, Sat-Sun off
-    v_dow := EXTRACT(DOW FROM p_date);
-    IF v_dow BETWEEN 1 AND 5 THEN
-      RETURN QUERY SELECT p_date, true, 'regular_workday'::TEXT, NULL::TEXT, 'Ngày làm việc'::TEXT, 'system'::TEXT;
-    ELSE
-      RETURN QUERY SELECT p_date, false, 'weekly_off'::TEXT, NULL::TEXT, 'Ngày nghỉ hàng tuần'::TEXT, 'system'::TEXT;
-    END IF;
-    RETURN;
-  END IF;
-
-  -- 2. Priority 1 & 2: Manual Admin Override & Active Events
-  SELECT * INTO v_event
-  FROM public.company_work_calendar_events e
-  WHERE e.event_date = p_date AND e.status = 'active'
-  ORDER BY 
-    CASE e.source_type 
-      WHEN 'manual' THEN 1 
-      WHEN 'system' THEN 2 
-      WHEN 'api' THEN 3 
-      ELSE 4 
-    END ASC,
-    e.updated_at DESC
+  SELECT * INTO v_settings
+  FROM public.company_work_calendar_settings
+  ORDER BY created_at ASC
   LIMIT 1;
 
-  IF v_event IS NOT NULL THEN
-    RETURN QUERY SELECT 
-      p_date,
-      v_event.is_working_day,
-      CASE 
-        WHEN v_event.source_type = 'manual' THEN 'manual_override'
-        WHEN v_event.event_type = 'public_holiday' THEN 'public_holiday'
-        WHEN v_event.event_type = 'company_holiday' THEN 'company_holiday'
-        WHEN v_event.event_type = 'makeup_workday' THEN 'makeup_workday'
-        WHEN v_event.event_type = 'special_workday' THEN 'special_workday'
-        ELSE 'calendar_event'
-      END::TEXT,
-      v_event.event_type::TEXT,
-      v_event.title::TEXT,
-      v_event.source_type::TEXT;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'WORK_CALENDAR_SETTINGS_NOT_FOUND';
+  END IF;
+
+  -- Priority 1: explicit manual Admin override.
+  SELECT * INTO v_event
+  FROM public.company_work_calendar_events e
+  WHERE e.event_date = p_date
+    AND e.status = 'active'
+    AND e.source_type = 'manual'
+  ORDER BY e.updated_at DESC, e.created_at DESC
+  LIMIT 1;
+
+  IF FOUND THEN
+    RETURN QUERY SELECT p_date, v_event.is_working_day, 'manual_override'::TEXT,
+      v_event.event_type, v_event.title, v_event.source_type;
     RETURN;
   END IF;
 
-  -- 3. Day of week calculation (0=Sun, 1=Mon, ..., 6=Sat)
-  v_dow := EXTRACT(DOW FROM p_date);
+  -- Priority 2/3: company holiday, then official public holiday.
+  SELECT * INTO v_event
+  FROM public.company_work_calendar_events e
+  WHERE e.event_date = p_date
+    AND e.status = 'active'
+    AND e.event_type IN ('public_holiday','company_holiday')
+  ORDER BY
+    CASE WHEN e.event_type = 'company_holiday' THEN 0 ELSE 1 END,
+    e.updated_at DESC,
+    e.created_at DESC
+  LIMIT 1;
 
-  -- Check alternate Saturday
-  IF v_dow = 6 AND v_settings.alternate_saturday_enabled THEN
-    IF v_settings.alternate_saturday_anchor_date IS NOT NULL THEN
-      v_days_diff := (p_date - v_settings.alternate_saturday_anchor_date);
-      -- 14 days cycle
-      IF (v_days_diff % 14 = 0) THEN
-        v_is_working_sat := v_settings.alternate_saturday_anchor_is_working;
-      ELSE
-        v_is_working_sat := NOT v_settings.alternate_saturday_anchor_is_working;
-      END IF;
+  IF FOUND THEN
+    RETURN QUERY SELECT p_date, false, v_event.event_type,
+      v_event.event_type, v_event.title, v_event.source_type;
+    RETURN;
+  END IF;
 
-      IF v_is_working_sat THEN
-        RETURN QUERY SELECT p_date, true, 'alternate_saturday'::TEXT, NULL::TEXT, 'Thứ 7 đi làm theo lịch cách tuần'::TEXT, 'system'::TEXT;
-      ELSE
-        RETURN QUERY SELECT p_date, false, 'alternate_saturday'::TEXT, NULL::TEXT, 'Nghỉ thứ 7 cách tuần'::TEXT, 'system'::TEXT;
-      END IF;
+  -- Priority 4: government/special makeup workday, opt-in only.
+  IF v_settings.apply_government_makeup_days THEN
+    SELECT * INTO v_event
+    FROM public.company_work_calendar_events e
+    WHERE e.event_date = p_date
+      AND e.status = 'active'
+      AND e.event_type IN ('makeup_workday','special_workday')
+      AND e.is_working_day = true
+    ORDER BY e.updated_at DESC, e.created_at DESC
+    LIMIT 1;
+
+    IF FOUND THEN
+      RETURN QUERY SELECT p_date, true, v_event.event_type,
+        v_event.event_type, v_event.title, v_event.source_type;
       RETURN;
     END IF;
   END IF;
 
-  -- Check Sunday
-  IF v_dow = 0 THEN
-    RETURN QUERY SELECT p_date, false, 'weekly_off'::TEXT, NULL::TEXT, 'Ngày nghỉ hàng tuần'::TEXT, 'system'::TEXT;
+  v_isodow := EXTRACT(ISODOW FROM p_date)::INTEGER;
+
+  -- Priority 5: alternate Saturday anchored at 2026-08-22 by current settings.
+  IF v_isodow = 6
+     AND v_settings.alternate_saturday_enabled
+     AND v_settings.alternate_saturday_anchor_date IS NOT NULL THEN
+    v_week_offset := (p_date - v_settings.alternate_saturday_anchor_date) / 7;
+
+    IF mod(abs(v_week_offset), 2) = 0 THEN
+      RETURN QUERY SELECT p_date, v_settings.alternate_saturday_anchor_is_working,
+        'alternate_saturday'::TEXT, NULL::TEXT,
+        CASE
+          WHEN v_settings.alternate_saturday_anchor_is_working
+            THEN 'Thứ 7 đi làm theo lịch cách tuần'
+          ELSE 'Nghỉ thứ 7 cách tuần'
+        END,
+        'system'::TEXT;
+    ELSE
+      RETURN QUERY SELECT p_date, NOT v_settings.alternate_saturday_anchor_is_working,
+        'alternate_saturday'::TEXT, NULL::TEXT,
+        CASE
+          WHEN NOT v_settings.alternate_saturday_anchor_is_working
+            THEN 'Thứ 7 đi làm theo lịch cách tuần'
+          ELSE 'Nghỉ thứ 7 cách tuần'
+        END,
+        'system'::TEXT;
+    END IF;
     RETURN;
   END IF;
 
-  -- Check weekday working days configuration
-  IF v_dow = ANY(v_settings.weekday_working_days) THEN
-    RETURN QUERY SELECT p_date, true, 'regular_workday'::TEXT, NULL::TEXT, 'Ngày làm việc'::TEXT, 'system'::TEXT;
-  ELSE
-    RETURN QUERY SELECT p_date, false, 'weekly_off'::TEXT, NULL::TEXT, 'Ngày nghỉ hàng tuần'::TEXT, 'system'::TEXT;
-  END IF;
+  -- Priority 6: regular ISO weekday/weekend rule (1=Mon ... 7=Sun).
+  RETURN QUERY SELECT p_date,
+    v_isodow = ANY(v_settings.weekday_working_days::INTEGER[]),
+    CASE
+      WHEN v_isodow = ANY(v_settings.weekday_working_days::INTEGER[])
+        THEN 'regular_workday'
+      ELSE 'weekly_off'
+    END,
+    NULL::TEXT,
+    CASE
+      WHEN v_isodow = ANY(v_settings.weekday_working_days::INTEGER[])
+        THEN 'Ngày làm việc'
+      ELSE 'Ngày nghỉ hàng tuần'
+    END,
+    'system'::TEXT;
 END;
 $$;
 
@@ -121,15 +144,26 @@ RETURNS TABLE (
   source_type TEXT
 )
 LANGUAGE plpgsql
-STABLE
-SECURITY DEFINER
-SET search_path = ''
+SECURITY INVOKER
+SET search_path TO 'public', 'pg_temp'
 AS $$
 BEGIN
+  IF p_from IS NULL OR p_to IS NULL OR p_to < p_from THEN
+    RAISE EXCEPTION 'INVALID_WORK_CALENDAR_RANGE';
+  END IF;
+
+  IF (p_to - p_from) > 400 THEN
+    RAISE EXCEPTION 'WORK_CALENDAR_RANGE_TOO_LARGE';
+  END IF;
+
   RETURN QUERY
-  SELECT r.*
-  FROM generate_series(p_from, p_to, '1 day'::interval) d(day_date)
-  CROSS JOIN LATERAL public.resolve_company_workday(d.day_date::DATE) r
-  ORDER BY r.work_date ASC;
+  SELECT r.work_date, r.is_working_day, r.reason, r.event_type, r.event_title, r.source_type
+  FROM generate_series(p_from::TIMESTAMP, p_to::TIMESTAMP, INTERVAL '1 day') g(day)
+  CROSS JOIN LATERAL public.resolve_company_workday(g.day::DATE) r;
 END;
 $$;
+
+REVOKE ALL ON FUNCTION public.resolve_company_workday(DATE) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.get_company_work_calendar(DATE, DATE) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.resolve_company_workday(DATE) TO service_role;
+GRANT EXECUTE ON FUNCTION public.get_company_work_calendar(DATE, DATE) TO service_role;

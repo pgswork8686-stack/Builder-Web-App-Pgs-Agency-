@@ -1,13 +1,28 @@
 import { z } from 'zod';
 
+function isValidIsoDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+const IsoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be in YYYY-MM-DD format')
+  .refine(isValidIsoDate, 'date must be a valid calendar date');
+
 export const WorkCalendarRangeQuerySchema = z
   .object({
-    from: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'from must be in YYYY-MM-DD format'),
-    to: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'to must be in YYYY-MM-DD format'),
+    from: IsoDateSchema,
+    to: IsoDateSchema,
   })
   .refine((data) => data.from <= data.to, {
     message: 'from date must be less than or equal to to date',
@@ -21,20 +36,20 @@ export type WorkCalendarRangeQueryDto = z.infer<
 export const UpdateWorkCalendarSettingsSchema = z
   .object({
     timezone: z.string().min(1).optional(),
+    // ISO day of week: 1=Monday ... 7=Sunday, matching Production DB.
     weekdayWorkingDays: z
-      .array(z.number().int().min(0).max(6))
+      .array(z.number().int().min(1).max(7))
       .min(1)
       .optional(),
     alternateSaturdayEnabled: z.boolean().optional(),
-    alternateSaturdayAnchorDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/)
-      .nullable()
-      .optional(),
+    alternateSaturdayAnchorDate: IsoDateSchema.nullable().optional(),
     alternateSaturdayAnchorIsWorking: z.boolean().optional(),
     applyGovernmentMakeupDays: z.boolean().optional(),
-    holidayCountryCode: z.string().min(2).max(10).optional(),
-    holidayProvider: z.string().nullable().optional(),
+    holidayCountryCode: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .optional(),
+    holidayProvider: z.string().min(1).nullable().optional(),
     autoHolidaySyncEnabled: z.boolean().optional(),
   })
   .strict();
@@ -54,9 +69,7 @@ export type WorkCalendarEventType = z.infer<typeof WorkCalendarEventTypeEnum>;
 
 export const CreateWorkCalendarEventSchema = z
   .object({
-    eventDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'eventDate must be in YYYY-MM-DD format'),
+    eventDate: IsoDateSchema,
     eventType: WorkCalendarEventTypeEnum,
     title: z.string().trim().min(1, 'title is required').max(200),
     isWorkingDay: z.boolean(),
@@ -70,15 +83,12 @@ export type CreateWorkCalendarEventDto = z.infer<
 
 export const UpdateWorkCalendarEventSchema = z
   .object({
-    eventDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'eventDate must be in YYYY-MM-DD format')
-      .optional(),
+    eventDate: IsoDateSchema.optional(),
     eventType: WorkCalendarEventTypeEnum.optional(),
     title: z.string().trim().min(1).max(200).optional(),
     isWorkingDay: z.boolean().optional(),
     notes: z.string().trim().max(1000).nullable().optional(),
-    status: z.enum(['active', 'inactive', 'cancelled']).optional(),
+    status: z.enum(['pending', 'active', 'ignored']).optional(),
   })
   .strict();
 
