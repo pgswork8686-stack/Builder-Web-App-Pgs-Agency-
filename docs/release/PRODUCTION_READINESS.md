@@ -28,12 +28,22 @@
 - [x] Workflow Engine V1: **Template graph, Cycle detection, published immutability, runtime snapshot, task idempotency, atomic approvals**
 - [x] Role-Based Access Control (RBAC): **5 distinct roles strictly isolated across all domains**
 
-## 4. Production Release Gate Status
+## 4. Release Pipeline & Production Gate Status
 
-- **Current State:** `READY FOR PRODUCTION APPLY`
-- **Production Writes:** `NONE` (Awaiting explicit release authorization: `APPROVE_PRODUCTION_RELEASE = YES`)
-- **Required Production Actions Upon Approval:**
-  1. Confirm database backup / PITR point.
-  2. Apply selective migrations from `docs/release/PRODUCTION_MIGRATION_MANIFEST.md` (`20260820120000` through `20260820135000`).
-  3. Configure production attendance hours (`workday_start_time`, `workday_end_time`) with approved business values.
-  4. Run postflight validation and verify read-only health metrics.
+- **Automated Regression:** **PASS (673/673 tests passed)**
+- **Live Staging UAT:** **PENDING (Awaiting cloud staging DB provisioning)**
+- **Main Branch Status:** **NOT YET MERGED / 82 COMMITS AHEAD IN PR #7**
+- **Production Database `umtgfaqjoqbsdzwpqizq`:** **100% UNTOUCHED / READ-ONLY (0 writes)**
+- **Current Pipeline Stage:** `READY FOR STAGING PROVISIONING`
+  *(NOT FULL UAT — NOT MAIN SYNCED — NOT READY FOR PRODUCTION APPLY UNTIL STAGING UAT IS PROVEN)*
+
+---
+
+## 5. Required Release Sequence (Strict Gate Order)
+1. **Provision Real Staging Database** (Submit cost/plan approval if enabling Supabase Branching).
+2. **Apply Release Migration Manifest to Staging** (53 clean migrations, NEVER monolithic Phase 10).
+3. **Deploy Staging App & Conduct Full Role UAT** (Admin, Team Leader, Employee, Accountant, Client).
+4. **Fix Any Staging Findings & Re-verify CI**.
+5. **Merge PR #7 into `main`** upon successful non-production verification.
+6. **Verify `main` CI on exact merged HEAD**.
+7. **STOP & Require Explicit Authorization** (`APPROVE_PRODUCTION_RELEASE = YES`) before touching Production.
