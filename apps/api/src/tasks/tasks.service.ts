@@ -14,6 +14,18 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
+export interface CreatedTaskRow extends Record<string, unknown> {
+  id: string;
+  project_id: string;
+  status: string;
+  updated_at: string;
+  assignee_user_id: string | null;
+}
+
+export interface TaskCreationContext {
+  workflowStageItemId: string;
+}
+
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
@@ -116,7 +128,7 @@ export class TasksService {
   private async requireProject(projectId: string) {
     const { data, error } = await this.client
       .from('projects')
-      .select('id')
+      .select('id,project_manager_user_id')
       .eq('id', projectId)
       .maybeSingle();
     if (error) {
@@ -132,6 +144,7 @@ export class TasksService {
         message: 'Không tìm thấy dự án.',
       });
     }
+    return data;
   }
 
   private async getAccess(projectId: string, user: RequestUser) {
@@ -141,7 +154,7 @@ export class TasksService {
         message: 'Khách hàng không có quyền truy cập công việc nội bộ.',
       });
     }
-    await this.requireProject(projectId);
+    const project = await this.requireProject(projectId);
     if (user.role === 'admin') {
       return { isAdmin: true, projectRole: 'project_manager' as const };
     }
@@ -164,7 +177,14 @@ export class TasksService {
         message: 'Bạn không phải thành viên của dự án.',
       });
     }
-    return { isAdmin: false, projectRole: data.project_role as string };
+    return {
+      isAdmin: false,
+      projectRole:
+        data.project_role === 'project_manager' ||
+        project.project_manager_user_id === user.profileId
+          ? ('project_manager' as const)
+          : (data.project_role as string),
+    };
   }
 
   private async getTaskRow(projectId: string, taskId: string) {
@@ -436,7 +456,12 @@ export class TasksService {
     };
   }
 
-  async createTask(projectId: string, dto: CreateTaskDto, user: RequestUser) {
+  async createTask(
+    projectId: string,
+    dto: CreateTaskDto,
+    user: RequestUser,
+    context?: TaskCreationContext,
+  ) {
     const access = await this.getAccess(projectId, user);
     if (!access.isAdmin && access.projectRole !== 'project_manager') {
       throw new ForbiddenException({
@@ -456,43 +481,67 @@ export class TasksService {
         dto.projectServiceItemId,
       );
     }
-    const { data, error } = await this.client
-      .from('tasks')
-      .insert({
-        project_id: projectId,
-        parent_task_id: dto.parentTaskId ?? null,
-        project_service_item_id: dto.projectServiceItemId ?? null,
-        title: dto.title,
-        description: dto.description ?? null,
-        status: dto.status,
-        priority: dto.priority,
-        assignee_user_id: dto.assigneeUserId ?? null,
-        reporter_user_id: user.profileId,
-        start_date: dto.startDate ?? null,
-        due_date: dto.dueDate ?? null,
-        sort_order: dto.sortOrder,
-        created_by: user.profileId,
-        updated_by: user.profileId,
-      })
-      .select()
-      .single();
-    if (error) this.mapWriteError(error);
-    this.emit(projectId, data.id, 'task.created', data.updated_at, {
-      status: data.status,
-    });
-    await this.runTaskSideEffects(
-      'task.created',
-      `task.created:${data.id}`,
-      data,
-      user,
-    );
-    if (data.assignee_user_id) {
+    let data: CreatedTaskRow;
+    let workflowLinkExisting = false;
+    if (context) {
+      if (!dto.projectServiceItemId) {
+        throw new BadRequestException({
+          code: 'WORKFLOW_TASK_ITEM_REQUIRED',
+          message: 'Workflow Task requires a Project Service Item.',
+        });
+      }
+      const result = await this.client.rpc('workflow_create_primary_task', {
+        p_project_id: projectId,
+        p_workflow_stage_item_id: context.workflowStageItemId,
+        p_project_service_item_id: dto.projectServiceItemId,
+        p_title: dto.title,
+        p_actor_id: user.profileId,
+      });
+      if (result.error) this.mapWriteError(result.error);
+      data = result.data as CreatedTaskRow;
+      workflowLinkExisting = data.workflowLinkExisting === true;
+    } else {
+      const result = await this.client
+        .from('tasks')
+        .insert({
+          project_id: projectId,
+          parent_task_id: dto.parentTaskId ?? null,
+          project_service_item_id: dto.projectServiceItemId ?? null,
+          title: dto.title,
+          description: dto.description ?? null,
+          status: dto.status,
+          priority: dto.priority,
+          assignee_user_id: dto.assigneeUserId ?? null,
+          reporter_user_id: user.profileId,
+          start_date: dto.startDate ?? null,
+          due_date: dto.dueDate ?? null,
+          sort_order: dto.sortOrder,
+          created_by: user.profileId,
+          updated_by: user.profileId,
+        })
+        .select()
+        .single();
+      if (result.error) this.mapWriteError(result.error);
+      data = result.data as CreatedTaskRow;
+    }
+    if (!workflowLinkExisting) {
+      this.emit(projectId, data.id, 'task.created', data.updated_at, {
+        status: data.status,
+      });
       await this.runTaskSideEffects(
-        'task.assigned',
-        `task.assigned:${data.id}:${data.assignee_user_id}`,
+        'task.created',
+        `task.created:${data.id}`,
         data,
         user,
       );
+      if (data.assignee_user_id) {
+        await this.runTaskSideEffects(
+          'task.assigned',
+          `task.assigned:${data.id}:${data.assignee_user_id}`,
+          data,
+          user,
+        );
+      }
     }
     return data;
   }
