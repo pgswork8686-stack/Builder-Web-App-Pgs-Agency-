@@ -119,7 +119,7 @@ RETURNS public.workflow_templates
 LANGUAGE plpgsql
 SECURITY INVOKER
 SET search_path = public, pg_temp
-AS 
+AS $$
 DECLARE
   v_service_code TEXT;
   v_next_version INTEGER;
@@ -164,7 +164,7 @@ BEGIN
 
   RETURN v_result;
 END;
-;
+$$;
 
 REVOKE ALL ON FUNCTION public.workflow_create_template(UUID, TEXT, TEXT, UUID) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.workflow_create_template(UUID, TEXT, TEXT, UUID) TO service_role;
