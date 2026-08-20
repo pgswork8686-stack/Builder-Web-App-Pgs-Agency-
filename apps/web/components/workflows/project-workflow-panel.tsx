@@ -13,11 +13,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import type { ProjectService } from "@/lib/api/projects";
 import {
   workflowsApi,
   type ProjectWorkflow,
+  type ProjectWorkflowItemDependency,
   type ProjectWorkflowStage,
+  type ProjectWorkflowStageDependency,
   type WorkflowApprovalRequest,
 } from "@/lib/api/workflows";
 
@@ -57,6 +60,19 @@ function approvalSummary(approvals: WorkflowApprovalRequest[]): string {
       (approval) => `Approval ${approval.status} (${approval.approval_type})`,
     )
     .join(" · ");
+}
+
+function dependencyEligibleAt(
+  dependency: ProjectWorkflowStageDependency | ProjectWorkflowItemDependency,
+  predecessorCompletedAt?: string | null,
+): string | null {
+  if (dependency.eligible_at) return dependency.eligible_at;
+  if (!predecessorCompletedAt) return null;
+  const completedAt = Date.parse(predecessorCompletedAt);
+  if (Number.isNaN(completedAt)) return null;
+  return new Date(
+    completedAt + dependency.lag_hours * 60 * 60 * 1000,
+  ).toISOString();
 }
 
 export function ProjectWorkflowPanel({
@@ -99,18 +115,23 @@ export function ProjectWorkflowPanel({
     [workflows],
   );
 
-  const run = async (id: string, action: () => Promise<unknown>) => {
+  const run = async (
+    id: string,
+    action: () => Promise<unknown>,
+  ): Promise<boolean> => {
     setBusyId(id);
     setError(null);
     try {
       await action();
       await load();
+      return true;
     } catch (caught) {
       setError(
         caught instanceof Error
           ? caught.message
           : "Thao tác quy trình thất bại.",
       );
+      return false;
     } finally {
       setBusyId(null);
     }
@@ -271,7 +292,7 @@ function WorkflowStageCard({
   canMutate: boolean;
   busyId: string | null;
   taskBase: string;
-  onRun: (id: string, action: () => Promise<unknown>) => Promise<void>;
+  onRun: (id: string, action: () => Promise<unknown>) => Promise<boolean>;
 }) {
   const statusIcon = {
     completed: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
@@ -284,6 +305,12 @@ function WorkflowStageCard({
     workflow.approvals ?? [],
     "stage",
     stage.id,
+  );
+  const incomingStageDependencies = (workflow.stage_dependencies ?? []).filter(
+    (dependency) => dependency.successor_stage_id === stage.id,
+  );
+  const workflowItems = (workflow.stages ?? []).flatMap(
+    (workflowStage) => workflowStage.items ?? [],
   );
 
   return (
@@ -331,11 +358,35 @@ function WorkflowStageCard({
         </div>
       </div>
 
-      {stage.status === "locked" && (
+      {stage.status === "locked" && incomingStageDependencies.length === 0 && (
         <p className="mt-2 text-xs text-amber-700">
           Bị khóa bởi Stage tiền nhiệm.
         </p>
       )}
+      {stage.status === "locked" &&
+        incomingStageDependencies.map((dependency) => {
+          const predecessor = (workflow.stages ?? []).find(
+            (candidate) => candidate.id === dependency.predecessor_stage_id,
+          );
+          return (
+            <DependencyReason
+              key={dependency.id}
+              dependency={dependency}
+              predecessorName={
+                predecessor?.name_snapshot ?? dependency.predecessor_stage_id
+              }
+              predecessorStatus={predecessor?.status}
+              eligibleAt={dependencyEligibleAt(
+                dependency,
+                predecessor?.completed_at,
+              )}
+              canMutate={canMutate}
+              busyId={busyId}
+              onRun={onRun}
+              projectId={projectId}
+            />
+          );
+        })}
       {stage.due_at && (
         <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
           <Clock3 className="h-3 w-3" /> SLA due{" "}
@@ -347,6 +398,17 @@ function WorkflowStageCard({
           {approvalSummary(stageApprovals)}
         </p>
       )}
+      <ApprovalRequestControls
+        approvals={stageApprovals}
+        target="stage"
+        targetId={stage.id}
+        targetLabel={stage.name_snapshot}
+        workflowId={workflow.id}
+        projectId={projectId}
+        canMutate={canMutate}
+        busyId={busyId}
+        onRun={onRun}
+      />
 
       <div className="mt-3 space-y-2">
         {(stage.items ?? []).map((item) => {
@@ -354,6 +416,11 @@ function WorkflowStageCard({
             workflow.approvals ?? [],
             "item",
             item.id,
+          );
+          const incomingItemDependencies = (
+            workflow.item_dependencies ?? []
+          ).filter(
+            (dependency) => dependency.successor_stage_item_id === item.id,
           );
           return (
             <div
@@ -369,7 +436,8 @@ function WorkflowStageCard({
                   </p>
                   <p className="text-muted-foreground">
                     {item.status}
-                    {item.status === "blocked"
+                    {item.status === "blocked" &&
+                    incomingItemDependencies.length === 0
                       ? " · Blocked by Item dependency"
                       : ""}
                     {item.due_at
@@ -396,6 +464,48 @@ function WorkflowStageCard({
                     </Button>
                   )}
               </div>
+              {item.status === "blocked" &&
+                incomingItemDependencies.map((dependency) => {
+                  const predecessor = workflowItems.find(
+                    (candidate) =>
+                      candidate.id === dependency.predecessor_stage_item_id,
+                  );
+                  return (
+                    <DependencyReason
+                      key={dependency.id}
+                      dependency={dependency}
+                      predecessorName={
+                        predecessor?.project_service_item?.name ??
+                        predecessor?.project_service_item_code ??
+                        dependency.predecessor_stage_item_id
+                      }
+                      predecessorStatus={predecessor?.status}
+                      eligibleAt={dependencyEligibleAt(
+                        dependency,
+                        predecessor?.completed_at,
+                      )}
+                      canMutate={canMutate}
+                      busyId={busyId}
+                      onRun={onRun}
+                      projectId={projectId}
+                    />
+                  );
+                })}
+              <ApprovalRequestControls
+                approvals={approvals}
+                target="item"
+                targetId={item.id}
+                targetLabel={
+                  item.project_service_item?.name ??
+                  item.project_service_item_code ??
+                  item.id
+                }
+                workflowId={workflow.id}
+                projectId={projectId}
+                canMutate={canMutate}
+                busyId={busyId}
+                onRun={onRun}
+              />
               {(item.task_links ?? []).map((link) => (
                 <Link
                   key={link.id}
@@ -412,6 +522,165 @@ function WorkflowStageCard({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function DependencyReason({
+  dependency,
+  predecessorName,
+  predecessorStatus,
+  eligibleAt,
+  canMutate,
+  busyId,
+  onRun,
+  projectId,
+}: {
+  dependency: ProjectWorkflowStageDependency | ProjectWorkflowItemDependency;
+  predecessorName: string;
+  predecessorStatus?: string;
+  eligibleAt: string | null;
+  canMutate: boolean;
+  busyId: string | null;
+  onRun: (id: string, action: () => Promise<unknown>) => Promise<boolean>;
+  projectId: string;
+}) {
+  const [reason, setReason] = useState("");
+  const actionId = `dependency:${dependency.id}`;
+  const actionBusy = busyId !== null;
+
+  return (
+    <div
+      className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800"
+      data-testid={`dependency-reason-${dependency.id}`}
+      data-eligible-at={eligibleAt ?? undefined}
+    >
+      {dependency.overridden_at ? (
+        <p>
+          Đã bỏ qua phụ thuộc từ {predecessorName}
+          {dependency.override_reason ? `: ${dependency.override_reason}` : "."}
+        </p>
+      ) : (
+        <p>
+          Chờ {predecessorName}
+          {predecessorStatus ? ` (${predecessorStatus})` : ""}. Độ trễ:{" "}
+          {dependency.lag_hours}h
+          {eligibleAt
+            ? ` · Đủ điều kiện: ${new Date(eligibleAt).toLocaleString("vi-VN")}`
+            : ""}
+        </p>
+      )}
+      {canMutate && !dependency.overridden_at && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Input
+            aria-label={`Override reason ${dependency.id}`}
+            className="h-8 min-w-56 flex-1 bg-white"
+            placeholder="Lý do bỏ qua phụ thuộc"
+            value={reason}
+            disabled={actionBusy}
+            onChange={(event) => setReason(event.target.value)}
+          />
+          <Button
+            aria-label={`Override dependency ${dependency.id}`}
+            size="sm"
+            variant="outline"
+            disabled={reason.trim().length < 3 || actionBusy}
+            onClick={() => {
+              const nextReason = reason.trim();
+              void onRun(actionId, () =>
+                workflowsApi.overrideDependency(
+                  projectId,
+                  dependency.id,
+                  nextReason,
+                ),
+              ).then((succeeded) => {
+                if (succeeded) setReason("");
+              });
+            }}
+          >
+            Bỏ qua phụ thuộc
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ApprovalRequestControls({
+  approvals,
+  target,
+  targetId,
+  targetLabel,
+  workflowId,
+  projectId,
+  canMutate,
+  busyId,
+  onRun,
+}: {
+  approvals: WorkflowApprovalRequest[];
+  target: "stage" | "item";
+  targetId: string;
+  targetLabel: string;
+  workflowId: string;
+  projectId: string;
+  canMutate: boolean;
+  busyId: string | null;
+  onRun: (id: string, action: () => Promise<unknown>) => Promise<boolean>;
+}) {
+  const [requestNote, setRequestNote] = useState("");
+  if (!canMutate) return null;
+
+  const actionBusy = busyId !== null;
+  const pendingTypes = new Set(
+    approvals
+      .filter((approval) => approval.status === "pending")
+      .map((approval) => approval.approval_type),
+  );
+  const request = async (approvalType: "internal" | "client") => {
+    const succeeded = await onRun(`approval:${targetId}:${approvalType}`, () =>
+      workflowsApi.requestApproval(projectId, workflowId, {
+        ...(target === "stage"
+          ? { stageId: targetId }
+          : { stageItemId: targetId }),
+        approvalType,
+        requestNote: requestNote.trim() || undefined,
+      }),
+    );
+    if (succeeded) setRequestNote("");
+  };
+
+  return (
+    <div className="mt-2 flex flex-wrap gap-2 rounded-lg border bg-white p-2">
+      <Input
+        aria-label={`Approval note ${targetId}`}
+        className="h-8 min-w-56 flex-1"
+        placeholder="Ghi chú yêu cầu duyệt"
+        value={requestNote}
+        disabled={actionBusy}
+        onChange={(event) => setRequestNote(event.target.value)}
+      />
+      <Button
+        aria-label={`Request internal approval for ${targetLabel}`}
+        size="sm"
+        variant="outline"
+        disabled={pendingTypes.has("internal") || actionBusy}
+        onClick={() => void request("internal")}
+      >
+        {pendingTypes.has("internal")
+          ? "Đang chờ duyệt nội bộ"
+          : "Yêu cầu duyệt nội bộ"}
+      </Button>
+      <Button
+        aria-label={`Request client approval for ${targetLabel}`}
+        size="sm"
+        variant="outline"
+        disabled={pendingTypes.has("client") || actionBusy}
+        onClick={() => void request("client")}
+      >
+        {pendingTypes.has("client")
+          ? "Đang chờ duyệt khách hàng"
+          : "Yêu cầu duyệt khách hàng"}
+      </Button>
     </div>
   );
 }

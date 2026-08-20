@@ -26,9 +26,16 @@ export interface TaskCreationContext {
   workflowStageItemId: string;
 }
 
+export type WorkflowTaskStatusReconciler = (
+  projectId: string,
+  taskId: string,
+  actor: RequestUser,
+) => Promise<void>;
+
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
+  private workflowTaskStatusReconciler?: WorkflowTaskStatusReconciler;
 
   constructor(
     private readonly supabaseService: SupabaseService,
@@ -39,6 +46,12 @@ export class TasksService {
 
   private get client() {
     return this.supabaseService.getSystemClient();
+  }
+
+  registerWorkflowTaskStatusReconciler(
+    reconciler: WorkflowTaskStatusReconciler,
+  ): void {
+    this.workflowTaskStatusReconciler = reconciler;
   }
 
   private databaseFailure(code: string, message: string, error: any): never {
@@ -463,7 +476,11 @@ export class TasksService {
     context?: TaskCreationContext,
   ) {
     const access = await this.getAccess(projectId, user);
-    if (!access.isAdmin && access.projectRole !== 'project_manager') {
+    if (
+      !context &&
+      !access.isAdmin &&
+      access.projectRole !== 'project_manager'
+    ) {
       throw new ForbiddenException({
         code: 'TASK_ACCESS_DENIED',
         message: 'Chỉ quản lý dự án mới có thể tạo công việc.',
@@ -698,6 +715,19 @@ export class TasksService {
         user,
         existing,
       );
+    }
+    if (
+      dto.status !== undefined &&
+      data.status !== existing.status &&
+      ['done', 'cancelled'].includes(String(data.status))
+    ) {
+      try {
+        await this.workflowTaskStatusReconciler?.(projectId, taskId, user);
+      } catch (error) {
+        this.logger.error(
+          `Workflow task reconciliation failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+        );
+      }
     }
     return data;
   }

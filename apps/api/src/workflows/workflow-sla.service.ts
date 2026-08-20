@@ -120,6 +120,24 @@ export class WorkflowSlaService {
     if (!slaHours || slaHours <= 0) {
       return { configured: true, dueAt: null };
     }
+    return this.addWorkingDuration(startDate, slaHours, suppliedSettings);
+  }
+
+  async addWorkingDuration(
+    startDate: Date,
+    durationHours: number,
+    suppliedSettings?: WorkTimeSettings,
+  ): Promise<SlaCalculationResult> {
+    if (!Number.isFinite(durationHours) || durationHours < 0) {
+      return {
+        configured: false,
+        dueAt: null,
+        reason: 'INVALID_WORKING_DURATION',
+      };
+    }
+    if (durationHours === 0) {
+      return { configured: true, dueAt: startDate.toISOString() };
+    }
 
     let settings = suppliedSettings;
     if (!settings) {
@@ -164,7 +182,7 @@ export class WorkflowSlaService {
     const startParts = this.zonedParts(startDate, settings.timezone);
     let localDate = this.dateString(startParts);
     let localMinute = startParts.hour * 60 + startParts.minute;
-    let remainingMinutes = Math.round(slaHours * 60);
+    let remainingMinutes = Math.round(durationHours * 60);
 
     for (let inspectedDays = 0; inspectedDays < 366; inspectedDays += 1) {
       const day = await this.workCalendarService.resolveDay(localDate);

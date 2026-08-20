@@ -12,6 +12,7 @@
     "lint:fix": "pnpm -r --if-present lint:fix",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r --if-present test",
+    "test:workflow-migrations": "node scripts/verify-workflow-migrations.mjs",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },

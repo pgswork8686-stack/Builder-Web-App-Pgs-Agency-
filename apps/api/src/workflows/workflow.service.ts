@@ -15,6 +15,7 @@ import type {
   CreateTemplateStageDto,
   CreateWorkflowTemplateDto,
   MapStageItemDto,
+  ReorderTemplateStagesDto,
   UpdateMappedStageItemDto,
   UpdateTemplateStageDto,
   UpdateWorkflowTemplateDto,
@@ -91,6 +92,45 @@ export class WorkflowService {
       code,
       message: 'Workflow database operation failed.',
     });
+  }
+
+  private workflowRpcFailure(code: string, error: unknown): never {
+    const detail =
+      typeof error === 'object' && error && 'message' in error
+        ? String(error.message)
+        : '';
+    if (detail.includes('WORKFLOW_TEMPLATE_IMMUTABLE')) {
+      throw new ConflictException({
+        code: 'WORKFLOW_TEMPLATE_IMMUTABLE',
+        message: 'Published or archived workflow templates are immutable.',
+      });
+    }
+    for (const businessCode of [
+      'WORKFLOW_DEPENDENCY_CROSS_TEMPLATE',
+      'WORKFLOW_STAGE_DEPENDENCY_CYCLE',
+      'WORKFLOW_ITEM_DEPENDENCY_CYCLE',
+      'WORKFLOW_STAGE_REORDER_INVALID',
+    ]) {
+      if (detail.includes(businessCode)) {
+        throw new BadRequestException({
+          code: businessCode,
+          message: 'Workflow request violates template graph rules.',
+        });
+      }
+    }
+    if (detail.includes('WORKFLOW_DEPENDENCY_NOT_FOUND')) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_DEPENDENCY_NOT_FOUND',
+        message: 'Workflow dependency not found.',
+      });
+    }
+    if (detail.includes('WORKFLOW_TEMPLATE_NOT_FOUND')) {
+      throw new NotFoundException({
+        code: 'WORKFLOW_TEMPLATE_NOT_FOUND',
+        message: 'Workflow template not found.',
+      });
+    }
+    this.databaseFailure(code, error);
   }
 
   private async assertDraftTemplate(templateId: string) {
@@ -479,6 +519,24 @@ export class WorkflowService {
     return data;
   }
 
+  async reorderStages(
+    templateId: string,
+    dto: ReorderTemplateStagesDto,
+    user: RequestUser,
+  ) {
+    this.assertAdmin(user);
+    const { data, error } = await this.client.rpc(
+      'workflow_reorder_template_stages',
+      {
+        p_template_id: templateId,
+        p_stage_ids: dto.stageIds,
+        p_actor_id: user.profileId,
+      },
+    );
+    if (error) this.workflowRpcFailure('WORKFLOW_STAGE_REORDER_FAILED', error);
+    return data;
+  }
+
   async updateStage(
     stageId: string,
     dto: UpdateTemplateStageDto,
@@ -602,81 +660,35 @@ export class WorkflowService {
     user: RequestUser,
   ) {
     this.assertAdmin(user);
-    await this.assertDraftTemplate(templateId);
-    const { data: stages, error: stageError } = await this.client
-      .from('workflow_template_stages')
-      .select('id')
-      .eq('workflow_template_id', templateId)
-      .in('id', [dto.predecessorStageId, dto.successorStageId]);
-    if (stageError)
-      this.databaseFailure('WORKFLOW_STAGE_LOOKUP_FAILED', stageError);
-    if ((stages ?? []).length !== 2) {
-      throw new BadRequestException({
-        code: 'WORKFLOW_DEPENDENCY_CROSS_TEMPLATE',
-        message: 'Both stages must belong to this template.',
-      });
+    const { data, error } = await this.client.rpc(
+      'workflow_add_stage_dependency',
+      {
+        p_template_id: templateId,
+        p_predecessor_stage_id: dto.predecessorStageId,
+        p_successor_stage_id: dto.successorStageId,
+        p_lag_hours: dto.lagHours,
+        p_actor_id: user.profileId,
+      },
+    );
+    if (error) {
+      this.workflowRpcFailure('WORKFLOW_STAGE_DEPENDENCY_CREATE_FAILED', error);
     }
-    const { data: existing, error: dependencyError } = await this.client
-      .from('workflow_template_stage_dependencies')
-      .select('predecessor_stage_id,successor_stage_id')
-      .eq('workflow_template_id', templateId);
-    if (dependencyError) {
-      this.databaseFailure(
-        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
-        dependencyError,
-      );
-    }
-    const candidate = [
-      ...(existing ?? []).map((dependency) => ({
-        predecessorStageId: String(dependency.predecessor_stage_id),
-        successorStageId: String(dependency.successor_stage_id),
-      })),
-      dto,
-    ];
-    if (this.validation.detectStageCycles(candidate)) {
-      throw new BadRequestException({
-        code: 'WORKFLOW_STAGE_DEPENDENCY_CYCLE',
-        message: 'Stage dependency would create a cycle.',
-      });
-    }
-    const { data, error } = await this.client
-      .from('workflow_template_stage_dependencies')
-      .insert({
-        workflow_template_id: templateId,
-        predecessor_stage_id: dto.predecessorStageId,
-        successor_stage_id: dto.successorStageId,
-        lag_hours: dto.lagHours,
-      })
-      .select()
-      .single();
-    if (error)
-      this.databaseFailure('WORKFLOW_STAGE_DEPENDENCY_CREATE_FAILED', error);
     return data;
   }
 
   async deleteStageDependency(dependencyId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: dependency, error: lookupError } = await this.client
-      .from('workflow_template_stage_dependencies')
-      .select('workflow_template_id')
-      .eq('id', dependencyId)
-      .maybeSingle();
-    if (lookupError)
-      this.databaseFailure('WORKFLOW_DEPENDENCY_LOOKUP_FAILED', lookupError);
-    if (!dependency) {
-      throw new NotFoundException({
-        code: 'WORKFLOW_DEPENDENCY_NOT_FOUND',
-        message: 'Workflow dependency not found.',
-      });
+    const { data, error } = await this.client.rpc(
+      'workflow_delete_stage_dependency',
+      {
+        p_dependency_id: dependencyId,
+        p_actor_id: user.profileId,
+      },
+    );
+    if (error) {
+      this.workflowRpcFailure('WORKFLOW_STAGE_DEPENDENCY_DELETE_FAILED', error);
     }
-    await this.assertDraftTemplate(String(dependency.workflow_template_id));
-    const { error } = await this.client
-      .from('workflow_template_stage_dependencies')
-      .delete()
-      .eq('id', dependencyId);
-    if (error)
-      this.databaseFailure('WORKFLOW_STAGE_DEPENDENCY_DELETE_FAILED', error);
-    return { success: true };
+    return data;
   }
 
   async createItemDependency(
@@ -685,81 +697,34 @@ export class WorkflowService {
     user: RequestUser,
   ) {
     this.assertAdmin(user);
-    await this.assertDraftTemplate(templateId);
-    const targetIds = [dto.predecessorStageItemId, dto.successorStageItemId];
-    const { data: items, error: itemError } = await this.client
-      .from('workflow_template_stage_items')
-      .select('id')
-      .eq('workflow_template_id', templateId)
-      .in('id', targetIds);
-    if (itemError)
-      this.databaseFailure('WORKFLOW_ITEM_LOOKUP_FAILED', itemError);
-    if ((items ?? []).length !== 2) {
-      throw new BadRequestException({
-        code: 'WORKFLOW_DEPENDENCY_CROSS_TEMPLATE',
-        message: 'Both items must belong to this template.',
-      });
+    const { data, error } = await this.client.rpc(
+      'workflow_add_item_dependency',
+      {
+        p_template_id: templateId,
+        p_predecessor_stage_item_id: dto.predecessorStageItemId,
+        p_successor_stage_item_id: dto.successorStageItemId,
+        p_lag_hours: dto.lagHours,
+        p_actor_id: user.profileId,
+      },
+    );
+    if (error) {
+      this.workflowRpcFailure('WORKFLOW_ITEM_DEPENDENCY_CREATE_FAILED', error);
     }
-    const { data: existing, error: dependencyError } = await this.client
-      .from('workflow_template_item_dependencies')
-      .select('predecessor_stage_item_id,successor_stage_item_id')
-      .eq('workflow_template_id', templateId);
-    if (dependencyError) {
-      this.databaseFailure(
-        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
-        dependencyError,
-      );
-    }
-    const candidate = [
-      ...(existing ?? []).map((dependency) => ({
-        predecessorStageItemId: String(dependency.predecessor_stage_item_id),
-        successorStageItemId: String(dependency.successor_stage_item_id),
-      })),
-      dto,
-    ];
-    if (this.validation.detectItemCycles(candidate)) {
-      throw new BadRequestException({
-        code: 'WORKFLOW_ITEM_DEPENDENCY_CYCLE',
-        message: 'Item dependency would create a cycle.',
-      });
-    }
-    const { data, error } = await this.client
-      .from('workflow_template_item_dependencies')
-      .insert({
-        workflow_template_id: templateId,
-        predecessor_stage_item_id: dto.predecessorStageItemId,
-        successor_stage_item_id: dto.successorStageItemId,
-        lag_hours: dto.lagHours,
-      })
-      .select()
-      .single();
-    if (error)
-      this.databaseFailure('WORKFLOW_ITEM_DEPENDENCY_CREATE_FAILED', error);
     return data;
   }
 
   async deleteItemDependency(dependencyId: string, user: RequestUser) {
     this.assertAdmin(user);
-    const { data: dependency, error: lookupError } = await this.client
-      .from('workflow_template_item_dependencies')
-      .select('workflow_template_id')
-      .eq('id', dependencyId)
-      .maybeSingle();
-    if (lookupError)
-      this.databaseFailure('WORKFLOW_DEPENDENCY_LOOKUP_FAILED', lookupError);
-    if (!dependency) {
-      throw new NotFoundException({
-        code: 'WORKFLOW_DEPENDENCY_NOT_FOUND',
-        message: 'Workflow dependency not found.',
-      });
+    const { data, error } = await this.client.rpc(
+      'workflow_delete_item_dependency',
+      {
+        p_dependency_id: dependencyId,
+        p_actor_id: user.profileId,
+      },
+    );
+    if (error) {
+      this.workflowRpcFailure('WORKFLOW_ITEM_DEPENDENCY_DELETE_FAILED', error);
     }
-    await this.assertDraftTemplate(String(dependency.workflow_template_id));
-    const { error } = await this.client
-      .from('workflow_template_item_dependencies')
-      .delete()
-      .eq('id', dependencyId);
-    if (error)
-      this.databaseFailure('WORKFLOW_ITEM_DEPENDENCY_DELETE_FAILED', error);
-    return { success: true };
+    return data;
   }
 }

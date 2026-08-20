@@ -10,6 +10,8 @@ import {
 } from "react";
 import {
   Archive,
+  ArrowDown,
+  ArrowUp,
   CheckCircle2,
   Copy,
   GitBranch,
@@ -58,6 +60,8 @@ export function WorkflowBuilder() {
   const [validation, setValidation] =
     useState<WorkflowValidationResult>(emptyValidation);
   const [draftName, setDraftName] = useState("");
+  const [templateName, setTemplateName] = useState("");
+  const [templateDescription, setTemplateDescription] = useState("");
   const [stageName, setStageName] = useState("");
   const [stageSla, setStageSla] = useState("");
   const [predecessorStageId, setPredecessorStageId] = useState("");
@@ -69,6 +73,11 @@ export function WorkflowBuilder() {
   const [error, setError] = useState<string | null>(null);
   const serviceRequestId = useRef(0);
   const templateRequestId = useRef(0);
+
+  useEffect(() => {
+    setTemplateName(template?.name ?? "");
+    setTemplateDescription(template?.description ?? "");
+  }, [template?.description, template?.id, template?.name]);
 
   useEffect(() => {
     void servicesApi
@@ -241,6 +250,25 @@ export function WorkflowBuilder() {
   );
   const editable = template?.status === "draft";
   const interactionBusy = busy || loadingService || loadingTemplate;
+
+  const moveStage = async (stageId: string, direction: "up" | "down") => {
+    if (!template || !editable) return false;
+    const currentIndex = stages.findIndex((stage) => stage.id === stageId);
+    const targetIndex =
+      direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= stages.length) {
+      return false;
+    }
+    const stageIds = stages.map((stage) => stage.id);
+    [stageIds[currentIndex], stageIds[targetIndex]] = [
+      stageIds[targetIndex],
+      stageIds[currentIndex],
+    ];
+    return mutate(
+      () => workflowsApi.reorderStages(template.id, { stageIds }),
+      template.id,
+    );
+  };
 
   return (
     <div className="space-y-6 p-6" data-testid="workflow-builder">
@@ -423,7 +451,43 @@ export function WorkflowBuilder() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {editable && (
+                  <div className="grid gap-3 rounded-lg border p-4">
+                    <Input
+                      aria-label="Workflow Name"
+                      value={templateName}
+                      disabled={interactionBusy}
+                      onChange={(event) => setTemplateName(event.target.value)}
+                    />
+                    <textarea
+                      aria-label="Workflow Description"
+                      className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={templateDescription}
+                      disabled={interactionBusy}
+                      onChange={(event) =>
+                        setTemplateDescription(event.target.value)
+                      }
+                    />
+                    <Button
+                      className="justify-self-start"
+                      variant="outline"
+                      disabled={!templateName.trim() || interactionBusy}
+                      onClick={() =>
+                        void mutate(
+                          () =>
+                            workflowsApi.updateTemplate(template.id, {
+                              name: templateName.trim(),
+                              description: templateDescription.trim() || null,
+                            }),
+                          template.id,
+                        )
+                      }
+                    >
+                      <Save className="mr-2 h-4 w-4" /> Save Workflow Details
+                    </Button>
+                  </div>
+                )}
                 <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-4">
                   <div>
                     <p className="text-xs text-muted-foreground">
@@ -509,13 +573,16 @@ export function WorkflowBuilder() {
                   </form>
                 )}
 
-                {stages.map((stage) => (
+                {stages.map((stage, index) => (
                   <StageEditor
                     key={stage.id}
                     stage={stage}
                     deliveryItems={deliveryItems}
                     editable={editable}
                     busy={interactionBusy}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < stages.length - 1}
+                    onMove={(direction) => moveStage(stage.id, direction)}
                     onMutate={(action) => mutate(action, template.id)}
                   />
                 ))}
@@ -633,12 +700,18 @@ function StageEditor({
   deliveryItems,
   editable,
   busy,
+  canMoveUp,
+  canMoveDown,
+  onMove,
   onMutate,
 }: {
   stage: WorkflowTemplateStage;
   deliveryItems: ServiceDeliveryItem[];
   editable: boolean;
   busy: boolean;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMove: (direction: "up" | "down") => Promise<boolean>;
   onMutate: (action: () => Promise<unknown>) => Promise<boolean>;
 }) {
   const [editing, setEditing] = useState(false);
@@ -648,6 +721,7 @@ function StageEditor({
       ? ""
       : String(stage.sla_hours),
   );
+  const [editRequired, setEditRequired] = useState(stage.is_required);
   const [deliveryItemId, setDeliveryItemId] = useState("");
   const [completionMode, setCompletionMode] =
     useState<WorkflowCompletionMode>("tasks_done");
@@ -667,7 +741,7 @@ function StageEditor({
       <div className="flex items-start justify-between gap-3">
         <div>
           {editing ? (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Input
                 aria-label="Chỉnh tên Stage"
                 value={editName}
@@ -683,6 +757,16 @@ function StageEditor({
                 disabled={busy}
                 onChange={(event) => setEditSla(event.target.value)}
               />
+              <label className="flex items-center gap-2 text-xs">
+                <input
+                  aria-label={`Stage Required ${stage.id}`}
+                  type="checkbox"
+                  checked={editRequired}
+                  disabled={busy}
+                  onChange={(event) => setEditRequired(event.target.checked)}
+                />
+                Required
+              </label>
             </div>
           ) : (
             <p className="font-semibold">
@@ -697,11 +781,38 @@ function StageEditor({
         {editable && (
           <div className="flex gap-1">
             <Button
+              aria-label={`Move Stage ${stage.name} up`}
+              title="Move Stage up"
+              variant="ghost"
+              size="sm"
+              disabled={busy || !canMoveUp}
+              onClick={() => void onMove("up")}
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+            <Button
+              aria-label={`Move Stage ${stage.name} down`}
+              title="Move Stage down"
+              variant="ghost"
+              size="sm"
+              disabled={busy || !canMoveDown}
+              onClick={() => void onMove("down")}
+            >
+              <ArrowDown className="h-4 w-4" />
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               disabled={busy || (editing && !editName.trim())}
               onClick={() => {
                 if (!editing) {
+                  setEditName(stage.name);
+                  setEditSla(
+                    stage.sla_hours === null || stage.sla_hours === undefined
+                      ? ""
+                      : String(stage.sla_hours),
+                  );
+                  setEditRequired(stage.is_required);
                   setEditing(true);
                   return;
                 }
@@ -709,6 +820,7 @@ function StageEditor({
                   workflowsApi.updateStage(stage.id, {
                     name: editName.trim(),
                     slaHours: editSla ? Number(editSla) : null,
+                    isRequired: editRequired,
                   }),
                 ).then((succeeded) => {
                   if (succeeded) setEditing(false);

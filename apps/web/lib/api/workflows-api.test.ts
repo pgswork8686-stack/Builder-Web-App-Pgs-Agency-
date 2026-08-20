@@ -44,6 +44,15 @@ describe("Workflow API exact routes", () => {
     );
   });
 
+  it("reorders Stages with the exact ordered IDs", async () => {
+    const payload = { stageIds: ["stage-2", "stage-1"] };
+    await workflowsApi.reorderStages("template/id", payload);
+    expect(requestMock).toHaveBeenCalledWith(
+      "/admin/workflows/templates/template%2Fid/stages/reorder",
+      { method: "POST", body: JSON.stringify(payload) },
+    );
+  });
+
   it("maps an Item under the exact Stage", async () => {
     const payload = { serviceDeliveryItemId: "item-id" };
     await workflowsApi.mapItem("stage/id", payload);

@@ -97,6 +97,10 @@ export interface CreateWorkflowStagePayload {
 
 export type UpdateWorkflowStagePayload = Partial<CreateWorkflowStagePayload>;
 
+export interface ReorderWorkflowStagesPayload {
+  stageIds: string[];
+}
+
 export interface MapWorkflowItemPayload {
   serviceDeliveryItemId: string;
   sortOrder?: number;
@@ -157,6 +161,8 @@ export interface ProjectWorkflowStageItem {
     | "blocked"
     | "skipped";
   due_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
   project_service_item?: { name: string; is_required: boolean } | null;
   task_links?: WorkflowTaskLink[];
 }
@@ -172,7 +178,30 @@ export interface ProjectWorkflowStage {
   status: "locked" | "ready" | "in_progress" | "completed" | "skipped";
   sla_hours_snapshot?: number | null;
   due_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
   items?: ProjectWorkflowStageItem[];
+}
+
+interface ProjectWorkflowDependencyBase {
+  id: string;
+  project_workflow_id: string;
+  dependency_type?: "finish_to_start" | string;
+  lag_hours: number;
+  eligible_at?: string | null;
+  overridden_at?: string | null;
+  overridden_by?: string | null;
+  override_reason?: string | null;
+}
+
+export interface ProjectWorkflowStageDependency extends ProjectWorkflowDependencyBase {
+  predecessor_stage_id: string;
+  successor_stage_id: string;
+}
+
+export interface ProjectWorkflowItemDependency extends ProjectWorkflowDependencyBase {
+  predecessor_stage_item_id: string;
+  successor_stage_item_id: string;
 }
 
 export interface WorkflowApprovalRequest {
@@ -198,6 +227,8 @@ export interface ProjectWorkflow {
   name_snapshot: string;
   status: "not_started" | "in_progress" | "completed" | "on_hold" | "cancelled";
   stages?: ProjectWorkflowStage[];
+  stage_dependencies?: ProjectWorkflowStageDependency[];
+  item_dependencies?: ProjectWorkflowItemDependency[];
   approvals?: WorkflowApprovalRequest[];
   progress?: {
     completedItems: number;
@@ -300,6 +331,18 @@ export const workflowsApi = {
     return request(`/admin/workflows/stages/${encodeId(stageId)}`, {
       method: "DELETE",
     });
+  },
+  reorderStages(
+    templateId: string,
+    payload: ReorderWorkflowStagesPayload,
+  ): Promise<WorkflowTemplateStage[]> {
+    return request(
+      `/admin/workflows/templates/${encodeId(templateId)}/stages/reorder`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
   },
   mapItem(
     stageId: string,

@@ -24,6 +24,7 @@ import {
   CreateTemplateStageSchema,
   UpdateTemplateStageSchema,
   MapStageItemSchema,
+  ReorderTemplateStagesSchema,
   CreateStageDependencySchema,
   CreateItemDependencySchema,
   UpdateMappedStageItemSchema,
@@ -132,6 +133,17 @@ export class WorkflowTemplateController {
   ) {
     const parsed = parseBody(CreateTemplateStageSchema, body);
     return this.workflowService.createStage(templateId, parsed, user);
+  }
+
+  @Post('templates/:id/stages/reorder')
+  @Roles('admin')
+  async reorderStages(
+    @Param('id', ParseUUIDPipe) templateId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const parsed = parseBody(ReorderTemplateStagesSchema, body);
+    return this.workflowService.reorderStages(templateId, parsed, user);
   }
 
   @Patch('stages/:stageId')

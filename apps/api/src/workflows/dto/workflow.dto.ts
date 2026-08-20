@@ -35,6 +35,17 @@ export const UpdateTemplateStageSchema = z
   })
   .strict();
 
+export const ReorderTemplateStagesSchema = z
+  .object({
+    stageIds: z
+      .array(z.string().uuid())
+      .min(1)
+      .refine((stageIds) => new Set(stageIds).size === stageIds.length, {
+        message: 'WORKFLOW_STAGE_REORDER_DUPLICATE',
+      }),
+  })
+  .strict();
+
 export const MapStageItemSchema = z
   .object({
     serviceDeliveryItemId: z.string().uuid(),
@@ -114,6 +125,9 @@ export type UpdateWorkflowTemplateDto = z.infer<
 >;
 export type CreateTemplateStageDto = z.infer<typeof CreateTemplateStageSchema>;
 export type UpdateTemplateStageDto = z.infer<typeof UpdateTemplateStageSchema>;
+export type ReorderTemplateStagesDto = z.infer<
+  typeof ReorderTemplateStagesSchema
+>;
 export type MapStageItemDto = z.infer<typeof MapStageItemSchema>;
 export type UpdateMappedStageItemDto = z.infer<
   typeof UpdateMappedStageItemSchema

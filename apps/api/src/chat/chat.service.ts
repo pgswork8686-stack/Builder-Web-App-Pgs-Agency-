@@ -301,7 +301,7 @@ export class ChatService {
 
     const message = this.mapMessage(data as Record<string, any>);
     try {
-      this.realtime?.emitConversation(
+      await this.realtime?.emitConversation(
         conversationId,
         'chat:message:new',
         message,
@@ -382,7 +382,7 @@ export class ChatService {
       );
     }
     try {
-      this.realtime?.emitConversation(conversationId, 'chat:read', {
+      await this.realtime?.emitConversation(conversationId, 'chat:read', {
         conversationId,
         userId: user.profileId,
         readAt: data?.read_at ?? new Date().toISOString(),

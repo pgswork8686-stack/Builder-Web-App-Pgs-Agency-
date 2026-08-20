@@ -17,7 +17,9 @@ vi.mock("@/lib/api/workflows", () => ({
     getTemplate: vi.fn(),
     validateTemplate: vi.fn(),
     createTemplate: vi.fn(),
+    updateTemplate: vi.fn(),
     createStage: vi.fn(),
+    reorderStages: vi.fn(),
     cloneTemplate: vi.fn(),
     publishTemplate: vi.fn(),
     setDefault: vi.fn(),
@@ -112,6 +114,8 @@ describe("WorkflowBuilder", () => {
     expect(screen.getByRole("button", { name: /Tạo Draft/i })).toBeDefined();
     expect(screen.getByLabelText("Tên Stage")).toBeDefined();
     expect(screen.getByRole("button", { name: /Add Stage/i })).toBeDefined();
+    expect(screen.getByLabelText("Workflow Name")).toBeDefined();
+    expect(screen.getByLabelText("Workflow Description")).toBeDefined();
   });
 
   it("hides Draft editing controls for a published immutable Template", async () => {
@@ -135,12 +139,123 @@ describe("WorkflowBuilder", () => {
     render(<WorkflowBuilder />);
     await selectService();
     expect(screen.queryByLabelText("Tên Stage")).toBeNull();
+    expect(screen.queryByLabelText("Workflow Name")).toBeNull();
     expect(screen.queryByRole("button", { name: /Edit Stage/i })).toBeNull();
     expect(
       screen
         .getByRole("button", { name: /^Publish$/i })
         .hasAttribute("disabled"),
     ).toBe(true);
+  });
+
+  it("updates Draft Workflow metadata through updateTemplate", async () => {
+    const templateWithDescription = {
+      ...baseTemplate,
+      description: "Initial description",
+    };
+    vi.mocked(workflowsApi.listTemplates).mockResolvedValue([
+      templateWithDescription,
+    ]);
+    vi.mocked(workflowsApi.getTemplate).mockResolvedValue(
+      templateWithDescription,
+    );
+    vi.mocked(workflowsApi.updateTemplate).mockResolvedValue({
+      ...templateWithDescription,
+      name: "Updated Delivery Workflow",
+      description: "Updated description",
+    });
+
+    render(<WorkflowBuilder />);
+    await selectService();
+    fireEvent.change(screen.getByLabelText("Workflow Name"), {
+      target: { value: " Updated Delivery Workflow " },
+    });
+    fireEvent.change(screen.getByLabelText("Workflow Description"), {
+      target: { value: " Updated description " },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /Save Workflow Details/i }),
+    );
+
+    await waitFor(() =>
+      expect(workflowsApi.updateTemplate).toHaveBeenCalledWith("template-1", {
+        name: "Updated Delivery Workflow",
+        description: "Updated description",
+      }),
+    );
+  });
+
+  it("updates Stage required metadata and SLA in Draft", async () => {
+    const stage = {
+      id: "stage-1",
+      workflow_template_id: baseTemplate.id,
+      stage_code: "GDQT_01",
+      name: "Discovery",
+      sort_order: 1,
+      is_required: true,
+      sla_hours: 24,
+      items: [],
+    };
+    const stagedTemplate = { ...baseTemplate, stages: [stage] };
+    vi.mocked(workflowsApi.listTemplates).mockResolvedValue([stagedTemplate]);
+    vi.mocked(workflowsApi.getTemplate).mockResolvedValue(stagedTemplate);
+    vi.mocked(workflowsApi.updateStage).mockResolvedValue({
+      ...stage,
+      is_required: false,
+      sla_hours: 48,
+    });
+
+    render(<WorkflowBuilder />);
+    await selectService();
+    fireEvent.click(screen.getByRole("button", { name: /Edit Stage/i }));
+    fireEvent.change(screen.getByLabelText("Chỉnh SLA Stage"), {
+      target: { value: "48" },
+    });
+    fireEvent.click(screen.getByLabelText("Stage Required stage-1"));
+    fireEvent.click(screen.getByRole("button", { name: /Save Stage/i }));
+
+    await waitFor(() =>
+      expect(workflowsApi.updateStage).toHaveBeenCalledWith("stage-1", {
+        name: "Discovery",
+        slaHours: 48,
+        isRequired: false,
+      }),
+    );
+  });
+
+  it("moves a Stage with the exact full ordered Stage ID list", async () => {
+    const first = {
+      id: "stage-1",
+      workflow_template_id: baseTemplate.id,
+      stage_code: "GDQT_01",
+      name: "First",
+      sort_order: 1,
+      is_required: true,
+      items: [],
+    };
+    const second = {
+      ...first,
+      id: "stage-2",
+      stage_code: "GDQT_02",
+      name: "Second",
+      sort_order: 2,
+    };
+    const stagedTemplate = { ...baseTemplate, stages: [first, second] };
+    vi.mocked(workflowsApi.listTemplates).mockResolvedValue([stagedTemplate]);
+    vi.mocked(workflowsApi.getTemplate).mockResolvedValue(stagedTemplate);
+    vi.mocked(workflowsApi.reorderStages).mockResolvedValue([second, first]);
+
+    render(<WorkflowBuilder />);
+    await selectService();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Move Stage Second up" }),
+    );
+
+    await waitFor(() =>
+      expect(workflowsApi.reorderStages).toHaveBeenCalledWith("template-1", {
+        stageIds: ["stage-2", "stage-1"],
+      }),
+    );
   });
 
   it("shows validation counts and disables Publish when errors exist", async () => {

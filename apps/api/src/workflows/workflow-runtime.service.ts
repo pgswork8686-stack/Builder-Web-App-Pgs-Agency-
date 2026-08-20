@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import type { RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
@@ -41,7 +42,7 @@ interface RuntimeStageSummary {
 }
 
 @Injectable()
-export class WorkflowRuntimeService {
+export class WorkflowRuntimeService implements OnModuleInit {
   private readonly logger = new Logger(WorkflowRuntimeService.name);
 
   constructor(
@@ -50,6 +51,13 @@ export class WorkflowRuntimeService {
     private readonly slaService: WorkflowSlaService,
     private readonly automation?: AutomationService,
   ) {}
+
+  onModuleInit(): void {
+    this.tasksService?.registerWorkflowTaskStatusReconciler?.(
+      (projectId, taskId, actor) =>
+        this.reconcileLinkedWorkflowItems(projectId, taskId, actor),
+    );
+  }
 
   private get client() {
     return this.supabase.getSystemClient();
@@ -317,6 +325,33 @@ export class WorkflowRuntimeService {
 
   async getProjectWorkflows(projectId: string, user: RequestUser) {
     const access = await this.requireProjectAccess(projectId, user, 'read');
+    if (!access.isClient) {
+      const { data: workflowReferences, error: referenceError } =
+        await this.client
+          .from('project_workflows')
+          .select('id')
+          .eq('project_id', projectId);
+      if (referenceError) {
+        this.databaseFailure('WORKFLOW_RUNTIME_LIST_FAILED', referenceError);
+      }
+      for (const reference of workflowReferences ?? []) {
+        const workflowId = String(reference.id);
+        try {
+          const reconciliation = await this.reconcileWorkflowReadiness(
+            projectId,
+            workflowId,
+            user,
+          );
+          for (const itemId of reconciliation.itemIds) {
+            await this.reconcileWorkflowItem(projectId, itemId, user, true);
+          }
+        } catch (error) {
+          this.logger.error(
+            `Workflow read reconciliation failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+          );
+        }
+      }
+    }
     const { data, error } = await this.client
       .from('project_workflows')
       .select(
@@ -575,7 +610,7 @@ export class WorkflowRuntimeService {
   ): Promise<string[]> {
     const { data: dependencies, error: dependencyError } = await this.client
       .from('project_workflow_stage_dependencies')
-      .select('predecessor_stage_id,overridden_at')
+      .select('predecessor_stage_id,eligible_at,overridden_at')
       .eq('project_workflow_id', workflowId)
       .eq('successor_stage_id', stageId);
     if (dependencyError) {
@@ -584,9 +619,12 @@ export class WorkflowRuntimeService {
         dependencyError,
       );
     }
-    const predecessorIds = (dependencies ?? [])
-      .filter((dependency) => !dependency.overridden_at)
-      .map((dependency) => String(dependency.predecessor_stage_id));
+    const activeDependencies = (dependencies ?? []).filter(
+      (dependency) => !dependency.overridden_at,
+    );
+    const predecessorIds = activeDependencies.map((dependency) =>
+      String(dependency.predecessor_stage_id),
+    );
     if (predecessorIds.length === 0) return [];
 
     const { data: predecessors, error } = await this.client
@@ -600,15 +638,27 @@ export class WorkflowRuntimeService {
         String(predecessor.status),
       ]),
     );
-    return predecessorIds.filter((predecessorId) => {
-      const status = predecessorById.get(predecessorId);
-      return !status || !['completed', 'skipped'].includes(status);
-    });
+    return activeDependencies
+      .filter((dependency) => {
+        const predecessorId = String(dependency.predecessor_stage_id);
+        const eligibleAt = dependency.eligible_at
+          ? new Date(String(dependency.eligible_at))
+          : null;
+        const eligible =
+          eligibleAt !== null &&
+          !Number.isNaN(eligibleAt.getTime()) &&
+          eligibleAt.getTime() <= Date.now();
+        const status = predecessorById.get(predecessorId);
+        return (
+          !status || !['completed', 'skipped'].includes(status) || !eligible
+        );
+      })
+      .map((dependency) => String(dependency.predecessor_stage_id));
   }
 
   async startStage(projectId: string, stageId: string, user: RequestUser) {
     await this.requireProjectAccess(projectId, user, 'write');
-    const stage = await this.requireStage(projectId, stageId, true);
+    let stage = await this.requireStage(projectId, stageId, true);
     if (stage.status === 'in_progress') {
       const activationTime =
         typeof stage.started_at === 'string'
@@ -725,6 +775,280 @@ export class WorkflowRuntimeService {
     }
   }
 
+  private async dependencyEligibility(
+    table:
+      | 'project_workflow_stage_dependencies'
+      | 'project_workflow_item_dependencies',
+    dependency: Record<string, unknown>,
+    predecessor: Record<string, unknown> | undefined,
+    evaluatedAt: Date,
+  ): Promise<{ resolved: boolean; eligibleAt: string | null }> {
+    if (dependency.overridden_at) {
+      return { resolved: true, eligibleAt: null };
+    }
+    if (
+      !predecessor ||
+      !['completed', 'skipped'].includes(String(predecessor.status))
+    ) {
+      return { resolved: false, eligibleAt: null };
+    }
+
+    let eligibleAt =
+      typeof dependency.eligible_at === 'string'
+        ? dependency.eligible_at
+        : null;
+    if (!eligibleAt) {
+      const anchorValue = predecessor.completed_at ?? predecessor.updated_at;
+      const anchor =
+        typeof anchorValue === 'string'
+          ? new Date(anchorValue)
+          : anchorValue instanceof Date
+            ? anchorValue
+            : null;
+      if (!anchor || Number.isNaN(anchor.getTime())) {
+        return { resolved: false, eligibleAt: null };
+      }
+      const lagHours = Number(dependency.lag_hours ?? 0);
+      if (!Number.isFinite(lagHours) || lagHours < 0) {
+        return { resolved: false, eligibleAt: null };
+      }
+      const eligibility = await this.slaService.addWorkingDuration(
+        anchor,
+        lagHours,
+      );
+      if (!eligibility.configured || !eligibility.dueAt) {
+        return { resolved: false, eligibleAt: null };
+      }
+      eligibleAt = eligibility.dueAt;
+      const { error } = await this.client
+        .from(table)
+        .update({ eligible_at: eligibleAt })
+        .eq('id', dependency.id)
+        .is('eligible_at', null);
+      if (error) {
+        this.databaseFailure(
+          'WORKFLOW_DEPENDENCY_ELIGIBILITY_UPDATE_FAILED',
+          error,
+        );
+      }
+    }
+
+    const eligibleTime = new Date(eligibleAt);
+    return {
+      resolved:
+        !Number.isNaN(eligibleTime.getTime()) &&
+        eligibleTime.getTime() <= evaluatedAt.getTime(),
+      eligibleAt,
+    };
+  }
+
+  async reconcileWorkflowReadiness(
+    projectId: string,
+    workflowId: string,
+    user: RequestUser,
+  ): Promise<{ itemIds: string[] }> {
+    const workflow = await this.requireWorkflow(projectId, workflowId);
+    if (['completed', 'cancelled'].includes(String(workflow.status))) {
+      return { itemIds: [] };
+    }
+
+    const evaluatedAt = new Date();
+    const { data: stageData, error: stageError } = await this.client
+      .from('project_workflow_stages')
+      .select('id,status,started_at,completed_at,updated_at')
+      .eq('project_workflow_id', workflowId);
+    if (stageError)
+      this.databaseFailure('WORKFLOW_STAGE_LOOKUP_FAILED', stageError);
+    const stages = (stageData ?? []) as Array<Record<string, unknown>>;
+    const stageById = new Map(stages.map((stage) => [String(stage.id), stage]));
+
+    const { data: stageDependencyData, error: stageDependencyError } =
+      await this.client
+        .from('project_workflow_stage_dependencies')
+        .select(
+          'id,predecessor_stage_id,successor_stage_id,lag_hours,eligible_at,overridden_at',
+        )
+        .eq('project_workflow_id', workflowId);
+    if (stageDependencyError) {
+      this.databaseFailure(
+        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
+        stageDependencyError,
+      );
+    }
+    const stageDependencies = (stageDependencyData ?? []) as Array<
+      Record<string, unknown>
+    >;
+    const incomingStageDependencies = new Map<
+      string,
+      Array<Record<string, unknown>>
+    >();
+    const stageEligibility = new Map<
+      string,
+      { resolved: boolean; eligibleAt: string | null }
+    >();
+    for (const dependency of stageDependencies) {
+      const successorId = String(dependency.successor_stage_id);
+      const incoming = incomingStageDependencies.get(successorId) ?? [];
+      incoming.push(dependency);
+      incomingStageDependencies.set(successorId, incoming);
+      stageEligibility.set(
+        String(dependency.id),
+        await this.dependencyEligibility(
+          'project_workflow_stage_dependencies',
+          dependency,
+          stageById.get(String(dependency.predecessor_stage_id)),
+          evaluatedAt,
+        ),
+      );
+    }
+
+    for (const stage of stages) {
+      if (stage.status !== 'locked') continue;
+      const incoming = incomingStageDependencies.get(String(stage.id)) ?? [];
+      if (
+        !incoming.every(
+          (dependency) =>
+            stageEligibility.get(String(dependency.id))?.resolved === true,
+        )
+      ) {
+        continue;
+      }
+      const { data: unlockedStage, error } = await this.client
+        .from('project_workflow_stages')
+        .update({ status: 'ready' })
+        .eq('id', stage.id)
+        .eq('status', 'locked')
+        .select('id')
+        .maybeSingle();
+      if (error) this.databaseFailure('WORKFLOW_STAGE_UPDATE_FAILED', error);
+      if (unlockedStage) {
+        stage.status = 'ready';
+        await this.runEvent(
+          'workflow.stage.ready',
+          String(stage.id),
+          projectId,
+          workflowId,
+          user.profileId,
+        );
+      }
+    }
+
+    const { data: itemData, error: itemError } = await this.client
+      .from('project_workflow_stage_items')
+      .select(
+        'id,project_workflow_stage_id,status,sla_hours_snapshot,due_at,completed_at,updated_at',
+      )
+      .eq('project_workflow_id', workflowId);
+    if (itemError)
+      this.databaseFailure('WORKFLOW_ITEM_LOOKUP_FAILED', itemError);
+    const items = (itemData ?? []) as Array<Record<string, unknown>>;
+    const itemById = new Map(items.map((item) => [String(item.id), item]));
+
+    const { data: itemDependencyData, error: itemDependencyError } =
+      await this.client
+        .from('project_workflow_item_dependencies')
+        .select(
+          'id,predecessor_stage_item_id,successor_stage_item_id,lag_hours,eligible_at,overridden_at',
+        )
+        .eq('project_workflow_id', workflowId);
+    if (itemDependencyError) {
+      this.databaseFailure(
+        'WORKFLOW_DEPENDENCY_LOOKUP_FAILED',
+        itemDependencyError,
+      );
+    }
+    const itemDependencies = (itemDependencyData ?? []) as Array<
+      Record<string, unknown>
+    >;
+    const incomingItemDependencies = new Map<
+      string,
+      Array<Record<string, unknown>>
+    >();
+    const itemEligibility = new Map<
+      string,
+      { resolved: boolean; eligibleAt: string | null }
+    >();
+    for (const dependency of itemDependencies) {
+      const successorId = String(dependency.successor_stage_item_id);
+      const incoming = incomingItemDependencies.get(successorId) ?? [];
+      incoming.push(dependency);
+      incomingItemDependencies.set(successorId, incoming);
+      itemEligibility.set(
+        String(dependency.id),
+        await this.dependencyEligibility(
+          'project_workflow_item_dependencies',
+          dependency,
+          itemById.get(String(dependency.predecessor_stage_item_id)),
+          evaluatedAt,
+        ),
+      );
+    }
+
+    for (const item of items) {
+      if (!['locked', 'blocked'].includes(String(item.status))) continue;
+      const parentStage = stageById.get(String(item.project_workflow_stage_id));
+      if (
+        !parentStage ||
+        !['ready', 'in_progress'].includes(String(parentStage.status))
+      ) {
+        continue;
+      }
+      const incoming = incomingItemDependencies.get(String(item.id)) ?? [];
+      if (
+        !incoming.every(
+          (dependency) =>
+            itemEligibility.get(String(dependency.id))?.resolved === true,
+        )
+      ) {
+        continue;
+      }
+
+      let readyAt = evaluatedAt;
+      const eligibleTimes = incoming
+        .map(
+          (dependency) =>
+            itemEligibility.get(String(dependency.id))?.eligibleAt,
+        )
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => new Date(value))
+        .filter((value) => !Number.isNaN(value.getTime()));
+      if (eligibleTimes.length > 0) {
+        readyAt = new Date(
+          Math.max(...eligibleTimes.map((value) => value.getTime())),
+        );
+      } else if (typeof parentStage.started_at === 'string') {
+        readyAt = new Date(parentStage.started_at);
+      } else if (parentStage.started_at instanceof Date) {
+        readyAt = parentStage.started_at;
+      }
+      const update =
+        parentStage.status === 'in_progress'
+          ? await this.buildReadyItemUpdate(item, readyAt)
+          : { status: 'ready' };
+      const { data: unlockedItem, error } = await this.client
+        .from('project_workflow_stage_items')
+        .update(update)
+        .eq('id', item.id)
+        .in('status', ['locked', 'blocked'])
+        .select('id')
+        .maybeSingle();
+      if (error) this.databaseFailure('WORKFLOW_ITEM_UPDATE_FAILED', error);
+      if (unlockedItem) {
+        item.status = 'ready';
+        await this.runEvent(
+          'workflow.item.ready',
+          String(item.id),
+          projectId,
+          workflowId,
+          user.profileId,
+        );
+      }
+    }
+
+    await this.ensureReadyAutoTasks(projectId, workflowId, user);
+    return { itemIds: items.map((item) => String(item.id)) };
+  }
+
   private async taskRequirementsSatisfied(itemId: string): Promise<boolean> {
     const { data: links, error: linkError } = await this.client
       .from('project_workflow_task_links')
@@ -779,7 +1103,7 @@ export class WorkflowRuntimeService {
   ): Promise<string[]> {
     const { data: dependencies, error: dependencyError } = await this.client
       .from('project_workflow_item_dependencies')
-      .select('predecessor_stage_item_id,overridden_at')
+      .select('predecessor_stage_item_id,eligible_at,overridden_at')
       .eq('project_workflow_id', workflowId)
       .eq('successor_stage_item_id', itemId);
     if (dependencyError) {
@@ -788,9 +1112,12 @@ export class WorkflowRuntimeService {
         dependencyError,
       );
     }
-    const predecessorIds = (dependencies ?? [])
-      .filter((dependency) => !dependency.overridden_at)
-      .map((dependency) => String(dependency.predecessor_stage_item_id));
+    const activeDependencies = (dependencies ?? []).filter(
+      (dependency) => !dependency.overridden_at,
+    );
+    const predecessorIds = activeDependencies.map((dependency) =>
+      String(dependency.predecessor_stage_item_id),
+    );
     if (predecessorIds.length === 0) return [];
 
     const { data: predecessors, error } = await this.client
@@ -804,10 +1131,22 @@ export class WorkflowRuntimeService {
         String(predecessor.status),
       ]),
     );
-    return predecessorIds.filter((predecessorId) => {
-      const status = predecessorById.get(predecessorId);
-      return !status || !['completed', 'skipped'].includes(status);
-    });
+    return activeDependencies
+      .filter((dependency) => {
+        const predecessorId = String(dependency.predecessor_stage_item_id);
+        const eligibleAt = dependency.eligible_at
+          ? new Date(String(dependency.eligible_at))
+          : null;
+        const eligible =
+          eligibleAt !== null &&
+          !Number.isNaN(eligibleAt.getTime()) &&
+          eligibleAt.getTime() <= Date.now();
+        const status = predecessorById.get(predecessorId);
+        return (
+          !status || !['completed', 'skipped'].includes(status) || !eligible
+        );
+      })
+      .map((dependency) => String(dependency.predecessor_stage_item_id));
   }
 
   private async requireItemDependenciesResolved(
@@ -874,6 +1213,71 @@ export class WorkflowRuntimeService {
     const completed = await this.markItemCompleted(projectId, item, user);
     await this.unlockItemSuccessors(projectId, item, user);
     return completed;
+  }
+
+  async reconcileWorkflowItem(
+    projectId: string,
+    itemId: string,
+    user: RequestUser,
+    silent = false,
+  ): Promise<Record<string, unknown> | null> {
+    try {
+      const item = await this.requireItem(projectId, itemId, true);
+      if (['completed', 'skipped'].includes(String(item.status))) {
+        return item;
+      }
+      if (item.completion_mode === 'manual') {
+        return null;
+      }
+      const tasksSatisfied = await this.taskRequirementsSatisfied(itemId);
+      if (!tasksSatisfied) {
+        return null;
+      }
+      if (item.completion_mode === 'tasks_done_and_approval') {
+        const approvalDone = await this.approvalSatisfied(item);
+        if (!approvalDone) return null;
+      }
+      const blockedBy = await this.unresolvedItemPredecessors(
+        String(item.project_workflow_id),
+        itemId,
+      );
+      if (blockedBy.length > 0) {
+        return null;
+      }
+      const parentStage = await this.requireStage(
+        projectId,
+        String(item.project_workflow_stage_id),
+        true,
+      );
+      if (!['ready', 'in_progress'].includes(String(parentStage.status))) {
+        return null;
+      }
+      const completed = await this.markItemCompleted(projectId, item, user);
+      await this.unlockItemSuccessors(projectId, item, user);
+      return completed;
+    } catch (error) {
+      if (!silent) throw error;
+      this.logger.error(
+        `Workflow item reconciliation failed for ${itemId}: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+      return null;
+    }
+  }
+
+  async reconcileLinkedWorkflowItems(
+    projectId: string,
+    taskId: string,
+    actor: RequestUser,
+  ): Promise<void> {
+    const { data: links, error } = await this.client
+      .from('project_workflow_task_links')
+      .select('project_workflow_stage_item_id')
+      .eq('task_id', taskId);
+    if (error || !links || links.length === 0) return;
+    for (const link of links) {
+      const itemId = String(link.project_workflow_stage_item_id);
+      await this.reconcileWorkflowItem(projectId, itemId, actor, true);
+    }
   }
 
   private async markItemCompleted(
