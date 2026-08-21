@@ -31,7 +31,9 @@ ALTER TABLE public.employee_compensation_history ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.employee_compensation_history FROM PUBLIC, anon, authenticated;
 GRANT ALL ON TABLE public.employee_compensation_history TO service_role;
 
--- Migrate any existing records from employee_compensation_settings into employee_compensation_history
+-- Legacy compensation settings have no effective date. Preserve the source
+-- record's creation month as the explicit V1 baseline instead of inventing a
+-- fixed API fallback date.
 INSERT INTO public.employee_compensation_history (
   user_id,
   base_salary,
@@ -46,17 +48,13 @@ SELECT
   user_id,
   base_salary,
   allowances,
-  DATE '2026-01-01',
+  date_trunc('month', created_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date,
   true,
   updated_by_user_id,
   created_at,
   updated_at
 FROM public.employee_compensation_settings
-ON CONFLICT (user_id, effective_from) DO UPDATE
-SET
-  base_salary = EXCLUDED.base_salary,
-  allowances = EXCLUDED.allowances,
-  updated_at = now();
+ON CONFLICT (user_id, effective_from) DO NOTHING;
 
 -- Helper function to resolve effective compensation for a given month
 CREATE OR REPLACE FUNCTION public.get_effective_employee_compensation(p_user_id UUID, p_effective_date DATE)

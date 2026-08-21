@@ -32,10 +32,14 @@ export class PayrollService {
     return this.supabaseService.getSystemClient();
   }
 
-  private handleDbError(error: any, message: string): never {
+  private handleDbError(
+    error: any,
+    message: string,
+    code = 'PAYROLL_DATABASE_ERROR',
+  ): never {
     this.logger.error(`${message}: ${error?.message ?? JSON.stringify(error)}`);
     throw new InternalServerErrorException({
-      code: 'PAYROLL_DATABASE_ERROR',
+      code,
       message,
     });
   }
@@ -100,7 +104,11 @@ export class PayrollService {
       .eq('id', id)
       .maybeSingle();
 
-    if (runErr || !run) {
+    if (runErr) {
+      this.handleDbError(runErr, 'Không thể tải đợt lương.');
+    }
+
+    if (!run) {
       throw new NotFoundException({
         code: 'PAYROLL_RUN_NOT_FOUND',
         message: 'Không tìm thấy đợt lương.',
@@ -285,24 +293,33 @@ export class PayrollService {
 
     const { data, error } = await this.client
       .from('employee_compensation_history')
-      .upsert(
-        {
-          user_id: employeeUserId,
-          base_salary: dto.baseSalary,
-          allowances: dto.allowances ?? 0,
-          effective_from: dto.effectiveFrom,
-          payroll_eligible: dto.payrollEligible ?? true,
-          notes: dto.notes ?? null,
-          created_by_user_id: user.profileId,
-          updated_by_user_id: user.profileId,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,effective_from' },
-      )
+      .insert({
+        user_id: employeeUserId,
+        base_salary: dto.baseSalary,
+        allowances: dto.allowances ?? 0,
+        effective_from: dto.effectiveFrom,
+        payroll_eligible: dto.payrollEligible ?? true,
+        notes: dto.notes ?? null,
+        created_by_user_id: user.profileId,
+        updated_by_user_id: user.profileId,
+        updated_at: new Date().toISOString(),
+      })
       .select()
       .single();
 
     if (error) {
+      if (
+        error.code === '23505' ||
+        error.message?.includes(
+          'uq_employee_compensation_history_user_effective',
+        )
+      ) {
+        throw new ConflictException({
+          code: 'PAYROLL_COMPENSATION_REVISION_EXISTS',
+          message:
+            'Đã tồn tại phiên bản lương có cùng ngày hiệu lực cho nhân sự này.',
+        });
+      }
       this.handleDbError(error, 'Không thể lưu phiên bản lương nhân sự.');
     }
 
@@ -326,13 +343,12 @@ export class PayrollService {
     dto: UpsertEmployeeCompensationDto,
     user: RequestUser,
   ) {
-    const effectiveFrom = dto.effectiveFrom || '2026-01-01';
     return this.createEmployeeCompensationRevision(
       employeeUserId,
       {
         baseSalary: dto.baseSalary,
         allowances: dto.allowances ?? 0,
-        effectiveFrom,
+        effectiveFrom: dto.effectiveFrom,
         payrollEligible: dto.payrollEligible ?? true,
         notes: dto.notes ?? null,
       },
@@ -432,7 +448,7 @@ export class PayrollService {
       },
     );
 
-    if (calendarError || !calendarDays) {
+    if (calendarError) {
       this.logger.error(
         `Failed to resolve work calendar for ${startDate}..${endDate}: ${calendarError?.message}`,
       );
@@ -443,11 +459,34 @@ export class PayrollService {
       });
     }
 
-    const companyWorkDays = (calendarDays || []).filter(
-      (d: any) => d.is_working_day === true,
-    );
-    const companyStandardDays =
-      companyWorkDays.length > 0 ? companyWorkDays.length : 22;
+    const companyWorkDaysByDate = new Map<string, any>();
+    if (Array.isArray(calendarDays)) {
+      for (const calendarDay of calendarDays) {
+        if (
+          calendarDay?.is_working_day === true &&
+          typeof calendarDay.work_date === 'string' &&
+          /^\d{4}-\d{2}-\d{2}$/.test(calendarDay.work_date) &&
+          calendarDay.work_date >= startDate &&
+          calendarDay.work_date <= endDate
+        ) {
+          companyWorkDaysByDate.set(calendarDay.work_date, calendarDay);
+        }
+      }
+    }
+
+    const companyWorkDays = Array.from(companyWorkDaysByDate.values());
+    if (companyWorkDays.length === 0) {
+      this.logger.error(
+        `Work calendar returned no valid working days for ${startDate}..${endDate}.`,
+      );
+      throw new InternalServerErrorException({
+        code: 'PAYROLL_WORK_CALENDAR_INVALID',
+        message:
+          'Lịch làm việc công ty không có ngày công hợp lệ để tính lương.',
+      });
+    }
+
+    const companyStandardDays = companyWorkDays.length;
 
     // 3. Query all active employee profiles
     const { data: employees, error: empErr } = await this.client
@@ -528,58 +567,33 @@ export class PayrollService {
     });
 
     // 6. Query monthly compliance reviews for periodMonth
-    const { data: monthlyReviews } = await this.client
-      .from('employee_monthly_payroll_reviews')
-      .select(
-        'user_id, discipline_bonus_eligible, early_leave_makeup_confirmed',
-      )
-      .eq('period_month', dto.periodMonth);
+    const { data: monthlyReviews, error: monthlyReviewsError } =
+      await this.client
+        .from('employee_monthly_payroll_reviews')
+        .select(
+          'user_id, discipline_bonus_eligible, early_leave_makeup_confirmed',
+        )
+        .eq('period_month', dto.periodMonth);
+
+    if (monthlyReviewsError) {
+      this.handleDbError(
+        monthlyReviewsError,
+        'Không thể tải đánh giá tuân thủ tháng để tính lương.',
+        'PAYROLL_COMPLIANCE_LOOKUP_FAILED',
+      );
+    }
 
     const reviewsByUserId = new Map<string, any>();
     for (const r of monthlyReviews || []) {
       reviewsByUserId.set(String(r.user_id), r);
     }
 
-    // 7. Insert new payroll run
-    const { data: newRun, error: createErr } = await this.client
-      .from('payroll_runs')
-      .insert({
-        period_month: dto.periodMonth,
-        period_start_date: startDate,
-        period_end_date: endDate,
-        title: dto.title,
-        status: 'calculated',
-        created_by: user.profileId,
-      })
-      .select()
-      .single();
-
-    if (createErr) {
-      if (
-        createErr.code === '23505' ||
-        createErr.message?.includes('uq_payroll_runs_period_month')
-      ) {
-        throw new ConflictException({
-          code: 'PAYROLL_RUN_DUPLICATE_PERIOD',
-          message: `Đợt lương tháng ${dto.periodMonth} đã tồn tại trong hệ thống.`,
-        });
-      }
-      this.handleDbError(createErr, 'Không thể tạo đợt tính lương.');
-    }
-
-    if (!newRun || typeof newRun.id !== 'string') {
-      throw new InternalServerErrorException({
-        code: 'PAYROLL_RUN_CREATION_FAILED',
-        message: 'Không thể tạo đợt tính lương.',
-      });
-    }
-
-    const runId = newRun.id;
-    const payslipInserts = [];
+    // 7. Calculate every payslip before creating persistent payroll data.
+    const payslipDrafts: any[] = [];
     let totalGross = 0;
     let totalNet = 0;
 
-    // 8. Calculate payslip for each eligible employee
+    // 8. Calculate payslip for each eligible employee.
     for (const emp of payrollEligibleEmployees) {
       const compensation = compensationByEmployeeId.get(String(emp.user_id));
       if (!compensation) continue;
@@ -602,7 +616,7 @@ export class PayrollService {
       );
 
       // Query employee attendance records for this month
-      const { data: attendances } = await this.client
+      const { data: attendances, error: attendanceError } = await this.client
         .from('attendance_records')
         .select(
           'id, attendance_date, status, late_minutes, early_leave_minutes',
@@ -610,6 +624,14 @@ export class PayrollService {
         .eq('user_id', emp.user_id)
         .gte('attendance_date', startDate)
         .lte('attendance_date', endDate);
+
+      if (attendanceError) {
+        this.handleDbError(
+          attendanceError,
+          'Không thể tải dữ liệu chấm công để tính lương.',
+          'PAYROLL_ATTENDANCE_LOOKUP_FAILED',
+        );
+      }
 
       // Distinct attendance dates that fall on eligible company work days
       const workedDates = new Set<string>();
@@ -640,7 +662,7 @@ export class PayrollService {
       // Check monthly compliance review
       const review = reviewsByUserId.get(String(emp.user_id));
       const disciplineEligible = review?.discipline_bonus_eligible ?? true;
-      const earlyLeaveConfirmed = review?.early_leave_makeup_confirmed ?? true;
+      const earlyLeaveConfirmed = review?.early_leave_makeup_confirmed ?? false;
       const unapprovedEarlyLeaveOccurrences =
         !earlyLeaveConfirmed && earlyLeaveMinutesList.length > 0
           ? earlyLeaveMinutesList.length
@@ -676,8 +698,7 @@ export class PayrollService {
       totalGross += grossSalary;
       totalNet += netSalary;
 
-      payslipInserts.push({
-        payroll_run_id: runId,
+      payslipDrafts.push({
         user_id: emp.user_id,
         employee_profile_id: emp.user_id,
         standard_working_days: companyStandardDays,
@@ -706,33 +727,69 @@ export class PayrollService {
       });
     }
 
+    // 9. Persist only fully calculated data. Totals are written with the run,
+    // so there is no later update that could leave a calculated run stale.
+    const { data: newRun, error: createErr } = await this.client
+      .from('payroll_runs')
+      .insert({
+        period_month: dto.periodMonth,
+        period_start_date: startDate,
+        period_end_date: endDate,
+        title: dto.title,
+        status: 'calculated',
+        total_gross_amount: totalGross,
+        total_net_amount: totalNet,
+        total_employees_count: payslipDrafts.length,
+        created_by: user.profileId,
+      })
+      .select()
+      .single();
+
+    if (createErr) {
+      if (
+        createErr.code === '23505' ||
+        createErr.message?.includes('uq_payroll_runs_period_month')
+      ) {
+        throw new ConflictException({
+          code: 'PAYROLL_RUN_DUPLICATE_PERIOD',
+          message: `Đợt lương tháng ${dto.periodMonth} đã tồn tại trong hệ thống.`,
+        });
+      }
+      this.handleDbError(createErr, 'Không thể tạo đợt tính lương.');
+    }
+
+    if (!newRun || typeof newRun.id !== 'string') {
+      throw new InternalServerErrorException({
+        code: 'PAYROLL_RUN_CREATION_FAILED',
+        message: 'Không thể tạo đợt tính lương.',
+      });
+    }
+
+    const runId = newRun.id;
+    const payslipInserts = payslipDrafts.map((payslip) => ({
+      ...payslip,
+      payroll_run_id: runId,
+    }));
+
     if (payslipInserts.length > 0) {
       const { error: insertErr } = await this.client
         .from('payslips')
         .insert(payslipInserts);
 
       if (insertErr) {
-        await this.client.from('payroll_runs').delete().eq('id', runId);
+        const { error: cleanupError } = await this.client
+          .from('payroll_runs')
+          .delete()
+          .eq('id', runId);
+        if (cleanupError) {
+          this.handleDbError(
+            cleanupError,
+            'Không thể dọn dẹp đợt lương sau khi lưu phiếu lương thất bại.',
+            'PAYROLL_RUN_CLEANUP_FAILED',
+          );
+        }
         this.handleDbError(insertErr, 'Không thể lưu danh sách phiếu lương.');
       }
-    }
-
-    // Update totals in payroll run
-    const { error: updateErr } = await this.client
-      .from('payroll_runs')
-      .update({
-        status: 'calculated',
-        total_gross_amount: totalGross,
-        total_net_amount: totalNet,
-        total_employees_count: payslipInserts.length,
-      })
-      .eq('id', runId);
-
-    if (updateErr) {
-      this.handleDbError(
-        updateErr,
-        'Không thể cập nhật tổng số liệu đợt lương.',
-      );
     }
 
     return this.getPayrollRunById(runId, user);

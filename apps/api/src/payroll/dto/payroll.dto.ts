@@ -6,7 +6,6 @@ export const GeneratePayrollRunSchema = z
       .string()
       .regex(/^\d{4}-\d{2}$/, 'Tháng tính lương phải theo định dạng YYYY-MM.'),
     title: z.string().trim().min(3).max(200),
-    standardWorkingDays: z.number().int().min(15).max(31).optional(),
   })
   .strict();
 
@@ -47,7 +46,7 @@ export const UpsertEmployeeCompensationSchema = z
       'Lương cơ bản phải lớn hơn 0 VND.',
     ),
     allowances: PayrollAmountSchema.min(0, 'Phụ cấp không được âm.').default(0),
-    effectiveFrom: FirstDayOfMonthDateSchema.optional(),
+    effectiveFrom: FirstDayOfMonthDateSchema,
     payrollEligible: z.boolean().optional(),
     notes: z.string().trim().max(1000).optional().nullable(),
   })
@@ -60,7 +59,7 @@ export type UpsertEmployeeCompensationDto = z.infer<
 export const UpsertMonthlyPayrollReviewSchema = z
   .object({
     disciplineBonusEligible: z.boolean().default(true),
-    earlyLeaveMakeupConfirmed: z.boolean().default(true),
+    earlyLeaveMakeupConfirmed: z.boolean().default(false),
     notes: z.string().trim().max(1000).optional().nullable(),
   })
   .strict();

@@ -129,7 +129,7 @@ export const LOCAL_UAT = Object.freeze({
   payroll: Object.freeze({
     periodMonth: "2099-12",
     title: "[LOCAL-UAT] Payroll 2099-12",
-    standardWorkingDays: 22,
+    compensationEffectiveFrom: "2026-01-01",
   }),
   documents: Object.freeze({
     title: "[LOCAL-UAT] Storage byte-equality proof",

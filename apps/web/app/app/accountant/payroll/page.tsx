@@ -255,6 +255,22 @@ export default function AccountantPayrollPage() {
     }
   };
 
+  const handleToggleEarlyLeaveConfirmation = async (
+    userId: string,
+    currentDiscipline: boolean,
+    currentEarlyLeave: boolean,
+  ) => {
+    try {
+      await upsertMonthlyReview(userId, selectedMonth, {
+        disciplineBonusEligible: currentDiscipline,
+        earlyLeaveMakeupConfirmed: !currentEarlyLeave,
+      });
+      loadData();
+    } catch (err: any) {
+      alert(err?.message || "Không thể cập nhật xác nhận làm bù.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <SectionHeader
@@ -600,7 +616,7 @@ export default function AccountantPayrollPage() {
                     : true;
                   const isEarlyLeaveConfirmed = rev
                     ? rev.early_leave_makeup_confirmed
-                    : true;
+                    : false;
 
                   return (
                     <tr
@@ -636,21 +652,38 @@ export default function AccountantPayrollPage() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleToggleReview(
-                              emp.userId,
-                              isDisciplineEligible,
-                              isEarlyLeaveConfirmed,
-                            )
-                          }
-                        >
-                          {isDisciplineEligible
-                            ? "Hủy thưởng kỷ luật"
-                            : "Kích hoạt kỷ luật"}
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleToggleReview(
+                                emp.userId,
+                                isDisciplineEligible,
+                                isEarlyLeaveConfirmed,
+                              )
+                            }
+                          >
+                            {isDisciplineEligible
+                              ? "Hủy thưởng kỷ luật"
+                              : "Kích hoạt kỷ luật"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleToggleEarlyLeaveConfirmation(
+                                emp.userId,
+                                isDisciplineEligible,
+                                isEarlyLeaveConfirmed,
+                              )
+                            }
+                          >
+                            {isEarlyLeaveConfirmed
+                              ? "Hủy xác nhận làm bù"
+                              : "Xác nhận làm bù"}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );

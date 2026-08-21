@@ -697,7 +697,15 @@ async function clearRunScopedFixtures() {
          OR title LIKE '%Payroll%'
          OR title LIKE '%Test%'
     `,
-    [["2026-08", "2026-09", "2099-12", "1999-01", LOCAL_UAT.payroll.periodMonth]],
+    [
+      [
+        "2026-08",
+        "2026-09",
+        "2099-12",
+        "1999-01",
+        LOCAL_UAT.payroll.periodMonth,
+      ],
+    ],
   );
   await client.query(
     `
@@ -748,17 +756,14 @@ async function seedCompensationFixture() {
       `
         INSERT INTO public.employee_compensation_history (
           user_id, base_salary, allowances, effective_from, payroll_eligible, updated_by_user_id
-        ) VALUES ($1::uuid, $2::numeric, $3::numeric, '2026-01-01'::date, true, $4::uuid)
-        ON CONFLICT (user_id, effective_from) DO UPDATE
-        SET base_salary = EXCLUDED.base_salary,
-            allowances = EXCLUDED.allowances,
-            updated_by_user_id = EXCLUDED.updated_by_user_id,
-            updated_at = now()
+        ) VALUES ($1::uuid, $2::numeric, $3::numeric, $4::date, true, $5::uuid)
+        ON CONFLICT (user_id, effective_from) DO NOTHING
       `,
       [
         user.id,
         compensation.baseSalary,
         compensation.allowances,
+        LOCAL_UAT.payroll.compensationEffectiveFrom,
         LOCAL_UAT.users.admin.id,
       ],
     );

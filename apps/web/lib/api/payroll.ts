@@ -163,7 +163,6 @@ export async function fetchPayrollRunById(id: string): Promise<PayrollRun> {
 export async function generatePayrollRun(data: {
   periodMonth: string;
   title: string;
-  standardWorkingDays?: number;
 }): Promise<PayrollRun> {
   return request<PayrollRun>("/payroll/runs/generate", {
     method: "POST",

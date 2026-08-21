@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.employee_monthly_payroll_reviews (
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   period_month TEXT NOT NULL CHECK (period_month ~ '^[0-9]{4}-[0-9]{2}$'),
   discipline_bonus_eligible BOOLEAN NOT NULL DEFAULT true,
-  early_leave_makeup_confirmed BOOLEAN NOT NULL DEFAULT true,
+  early_leave_makeup_confirmed BOOLEAN NOT NULL DEFAULT false,
   notes TEXT,
   updated_by_user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

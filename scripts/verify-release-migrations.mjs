@@ -616,6 +616,29 @@ async function assertReleaseSchema(client) {
     1,
     "employee_monthly_payroll_reviews must enforce UNIQUE(user_id, period_month)",
   );
+
+  const earlyLeaveMakeupDefault = await client.query(`
+    SELECT is_nullable, column_default
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'employee_monthly_payroll_reviews'
+      AND column_name = 'early_leave_makeup_confirmed'
+  `);
+  assert.equal(
+    earlyLeaveMakeupDefault.rowCount,
+    1,
+    "employee_monthly_payroll_reviews must expose early_leave_makeup_confirmed",
+  );
+  assert.equal(
+    earlyLeaveMakeupDefault.rows[0].is_nullable,
+    "NO",
+    "early_leave_makeup_confirmed must be required",
+  );
+  assert.match(
+    String(earlyLeaveMakeupDefault.rows[0].column_default),
+    /false/i,
+    "early_leave_makeup_confirmed must default to false",
+  );
 }
 
 async function expectDatabaseError(action, accepted, label) {
@@ -995,6 +1018,30 @@ async function runReleaseSmoke(client, seed) {
     assert.equal(compHistory.rowCount, 1);
     assert.equal(String(compHistory.rows[0].base_salary), "25000000.00");
 
+    await expectDatabaseError(
+      () =>
+        client.query(
+          `INSERT INTO public.employee_compensation_history (
+             user_id, base_salary, allowances, effective_from, payroll_eligible, created_by_user_id
+           ) VALUES ($1, 99999999, 0, '2026-08-01', false, $2)`,
+          [seed.employeeId, ADMIN_ID],
+        ),
+      ["23505", "uq_employee_compensation_history_user_effective"],
+      "Duplicate employee compensation revision",
+    );
+    const unchangedCompHistory = await client.query(
+      `SELECT base_salary, allowances, payroll_eligible
+       FROM public.employee_compensation_history
+       WHERE id = $1`,
+      [compHistory.rows[0].id],
+    );
+    assert.equal(
+      String(unchangedCompHistory.rows[0].base_salary),
+      "25000000.00",
+    );
+    assert.equal(String(unchangedCompHistory.rows[0].allowances), "2000000.00");
+    assert.equal(unchangedCompHistory.rows[0].payroll_eligible, true);
+
     const effectiveComp = await client.query(
       `SELECT * FROM public.get_effective_employee_compensation($1, '2026-08-15'::date)`,
       [seed.employeeId],
@@ -1005,13 +1052,14 @@ async function runReleaseSmoke(client, seed) {
     // 3C. Monthly Reviews
     const monthlyReview = await client.query(
       `INSERT INTO public.employee_monthly_payroll_reviews (
-         user_id, period_month, discipline_bonus_eligible, early_leave_makeup_confirmed
-       ) VALUES ($1, '2026-08', true, true)
-       RETURNING id, discipline_bonus_eligible`,
+         user_id, period_month, discipline_bonus_eligible
+       ) VALUES ($1, '2026-08', true)
+       RETURNING id, discipline_bonus_eligible, early_leave_makeup_confirmed`,
       [seed.employeeId],
     );
     assert.equal(monthlyReview.rowCount, 1);
     assert.equal(monthlyReview.rows[0].discipline_bonus_eligible, true);
+    assert.equal(monthlyReview.rows[0].early_leave_makeup_confirmed, false);
 
     const payrollRun = await client.query(
       `INSERT INTO public.payroll_runs (
