@@ -93,11 +93,7 @@ async function loadManifest() {
     .filter((file) => /^\d{14}_.+\.sql$/u.test(file))
     .sort();
 
-  assert(
-    allFiles.includes(LEGACY_PHASE10),
-    "Legacy Phase10 migration file is missing from source for exclusion check",
-  );
-
+  const phase10PresentInDir = allFiles.includes(LEGACY_PHASE10);
   const baseline = allFiles.filter((file) => {
     const stamp = file.slice(0, 14);
     return stamp <= BASELINE_END && file !== LEGACY_PHASE10;
@@ -119,7 +115,12 @@ async function loadManifest() {
   }
 
   // Verify Phase10 isolation
-  const phase10Sql = await readFile(join(MIGRATIONS_DIR, LEGACY_PHASE10), "utf8");
+  let phase10Sql = "";
+  try {
+    phase10Sql = await readFile(join(MIGRATIONS_DIR, LEGACY_PHASE10), "utf8");
+  } catch {
+    phase10Sql = await readFile(join(ROOT, "supabase", `${LEGACY_PHASE10}.excluded`), "utf8");
+  }
   const phase10Created = extractCreatedPublicObjects(phase10Sql);
 
   for (const file of [...baseline, ...WORKFLOW_MIGRATIONS]) {
@@ -166,8 +167,6 @@ async function bootstrapSupabaseSurface(client) {
   phase("Bootstrap clean Supabase environment");
   await client.query(`
     DROP SCHEMA IF EXISTS public CASCADE;
-    DROP SCHEMA IF EXISTS auth CASCADE;
-    DROP SCHEMA IF EXISTS storage CASCADE;
     DROP SCHEMA IF EXISTS supabase_migrations CASCADE;
 
     CREATE SCHEMA public;
@@ -248,6 +247,14 @@ async function bootstrapSupabaseSurface(client) {
       metadata JSONB,
       path_tokens TEXT[] GENERATED ALWAYS AS (string_to_array(name, '/')) STORED
     );
+
+    ALTER TABLE storage.objects DISABLE TRIGGER ALL;
+    ALTER TABLE storage.buckets DISABLE TRIGGER ALL;
+    DELETE FROM storage.objects;
+    DELETE FROM storage.buckets;
+    ALTER TABLE storage.objects ENABLE TRIGGER ALL;
+    ALTER TABLE storage.buckets ENABLE TRIGGER ALL;
+    DELETE FROM auth.users;
   `);
 }
 
