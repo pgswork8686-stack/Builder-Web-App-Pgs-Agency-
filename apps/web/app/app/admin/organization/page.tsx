@@ -8,101 +8,95 @@ import {
   UserSquare2,
   Briefcase,
   ArrowLeft,
+  ChevronRight,
 } from "lucide-react";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function AdminOrganizationDashboard() {
   const cards = [
     {
       title: "Phòng ban",
-      desc: "Quản lý danh sách phòng ban, sơ đồ phòng ban công ty.",
+      desc: "Quản lý danh sách phòng ban, sơ đồ phòng ban và mã định danh.",
       icon: Building2,
       href: "/app/admin/departments",
-      color: "from-blue-500/20 to-cyan-500/20 text-cyan-400 border-cyan-500/30",
-      hoverGlow: "group-hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]",
+      color: "bg-[#EEF2FF] text-[#4F75FF]",
+      border: "border-[#EDF2F7]",
     },
     {
       title: "Đội nhóm",
-      desc: "Quản lý đội nhóm nghiệp vụ và phân công trưởng nhóm.",
+      desc: "Quản lý đội nhóm nghiệp vụ và phân công trưởng nhóm quản lý.",
       icon: Users2,
       href: "/app/admin/teams",
-      color:
-        "from-purple-500/20 to-pink-500/20 text-pink-400 border-pink-500/30",
-      hoverGlow: "group-hover:shadow-[0_0_20px_rgba(236,72,153,0.15)]",
+      color: "bg-[#F3E8FF] text-[#9333EA]",
+      border: "border-[#EDF2F7]",
     },
     {
       title: "Nhân sự",
-      desc: "Hồ sơ nhân viên, chức danh, quan hệ quản lý trực tiếp.",
+      desc: "Hồ sơ nhân viên, chức danh, mã nhân sự và quản lý trực tiếp.",
       icon: UserSquare2,
       href: "/app/admin/people",
-      color:
-        "from-emerald-500/20 to-teal-500/20 text-teal-400 border-teal-500/30",
-      hoverGlow: "group-hover:shadow-[0_0_20px_rgba(20,184,166,0.15)]",
+      color: "bg-[#E6FBF5] text-[#059669]",
+      border: "border-[#EDF2F7]",
     },
     {
       title: "Khách hàng",
-      desc: "Quản lý doanh nghiệp khách hàng và tài khoản đối tác.",
+      desc: "Quản lý doanh nghiệp khách hàng và các tài khoản đối tác.",
       icon: Briefcase,
       href: "/app/admin/clients",
-      color:
-        "from-amber-500/20 to-orange-500/20 text-orange-400 border-orange-500/30",
-      hoverGlow: "group-hover:shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+      color: "bg-[#FEF9C3] text-[#CA8A04]",
+      border: "border-[#EDF2F7]",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] p-6 lg:p-12 selection:bg-cyan-500 selection:text-black">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold uppercase tracking-wider mb-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            PGS Hub • Phase 2
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            Cơ Cấu Tổ Chức & Nhân Sự
-          </h1>
-          <p className="text-slate-400 text-sm md:text-base mt-2">
-            Quản trị phòng ban, đội nhóm, hồ sơ nhân sự công ty và thông tin
-            khách hàng đối tác.
-          </p>
-        </div>
-
-        <Link
-          href="/app/admin"
-          className="flex items-center gap-2 self-start px-4 py-2 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition duration-300 text-sm text-slate-300 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Quay lại Admin Dashboard
-        </Link>
-      </div>
+      <SectionHeader
+        title="Cơ cấu Tổ chức & Nhân sự"
+        description="Quản trị phòng ban, đội nhóm, hồ sơ nhân sự công ty và thông tin khách hàng đối tác."
+        action={
+          <Link href="/app/admin">
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+            >
+              Quay lại Dashboard
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Grid Menu Cards */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((card) => {
-          const Icon = card.icon;
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {cards.map((item) => {
+          const Icon = item.icon;
           return (
-            <Link
-              key={card.title}
-              href={card.href}
-              className={`group relative overflow-hidden rounded-2xl border bg-slate-900/40 backdrop-blur-md p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-slate-600/50 ${card.hoverGlow}`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div>
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} border flex items-center justify-center mb-6`}
-                >
-                  <Icon className="w-6 h-6" />
+            <Link key={item.href} href={item.href} className="group block">
+              <Card className="p-6 h-full flex flex-col justify-between hover:border-[#4F75FF]/40 hover:shadow-md transition-all">
+                <div className="space-y-4">
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.color} shadow-xs`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                  {card.title}
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  {card.desc}
-                </p>
-              </div>
-              <div className="mt-8 text-xs text-cyan-400 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                Quản lý chi tiết →
-              </div>
+
+                <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-between text-xs font-bold text-[#4F75FF] group-hover:translate-x-0.5 transition-transform">
+                  <span>Truy cập quản lý</span>
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              </Card>
             </Link>
           );
         })}

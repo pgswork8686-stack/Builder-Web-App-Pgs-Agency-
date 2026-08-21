@@ -8,23 +8,42 @@ import {
   ArrowLeft,
   Loader2,
   Edit3,
-  CheckCircle2,
   AlertTriangle,
-  HelpCircle,
+  UserCheck,
+  UserX,
 } from "lucide-react";
-import { organizationApi } from "../../../../lib/api/organization";
+import {
+  organizationApi,
+  type Department,
+} from "../../../../lib/api/organization";
+import { peopleApi } from "../../../../lib/api/people";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog } from "@/components/ui/dialog";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui/table";
 
-interface Department {
+interface EmployeeOption {
   id: string;
-  code: string;
-  name: string;
-  description: string | null;
-  is_active: boolean;
-  created_at: string;
+  fullName: string;
+  email: string;
+  employeeCode?: string;
+  role: string;
 }
 
 export default function AdminDepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,18 +52,41 @@ export default function AdminDepartmentsPage() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [headUserId, setHeadUserId] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Edit states
   const [editingDept, setEditingDept] = useState<Department | null>(null);
+  const [editHeadUserId, setEditHeadUserId] = useState<string>("");
 
-  const fetchDepts = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await organizationApi.getDepartments();
-      setDepartments(data);
+      const [deptsData, peopleData] = await Promise.all([
+        organizationApi.getDepartments(),
+        peopleApi
+          .getPeopleDirectory({ pageSize: 100 })
+          .catch(() => ({ items: [] })),
+      ]);
+      setDepartments(deptsData);
+
+      // Filter only internal active employees
+      const internalStaff = (peopleData.items || [])
+        .filter(
+          (p: any) =>
+            p.role !== "client" &&
+            (p.accountStatus === "active" || p.account_status === "active"),
+        )
+        .map((p: any) => ({
+          id: p.id,
+          fullName: p.fullName || p.full_name || "Nhân viên",
+          email: p.email,
+          employeeCode: p.employeeCode || p.employee_code,
+          role: p.role,
+        }));
+      setEmployees(internalStaff);
     } catch (err: any) {
       setError(err.message || "Không thể tải danh sách phòng ban");
     } finally {
@@ -53,7 +95,7 @@ export default function AdminDepartmentsPage() {
   };
 
   useEffect(() => {
-    fetchDepts();
+    fetchData();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -75,12 +117,14 @@ export default function AdminDepartmentsPage() {
         code: code.trim().toUpperCase(),
         name: name.trim(),
         description: description.trim() || undefined,
+        headUserId: headUserId || null,
       });
       setDepartments((prev) => [...prev, newDept]);
       setShowAddForm(false);
       setCode("");
       setName("");
       setDescription("");
+      setHeadUserId("");
     } catch (err: any) {
       setFormError(err.message || "Tạo phòng ban thất bại");
     } finally {
@@ -91,16 +135,20 @@ export default function AdminDepartmentsPage() {
   const handleUpdateStatus = async (dept: Department) => {
     try {
       const updated = await organizationApi.updateDepartment(dept.id, {
-        isActive: !dept.is_active,
+        isActive: !dept.isActive,
       });
       setDepartments((prev) =>
-        prev.map((d) =>
-          d.id === dept.id ? { ...d, is_active: updated.is_active } : d,
-        ),
+        prev.map((d) => (d.id === dept.id ? updated : d)),
       );
     } catch (err: any) {
       alert(err.message || "Thay đổi trạng thái thất bại");
     }
+  };
+
+  const openEditModal = (dept: Department) => {
+    setEditingDept(dept);
+    setEditHeadUserId(dept.headUserId || "");
+    setFormError(null);
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -121,7 +169,8 @@ export default function AdminDepartmentsPage() {
       const updated = await organizationApi.updateDepartment(editingDept.id, {
         name: editingDept.name.trim(),
         description: editingDept.description?.trim() || null,
-        isActive: editingDept.is_active,
+        headUserId: editHeadUserId || null,
+        isActive: editingDept.isActive,
       });
       setDepartments((prev) =>
         prev.map((d) => (d.id === updated.id ? updated : d)),
@@ -135,262 +184,376 @@ export default function AdminDepartmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] p-6 lg:p-12">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <Link
-            href="/app/admin/organization"
-            className="inline-flex items-center gap-1 text-slate-400 hover:text-cyan-400 text-sm mb-3 transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Cơ cấu tổ chức
-          </Link>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent flex items-center gap-3">
-            <Building2 className="w-8 h-8 text-cyan-400" />
-            Quản Lý Phòng Ban
-          </h1>
-        </div>
-
-        <button
-          onClick={() => {
-            setEditingDept(null);
-            setShowAddForm(!showAddForm);
-          }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-black font-semibold rounded-xl transition duration-300 text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Thêm phòng ban mới
-        </button>
-      </div>
-
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Forms column (Add or Edit) */}
-        {(showAddForm || editingDept) && (
-          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl p-6 self-start">
-            <h2 className="text-xl font-bold text-white mb-6">
-              {editingDept ? "Chỉnh sửa phòng ban" : "Tạo phòng ban mới"}
-            </h2>
-
-            <form
-              onSubmit={editingDept ? handleEditSubmit : handleCreate}
-              className="space-y-4"
+      <SectionHeader
+        title="Cơ Cấu Phòng Ban & Trưởng Phòng"
+        description="Quản trị 9 phòng ban chính thức của PGS Agency và bổ nhiệm Trưởng phòng."
+        badge={`${departments.length} Phòng ban`}
+        action={
+          <div className="flex items-center gap-3">
+            <Link href="/app/admin/organization">
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
+              >
+                Cơ cấu tổ chức
+              </Button>
+            </Link>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setEditingDept(null);
+                setHeadUserId("");
+                setShowAddForm(true);
+              }}
+              leftIcon={<Plus className="w-4 h-4" />}
             >
-              {formError && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>{formError}</span>
-                </div>
-              )}
-
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                  Mã phòng ban (Không được đổi)
-                </label>
-                <input
-                  type="text"
-                  value={editingDept ? editingDept.code : code}
-                  onChange={(e) => setCode(e.target.value)}
-                  disabled={!!editingDept}
-                  placeholder="Ví dụ: SEO, TECH, HR"
-                  className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                  Tên phòng ban
-                </label>
-                <input
-                  type="text"
-                  value={editingDept ? editingDept.name : name}
-                  onChange={(e) =>
-                    editingDept
-                      ? setEditingDept({ ...editingDept, name: e.target.value })
-                      : setName(e.target.value)
-                  }
-                  placeholder="Ví dụ: Tối ưu hoá công cụ tìm kiếm"
-                  className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition duration-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                  Mô tả phòng ban
-                </label>
-                <textarea
-                  rows={4}
-                  value={
-                    editingDept ? editingDept.description || "" : description
-                  }
-                  onChange={(e) =>
-                    editingDept
-                      ? setEditingDept({
-                          ...editingDept,
-                          description: e.target.value,
-                        })
-                      : setDescription(e.target.value)
-                  }
-                  placeholder="Chi tiết về nhiệm vụ chính..."
-                  className="w-full bg-[#161D30] border border-slate-700/60 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition duration-300 resize-none"
-                />
-              </div>
-
-              {editingDept && (
-                <div className="flex items-center gap-2 py-2">
-                  <input
-                    type="checkbox"
-                    id="is_active"
-                    checked={editingDept.is_active}
-                    onChange={(e) =>
-                      setEditingDept({
-                        ...editingDept,
-                        is_active: e.target.checked,
-                      })
-                    }
-                    className="w-4 h-4 accent-cyan-500"
-                  />
-                  <label
-                    htmlFor="is_active"
-                    className="text-sm text-slate-300 cursor-pointer"
-                  >
-                    Phòng ban hoạt động
-                  </label>
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 px-4 py-2.5 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-black font-semibold rounded-xl transition duration-300 text-sm flex items-center justify-center gap-2"
-                >
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {editingDept ? "Cập nhật" : "Khởi tạo"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddForm(false);
-                    setEditingDept(null);
-                  }}
-                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-xl transition duration-300 text-sm"
-                >
-                  Huỷ
-                </button>
-              </div>
-            </form>
+              Thêm phòng ban mới
+            </Button>
           </div>
-        )}
+        }
+      />
 
-        {/* Listings column */}
-        <div
-          className={
-            showAddForm || editingDept ? "lg:col-span-2" : "lg:col-span-3"
-          }
-        >
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-900/30 rounded-2xl border border-slate-800">
-              <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-4" />
-              <span className="text-slate-400 text-sm">
-                Đang tải danh sách phòng ban...
-              </span>
-            </div>
-          ) : error ? (
-            <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 shrink-0" />
-              <div>
-                <h4 className="font-bold">Lỗi tải dữ liệu</h4>
-                <p className="text-sm mt-1">{error}</p>
-                <button
-                  onClick={fetchDepts}
-                  className="mt-3 px-4 py-2 bg-red-500 text-black font-semibold rounded-xl text-xs"
-                >
-                  Thử lại
-                </button>
-              </div>
-            </div>
-          ) : departments.length === 0 ? (
-            <div className="text-center py-20 bg-slate-900/20 border border-dashed border-slate-850 rounded-2xl">
-              <Building2 className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-slate-300">
-                Chưa có phòng ban nào
-              </h3>
-              <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">
-                Bắt đầu tạo sơ đồ cơ cấu công ty bằng cách thêm phòng ban đầu
-                tiên.
-              </p>
-            </div>
-          ) : (
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left">
-                  <thead>
-                    <tr className="border-b border-slate-800 bg-slate-950/20 text-slate-400 text-xs font-semibold uppercase tracking-wider">
-                      <th className="py-4 px-6">Mã</th>
-                      <th className="py-4 px-6">Tên phòng ban</th>
-                      <th className="py-4 px-6">Mô tả</th>
-                      <th className="py-4 px-6">Trạng thái</th>
-                      <th className="py-4 px-6">Ngày tạo</th>
-                      <th className="py-4 px-6 text-right">Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-850 text-sm">
-                    {departments.map((dept) => (
-                      <tr
-                        key={dept.id}
-                        className="hover:bg-slate-850/20 transition duration-150"
-                      >
-                        <td className="py-4 px-6 font-bold text-cyan-400">
-                          {dept.code}
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-white">
-                          {dept.name}
-                        </td>
-                        <td className="py-4 px-6 text-slate-400 max-w-xs truncate">
-                          {dept.description || "—"}
-                        </td>
-                        <td className="py-4 px-6">
-                          <button
-                            onClick={() => handleUpdateStatus(dept)}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition duration-150 border ${
-                              dept.is_active
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : "bg-slate-800 border-slate-700 text-slate-400"
-                            }`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${dept.is_active ? "bg-emerald-400" : "bg-slate-500"}`}
-                            />
-                            {dept.is_active ? "Hoạt động" : "Tắt"}
-                          </button>
-                        </td>
-                        <td className="py-4 px-6 text-slate-500 text-xs">
-                          {new Date(dept.created_at).toLocaleDateString(
-                            "vi-VN",
-                          )}
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <button
-                            onClick={() => {
-                              setShowAddForm(false);
-                              setEditingDept(dept);
-                            }}
-                            className="p-2 hover:bg-slate-800 rounded-xl transition duration-150 text-slate-400 hover:text-cyan-400"
-                            title="Chỉnh sửa"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+      {error ? (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+            <span>{error}</span>
+          </div>
+          <Button variant="danger" size="sm" onClick={fetchData}>
+            Thử lại
+          </Button>
         </div>
-      </div>
+      ) : null}
+
+      {/* Main Table Card */}
+      <Card className="p-0 overflow-hidden">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+            <span className="text-xs text-[#64748B]">
+              Đang tải danh sách phòng ban...
+            </span>
+          </div>
+        ) : departments.length === 0 ? (
+          <EmptyState
+            icon={<Building2 className="w-8 h-8 text-[#4F75FF]" />}
+            title="Chưa có phòng ban nào"
+            description="Bắt đầu tạo sơ đồ cơ cấu công ty bằng cách thêm phòng ban đầu tiên."
+            actionLabel="Thêm phòng ban"
+            onAction={() => setShowAddForm(true)}
+          />
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>Mã PB</TableHeaderCell>
+                  <TableHeaderCell>Mã định danh</TableHeaderCell>
+                  <TableHeaderCell>Tên phòng ban</TableHeaderCell>
+                  <TableHeaderCell>
+                    Trưởng phòng (Department Head)
+                  </TableHeaderCell>
+                  <TableHeaderCell>Mô tả chức năng</TableHeaderCell>
+                  <TableHeaderCell>Trạng thái</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
+                    Thao tác
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {departments.map((dept) => (
+                  <TableRow key={dept.id}>
+                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      {dept.departmentCode}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
+                      {dept.code}
+                    </TableCell>
+                    <TableCell className="font-bold text-[#0F172A]">
+                      {dept.name}
+                    </TableCell>
+                    <TableCell>
+                      {dept.head ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] flex items-center justify-center font-bold text-xs">
+                            {dept.head.fullName.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-xs text-[#0F172A]">
+                              {dept.head.fullName}
+                            </div>
+                            <div className="text-[10px] text-[#64748B] font-mono">
+                              {dept.headUserCode ||
+                                dept.head.employeeCode ||
+                                dept.head.email}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <Badge variant="default" size="sm">
+                          Chưa bổ nhiệm
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-xs text-[#64748B] max-w-xs truncate">
+                      {dept.description || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => handleUpdateStatus(dept)}
+                        className="cursor-pointer"
+                      >
+                        <Badge
+                          variant={dept.isActive ? "success" : "default"}
+                          size="sm"
+                        >
+                          {dept.isActive ? "Đang hoạt động" : "Tạm ngưng"}
+                        </Badge>
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEditModal(dept)}
+                        leftIcon={<Edit3 className="w-3.5 h-3.5" />}
+                      >
+                        Sửa / Bổ nhiệm
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Card>
+
+      {/* Modal Add Department */}
+      {showAddForm && (
+        <Dialog
+          isOpen={showAddForm}
+          onClose={() => setShowAddForm(false)}
+          maxWidth="md"
+          title="Tạo phòng ban mới"
+          description="Thiết lập phòng ban mới vào cơ cấu tổ chức doanh nghiệp."
+        >
+          <form onSubmit={handleCreate} className="space-y-4 pt-2">
+            {formError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mã phòng ban *
+              </label>
+              <input
+                type="text"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="VD: SEO, TECH, HR, MKT"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Tên phòng ban *
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="VD: Phòng Tối ưu hóa Tìm kiếm (SEO)"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Trưởng phòng (Tùy chọn)
+              </label>
+              <select
+                value={headUserId}
+                onChange={(e) => setHeadUserId(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chưa bổ nhiệm --</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.fullName} ({emp.employeeCode || emp.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mô tả chức năng
+              </label>
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Mô tả phạm vi và nhiệm vụ của phòng ban..."
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+              />
+            </div>
+
+            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAddForm(false)}
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={submitting}
+                isLoading={submitting}
+              >
+                Khởi tạo phòng ban
+              </Button>
+            </div>
+          </form>
+        </Dialog>
+      )}
+
+      {/* Modal Edit Department */}
+      {editingDept && (
+        <Dialog
+          isOpen={!!editingDept}
+          onClose={() => setEditingDept(null)}
+          maxWidth="md"
+          title="Chỉnh sửa & Bổ nhiệm Trưởng phòng"
+          description={`Phòng ban: ${editingDept.departmentCode} - ${editingDept.code}`}
+        >
+          <form onSubmit={handleEditSubmit} className="space-y-4 pt-2">
+            {formError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mã phòng ban (Cố định)
+              </label>
+              <input
+                type="text"
+                disabled
+                value={`${editingDept.departmentCode} (${editingDept.code})`}
+                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Tên phòng ban *
+              </label>
+              <input
+                type="text"
+                required
+                value={editingDept.name}
+                onChange={(e) =>
+                  setEditingDept({ ...editingDept, name: e.target.value })
+                }
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Bổ nhiệm Trưởng phòng
+              </label>
+              <select
+                value={editHeadUserId}
+                onChange={(e) => setEditHeadUserId(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+              >
+                <option value="">-- Chưa bổ nhiệm (Trống) --</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.fullName} ({emp.employeeCode || emp.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                Mô tả chức năng
+              </label>
+              <textarea
+                rows={3}
+                value={editingDept.description || ""}
+                onChange={(e) =>
+                  setEditingDept({
+                    ...editingDept,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="edit_is_active"
+                checked={editingDept.isActive}
+                onChange={(e) =>
+                  setEditingDept({
+                    ...editingDept,
+                    isActive: e.target.checked,
+                  })
+                }
+                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+              />
+              <label
+                htmlFor="edit_is_active"
+                className="text-xs font-semibold text-[#0F172A] cursor-pointer select-none"
+              >
+                Phòng ban đang hoạt động
+              </label>
+            </div>
+
+            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setEditingDept(null)}
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={submitting}
+                isLoading={submitting}
+              >
+                Lưu thay đổi
+              </Button>
+            </div>
+          </form>
+        </Dialog>
+      )}
     </div>
   );
 }

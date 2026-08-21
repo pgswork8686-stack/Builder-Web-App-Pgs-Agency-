@@ -1,5 +1,23 @@
 import { request } from "./client";
 
+export interface ClientCompany {
+  id: string;
+  code: string;
+  clientCode?: string;
+  name: string;
+  taxCode?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  address?: string | null;
+  status: "active" | "inactive";
+  isActive?: boolean;
+  notes?: string | null;
+  contactPerson?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   return request(url, options);
 };
@@ -31,7 +49,7 @@ export const clientsApi = {
   },
 
   async createClientCompany(data: {
-    code: string;
+    code?: string;
     name: string;
     taxCode?: string | null;
     email?: string | null;

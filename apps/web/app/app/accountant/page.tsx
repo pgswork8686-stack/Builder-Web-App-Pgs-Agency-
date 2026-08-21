@@ -1,187 +1,270 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  UserCheck,
-  ShieldCheck,
-  Activity,
-  LogOut,
-  Bell,
-  MessageCircle,
+  CreditCard,
+  FileText,
+  DollarSign,
+  TrendingUp,
+  Receipt,
+  Clock,
+  ArrowRight,
+  ChevronRight,
+  CheckCircle2,
+  AlertCircle,
+  FileSpreadsheet,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { NotificationBell } from "@/components/phase7/notification-bell";
+import { financeApi } from "@/lib/api/finance";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AccountantDashboardPage() {
-  const router = useRouter();
+  const [summary, setSummary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const sum = await financeApi.getSummary();
+        setSummary(sum);
+      } catch {
+        // Safe load
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const formatVND = (amount: number) => {
+    if (!amount) return "0 ₫";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FFC400] text-black font-black flex items-center justify-center text-sm">
-            P
-          </div>
-          <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">
-              | Accountant Workspace
-            </span>
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Kế toán (Accountant)</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors cursor-pointer"
-            title="Đăng xuất"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
-        <div className="border-b border-[#151516] pb-6">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Góc làm việc Kế toán
+    <div className="space-y-6">
+      {/* Top Greeting Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
+            Tổng quan tài chính (Accounting Dashboard)
           </h1>
-          <p className="mt-1 text-sm text-[#606060]">
-            Quản lý tài chính, giao dịch hợp đồng, kiểm soát chi phí doanh
-            nghiệp.
+          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+            Theo dõi doanh thu, công nợ, hóa đơn, chi phí và bảng lương.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Vai trò của bạn
-              </span>
-              <UserCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Kế toán viên
-            </div>
-            <div className="text-xs text-[#606060]">
-              Quyền quản lý dữ liệu tài chính & hóa đơn
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Trạng thái tài khoản
-              </span>
-              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Đang hoạt động
-            </div>
-            <div className="text-xs text-emerald-400">
-              Tài khoản đã được phê duyệt
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Cơ sở dữ liệu
-              </span>
-              <Activity className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Kết nối an toàn
-            </div>
-            <div className="text-xs text-emerald-400">
-              Bảo vệ SSL & RLS Enforced
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <Link
-            href="/app/notifications"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
-          >
-            <Bell className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
-              Thông báo
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Nhận cập nhật hóa đơn, thanh toán, chat và công việc liên quan.
-            </p>
-          </Link>
-
-          <Link
-            href="/app/chat"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
-          >
-            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400]">
-              Chat
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Trao đổi nội bộ hoặc theo project đã được phân quyền.
-            </p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+            Tháng 8/2026
+          </span>
+          <Link href="/app/accountant/finance/invoices">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Receipt className="w-4 h-4" />}
+            >
+              Quản lý hóa đơn
+            </Button>
           </Link>
         </div>
+      </div>
 
-        {/* Finance Quick Links Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-white">Quản lý Tài chính</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <Link
-              href="/app/accountant/finance"
-              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
-            >
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-                Tổng quan tài chính
-              </h4>
-              <p className="text-xs text-[#606060]">
-                Xem doanh thu thực tế, nợ quá hạn và các thay đổi tài chính.
-              </p>
+      {/* Main Hero: Doanh thu tháng + 2 Mini KPI Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Banner: Doanh thu tháng */}
+        <div className="lg:col-span-6 rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-black text-[#24304A] tracking-tight">
+              Doanh thu YTD: {formatVND(summary?.total_revenue_ytd || 0)}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
+              Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang
+              thực thi.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-6">
+            <Link href="/app/accountant/finance/contracts">
+              <Button variant="primary" size="sm">
+                Xem hợp đồng
+              </Button>
             </Link>
-
-            <Link
-              href="/app/accountant/finance/contracts"
-              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
-            >
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-                Danh sách hợp đồng
-              </h4>
-              <p className="text-xs text-[#606060]">
-                Tạo mới, chỉnh sửa nháp và quản lý vòng đời hợp đồng.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/accountant/finance/invoices"
-              className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-2 group"
-            >
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-                Danh sách hóa đơn
-              </h4>
-              <p className="text-xs text-[#606060]">
-                Ghi nhận thanh toán, đánh dấu quá hạn, phát hành hóa đơn.
-              </p>
+            <Link href="/app/accountant/payroll">
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<FileSpreadsheet className="w-4 h-4" />}
+              >
+                Bảng lương
+              </Button>
             </Link>
           </div>
         </div>
-      </main>
+
+        {/* Dòng tiền ròng */}
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+          <div>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Dòng tiền ròng
+            </span>
+            <div className="text-2xl font-black text-[#24304A] mt-2">
+              {formatVND(summary?.total_revenue_ytd || 0)}
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+            <TrendingUp className="w-3.5 h-3.5" />
+            Cân đối thu chi
+          </span>
+        </div>
+
+        {/* Quá hạn */}
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+          <div>
+            <span className="text-xs font-bold text-[#7C879D]">
+              Công nợ quá hạn
+            </span>
+            <div className="text-2xl font-black text-[#24304A] mt-2">
+              {formatVND(summary?.total_outstanding_ar || 0)}
+            </div>
+          </div>
+          <span className="text-xs font-bold text-[#FA896B] mt-4">
+            {summary?.total_outstanding_ar
+              ? "Cần đôn đốc thanh toán"
+              : "Không có nợ xấu"}
+          </span>
+        </div>
+      </div>
+
+      {/* 5-Metric Row: Doanh thu, Phải thu, Phải trả, Quá hạn, Lương */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Doanh thu</span>
+          <p className="text-lg font-black text-[#24304A] mt-2 truncate">
+            {formatVND(summary?.total_revenue_ytd || 0)}
+          </p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Phải thu</span>
+          <p className="text-lg font-black text-[#24304A] mt-2 truncate">
+            {formatVND(summary?.total_outstanding_ar || 0)}
+          </p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Phải trả</span>
+          <p className="text-lg font-black text-[#24304A] mt-2 truncate">0 ₫</p>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-bold text-[#7C879D]">Quá hạn</span>
+          <p className="text-lg font-black text-[#FA896B] mt-2 truncate">
+            {formatVND(summary?.total_overdue_ar || 0)}
+          </p>
+        </Card>
+
+        <Card className="p-4 col-span-2 sm:col-span-1">
+          <span className="text-xs font-bold text-[#7C879D]">Lương</span>
+          <p className="text-lg font-black text-[#24304A] mt-2 truncate">0 ₫</p>
+        </Card>
+      </div>
+
+      {/* Dual Section: Thu và chi theo tuần & Khoản đến hạn */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Thu và chi theo tuần
+            </h3>
+            <span className="text-xs text-[#7C879D]">Dữ liệu tự động</span>
+          </div>
+
+          <Card className="p-6 text-center">
+            <EmptyState
+              icon={<TrendingUp className="w-8 h-8 text-[#7C879D]" />}
+              title="Chưa có dữ liệu biến động thu chi"
+              description="Biểu đồ dòng tiền sẽ được cập nhật khi các giao dịch phát sinh."
+            />
+          </Card>
+        </div>
+
+        <div className="lg:col-span-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Khoản đến hạn
+            </h3>
+            <Badge variant="gold" size="sm">
+              0 khoản
+            </Badge>
+          </div>
+
+          <Card className="p-4">
+            <p className="text-xs text-[#7C879D]">
+              Không có khoản thanh toán nào sắp đến hạn trong tuần này.
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* Dual Section: Giao dịch gần đây & Chi phí dự án */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Giao dịch gần đây
+          </h3>
+          <Card className="p-4">
+            <p className="text-xs text-[#7C879D]">
+              Chưa có giao dịch thanh toán mới trong hệ thống.
+            </p>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Chi phí dự án
+          </h3>
+          <Card className="p-4">
+            <p className="text-xs text-[#7C879D]">
+              Chưa có phiếu đề nghị chi phí dự án nào được gửi.
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* Full-Width Section: Chấm công & Kiểm tra ngày công */}
+      <div className="rounded-3xl bg-white border border-[#EDF2F7] p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#5D87FF]" />
+              Chấm công & Quản lý ngày công toàn công ty
+            </h3>
+            <p className="text-xs text-[#7C879D]">
+              Điểm danh ca làm việc cá nhân và đối soát dữ liệu chấm công GPS
+              của toàn bộ nhân sự phục vụ tính lương.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/app/accountant/attendance">
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Clock className="w-4 h-4" />}
+              >
+                Mở bảng chấm công
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

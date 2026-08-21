@@ -14,9 +14,28 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
+export interface CreatedTaskRow extends Record<string, unknown> {
+  id: string;
+  project_id: string;
+  status: string;
+  updated_at: string;
+  assignee_user_id: string | null;
+}
+
+export interface TaskCreationContext {
+  workflowStageItemId: string;
+}
+
+export type WorkflowTaskStatusReconciler = (
+  projectId: string,
+  taskId: string,
+  actor: RequestUser,
+) => Promise<void>;
+
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
+  private workflowTaskStatusReconciler?: WorkflowTaskStatusReconciler;
 
   constructor(
     private readonly supabaseService: SupabaseService,
@@ -27,6 +46,12 @@ export class TasksService {
 
   private get client() {
     return this.supabaseService.getSystemClient();
+  }
+
+  registerWorkflowTaskStatusReconciler(
+    reconciler: WorkflowTaskStatusReconciler,
+  ): void {
+    this.workflowTaskStatusReconciler = reconciler;
   }
 
   private databaseFailure(code: string, message: string, error: any): never {
@@ -116,7 +141,7 @@ export class TasksService {
   private async requireProject(projectId: string) {
     const { data, error } = await this.client
       .from('projects')
-      .select('id')
+      .select('id,project_manager_user_id')
       .eq('id', projectId)
       .maybeSingle();
     if (error) {
@@ -132,6 +157,7 @@ export class TasksService {
         message: 'Không tìm thấy dự án.',
       });
     }
+    return data;
   }
 
   private async getAccess(projectId: string, user: RequestUser) {
@@ -141,7 +167,7 @@ export class TasksService {
         message: 'Khách hàng không có quyền truy cập công việc nội bộ.',
       });
     }
-    await this.requireProject(projectId);
+    const project = await this.requireProject(projectId);
     if (user.role === 'admin') {
       return { isAdmin: true, projectRole: 'project_manager' as const };
     }
@@ -164,7 +190,14 @@ export class TasksService {
         message: 'Bạn không phải thành viên của dự án.',
       });
     }
-    return { isAdmin: false, projectRole: data.project_role as string };
+    return {
+      isAdmin: false,
+      projectRole:
+        data.project_role === 'project_manager' ||
+        project.project_manager_user_id === user.profileId
+          ? ('project_manager' as const)
+          : (data.project_role as string),
+    };
   }
 
   private async getTaskRow(projectId: string, taskId: string) {
@@ -267,9 +300,53 @@ export class TasksService {
     }
   }
 
+  private async validateProjectServiceItem(
+    projectId: string,
+    projectServiceItemId?: string | null,
+  ) {
+    if (!projectServiceItemId) return;
+    const { data, error } = await this.client
+      .from('project_service_items')
+      .select('id,project_id')
+      .eq('id', projectServiceItemId)
+      .maybeSingle();
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_LOOKUP_FAILED',
+        'Không thể kiểm tra hạng mục triển khai.',
+        error,
+      );
+    }
+    if (!data) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_NOT_FOUND',
+        message: 'Không tìm thấy hạng mục triển khai dịch vụ.',
+      });
+    }
+    if (data.project_id !== projectId) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_INVALID',
+        message: 'Hạng mục triển khai phải thuộc cùng dự án.',
+      });
+    }
+  }
+
   private mapWriteError(error: any): never {
     const message = error?.message ?? '';
     const code = error?.code ?? '';
+    if (
+      message.includes('TASK_PROJECT_SERVICE_ITEM_INVALID') ||
+      message.includes('Cross-project linking') ||
+      code === 'P3001' ||
+      code === 'P3002'
+    ) {
+      throw new BadRequestException({
+        code: 'TASK_PROJECT_SERVICE_ITEM_INVALID',
+        message:
+          'Hạng mục triển khai không hợp lệ hoặc không thuộc cùng dự án.',
+      });
+    }
     if (message.includes('TASK_ASSIGNEE_NOT_PROJECT_MEMBER')) {
       throw new BadRequestException({
         code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER',
@@ -349,6 +426,8 @@ export class TasksService {
       query = query.eq('assignee_user_id', filters.assigneeUserId);
     if (filters.parentTaskId)
       query = query.eq('parent_task_id', filters.parentTaskId);
+    if (filters.projectServiceItemId)
+      query = query.eq('project_service_item_id', filters.projectServiceItemId);
 
     const { data, count, error } = await query
       .order('sort_order', { ascending: true })
@@ -390,9 +469,18 @@ export class TasksService {
     };
   }
 
-  async createTask(projectId: string, dto: CreateTaskDto, user: RequestUser) {
+  async createTask(
+    projectId: string,
+    dto: CreateTaskDto,
+    user: RequestUser,
+    context?: TaskCreationContext,
+  ) {
     const access = await this.getAccess(projectId, user);
-    if (!access.isAdmin && access.projectRole !== 'project_manager') {
+    if (
+      !context &&
+      !access.isAdmin &&
+      access.projectRole !== 'project_manager'
+    ) {
       throw new ForbiddenException({
         code: 'TASK_ACCESS_DENIED',
         message: 'Chỉ quản lý dự án mới có thể tạo công việc.',
@@ -404,42 +492,73 @@ export class TasksService {
     if (dto.parentTaskId) {
       await this.validateParent(projectId, dto.parentTaskId);
     }
-    const { data, error } = await this.client
-      .from('tasks')
-      .insert({
-        project_id: projectId,
-        parent_task_id: dto.parentTaskId ?? null,
-        title: dto.title,
-        description: dto.description ?? null,
-        status: dto.status,
-        priority: dto.priority,
-        assignee_user_id: dto.assigneeUserId ?? null,
-        reporter_user_id: user.profileId,
-        start_date: dto.startDate ?? null,
-        due_date: dto.dueDate ?? null,
-        sort_order: dto.sortOrder,
-        created_by: user.profileId,
-        updated_by: user.profileId,
-      })
-      .select()
-      .single();
-    if (error) this.mapWriteError(error);
-    this.emit(projectId, data.id, 'task.created', data.updated_at, {
-      status: data.status,
-    });
-    await this.runTaskSideEffects(
-      'task.created',
-      `task.created:${data.id}`,
-      data,
-      user,
-    );
-    if (data.assignee_user_id) {
+    if (dto.projectServiceItemId) {
+      await this.validateProjectServiceItem(
+        projectId,
+        dto.projectServiceItemId,
+      );
+    }
+    let data: CreatedTaskRow;
+    let workflowLinkExisting = false;
+    if (context) {
+      if (!dto.projectServiceItemId) {
+        throw new BadRequestException({
+          code: 'WORKFLOW_TASK_ITEM_REQUIRED',
+          message: 'Workflow Task requires a Project Service Item.',
+        });
+      }
+      const result = await this.client.rpc('workflow_create_primary_task', {
+        p_project_id: projectId,
+        p_workflow_stage_item_id: context.workflowStageItemId,
+        p_project_service_item_id: dto.projectServiceItemId,
+        p_title: dto.title,
+        p_actor_id: user.profileId,
+      });
+      if (result.error) this.mapWriteError(result.error);
+      data = result.data as CreatedTaskRow;
+      workflowLinkExisting = data.workflowLinkExisting === true;
+    } else {
+      const result = await this.client
+        .from('tasks')
+        .insert({
+          project_id: projectId,
+          parent_task_id: dto.parentTaskId ?? null,
+          project_service_item_id: dto.projectServiceItemId ?? null,
+          title: dto.title,
+          description: dto.description ?? null,
+          status: dto.status,
+          priority: dto.priority,
+          assignee_user_id: dto.assigneeUserId ?? null,
+          reporter_user_id: user.profileId,
+          start_date: dto.startDate ?? null,
+          due_date: dto.dueDate ?? null,
+          sort_order: dto.sortOrder,
+          created_by: user.profileId,
+          updated_by: user.profileId,
+        })
+        .select()
+        .single();
+      if (result.error) this.mapWriteError(result.error);
+      data = result.data as CreatedTaskRow;
+    }
+    if (!workflowLinkExisting) {
+      this.emit(projectId, data.id, 'task.created', data.updated_at, {
+        status: data.status,
+      });
       await this.runTaskSideEffects(
-        'task.assigned',
-        `task.assigned:${data.id}:${data.assignee_user_id}`,
+        'task.created',
+        `task.created:${data.id}`,
         data,
         user,
       );
+      if (data.assignee_user_id) {
+        await this.runTaskSideEffects(
+          'task.assigned',
+          `task.assigned:${data.id}:${data.assignee_user_id}`,
+          data,
+          user,
+        );
+      }
     }
     return data;
   }
@@ -476,6 +595,13 @@ export class TasksService {
     if (dto.parentTaskId) {
       await this.validateParent(projectId, dto.parentTaskId, taskId);
     }
+    if (dto.projectServiceItemId !== undefined) {
+      await this.validateProjectServiceItem(
+        projectId,
+        dto.projectServiceItemId,
+      );
+    }
+
     const effectiveStart =
       dto.startDate !== undefined ? dto.startDate : existing.start_date;
     const effectiveDue =
@@ -516,15 +642,28 @@ export class TasksService {
         },
       );
       if (error) this.mapWriteError(error);
-      data = (Array.isArray(statusData) ? statusData[0] : statusData) as Record<
-        string,
-        any
-      > | null;
+
+      if (dto.projectServiceItemId !== undefined) {
+        const { data: itemUpdated, error: itemErr } = await this.client
+          .from('tasks')
+          .update({ project_service_item_id: dto.projectServiceItemId })
+          .eq('id', taskId)
+          .select()
+          .single();
+        if (itemErr) this.mapWriteError(itemErr);
+        if (itemUpdated) data = itemUpdated as Record<string, any>;
+      } else {
+        data = (
+          Array.isArray(statusData) ? statusData[0] : statusData
+        ) as Record<string, any> | null;
+      }
     } else {
       // CASE A: status is NOT provided, perform normal tasks table update
       const payload: Record<string, unknown> = { updated_by: user.profileId };
       if (dto.parentTaskId !== undefined)
         payload.parent_task_id = dto.parentTaskId;
+      if (dto.projectServiceItemId !== undefined)
+        payload.project_service_item_id = dto.projectServiceItemId;
       if (dto.title !== undefined) payload.title = dto.title;
       if (dto.description !== undefined)
         payload.description = dto.description ?? null;
@@ -576,6 +715,19 @@ export class TasksService {
         user,
         existing,
       );
+    }
+    if (
+      dto.status !== undefined &&
+      data.status !== existing.status &&
+      ['done', 'cancelled'].includes(String(data.status))
+    ) {
+      try {
+        await this.workflowTaskStatusReconciler?.(projectId, taskId, user);
+      } catch (error) {
+        this.logger.error(
+          `Workflow task reconciliation failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+        );
+      }
     }
     return data;
   }

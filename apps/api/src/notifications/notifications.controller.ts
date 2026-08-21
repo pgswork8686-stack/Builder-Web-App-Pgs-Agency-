@@ -19,6 +19,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import {
   NotificationListQuerySchema,
   NotificationPreferencesUpdateSchema,
+  BroadcastNotificationSchema,
 } from './dto/notification.dto';
 import { NotificationsService } from './notifications.service';
 
@@ -41,6 +42,19 @@ export class NotificationsController {
       });
     }
     return this.notificationsService.list(parsed.data, user);
+  }
+
+  @Post('broadcast')
+  @Roles('admin')
+  async broadcast(@Body() body: unknown, @CurrentUser() user: RequestUser) {
+    const parsed = BroadcastNotificationSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_FAILED',
+        message: parsed.error.errors.map((item) => item.message).join(', '),
+      });
+    }
+    return this.notificationsService.broadcastToAll(parsed.data, user);
   }
 
   @Get('unread-count')

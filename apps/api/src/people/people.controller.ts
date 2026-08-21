@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -19,6 +20,9 @@ import { RolesGuard } from '../auth/roles.guard';
 import {
   CreateEmploymentSchema,
   UpdateEmploymentSchema,
+  UpdatePersonFullSchema,
+  AssignUserProjectsSchema,
+  UpdateOwnProfileSchema,
 } from './dto/employment.dto';
 import { PeopleService } from './people.service';
 
@@ -79,6 +83,21 @@ export class PeopleController {
       user.authUserId,
       user.role as string,
     );
+  }
+
+  // --- OWN PROFILE UPDATE ---
+  @Patch('me/profile')
+  async updateMyProfile(
+    @CurrentUser('authUserId') userId: string,
+    @Body() body: unknown,
+  ) {
+    const result = UpdateOwnProfileSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+    return this.peopleService.updateOwnProfile(userId, result.data);
   }
 
   // --- TEAM LEADER SCOPE ---
@@ -151,6 +170,61 @@ export class PeopleController {
       );
     }
     return this.peopleService.updateEmploymentProfile(
+      userId,
+      result.data,
+      adminUserId,
+    );
+  }
+
+  @Patch('admin/people/:userId/full')
+  @Roles('admin')
+  async updatePersonFull(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
+    @CurrentUser('authUserId') adminUserId: string,
+  ) {
+    const result = UpdatePersonFullSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+    return this.peopleService.updatePersonFull(
+      userId,
+      result.data,
+      adminUserId,
+    );
+  }
+
+  @Delete('admin/people/:userId')
+  @Roles('admin')
+  async deletePerson(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser('authUserId') adminUserId: string,
+  ) {
+    return this.peopleService.deletePerson(userId, adminUserId);
+  }
+
+  @Get('admin/people/:userId/projects')
+  @Roles('admin')
+  async getUserProjects(@Param('userId', ParseUUIDPipe) userId: string) {
+    return this.peopleService.getUserProjects(userId);
+  }
+
+  @Post('admin/people/:userId/projects')
+  @Roles('admin')
+  async assignUserProjects(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
+    @CurrentUser('authUserId') adminUserId: string,
+  ) {
+    const result = AssignUserProjectsSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+    return this.peopleService.assignUserProjects(
       userId,
       result.data,
       adminUserId,

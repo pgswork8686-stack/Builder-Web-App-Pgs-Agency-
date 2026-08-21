@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ArrowLeft,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
@@ -63,41 +64,41 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#070707] text-[#FFF8E6]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8FAFC] text-[#0F172A]">
       {/* Video Hero Left Panel (~52%) */}
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
-      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-[#070707]">
+      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#EDF2F7]">
         <div className="w-full max-w-md space-y-8">
           <div>
             <Link
               href="/auth/login"
-              className="inline-flex items-center gap-2 text-xs text-[#606060] hover:text-[#FFC400] mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#4F75FF] mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Quay lại đăng nhập</span>
             </Link>
 
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
               Cập nhật mật khẩu
             </h2>
-            <p className="mt-2 text-sm text-[#606060]">
+            <p className="mt-1 text-xs text-[#64748B]">
               Nhập mật khẩu mới cho tài khoản của bạn.
             </p>
           </div>
 
           {/* Messages */}
           {errorMsg && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-950/50 border border-red-500/30 text-red-300 text-sm">
-              <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
+            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 text-sm">
-              <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400 mt-0.5" />
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
               <span>{successMsg}</span>
             </div>
           )}
@@ -105,53 +106,50 @@ export default function UpdatePasswordPage() {
           {/* Form */}
           <form onSubmit={handleUpdatePassword} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#606060] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1.5">
                 Mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#606060]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 6 ký tự"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0E0E0F] border border-[#151516] focus:border-[#FFC400] text-white text-sm placeholder-[#606060] outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#606060] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1.5">
                 Xác nhận mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#606060]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                 <input
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0E0E0F] border border-[#151516] focus:border-[#FFC400] text-white text-sm placeholder-[#606060] outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all duration-200 shadow-[0_0_20px_rgba(255,196,0,0.2)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              isLoading={loading}
+              leftIcon={<ShieldCheck className="w-4 h-4" />}
+              className="w-full"
             >
-              {loading ? (
-                <span>Đang lưu...</span>
-              ) : (
-                <>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Đổi mật khẩu</span>
-                </>
-              )}
-            </button>
+              Đổi mật khẩu
+            </Button>
           </form>
         </div>
       </div>

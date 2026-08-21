@@ -39,6 +39,7 @@ const envSchema = z.object({
     if (typeof val === 'boolean') return val;
     return undefined;
   }, z.boolean().optional()),
+  CALENDARIFIC_API_KEY: z.string().optional(),
 });
 
 export function validateEnv(config: Record<string, unknown>) {

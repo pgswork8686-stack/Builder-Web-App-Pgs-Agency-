@@ -52,4 +52,8 @@ export class ConfigService {
     }
     return this.appEnv === 'production';
   }
+
+  get calendarificApiKey(): string | undefined {
+    return this.nestConfigService.get<string>('CALENDARIFIC_API_KEY');
+  }
 }

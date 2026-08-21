@@ -26,6 +26,13 @@ export const ProjectServiceStatusSchema = z.enum([
   'completed',
   'cancelled',
 ]);
+export const ProjectServiceItemStatusSchema = z.enum([
+  'planned',
+  'in_progress',
+  'blocked',
+  'done',
+  'cancelled',
+]);
 
 const DateSchema = z
   .string()
@@ -72,9 +79,12 @@ export const CreateProjectSchema = z
     projectCode: z
       .string()
       .trim()
-      .min(2)
-      .max(40)
-      .transform((value) => value.toUpperCase()),
+      .transform((value) => value.toUpperCase())
+      .refine((value) => !value || /^DA_[0-9]{2,}$/.test(value), {
+        message:
+          'Mã dự án phải có định dạng DA_XX (ví dụ: DA_01) hoặc để trống để tự sinh.',
+      })
+      .optional(),
     clientCompanyId: z.string().uuid(),
     name: z.string().trim().min(2).max(200),
     description: nullableText(5000),
@@ -175,4 +185,20 @@ export const UpdateProjectServiceSchema = z
 
 export type UpdateProjectServiceDto = z.infer<
   typeof UpdateProjectServiceSchema
+>;
+
+export const UpdateProjectServiceItemSchema = z
+  .object({
+    name: z.string().trim().min(1).max(255).optional(),
+    description: nullableText(5000),
+    status: ProjectServiceItemStatusSchema.optional(),
+    sortOrder: z.coerce.number().int().min(0).optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'PATCH_EMPTY',
+  });
+
+export type UpdateProjectServiceItemDto = z.infer<
+  typeof UpdateProjectServiceItemSchema
 >;

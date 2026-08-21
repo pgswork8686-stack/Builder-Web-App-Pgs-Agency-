@@ -36,6 +36,7 @@ const validateDateRange = (
 export const CreateTaskSchema = z
   .object({
     parentTaskId: z.string().uuid().nullable().optional(),
+    projectServiceItemId: z.string().uuid().nullable().optional(),
     title: z.string().trim().min(1).max(240),
     description: z.string().trim().max(10000).nullable().optional(),
     status: TaskStatusSchema.default('todo'),
@@ -53,6 +54,7 @@ export type CreateTaskDto = z.infer<typeof CreateTaskSchema>;
 export const UpdateTaskSchema = z
   .object({
     parentTaskId: z.string().uuid().nullable().optional(),
+    projectServiceItemId: z.string().uuid().nullable().optional(),
     title: z.string().trim().min(1).max(240).optional(),
     description: z.string().trim().max(10000).nullable().optional(),
     status: TaskStatusSchema.optional(),
@@ -75,6 +77,7 @@ export const TaskListQuerySchema = z.object({
   priority: TaskPrioritySchema.optional(),
   assigneeUserId: z.string().uuid().optional(),
   parentTaskId: z.string().uuid().optional(),
+  projectServiceItemId: z.string().uuid().optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });

@@ -19,6 +19,12 @@ import {
   type AutomationTrigger,
 } from "@/lib/api/automation";
 import { NotificationBell } from "./notification-bell";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { StatCard } from "@/components/dashboard/stat-card";
 
 type RecipientMode =
   | "default"
@@ -136,7 +142,7 @@ function statusClasses(status: AutomationExecutionStatus) {
     running: "bg-amber-400 text-black",
     success: "bg-emerald-400 text-black",
     failed: "bg-red-500 text-white",
-    skipped: "bg-[#151516] text-[#606060]",
+    skipped: "bg-[#F1F5F9] text-[#64748B]",
   };
   return classes[status];
 }
@@ -281,63 +287,62 @@ export function AutomationWorkspace() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6]">
-      <header className="sticky top-0 z-20 border-b border-[#151516] bg-[#0E0E0F]/90 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FFC400]">
-              Phase 7 · Admin
-            </div>
-            <h1 className="mt-1 text-2xl font-black text-white">
-              Automation console
-            </h1>
-            <p className="mt-1 text-sm text-[#606060]">
-              Rule nội bộ an toàn: trigger registry cố định, action hiện tại chỉ
-              tạo notification, không webhook/shell/JS/SQL/HTTP.
-            </p>
-          </div>
-          <NotificationBell />
-        </div>
-      </header>
+    <div className="space-y-6">
+      <SectionHeader
+        title="Trung tâm Tự động hóa"
+        description="Rule nội bộ an toàn: trigger registry cố định, action tạo notification trực tiếp trong hệ thống."
+        action={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => void load()}
+            leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
+          >
+            Tải lại
+          </Button>
+        }
+      />
 
-      <main className="mx-auto grid max-w-7xl gap-6 p-6 lg:grid-cols-[26rem_1fr] lg:p-8">
+      <div className="grid gap-6 lg:grid-cols-[26rem_1fr]">
         <aside className="space-y-6">
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
+          <Card className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFC400] text-black">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-white">Tạo rule mới</h2>
-                <p className="text-xs text-[#606060]">
-                  Form chỉ tạo `create_notification`.
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Tạo quy tắc mới
+                </h2>
+                <p className="text-[11px] text-[#64748B]">
+                  Hành động chuẩn hóa: `create_notification`.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 space-y-4">
+            <div className="space-y-3 pt-2">
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Tên rule
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Tên quy tắc *
                 </span>
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Ví dụ: Nhắc assignee khi task được giao"
-                  className="mt-2 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                  placeholder="Ví dụ: Nhắc nhở khi giao task mới"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Trigger
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Trigger sự kiện *
                 </span>
                 <select
                   value={triggerType}
                   onChange={(event) =>
                     setTriggerType(event.target.value as AutomationTrigger)
                   }
-                  className="mt-2 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none focus:border-[#FFC400]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 >
                   {automationTriggers.map((trigger) => (
                     <option key={trigger} value={trigger}>
@@ -348,29 +353,29 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Điều kiện JSON
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Điều kiện so khớp JSON
                 </span>
                 <textarea
                   value={conditionsText}
                   onChange={(event) => setConditionsText(event.target.value)}
-                  className="mt-2 min-h-24 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#FFC400]"
+                  className="mt-1 min-h-20 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
-                <span className="mt-1 block text-[11px] text-[#606060]">
-                  Chỉ so khớp key/value trong payload; không chạy code.
+                <span className="mt-0.5 block text-[10px] text-[#94A3B8]">
+                  So khớp payload key/value an toàn.
                 </span>
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Người nhận
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Đối tượng nhận thông báo *
                 </span>
                 <select
                   value={recipientMode}
                   onChange={(event) =>
                     setRecipientMode(event.target.value as RecipientMode)
                   }
-                  className="mt-2 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none focus:border-[#FFC400]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 >
                   {recipientModes.map((mode) => (
                     <option key={mode.value} value={mode.value}>
@@ -381,210 +386,187 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Tiêu đề notification
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Tiêu đề thông báo
                 </span>
                 <input
                   value={actionTitle}
                   onChange={(event) => setActionTitle(event.target.value)}
-                  placeholder="Để trống sẽ dùng tên rule/event"
-                  className="mt-2 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                  placeholder="Để trống sẽ dùng tên mặc định"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Nội dung notification
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Nội dung thông báo
                 </span>
                 <textarea
                   value={actionMessage}
                   onChange={(event) => setActionMessage(event.target.value)}
                   placeholder="Để trống sẽ dùng nội dung event mặc định"
-                  className="mt-2 min-h-20 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                  className="mt-1 min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
               <label className="block">
-                <span className="text-xs font-bold text-[#FFC400]">
-                  Internal action URL
+                <span className="text-xs font-semibold text-[#64748B]">
+                  Internal Action URL
                 </span>
                 <input
                   value={actionUrl}
                   onChange={(event) => setActionUrl(event.target.value)}
                   placeholder="/app/tasks hoặc /app/chat"
-                  className="mt-2 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full mt-2"
                 disabled={working === "create" || name.trim().length < 2}
                 onClick={createRule}
-                className="w-full rounded-xl bg-[#FFC400] px-4 py-3 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {working === "create" ? "Đang tạo..." : "Tạo rule an toàn"}
-              </button>
+                {working === "create"
+                  ? "Đang tạo quy tắc..."
+                  : "Tạo quy tắc mới"}
+              </Button>
             </div>
-          </section>
+          </Card>
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-            <div className="flex items-center gap-3">
-              <Play className="h-5 w-5 text-[#FFC400]" />
-              <h2 className="font-bold text-white">Chạy automation</h2>
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center gap-2.5">
+              <Play className="h-4 w-4 text-[#4F75FF]" />
+              <h2 className="font-bold text-[#0F172A] text-sm">
+                Chạy thử nghiệm
+              </h2>
             </div>
-            <div className="mt-4 space-y-3">
-              <button
-                type="button"
+            <div className="space-y-2 pt-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full"
                 disabled={working === "scheduled"}
                 onClick={runScheduled}
-                className="w-full rounded-xl border border-[#FFC400]/20 px-4 py-3 text-sm font-bold text-[#FFC400] disabled:opacity-50"
               >
                 {working === "scheduled"
                   ? "Đang quét lịch..."
-                  : "Quét lịch: invoice overdue"}
-              </button>
+                  : "Quét lịch: Invoice quá hạn"}
+              </Button>
 
               <input
                 value={manualEventKey}
                 onChange={(event) => setManualEventKey(event.target.value)}
-                placeholder="Manual event key, tối thiểu 8 ký tự"
-                className="w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 text-sm text-white outline-none placeholder:text-[#606060] focus:border-[#FFC400]"
+                placeholder="Nhập Event Key (>= 8 ký tự)..."
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
               <textarea
                 value={manualPayloadText}
                 onChange={(event) => setManualPayloadText(event.target.value)}
-                className="min-h-24 w-full rounded-xl border border-[#151516] bg-[#070707] px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#FFC400]"
+                className="min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
                 disabled={
                   working === "manual" || manualEventKey.trim().length < 8
                 }
                 onClick={runManual}
-                className="w-full rounded-xl bg-[#151516] px-4 py-3 text-sm font-bold text-[#FFC400] disabled:opacity-50"
               >
                 {working === "manual" ? "Đang chạy..." : "Chạy manual event"}
-              </button>
+              </Button>
             </div>
-          </section>
+          </Card>
         </aside>
 
-        <section className="space-y-6">
+        <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-              <div className="flex items-center justify-between text-[#606060]">
-                <span className="text-xs font-bold uppercase">Rules</span>
-                <Bot className="h-4 w-4 text-[#FFC400]" />
-              </div>
-              <div className="mt-3 text-3xl font-black text-white">
-                {rules.length}
-              </div>
-              <div className="mt-1 text-xs text-emerald-400">
-                {enabledCount} đang bật
-              </div>
-            </div>
-            <div className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-              <div className="flex items-center justify-between text-[#606060]">
-                <span className="text-xs font-bold uppercase">Executions</span>
-                <CheckCircle2 className="h-4 w-4 text-[#FFC400]" />
-              </div>
-              <div className="mt-3 text-3xl font-black text-white">
-                {executions.length}
-              </div>
-              <div className="mt-1 text-xs text-[#606060]">
-                30 lần chạy gần nhất
-              </div>
-            </div>
-            <div className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-              <div className="flex items-center justify-between text-[#606060]">
-                <span className="text-xs font-bold uppercase">Security</span>
-                <ShieldCheck className="h-4 w-4 text-[#FFC400]" />
-              </div>
-              <div className="mt-3 text-2xl font-black text-white">
-                Controlled
-              </div>
-              <div className="mt-1 text-xs text-[#606060]">
-                Không có arbitrary execution
-              </div>
-            </div>
+            <StatCard
+              variant="blue"
+              title="Quy tắc tự động"
+              value={rules.length.toString()}
+              subtitle={`${enabledCount} đang kích hoạt`}
+              icon={<Bot className="h-4 w-4" />}
+            />
+            <StatCard
+              variant="green"
+              title="Lượt thực thi"
+              value={executions.length.toString()}
+              subtitle="30 lượt chạy gần nhất"
+              icon={<CheckCircle2 className="h-4 w-4" />}
+            />
+            <StatCard
+              variant="default"
+              title="Bảo mật & Phân quyền"
+              value="Được kiểm soát"
+              subtitle="Sandbox an toàn tuyệt đối"
+              icon={<ShieldCheck className="h-4 w-4" />}
+            />
           </div>
 
           {error ? (
-            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
-              <div className="flex items-center gap-2">
-                <XCircle className="h-4 w-4" />
-                {error}
-              </div>
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700 flex items-center gap-2">
+              <XCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
             </div>
           ) : null}
 
           {notice ? (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4" />
-                {notice}
-              </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-700 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span>{notice}</span>
             </div>
           ) : null}
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F]">
-            <div className="flex items-center justify-between border-b border-[#151516] p-5">
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
               <div>
-                <h2 className="font-bold text-white">Automation rules</h2>
-                <p className="mt-1 text-xs text-[#606060]">
-                  Idempotency và failure isolation nằm ở database/service.
+                <h2 className="font-extrabold text-[#0F172A] text-sm">
+                  Danh sách quy tắc
+                </h2>
+                <p className="text-[11px] text-[#64748B]">
+                  Đảm bảo Idempotency và cách ly lỗi an toàn.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => void load()}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400]"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-                Tải lại
-              </button>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center gap-2 p-10 text-sm text-[#606060]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
-                Đang tải automation...
+              <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#64748B]">
+                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+                Đang tải danh sách quy tắc...
               </div>
             ) : rules.length === 0 ? (
-              <div className="p-10 text-center">
-                <div className="text-lg font-bold text-white">
-                  Chưa có rule nào
-                </div>
-                <p className="mt-2 text-sm text-[#606060]">
-                  Tạo rule đầu tiên ở form bên trái để bắt đầu automation nội
-                  bộ.
-                </p>
-              </div>
+              <EmptyState
+                icon={<Bot className="w-8 h-8 text-[#4F75FF]" />}
+                title="Chưa có quy tắc nào"
+                description="Tạo quy tắc tự động hóa đầu tiên bằng biểu mẫu bên trái."
+              />
             ) : (
-              <div className="divide-y divide-[#151516]">
+              <div className="divide-y divide-[#EDF2F7]">
                 {rules.map((rule) => (
-                  <article key={rule.id} className="p-5">
+                  <article key={rule.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="font-bold text-white">{rule.name}</h3>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <span className="rounded-full bg-[#151516] px-3 py-1 text-[11px] font-bold text-[#FFC400]">
+                        <h3 className="font-bold text-sm text-[#0F172A]">
+                          {rule.name}
+                        </h3>
+                        <div className="mt-1.5 flex flex-wrap gap-2">
+                          <Badge variant="blue" size="sm">
                             {rule.triggerType}
-                          </span>
-                          <span className="rounded-full bg-[#151516] px-3 py-1 text-[11px] text-[#606060]">
+                          </Badge>
+                          <Badge variant="default" size="sm">
                             {rule.actionType}
-                          </span>
-                          <span
-                            className={`rounded-full px-3 py-1 text-[11px] font-black ${
-                              rule.isEnabled
-                                ? "bg-emerald-400 text-black"
-                                : "bg-[#151516] text-[#606060]"
-                            }`}
+                          </Badge>
+                          <Badge
+                            variant={rule.isEnabled ? "success" : "default"}
+                            size="sm"
                           >
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
-                          </span>
+                          </Badge>
                         </div>
-                        <pre className="mt-3 max-w-full overflow-x-auto rounded-2xl bg-[#070707] p-3 text-[11px] text-[#FFF8E6]/70">
+                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-[11px] font-mono text-[#64748B]">
                           {JSON.stringify(
                             {
                               conditions: rule.conditions,
@@ -595,62 +577,74 @@ export function AutomationWorkspace() {
                           )}
                         </pre>
                       </div>
-                      <button
-                        type="button"
+                      <Button
+                        variant={rule.isEnabled ? "secondary" : "primary"}
+                        size="sm"
                         disabled={working === rule.id}
                         onClick={() => void toggleRule(rule)}
-                        className="rounded-xl border border-[#FFC400]/20 px-4 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-50"
                       >
                         {working === rule.id
                           ? "Đang lưu..."
                           : rule.isEnabled
                             ? "Tắt rule"
                             : "Bật rule"}
-                      </button>
+                      </Button>
                     </div>
                   </article>
                 ))}
               </div>
             )}
-          </section>
+          </Card>
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F]">
-            <div className="border-b border-[#151516] p-5">
-              <h2 className="font-bold text-white">Lịch sử execution</h2>
-              <p className="mt-1 text-xs text-[#606060]">
-                Các lỗi action được ghi nhận riêng để không làm vỡ luồng chính.
+          <Card className="p-6 space-y-4">
+            <div className="border-b border-[#EDF2F7] pb-3">
+              <h2 className="font-extrabold text-[#0F172A] text-sm">
+                Lịch sử thực thi
+              </h2>
+              <p className="text-[11px] text-[#64748B]">
+                Ghi nhận chi tiết kết quả chạy tự động.
               </p>
             </div>
-            <div className="divide-y divide-[#151516]">
+            <div className="divide-y divide-[#EDF2F7]">
               {executions.length === 0 ? (
-                <div className="p-8 text-center text-sm text-[#606060]">
-                  Chưa có execution nào.
+                <div className="p-8 text-center text-xs text-[#94A3B8]">
+                  Chưa có lượt thực thi nào được ghi nhận.
                 </div>
               ) : (
                 executions.map((execution) => (
-                  <article key={execution.id} className="p-5">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <article
+                    key={execution.id}
+                    className="py-3 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <div className="font-bold text-white">
+                        <div className="font-bold text-xs text-[#0F172A]">
                           {execution.rule?.name ?? execution.triggerType}
                         </div>
-                        <div className="mt-1 text-xs text-[#606060]">
+                        <div className="text-[11px] text-[#94A3B8] font-mono">
                           {execution.eventKey}
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`rounded-full px-3 py-1 text-[11px] font-black ${statusClasses(execution.status)}`}
+                        <Badge
+                          variant={
+                            execution.status === "success"
+                              ? "success"
+                              : execution.status === "failed"
+                                ? "danger"
+                                : "default"
+                          }
+                          size="sm"
                         >
                           {execution.status}
-                        </span>
-                        <span className="text-xs text-[#606060]">
+                        </Badge>
+                        <span className="text-[11px] text-[#94A3B8] font-mono">
                           {formatDateTime(execution.createdAt)}
                         </span>
                       </div>
                     </div>
                     {execution.errorMessage ? (
-                      <div className="mt-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200">
+                      <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700">
                         {execution.errorMessage}
                       </div>
                     ) : null}
@@ -658,9 +652,9 @@ export function AutomationWorkspace() {
                 ))
               )}
             </div>
-          </section>
-        </section>
-      </main>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

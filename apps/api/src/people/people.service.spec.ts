@@ -309,4 +309,126 @@ describe('PeopleService', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('deletePerson (Lock & Terminate Account)', () => {
+    it('should throw BadRequestException when admin tries to terminate themselves', async () => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { id: 'admin-1', role: 'admin', account_status: 'active' },
+              error: null,
+            }),
+          };
+        }
+        return {};
+      });
+
+      await expect(service.deletePerson('admin-1', 'admin-1')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should successfully permanently delete user from database and auth', async () => {
+      const createChain = () => {
+        const chain: any = {
+          then: (resolve: any) => resolve({ data: null, error: null }),
+        };
+        for (const method of ['select', 'eq', 'update', 'delete']) {
+          chain[method] = jest.fn(() => chain);
+        }
+        chain.maybeSingle = jest.fn().mockResolvedValue({
+          data: {
+            id: 'user-1',
+            role: 'employee',
+            account_status: 'active',
+          },
+          error: null,
+        });
+        return chain;
+      };
+
+      const tableChains: Record<string, any> = {};
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (!tableChains[table]) {
+          tableChains[table] = createChain();
+        }
+        return tableChains[table];
+      });
+
+      const res = await service.deletePerson('user-1', 'admin-1');
+
+      expect(res).toEqual({
+        success: true,
+        message:
+          'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
+      });
+      expect(tableChains['profiles'].delete).toHaveBeenCalled();
+      expect(tableChains['employee_profiles'].delete).toHaveBeenCalled();
+    });
+  });
+
+  describe('updatePersonFull', () => {
+    it('should allow admin to change role and activate suspended accounts', async () => {
+      jest.spyOn(service, 'getPersonByUserId').mockResolvedValue({
+        id: 'user-1',
+        email: 'user1@example.com',
+        phone: null,
+        fullName: 'User One',
+        avatarUrl: null,
+        role: 'employee',
+        accountStatus: 'active',
+        employeeProfile: null,
+      });
+
+      const updateProfileMock = jest.fn().mockReturnThis();
+
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: {
+                id: 'user-1',
+                role: 'employee',
+                account_status: 'rejected',
+              },
+              error: null,
+            }),
+            update: updateProfileMock,
+          };
+        }
+        if (table === 'employee_profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { employee_code: 'EMP-001' },
+              error: null,
+            }),
+            upsert: jest.fn().mockResolvedValue({ error: null }),
+          };
+        }
+        return {};
+      });
+
+      const res = await service.updatePersonFull(
+        'user-1',
+        { role: 'team_leader', accountStatus: 'active' },
+        'admin-1',
+      );
+
+      expect(res).toBeDefined();
+      expect(updateProfileMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          account_status: 'active',
+          role: 'team_leader',
+          approved_by: 'admin-1',
+        }),
+      );
+    });
+  });
 });

@@ -12,6 +12,8 @@
     "lint:fix": "pnpm -r --if-present lint:fix",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r --if-present test",
+    "test:workflow-migrations": "node scripts/verify-workflow-migrations.mjs",
+    "test:release-migrations": "node scripts/verify-release-migrations.mjs",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },
@@ -21,7 +23,9 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "pg": "^8.23.0",
+    "playwright": "^1.62.1",
     "prettier": "^3.0.0",
+    "socket.io-client": "^4.8.3",
     "typescript": "^5.9.3"
   }
 }

@@ -45,3 +45,6 @@ next-env.d.ts
 # agent files (Next.js auto-generated)
 apps/web/AGENTS.md
 apps/web/CLAUDE.md
+
+# supabase temp
+supabase/.temp/

@@ -15,8 +15,10 @@ import {
   ProjectListQuery,
   UpdateProjectDto,
   UpdateProjectMembershipDto,
+  UpdateProjectServiceItemDto,
   UpdateProjectServiceDto,
 } from './dto/project.dto';
+import type { AppRole } from '../auth/auth.types';
 
 type ProjectRow = Record<string, any>;
 
@@ -171,9 +173,15 @@ export class ProjectsService {
         message: 'Quản lý dự án phải là người dùng nội bộ đang hoạt động.',
       });
     }
+    if (message.includes('PRIMARY_PROJECT_MANAGER_MEMBERSHIP_REQUIRED')) {
+      throw new ConflictException({
+        code: 'PROJECT_MANAGER_CONSISTENCY_REQUIRED',
+        message: 'Không thể thay đổi thành viên quản lý dự án chính.',
+      });
+    }
     this.databaseFailure(
-      'PROJECT_MANAGER_WRITE_FAILED',
-      'Không thể lưu quản lý dự án lúc này.',
+      'PROJECT_CREATE_FAILED',
+      'Không thể tạo dự án lúc này. ' + (error?.message ?? ''),
       error,
     );
   }
@@ -284,40 +292,46 @@ export class ProjectsService {
       await this.validateProjectManager(dto.projectManagerUserId);
     }
 
-    const { data: existing, error: existingError } = await this.client
-      .from('projects')
-      .select('id')
-      .eq('project_code', dto.projectCode)
-      .maybeSingle();
-    if (existingError) {
-      this.databaseFailure(
-        'PROJECT_CODE_LOOKUP_FAILED',
-        'Không thể kiểm tra mã dự án.',
-        existingError,
-      );
+    if (dto.projectCode) {
+      const { data: existing, error: existingError } = await this.client
+        .from('projects')
+        .select('id')
+        .eq('project_code', dto.projectCode)
+        .maybeSingle();
+      if (existingError) {
+        this.databaseFailure(
+          'PROJECT_CODE_LOOKUP_FAILED',
+          'Không thể kiểm tra mã dự án.',
+          existingError,
+        );
+      }
+      if (existing) {
+        throw new ConflictException({
+          code: 'PROJECT_CODE_ALREADY_EXISTS',
+          message: 'Mã dự án đã tồn tại.',
+        });
+      }
     }
-    if (existing) {
-      throw new ConflictException({
-        code: 'PROJECT_CODE_ALREADY_EXISTS',
-        message: 'Mã dự án đã tồn tại.',
-      });
+
+    const payload: Record<string, unknown> = {
+      client_company_id: dto.clientCompanyId,
+      name: dto.name,
+      description: dto.description ?? null,
+      status: dto.status,
+      priority: dto.priority,
+      project_manager_user_id: dto.projectManagerUserId ?? null,
+      start_date: dto.startDate ?? null,
+      due_date: dto.dueDate ?? null,
+      created_by: actorUserId,
+      updated_by: actorUserId,
+    };
+    if (dto.projectCode) {
+      payload.project_code = dto.projectCode;
     }
 
     const { data, error } = await this.client
       .from('projects')
-      .insert({
-        project_code: dto.projectCode,
-        client_company_id: dto.clientCompanyId,
-        name: dto.name,
-        description: dto.description ?? null,
-        status: dto.status,
-        priority: dto.priority,
-        project_manager_user_id: dto.projectManagerUserId ?? null,
-        start_date: dto.startDate ?? null,
-        due_date: dto.dueDate ?? null,
-        created_by: actorUserId,
-        updated_by: actorUserId,
-      })
+      .insert(payload)
       .select()
       .single();
 
@@ -617,7 +631,9 @@ export class ProjectsService {
     await this.getProjectRow(projectId);
     const { data, error } = await this.client
       .from('project_services')
-      .select('*, service:services(id,code,name,description,active)')
+      .select(
+        '*, service:services(id,code,service_code,name,description,active), items:project_service_items(*)',
+      )
       .eq('project_id', projectId)
       .order('created_at', { ascending: true });
     if (error) {
@@ -627,6 +643,18 @@ export class ProjectsService {
         error,
       );
     }
+    // Sort items by sort_order
+    (data ?? []).forEach((ps: any) => {
+      if (ps.items && Array.isArray(ps.items)) {
+        ps.items.sort(
+          (a: any, b: any) =>
+            (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+            (a.project_service_item_code ?? '').localeCompare(
+              b.project_service_item_code ?? '',
+            ),
+        );
+      }
+    });
     return data ?? [];
   }
 
@@ -691,6 +719,7 @@ export class ProjectsService {
         error,
       );
     }
+
     return data;
   }
 
@@ -786,7 +815,229 @@ export class ProjectsService {
     return { success: true };
   }
 
-  async getInternalProjects(userId: string, page = 1, pageSize = 20) {
+  // ============================================================
+  // PROJECT SERVICE ITEMS (INSTANCE DELIVERABLES)
+  // ============================================================
+
+  private async requireProjectReadAccess(
+    userId: string,
+    role: AppRole,
+    projectId: string,
+  ): Promise<ProjectRow> {
+    if (role === 'admin') {
+      return this.getProjectRow(projectId);
+    }
+    if (role === 'client') {
+      const project = await this.getProjectRow(projectId);
+      const { data: membership, error: membershipError } = await this.client
+        .from('client_memberships')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('client_company_id', project.client_company_id)
+        .maybeSingle();
+
+      if (membershipError) {
+        this.databaseFailure(
+          'PROJECT_ACCESS_LOOKUP_FAILED',
+          'Không thể kiểm tra quyền dự án khách hàng.',
+          membershipError,
+        );
+      }
+      if (!membership) {
+        throw new NotFoundException({
+          code: 'PROJECT_NOT_FOUND',
+          message: 'Không tìm thấy dự án.',
+        });
+      }
+      return project;
+    }
+
+    // Internal roles: team_leader, employee, accountant
+    const { data: membership, error: membershipError } = await this.client
+      .from('project_memberships')
+      .select('id,project_role')
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (membershipError) {
+      this.databaseFailure(
+        'PROJECT_ACCESS_LOOKUP_FAILED',
+        'Không thể kiểm tra quyền dự án.',
+        membershipError,
+      );
+    }
+    if (!membership) {
+      throw new ForbiddenException({
+        code: 'PROJECT_ACCESS_DENIED',
+        message: 'Bạn không có quyền truy cập dự án này.',
+      });
+    }
+
+    return this.getProjectRow(projectId);
+  }
+
+  private async requireProjectWriteAccess(
+    userId: string,
+    role: AppRole,
+    projectId: string,
+  ): Promise<ProjectRow> {
+    if (role === 'admin') {
+      return this.getProjectRow(projectId);
+    }
+    if (role === 'client' || role === 'accountant') {
+      throw new ForbiddenException({
+        code: 'PROJECT_ACCESS_DENIED',
+        message: 'Bạn không có quyền cập nhật hạng mục dịch vụ dự án.',
+      });
+    }
+
+    // Internal roles: team_leader, employee
+    const { data: membership, error: membershipError } = await this.client
+      .from('project_memberships')
+      .select('id,project_role')
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (membershipError) {
+      this.databaseFailure(
+        'PROJECT_ACCESS_LOOKUP_FAILED',
+        'Không thể kiểm tra quyền dự án.',
+        membershipError,
+      );
+    }
+    if (!membership) {
+      throw new ForbiddenException({
+        code: 'PROJECT_ACCESS_DENIED',
+        message: 'Bạn không có quyền truy cập dự án này.',
+      });
+    }
+
+    return this.getProjectRow(projectId);
+  }
+
+  async getProjectServiceItems(
+    userId: string,
+    role: AppRole,
+    projectId: string,
+    projectServiceId?: string,
+  ) {
+    await this.requireProjectReadAccess(userId, role, projectId);
+
+    if (projectServiceId) {
+      const { data: projectService, error: psError } = await this.client
+        .from('project_services')
+        .select('id, project_id')
+        .eq('id', projectServiceId)
+        .eq('project_id', projectId)
+        .maybeSingle();
+
+      if (psError) {
+        this.databaseFailure(
+          'PROJECT_SERVICE_LOOKUP_FAILED',
+          'Không thể kiểm tra dịch vụ dự án.',
+          psError,
+        );
+      }
+      if (!projectService) {
+        throw new NotFoundException({
+          code: 'PROJECT_SERVICE_NOT_FOUND',
+          message: 'Không tìm thấy dịch vụ dự án.',
+        });
+      }
+    }
+
+    let query = this.client
+      .from('project_service_items')
+      .select('*')
+      .eq('project_id', projectId);
+
+    if (projectServiceId) {
+      query = query.eq('project_service_id', projectServiceId);
+    }
+
+    const { data, error } = await query
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEMS_LOOKUP_FAILED',
+        'Không thể truy vấn hạng mục dịch vụ dự án.',
+        error,
+      );
+    }
+
+    return data ?? [];
+  }
+
+  async updateProjectServiceItem(
+    userId: string,
+    role: AppRole,
+    projectId: string,
+    itemId: string,
+    dto: UpdateProjectServiceItemDto,
+  ) {
+    await this.requireProjectWriteAccess(userId, role, projectId);
+
+    const { data: existing, error: lookupError } = await this.client
+      .from('project_service_items')
+      .select('*')
+      .eq('id', itemId)
+      .eq('project_id', projectId)
+      .maybeSingle();
+
+    if (lookupError) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_LOOKUP_FAILED',
+        'Không thể kiểm tra hạng mục dịch vụ dự án.',
+        lookupError,
+      );
+    }
+    if (!existing) {
+      throw new NotFoundException({
+        code: 'PROJECT_SERVICE_ITEM_NOT_FOUND',
+        message: 'Không tìm thấy hạng mục dịch vụ dự án.',
+      });
+    }
+
+    const payload: Record<string, unknown> = {
+      updated_by: userId,
+    };
+    if (dto.name !== undefined) payload.name = dto.name;
+    if (dto.description !== undefined) payload.description = dto.description;
+    if (dto.status !== undefined) payload.status = dto.status;
+    if (dto.sortOrder !== undefined) payload.sort_order = dto.sortOrder;
+
+    const { data, error } = await this.client
+      .from('project_service_items')
+      .update(payload)
+      .eq('id', itemId)
+      .eq('project_id', projectId)
+      .select()
+      .single();
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_SERVICE_ITEM_UPDATE_FAILED',
+        'Không thể cập nhật hạng mục dịch vụ dự án.',
+        error,
+      );
+    }
+
+    return data;
+  }
+
+  async getInternalProjects(
+    userId: string,
+    page = 1,
+    pageSize = 20,
+    role?: AppRole,
+  ) {
+    if (role === 'admin') {
+      return this.getAdminProjects({ page, pageSize });
+    }
     const offset = (page - 1) * pageSize;
     const { data, count, error } = await this.client
       .from('project_memberships')
@@ -818,25 +1069,33 @@ export class ProjectsService {
     };
   }
 
-  async getInternalProjectById(userId: string, projectId: string) {
-    const { data: membership, error: membershipError } = await this.client
-      .from('project_memberships')
-      .select('id,project_role')
-      .eq('project_id', projectId)
-      .eq('user_id', userId)
-      .maybeSingle();
-    if (membershipError) {
-      this.databaseFailure(
-        'PROJECT_ACCESS_LOOKUP_FAILED',
-        'Không thể kiểm tra quyền dự án.',
-        membershipError,
-      );
-    }
-    if (!membership) {
-      throw new ForbiddenException({
-        code: 'PROJECT_ACCESS_DENIED',
-        message: 'Bạn không có quyền truy cập dự án này.',
-      });
+  async getInternalProjectById(
+    userId: string,
+    projectId: string,
+    role?: AppRole,
+  ) {
+    let currentRole = 'project_manager';
+    if (role !== 'admin') {
+      const { data: membership, error: membershipError } = await this.client
+        .from('project_memberships')
+        .select('id,project_role')
+        .eq('project_id', projectId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (membershipError) {
+        this.databaseFailure(
+          'PROJECT_ACCESS_LOOKUP_FAILED',
+          'Không thể kiểm tra quyền dự án.',
+          membershipError,
+        );
+      }
+      if (!membership) {
+        throw new ForbiddenException({
+          code: 'PROJECT_ACCESS_DENIED',
+          message: 'Bạn không có quyền truy cập dự án này.',
+        });
+      }
+      currentRole = membership.project_role;
     }
     const { data, error } = await this.client
       .from('projects')
@@ -860,7 +1119,7 @@ export class ProjectsService {
     }
     return {
       ...this.mapProject(data),
-      currentProjectRole: membership.project_role,
+      currentProjectRole: currentRole,
     };
   }
 

@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { XCircle, LogOut, Mail, AlertTriangle } from "lucide-react";
 import { getMe } from "@/lib/api/auth";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function AccountRejectedPage() {
   const router = useRouter();
@@ -33,31 +36,28 @@ export default function AccountRejectedPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#070707] text-[#FFF8E6] p-6 relative overflow-hidden">
-      {/* Background red glow effects */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-md w-full bg-[#0E0E0F] border border-[#151516] p-8 rounded-2xl shadow-2xl text-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-[#0F172A] p-6 relative">
+      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#EDF2F7]">
         {/* Status Icon Header */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
           <XCircle className="w-8 h-8" />
         </div>
 
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold uppercase tracking-wider mb-3">
+        <div className="space-y-2">
+          <Badge variant="danger" size="md">
             Trạng thái: Bị từ chối
-          </div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
+          </Badge>
+          <h2 className="text-xl font-extrabold text-[#0F172A] tracking-tight">
             Tài khoản bị từ chối
           </h2>
         </div>
 
-        <div className="text-left space-y-3 bg-[#151516]/80 p-4 rounded-xl border border-[#151516]">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-red-400">
-            <AlertTriangle className="w-4 h-4" />
+        <div className="text-left space-y-2 bg-[#FEF2F2] p-4 rounded-xl border border-[#FEE2E2]">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-700">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>Lý do từ chối:</span>
           </div>
-          <p className="text-sm text-[#FFF8E6]/80 leading-relaxed">
+          <p className="text-xs text-red-800 leading-relaxed">
             {rejectionReason ||
               "Yêu cầu đăng ký tài khoản không phù hợp với quy định của PGS Agency hoặc thông tin chưa đủ điều kiện phê duyệt."}
           </p>
@@ -66,22 +66,25 @@ export default function AccountRejectedPage() {
         <div className="flex flex-col gap-3 pt-2">
           <a
             href="mailto:admin@pgsagency.com"
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-white font-medium text-sm transition-colors border border-[#151516]"
+            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white border border-[#CBD5E1] text-[#0F172A] font-bold text-xs hover:bg-[#F8FAFC] transition-colors"
           >
-            <Mail className="w-4 h-4 text-[#FFC400]" />
+            <Mail className="w-4 h-4 text-[#4F75FF]" />
             <span>Liên hệ Quản trị viên</span>
           </a>
 
-          <button
+          <Button
+            variant="danger"
+            size="lg"
             onClick={handleLogout}
             disabled={loggingOut}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-950/40 hover:bg-red-950/70 text-red-300 font-medium text-sm transition-colors border border-red-500/20 cursor-pointer disabled:opacity-50"
+            isLoading={loggingOut}
+            leftIcon={<LogOut className="w-4 h-4" />}
+            className="w-full"
           >
-            <LogOut className="w-4 h-4" />
-            <span>{loggingOut ? "Đang đăng xuất..." : "Đăng xuất"}</span>
-          </button>
+            Đăng xuất
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

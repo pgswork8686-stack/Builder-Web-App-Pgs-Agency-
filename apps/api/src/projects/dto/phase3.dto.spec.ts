@@ -20,13 +20,13 @@ describe('Phase 3 DTO validation', () => {
   describe('projects', () => {
     it('normalizes an admin-provided project code and supplies defaults', () => {
       const parsed = CreateProjectSchema.parse({
-        projectCode: '  pgs-2026-001 ',
+        projectCode: '  da_01 ',
         clientCompanyId: UUID,
         name: 'Website launch',
       });
 
       expect(parsed).toMatchObject({
-        projectCode: 'PGS-2026-001',
+        projectCode: 'DA_01',
         status: 'draft',
         priority: 'medium',
       });
@@ -44,7 +44,7 @@ describe('Phase 3 DTO validation', () => {
     ])('rejects %s', (_label, override) => {
       expect(
         CreateProjectSchema.safeParse({
-          projectCode: 'PGS-1',
+          projectCode: 'DA_01',
           clientCompanyId: UUID,
           name: 'Project',
           ...override,

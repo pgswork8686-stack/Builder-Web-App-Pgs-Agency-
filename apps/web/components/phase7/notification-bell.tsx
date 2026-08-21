@@ -173,31 +173,31 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#FFC400]/20 bg-[#151516] text-[#FFF8E6] transition hover:border-[#FFC400]/50 hover:text-[#FFC400]"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#64748B] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#F8FAFC] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#FFC400] px-1.5 py-0.5 text-[10px] font-black text-black">
+          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#4F75FF] px-1.5 py-0.5 text-[10px] font-black text-white shadow-xs">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#FFC400]/20 bg-[#0E0E0F] shadow-2xl">
-          <div className="flex items-center justify-between border-b border-[#151516] px-4 py-3">
+        <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#EDF2F7] bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-[#EDF2F7] px-4 py-3 bg-[#F8FAFC]">
             <div>
-              <div className="text-sm font-bold text-white">Thông báo</div>
-              <div className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-[#606060]">
+              <div className="text-sm font-bold text-[#0F172A]">Thông báo</div>
+              <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#64748B]">
                 {connectionState === "denied" ? (
-                  <WifiOff className="h-3 w-3 text-red-400" />
+                  <WifiOff className="h-3 w-3 text-red-500" />
                 ) : (
                   <span
                     className={`h-2 w-2 rounded-full ${
                       connectionState === "connected"
-                        ? "bg-emerald-400"
-                        : "bg-amber-400"
+                        ? "bg-emerald-500"
+                        : "bg-amber-500"
                     }`}
                   />
                 )}
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#FFC400]/20 px-2.5 py-1.5 text-[11px] font-semibold text-[#FFC400] disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -223,53 +223,53 @@ export function NotificationBell() {
             {error ? (
               <div
                 role="alert"
-                className="px-4 py-6 text-center text-sm text-red-300"
+                className="px-4 py-6 text-center text-xs text-rose-600 bg-rose-50"
               >
                 <p>{error}</p>
                 <button
                   type="button"
                   onClick={() => void reload()}
-                  className="mt-3 rounded-lg border border-[#FFC400]/20 px-2.5 py-1.5 text-xs font-semibold text-[#FFC400]"
+                  className="mt-3 rounded-lg border border-rose-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition-colors"
                 >
                   Thử lại
                 </button>
               </div>
             ) : loading ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-8 text-sm text-[#606060]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
+              <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#64748B]">
+                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-[#606060]">
+              <div className="px-4 py-8 text-center text-xs text-[#94A3B8]">
                 Chưa có thông báo mới.
               </div>
             ) : (
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="border-b border-[#151516] px-4 py-3 last:border-b-0"
+                  className="border-b border-[#EDF2F7] px-4 py-3 last:border-b-0 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <span
-                      className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#303033]" : "bg-[#FFC400]"
+                      className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="line-clamp-1 text-sm font-semibold text-white">
+                      <div className="line-clamp-1 text-xs font-bold text-[#0F172A]">
                         {item.title}
                       </div>
-                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#FFF8E6]/70">
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#64748B]">
                         {item.message}
                       </p>
-                      <div className="mt-2 text-[11px] text-[#606060]">
+                      <div className="mt-2 text-[10px] font-mono text-[#94A3B8]">
                         {formatDateTime(item.createdAt)}
                       </div>
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-2.5 flex flex-wrap gap-2">
                         <Link
                           href={safeActionUrl(item.actionUrl)}
                           onClick={() => void markRead(item)}
-                          className="rounded-lg bg-[#FFC400] px-2.5 py-1.5 text-[11px] font-bold text-black"
+                          className="rounded-lg bg-[#4F75FF] px-2.5 py-1 text-[11px] font-bold text-white hover:bg-[#3D62EE] transition-colors"
                         >
                           Mở
                         </Link>
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#FFC400]/20 px-2.5 py-1.5 text-[11px] font-semibold text-[#FFC400] disabled:opacity-50"
+                            className="rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>
@@ -293,7 +293,7 @@ export function NotificationBell() {
 
           <Link
             href="/app/notifications"
-            className="block border-t border-[#151516] px-4 py-3 text-center text-xs font-bold text-[#FFC400] hover:bg-[#151516]"
+            className="block border-t border-[#EDF2F7] bg-[#F8FAFC] px-4 py-2.5 text-center text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
           >
             Xem trung tâm thông báo
           </Link>

@@ -3,6 +3,11 @@ import { request } from "./client";
 export interface AttendanceRecord {
   id: string;
   user_id: string;
+  employee?: {
+    full_name?: string;
+    work_email?: string;
+    employee_code?: string;
+  } | null;
   attendance_date: string;
   check_in_at: string | null;
   check_out_at: string | null;

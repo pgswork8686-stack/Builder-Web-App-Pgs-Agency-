@@ -8,6 +8,8 @@ export interface UserPayload {
   avatarUrl: string | null;
 }
 
+export type AppRole = NonNullable<AccountPayload["role"]>;
+
 export interface AccountPayload {
   status: "pending" | "active" | "rejected";
   role: "admin" | "team_leader" | "employee" | "accountant" | "client" | null;

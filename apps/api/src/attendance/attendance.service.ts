@@ -430,13 +430,16 @@ export class AttendanceService {
         p_status: status,
         p_late_minutes: lateMinutes,
         p_source: 'web',
-        p_created_by: user.profileId,
-        p_updated_by: user.profileId,
+        p_created_by: user.authUserId || user.profileId,
+        p_updated_by: user.authUserId || user.profileId,
         p_photo_session_id: dto.photoUploadSessionId ?? null,
       },
     );
 
     if (error) {
+      this.logger.error(
+        `RPC phase5_check_in_attendance error: ${error.message} - ${JSON.stringify(error)}`,
+      );
       const msg = error.message;
       if (error.code === '23505' || msg.includes('duplicate key')) {
         throw new BadRequestException({
@@ -478,21 +481,21 @@ export class AttendanceService {
     if (findError) {
       throw new InternalServerErrorException({
         code: 'ATTENDANCE_WRITE_FAILED',
-        message: 'Lỗi truy vấn bản ghi chấm công ngày hôm nay.',
+        message: 'Không thể kiểm tra thông tin check-in hiện tại.',
       });
     }
 
     if (!record) {
       throw new BadRequestException({
         code: 'ATTENDANCE_NOT_CHECKED_IN',
-        message: 'Bạn chưa check-in cho ngày hôm nay.',
+        message: 'Bạn chưa thực hiện check-in cho ngày hôm nay.',
       });
     }
 
     if (record.check_out_at) {
       throw new BadRequestException({
         code: 'ATTENDANCE_ALREADY_CHECKED_OUT',
-        message: 'Bạn đã check-out ngày hôm nay rồi.',
+        message: 'Bạn đã hoàn tất check-out cho ngày hôm nay rồi.',
       });
     }
 
@@ -537,6 +540,9 @@ export class AttendanceService {
     );
 
     if (error) {
+      this.logger.error(
+        `RPC phase5_check_out_attendance error: ${error.message} - ${JSON.stringify(error)}`,
+      );
       const msg = error.message;
       if (msg.includes('ATTENDANCE_NOT_CHECKED_IN')) {
         throw new BadRequestException({
@@ -614,14 +620,15 @@ export class AttendanceService {
     };
   }
 
-  // Admin / Team Leader attendance lookup API (Blocker 10 - DB Side Filtering before Pagination)
+  // Admin / Team Leader / Accountant attendance lookup API
   async getDirectory(query: AttendanceQuery, user: RequestUser) {
     this.enforceInternalUser(user);
 
     const isAdmin = user.role === 'admin';
     const isLeader = user.role === 'team_leader';
+    const isAccountant = user.role === 'accountant';
 
-    if (!isAdmin && !isLeader) {
+    if (!isAdmin && !isLeader && !isAccountant) {
       throw new ForbiddenException({
         code: 'ATTENDANCE_ACCESS_DENIED',
         message: 'Bạn không có quyền truy cập danh sách chấm công nhân viên.',
@@ -662,11 +669,11 @@ export class AttendanceService {
       });
     }
 
-    // Build the DB-side filters
+    // Build the DB-side filters with explicit FK constraints to avoid ambiguous relationship errors
     let dbQuery = this.client
       .from('attendance_records')
       .select(
-        '*, profile:profiles!inner(id, full_name, email, avatar_url, employee_profile:employee_profiles!inner(team_id, department_id))',
+        '*, profile:profiles!attendance_records_user_id_fkey(id, full_name, email, avatar_url, employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id, department_id))',
         { count: 'exact' },
       );
 
@@ -706,6 +713,9 @@ export class AttendanceService {
       .range(offset, offset + query.pageSize - 1);
 
     if (error) {
+      this.logger.error(
+        `getDirectory query failed: ${error.message} - ${JSON.stringify(error)}`,
+      );
       throw new InternalServerErrorException({
         code: 'ATTENDANCE_WRITE_FAILED',
         message: 'Không thể truy vấn danh sách chấm công nhân sự.',
@@ -732,8 +742,8 @@ export class AttendanceService {
 
       delete rowCopy.profile;
 
-      // Hide precise coordinates for non-self unless admin
-      if (!isAdmin) {
+      // Hide precise coordinates for non-self unless admin or accountant
+      if (!isAdmin && !isAccountant) {
         delete rowCopy.check_in_latitude;
         delete rowCopy.check_in_longitude;
         delete rowCopy.check_out_latitude;

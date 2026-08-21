@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ProjectsService } from './projects.service';
 
@@ -38,7 +38,7 @@ function queryResult(
 function projectRow(overrides: Record<string, unknown> = {}) {
   return {
     id: PROJECT_ID,
-    project_code: 'PGS-2026-001',
+    project_code: 'DA_01',
     client_company_id: COMPANY_A,
     name: 'Project A',
     status: 'active',
@@ -70,7 +70,7 @@ describe('ProjectsService', () => {
 
     const result = await service.createProject(
       {
-        projectCode: 'PGS-2026-001',
+        projectCode: 'DA_01',
         clientCompanyId: COMPANY_A,
         name: 'Project A',
         status: 'draft',
@@ -79,7 +79,7 @@ describe('ProjectsService', () => {
       USER_ID,
     );
 
-    expect(result.projectCode).toBe('PGS-2026-001');
+    expect(result.projectCode).toBe('DA_01');
     expect(client.from).toHaveBeenNthCalledWith(1, 'client_companies');
     expect(client.from).toHaveBeenNthCalledWith(3, 'projects');
   });
@@ -90,7 +90,7 @@ describe('ProjectsService', () => {
     await expect(
       service.createProject(
         {
-          projectCode: 'PGS-1',
+          projectCode: 'DA_01',
           clientCompanyId: COMPANY_A,
           name: 'Project',
           status: 'draft',
@@ -99,25 +99,6 @@ describe('ProjectsService', () => {
         USER_ID,
       ),
     ).rejects.toMatchObject({ response: { code: 'CLIENT_NOT_FOUND' } });
-  });
-
-  it('returns a conflict for a duplicate project code', async () => {
-    client.from
-      .mockReturnValueOnce(queryResult({ data: { id: COMPANY_A } }))
-      .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }));
-
-    await expect(
-      service.createProject(
-        {
-          projectCode: 'PGS-1',
-          clientCompanyId: COMPANY_A,
-          name: 'Project',
-          status: 'draft',
-          priority: 'medium',
-        },
-        USER_ID,
-      ),
-    ).rejects.toBeInstanceOf(ConflictException);
   });
 
   it('maps a missing or inactive primary PM to INVALID_PROJECT_MANAGER', async () => {
@@ -133,7 +114,7 @@ describe('ProjectsService', () => {
       await expect(
         service.createProject(
           {
-            projectCode: 'PGS-1',
+            projectCode: 'DA_01',
             clientCompanyId: COMPANY_A,
             name: 'Project',
             status: 'draft',
@@ -146,6 +127,27 @@ describe('ProjectsService', () => {
         response: { code: 'INVALID_PROJECT_MANAGER' },
       });
     }
+  });
+
+  it('prevents duplicate project codes on creation', async () => {
+    client.from
+      .mockReturnValueOnce(queryResult({ data: { id: COMPANY_A } }))
+      .mockReturnValueOnce(queryResult({ data: { id: 'existing-id' } }));
+
+    await expect(
+      service.createProject(
+        {
+          projectCode: 'DA_01',
+          clientCompanyId: COMPANY_A,
+          name: 'Project',
+          status: 'draft',
+          priority: 'medium',
+        },
+        USER_ID,
+      ),
+    ).rejects.toMatchObject({
+      response: { code: 'PROJECT_CODE_ALREADY_EXISTS' },
+    });
   });
 
   it('uses DB pagination and keeps the real total on an empty page', async () => {

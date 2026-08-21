@@ -1,201 +1,559 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShieldCheck,
+  ShieldAlert,
   UserCheck,
   Users,
-  Settings,
-  Activity,
-  ArrowRight,
-  LogOut,
-  FileText,
-  Bell,
-  MessageCircle,
-  Bot,
+  FolderKanban,
+  CreditCard,
+  Briefcase,
+  FolderOpen,
+  ListTodo,
+  ChevronRight,
+  Clock,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { NotificationBell } from "@/components/phase7/notification-bell";
+import { getPendingUsers, type PendingUser } from "@/lib/api/admin";
+import { projectsApi, type Project } from "@/lib/api/projects";
+import { peopleApi } from "@/lib/api/people";
+import { clientsApi } from "@/lib/api/clients";
+import { financeApi } from "@/lib/api/finance";
+import { getMe, type UserPayload } from "@/lib/api/auth";
+import { API_BASE_URL } from "@/lib/api/client";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const [user, setUser] = useState<UserPayload | null>(null);
+  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
+  const [stats, setStats] = useState({
+    projectCount: 0,
+    clientCount: 0,
+    peopleCount: 0,
+    monthlyRevenue: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+  useEffect(() => {
+    async function loadAdminData() {
+      try {
+        const [meRes, pendingRes, projRes, peopleRes, clientRes, finRes] =
+          await Promise.allSettled([
+            getMe(),
+            getPendingUsers(1, 10),
+            projectsApi.getAdminProjects({ page: 1, pageSize: 6 }),
+            peopleApi.getPeopleDirectory({ page: 1, pageSize: 1 }),
+            clientsApi.getClientCompanies({ page: 1, pageSize: 1 }),
+            financeApi.getSummary(),
+          ]);
+
+        if (meRes.status === "fulfilled") setUser(meRes.value.user);
+        if (pendingRes.status === "fulfilled")
+          setPendingUsers(pendingRes.value.items || []);
+        if (projRes.status === "fulfilled") {
+          setProjects(projRes.value.items || []);
+          setStats((prev) => ({
+            ...prev,
+            projectCount: projRes.value.total || 0,
+          }));
+        }
+        if (peopleRes.status === "fulfilled") {
+          setStats((prev) => ({
+            ...prev,
+            peopleCount: peopleRes.value.total || 0,
+          }));
+        }
+        if (clientRes.status === "fulfilled") {
+          setStats((prev) => ({
+            ...prev,
+            clientCount: (clientRes.value as { total?: number })?.total || 0,
+          }));
+        }
+        if (finRes.status === "fulfilled" && finRes.value) {
+          setStats((prev) => ({
+            ...prev,
+            monthlyRevenue: finRes.value.total_revenue_ytd || 0,
+          }));
+        }
+
+        // Test real API health
+        try {
+          const healthRes = await fetch(`${API_BASE_URL}/health`);
+          if (healthRes.ok) {
+            const healthData = await healthRes.json();
+            setApiHealthy(healthData.status === "ok");
+          } else {
+            setApiHealthy(false);
+          }
+        } catch {
+          setApiHealthy(false);
+        }
+      } catch {
+        // Safe load
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAdminData();
+  }, []);
+
+  const userName =
+    user?.fullName || user?.email?.split("@")[0] || "Quản trị viên";
+
+  const formatVND = (amount: number) => {
+    if (!amount) return "0 ₫";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col">
-      {/* Header */}
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FFC400] text-black font-black flex items-center justify-center text-sm">
-            P
-          </div>
-          <span className="font-bold text-base tracking-wide text-white">
-            PGS HUB{" "}
-            <span className="text-[#FFC400] font-normal">
-              | Admin Workspace
-            </span>
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#151516] border border-[#FFC400]/20 text-xs text-[#FFC400]">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Quản trị viên (Admin)</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors cursor-pointer"
-            title="Đăng xuất"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 space-y-8">
-        <div className="border-b border-[#151516] pb-6">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Bảng điều khiển Quản trị viên
+    <div className="space-y-6">
+      {/* Top Greeting Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
+            Chào buổi sáng, {userName}
           </h1>
-          <p className="mt-1 text-sm text-[#606060]">
-            Quản lý tài khoản người dùng, cấu hình hệ thống và phân quyền truy
-            cập doanh nghiệp.
+          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+            Đây là tình hình vận hành của PGS Agency hôm nay.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <Link
-            href="/app/notifications"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <Bell className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Thông báo
-            </h3>
-            <p className="text-xs text-[#606060]">
-              Theo dõi sự kiện task, leave, attendance, finance, chat và dự án.
-            </p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+            Hôm nay
+          </span>
+          <Link href="/app/admin/accounts/pending">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<UserCheck className="w-4 h-4" />}
+            >
+              Duyệt tài khoản{" "}
+              {pendingUsers.length > 0 && `(${pendingUsers.length})`}
+            </Button>
           </Link>
+        </div>
+      </div>
 
-          <Link
-            href="/app/chat"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <MessageCircle className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Chat
+      {/* 3 Primary Hero Blocks */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Block 1: System Status with Verified Health Check */}
+        <div
+          className={`rounded-3xl p-6 flex flex-col justify-between shadow-xs border ${
+            apiHealthy === false
+              ? "bg-rose-50 border-rose-200"
+              : "bg-[#E6FBF5] border-[#A7F3D0]"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div
+              className={`w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-xs ${
+                apiHealthy === false ? "bg-rose-500" : "bg-[#13DEB9]"
+              }`}
+            >
+              {apiHealthy === false ? (
+                <ShieldAlert className="w-5 h-5" />
+              ) : (
+                <ShieldCheck className="w-5 h-5" />
+              )}
+            </div>
+            <Badge
+              variant={apiHealthy === false ? "danger" : "success"}
+              size="sm"
+            >
+              {apiHealthy === false
+                ? "Sự cố kết nối"
+                : apiHealthy === true
+                  ? "API đang hoạt động"
+                  : "Đang kiểm tra..."}
+            </Badge>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              {apiHealthy === false
+                ? "Hệ thống đang gặp sự cố kết nối"
+                : "Hệ thống đang vận hành ổn định"}
             </h3>
-            <p className="text-xs text-[#606060]">
-              Direct chat nội bộ và project chat có kiểm tra membership.
+            <p
+              className={`text-xs mt-1 font-medium ${
+                apiHealthy === false ? "text-rose-600" : "text-[#059669]"
+              }`}
+            >
+              {apiHealthy === false
+                ? "Không thể kết nối tới dịch vụ API backend"
+                : "Dịch vụ API backend phản hồi bình thường"}
             </p>
-          </Link>
+          </div>
+        </div>
 
-          <Link
-            href="/app/admin/automation"
-            className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] hover:border-[#FFC400]/40 transition-all space-y-3 group"
-          >
-            <Bot className="w-5 h-5 text-[#FFC400]" />
-            <h3 className="text-sm font-bold text-white group-hover:text-[#FFC400] transition-colors">
-              Automation
+        {/* Block 2: Total Progress */}
+        <div className="rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 flex flex-col justify-between shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-[#5D87FF] text-white flex items-center justify-center shadow-xs">
+              <FolderKanban className="w-5 h-5" />
+            </div>
+            <Badge variant="blue" size="sm">
+              Vận hành
+            </Badge>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Tiến độ tổng: {stats.projectCount} Dự án
             </h3>
-            <p className="text-xs text-[#606060]">
-              Rule nội bộ an toàn, chỉ tạo notification qua trigger registry.
+            <p className="text-xs text-[#5D87FF] mt-1 font-medium">
+              Theo dõi phân bổ nguồn lực & bàn giao đúng hạn
             </p>
+          </div>
+        </div>
+
+        {/* Block 3: Monthly Revenue */}
+        <div className="rounded-3xl bg-[#FEF9C3] border border-[#FEF08A] p-6 flex flex-col justify-between shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFC400] text-white flex items-center justify-center shadow-xs">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <Badge variant="gold" size="sm">
+              Tài chính
+            </Badge>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Doanh thu YTD: {formatVND(stats.monthlyRevenue)}
+            </h3>
+            <p className="text-xs text-[#B45309] mt-1 font-medium">
+              Hợp đồng & hóa đơn được đối soát tự động
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5-Metric Row - Exact Figma Order: Dự án, Công việc, Khách hàng, Nhân sự, Tài liệu */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* 1. Dự án */}
+        <Link href="/app/admin/projects">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FolderKanban className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.projectCount}
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 2. Công việc (theo dõi trong chi tiết từng dự án) */}
+        <Link href="/app/admin/tasks">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#FFC400] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <ListTodo className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Công việc
+              </p>
+              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+                Theo dự án
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 3. Khách hàng */}
+        <Link href="/app/admin/clients">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">
+                Khách hàng
+              </p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.clientCount}
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 4. Nhân sự */}
+        <Link href="/app/admin/people">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Users className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">Nhân sự</p>
+              <p className="text-lg font-black text-[#24304A] tracking-tight">
+                {stats.peopleCount}
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* 5. Tài liệu */}
+        <Link href="/app/admin/documents">
+          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group col-span-2 sm:col-span-1">
+            <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#FA896B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FolderOpen className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-[#7C879D] font-medium">Tài liệu</p>
+              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+                Theo dự án
+              </p>
+            </div>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Dual Section: Tiến độ dự án & Chờ phê duyệt */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        {/* Left 7 cols: Tiến độ dự án */}
+        <div className="md:col-span-7 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Tiến độ dự án
+            </h3>
+            <Link
+              href="/app/admin/projects"
+              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            >
+              Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {projects.length === 0 ? (
+            <Card className="p-6 text-center">
+              <EmptyState
+                icon={<FolderKanban className="w-8 h-8 text-[#7C879D]" />}
+                title="Chưa có dự án nào"
+                description="Tạo dự án mới để theo dõi tiến độ công việc và phân bổ nhân sự."
+                actionLabel="Tạo dự án mới"
+                onAction={() => router.push("/app/admin/projects")}
+              />
+            </Card>
+          ) : (
+            <Card className="divide-y divide-[#EDF2F7]">
+              {projects.slice(0, 4).map((p) => (
+                <div
+                  key={p.id}
+                  className="p-3.5 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                        {p.projectCode}
+                      </span>
+                      <h4 className="text-xs font-bold text-[#24304A] truncate">
+                        {p.name}
+                      </h4>
+                    </div>
+                    <p className="text-[11px] text-[#7C879D] mt-0.5 truncate">
+                      Khách hàng: {p.clientCompany?.name || "Chưa liên kết"}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={
+                      p.status === "active"
+                        ? "blue"
+                        : p.status === "completed"
+                          ? "success"
+                          : "default"
+                    }
+                    size="sm"
+                  >
+                    {p.status}
+                  </Badge>
+                </div>
+              ))}
+            </Card>
+          )}
+        </div>
+
+        {/* Right 5 cols: Chờ phê duyệt */}
+        <div className="md:col-span-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+              Chờ phê duyệt
+            </h3>
+            <Badge variant="gold" size="sm">
+              {pendingUsers.length} yêu cầu
+            </Badge>
+          </div>
+
+          <Card className="p-3.5 space-y-2.5">
+            <Link
+              href="/app/admin/accounts/pending"
+              className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] flex items-center justify-between hover:bg-[#E0EAFF] transition-all block"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-[#5D87FF] text-white flex items-center justify-center shrink-0">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h5 className="text-xs font-bold text-[#24304A]">
+                    Tài khoản chờ duyệt
+                  </h5>
+                  <p className="text-[11px] text-[#7C879D]">
+                    {pendingUsers.length} tài khoản mới đăng ký
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#5D87FF]" />
+            </Link>
+
+            <Link
+              href="/app/admin/leave"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] flex items-center justify-between hover:bg-[#EEF2FF] transition-all block"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-[#FFC400] text-white flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h5 className="text-xs font-bold text-[#24304A]">
+                    Đơn nghỉ phép
+                  </h5>
+                  <p className="text-[11px] text-[#7C879D]">
+                    Kiểm tra và phê duyệt nghỉ phép
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#7C879D]" />
+            </Link>
+          </Card>
+        </div>
+      </div>
+
+      {/* Dual Section: Dự án cần chú ý & Hoạt động gần đây */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        <div className="md:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Dự án cần chú ý
+          </h3>
+          <Card className="p-5 text-center">
+            <p className="text-xs text-[#7C879D]">
+              Chưa có dự án nào rơi vào tình trạng quá hạn hoặc cảnh báo rủi ro.
+            </p>
+          </Card>
+        </div>
+
+        <div className="md:col-span-6 space-y-3">
+          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            Hoạt động gần đây
+          </h3>
+          <Card className="p-5 text-center">
+            <p className="text-xs text-[#7C879D]">Chưa có hoạt động gần đây</p>
+          </Card>
+        </div>
+      </div>
+
+      {/* Full-Width Section: Duyệt tài khoản và phân quyền mới */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight">
+              Duyệt tài khoản và phân quyền mới
+            </h3>
+            <p className="text-xs text-[#7C879D] mt-0.5">
+              Danh sách người dùng mới đăng ký chờ xét duyệt vai trò và bộ phận
+              làm việc.
+            </p>
+          </div>
+          <Link href="/app/admin/accounts/pending">
+            <Button variant="secondary" size="sm">
+              Xem tất cả ({pendingUsers.length})
+            </Button>
           </Link>
         </div>
 
-        {/* Feature Banner: Account Approvals */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0E0E0F] via-[#151516] to-[#0E0E0F] border border-[#FFC400]/30 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="space-y-2 max-w-xl z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 text-[#FFC400] text-xs font-semibold">
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>Yêu cầu mới cần phê duyệt</span>
-            </div>
-            <h3 className="text-xl font-bold text-white">
-              Phê duyệt & Phân quyền tài khoản
-            </h3>
-            <p className="text-xs text-[#FFF8E6]/70 leading-relaxed">
-              Xem danh sách nhân sự mới đăng ký, chọn vai trò thích hợp và duyệt
-              cấp tài khoản vào hệ thống.
-            </p>
-          </div>
-
-          <Link
-            href="/app/admin/accounts/pending"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
-          >
-            <span>Đến trang phê duyệt</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Feature Banner: Finance */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0E0E0F] via-[#151516] to-[#0E0E0F] border border-[#FFC400]/30 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="space-y-2 max-w-xl z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC400]/10 text-[#FFC400] text-xs font-semibold">
-              <FileText className="w-3.5 h-3.5" />
-              <span>Quản lý tài chính doanh nghiệp</span>
-            </div>
-            <h3 className="text-xl font-bold text-white">
-              Hợp đồng, Hóa đơn & Doanh thu
-            </h3>
-            <p className="text-xs text-[#FFF8E6]/70 leading-relaxed">
-              Theo dõi và quản lý toàn bộ hợp đồng dịch vụ, hóa đơn phát hành,
-              ghi nhận thanh toán công nợ và báo cáo tổng quan.
-            </p>
-          </div>
-
-          <Link
-            href="/app/admin/finance"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#FFC400] to-[#CFA63E] hover:brightness-110 text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,196,0,0.2)] shrink-0 z-10"
-          >
-            <span>Đến trang tài chính</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Real workspace claims */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Vai trò của bạn
-              </span>
-              <ShieldCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Quản trị viên
-            </div>
-            <div className="text-xs text-[#606060]">
-              Bạn sở hữu quyền quản trị toàn bộ cấu hình hệ thống và dữ liệu.
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-3">
-            <div className="flex items-center justify-between text-[#606060]">
-              <span className="text-xs font-semibold uppercase">
-                Quyền hạn phê duyệt
-              </span>
-              <UserCheck className="w-4 h-4 text-[#FFC400]" />
-            </div>
-            <div className="text-2xl font-extrabold text-white">
-              Quản lý tài khoản chờ duyệt
-            </div>
-            <div className="text-xs text-[#606060]">
-              Xét duyệt danh tính và phân quyền vai trò cho nhân sự mới đăng ký.
-            </div>
-          </div>
-        </div>
-      </main>
+        {pendingUsers.length === 0 ? (
+          <Card className="p-8 text-center">
+            <EmptyState
+              icon={<UserCheck className="w-10 h-10 text-[#13DEB9]" />}
+              title="Không có yêu cầu chờ duyệt"
+              description="Hiện tại tất cả tài khoản đã được phê duyệt và phân quyền đầy đủ."
+            />
+          </Card>
+        ) : (
+          <TableContainer>
+            <Table>
+              <thead>
+                <TableRow>
+                  <TableHead>NGƯỜI ĐĂNG KÝ</TableHead>
+                  <TableHead>LOẠI ĐỀ XUẤT</TableHead>
+                  <TableHead>PHẠM VI</TableHead>
+                  <TableHead>TRẠNG THÁI</TableHead>
+                  <TableHead className="text-right">THAO TÁC</TableHead>
+                </TableRow>
+              </thead>
+              <TableBody>
+                {pendingUsers.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar name={u.fullName || u.email || "?"} size="sm" />
+                        <div>
+                          <p className="text-xs font-bold text-[#24304A]">
+                            {u.fullName || "Chưa đặt tên"}
+                          </p>
+                          <p className="text-[11px] text-[#7C879D]">
+                            {u.email}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="gold" size="sm">
+                        {u.role ? u.role.toUpperCase() : "CHỜ PHÂN VAI TRÒ"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-[#7C879D]">
+                      Toàn hệ thống
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="gold" size="sm">
+                        {u.accountStatus.toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Link href="/app/admin/accounts/pending">
+                        <Button variant="primary" size="sm">
+                          Xét duyệt
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </div>
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle,
-  Clock,
   Play,
   FileText,
   Eye,
@@ -18,6 +17,10 @@ import {
 } from "lucide-react";
 import { financeApi, Contract, Invoice } from "@/lib/api/finance";
 import { FinanceConfirmDialog } from "./FinanceConfirmDialog";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ContractDetailProps {
   roleBasePath: string;
@@ -98,10 +101,13 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
     try {
       setTransitioning(true);
       await financeApi.transitionContract(id, confirmStatus);
-      showToast("Chuyển trạng thái hợp đồng thành công.");
+      showToast("Cập nhật trạng thái hợp đồng thành công!");
       await loadData();
     } catch (err: any) {
-      setActionError(err.message || "Chuyển trạng thái thất bại.");
+      setActionError(
+        err?.response?.data?.message ||
+          "Không thể thay đổi trạng thái hợp đồng. Vui lòng kiểm tra lại điều kiện.",
+      );
     } finally {
       setTransitioning(false);
     }
@@ -116,13 +122,20 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
     setToggleVisibleOpen(false);
     try {
       setTransitioning(true);
-      await financeApi.updateContract(id, { clientVisible: targetVisibility });
+      await financeApi.updateContract(id, {
+        clientVisible: targetVisibility,
+      });
       showToast(
-        `Đã ${targetVisibility ? "hiển thị" : "ẩn"} hợp đồng với khách hàng.`,
+        targetVisibility
+          ? "Đã cho phép khách hàng xem hợp đồng này."
+          : "Đã ẩn hợp đồng với khách hàng.",
       );
       await loadData();
     } catch (err: any) {
-      setActionError(err.message || "Thay đổi hiển thị thất bại.");
+      setActionError(
+        err?.response?.data?.message ||
+          "Không thể cập nhật quyền hiển thị khách hàng.",
+      );
     } finally {
       setTransitioning(false);
     }
@@ -139,27 +152,27 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
     switch (status) {
       case "draft":
         return (
-          <span className="px-2.5 py-1 rounded-full bg-[#151516] border border-[#FFC400]/30 text-[#FFC400] text-xs font-bold">
+          <Badge variant="gold" size="sm">
             Nháp
-          </span>
+          </Badge>
         );
       case "active":
         return (
-          <span className="px-2.5 py-1 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 text-[#00E676] text-xs font-bold">
+          <Badge variant="success" size="sm">
             Đang hiệu lực
-          </span>
+          </Badge>
         );
       case "completed":
         return (
-          <span className="px-2.5 py-1 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-xs font-bold">
+          <Badge variant="blue" size="sm">
             Hoàn thành
-          </span>
+          </Badge>
         );
       case "cancelled":
         return (
-          <span className="px-2.5 py-1 rounded-full bg-[#FF1744]/10 border border-[#FF1744]/30 text-[#FF1744] text-xs font-bold">
+          <Badge variant="default" size="sm">
             Đã hủy
-          </span>
+          </Badge>
         );
       default:
         return null;
@@ -168,121 +181,123 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070707] text-[#FFF8E6] flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 text-[#FFC400] animate-spin" />
-        <span className="text-sm text-[#606060]">
-          Đang tải chi tiết hợp đồng...
-        </span>
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
       </div>
     );
   }
 
   if (!contract) {
     return (
-      <div className="min-h-screen bg-[#070707] text-[#FFF8E6] flex flex-col items-center justify-center gap-4 p-6">
-        <AlertTriangle className="w-12 h-12 text-[#FF1744]" />
-        <span className="text-sm text-[#606060]">
-          Không tìm thấy hợp đồng yêu cầu.
-        </span>
-        <Link
-          href={`${roleBasePath}/finance/contracts`}
-          className="px-4 py-2 rounded-xl bg-[#151516] text-[#FFC400] hover:brightness-110 border border-[#FFC400]/20 font-bold text-xs"
-        >
-          Quay lại danh sách
+      <div className="p-8 text-center bg-white rounded-2xl border border-[#EDF2F7] space-y-4">
+        <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
+        <h2 className="text-base font-bold text-[#0F172A]">
+          Không tìm thấy hợp đồng
+        </h2>
+        <p className="text-xs text-[#64748B]">
+          Hợp đồng không tồn tại hoặc bạn không có quyền truy cập.
+        </p>
+        <Link href={`${roleBasePath}/finance/contracts`}>
+          <Button variant="secondary" size="sm">
+            Quay lại danh sách
+          </Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6] font-sans flex flex-col relative">
-      {/* Toast Notification */}
+    <div className="space-y-6">
+      {/* Toast */}
       {successToast && (
-        <div className="fixed top-20 right-6 z-50 bg-[#00E676] text-black px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 font-bold text-xs animate-bounce">
+        <div className="fixed top-20 right-6 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs">
           <CheckCircle className="w-4 h-4" />
           <span>{successToast}</span>
         </div>
       )}
 
-      {/* Header */}
-      <header className="h-16 border-b border-[#151516] bg-[#0E0E0F]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-4">
-          <Link
-            href={`${roleBasePath}/finance/contracts`}
-            className="p-2 rounded-xl bg-[#151516] hover:bg-[#1f1f22] text-[#606060] hover:text-white transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Link>
-          <span className="font-bold text-base tracking-wide text-white">
-            Chi tiết hợp đồng{" "}
-            <span className="text-[#FFC400] font-normal">
-              | {contract.contract_number}
-            </span>
-          </span>
-        </div>
+      {/* Top Header */}
+      <SectionHeader
+        title={`Hợp đồng: ${contract.contract_number}`}
+        description={contract.title}
+        badge={contract.status ? contract.status.toUpperCase() : undefined}
+        action={
+          <div className="flex items-center gap-3">
+            <Link href={`${roleBasePath}/finance/contracts`}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ChevronLeft className="w-4 h-4" />}
+              >
+                Quay lại
+              </Button>
+            </Link>
 
-        <div className="flex items-center gap-3">
-          {contract.status === "draft" && (
-            <>
-              <button
-                disabled={transitioning}
-                onClick={() => triggerTransitionConfirm("active")}
-                className="px-4 py-2.5 rounded-xl bg-[#00E676] text-black font-bold text-xs hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Play className="w-3.5 h-3.5 fill-black" />
-                <span>Kích hoạt</span>
-              </button>
-              <button
-                disabled={transitioning}
-                onClick={() => triggerTransitionConfirm("cancelled")}
-                className="px-4 py-2.5 rounded-xl bg-[#FF1744]/10 border border-[#FF1744]/30 text-[#FF1744] hover:bg-[#FF1744]/20 font-bold text-xs transition-all cursor-pointer"
-              >
-                Hủy hợp đồng
-              </button>
-            </>
-          )}
+            {contract.status === "draft" && (
+              <>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={transitioning}
+                  onClick={() => triggerTransitionConfirm("active")}
+                  leftIcon={<Play className="w-3.5 h-3.5" />}
+                >
+                  Kích hoạt
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={transitioning}
+                  onClick={() => triggerTransitionConfirm("cancelled")}
+                >
+                  Hủy hợp đồng
+                </Button>
+              </>
+            )}
 
-          {contract.status === "active" && (
-            <>
-              <button
-                disabled={transitioning}
-                onClick={() => triggerTransitionConfirm("completed")}
-                className="px-4 py-2.5 rounded-xl bg-[#00E5FF] text-black font-bold text-xs hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <CheckCircle className="w-3.5 h-3.5" />
-                <span>Hoàn thành</span>
-              </button>
-              <button
-                disabled={transitioning}
-                onClick={() => triggerTransitionConfirm("cancelled")}
-                className="px-4 py-2.5 rounded-xl bg-[#FF1744]/10 border border-[#FF1744]/30 text-[#FF1744] hover:bg-[#FF1744]/20 font-bold text-xs transition-all cursor-pointer"
-              >
-                Hủy hợp đồng
-              </button>
-            </>
-          )}
-        </div>
-      </header>
+            {contract.status === "active" && (
+              <>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={transitioning}
+                  onClick={() => triggerTransitionConfirm("completed")}
+                  leftIcon={<CheckCircle className="w-3.5 h-3.5" />}
+                >
+                  Hoàn thành
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={transitioning}
+                  onClick={() => triggerTransitionConfirm("cancelled")}
+                >
+                  Hủy hợp đồng
+                </Button>
+              </>
+            )}
+          </div>
+        }
+      />
 
       {/* Main Grid */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          {/* Action Error Alerts */}
           {actionError && (
-            <div className="p-4 rounded-2xl bg-[#FF1744]/10 border border-[#FF1744]/20 text-[#FF1744] text-xs font-semibold flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{actionError}</span>
             </div>
           )}
 
           {/* Details Overview Card */}
-          <div className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#151516] pb-4">
+          <Card className="p-6 space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EDF2F7] pb-4">
               <div className="space-y-1">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Tiêu đề hợp đồng
                 </span>
-                <h2 className="text-xl font-bold text-white leading-tight">
+                <h2 className="text-lg font-extrabold text-[#0F172A] leading-tight">
                   {contract.title}
                 </h2>
               </div>
@@ -290,29 +305,29 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+              <div className="space-y-1">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Mã hợp đồng
                 </span>
-                <p className="text-sm font-mono font-bold text-white">
+                <p className="text-sm font-mono font-bold text-[#0F172A]">
                   {contract.contract_number}
                 </p>
               </div>
 
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+              <div className="space-y-1">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Khách hàng
                 </span>
-                <p className="text-sm text-[#FFF8E6]/85 font-medium">
+                <p className="text-sm text-[#0F172A] font-medium">
                   {contract.client_company?.name || "—"}
                 </p>
               </div>
 
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+              <div className="space-y-1">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Giá trị hợp đồng
                 </span>
-                <p className="text-lg font-extrabold text-[#FFC400]">
+                <p className="text-lg font-black text-[#4F75FF]">
                   {formatCurrency(
                     contract.contract_value,
                     contract.currency_code,
@@ -320,36 +335,36 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 </p>
               </div>
 
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+              <div className="space-y-1">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Dự án liên kết
                 </span>
-                <p className="text-sm text-[#FFF8E6]/85 font-medium">
+                <p className="text-sm text-[#0F172A] font-medium">
                   {contract.project?.name || "—"}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#151516] pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#EDF2F7] pt-6">
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#606060]" />
+                <Calendar className="w-5 h-5 text-[#4F75FF]" />
                 <div className="space-y-0.5">
-                  <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+                  <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                     Ngày bắt đầu
                   </span>
-                  <p className="text-xs font-mono text-white">
+                  <p className="text-xs font-mono text-[#0F172A]">
                     {contract.start_date}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#606060]" />
+                <Calendar className="w-5 h-5 text-[#4F75FF]" />
                 <div className="space-y-0.5">
-                  <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider">
+                  <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                     Ngày kết thúc
                   </span>
-                  <p className="text-xs font-mono text-white">
+                  <p className="text-xs font-mono text-[#0F172A]">
                     {contract.end_date || "Không giới hạn"}
                   </p>
                 </div>
@@ -357,92 +372,89 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             </div>
 
             {contract.notes && (
-              <div className="border-t border-[#151516] pt-6 space-y-2">
-                <span className="text-[10px] text-[#606060] uppercase font-bold tracking-wider block">
+              <div className="border-t border-[#EDF2F7] pt-6 space-y-2">
+                <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider block">
                   Điều khoản & Ghi chú
                 </span>
-                <p className="text-xs text-[#FFF8E6]/70 leading-relaxed bg-[#151516]/40 p-4 rounded-xl border border-[#1f1f22] whitespace-pre-wrap">
+                <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7] whitespace-pre-wrap">
                   {contract.notes}
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         </div>
 
         {/* Sidebar Info & Invoices */}
         <div className="space-y-6">
-          {/* Client Visibility Control Card */}
-          <div className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-4">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+          {/* Client Visibility Card */}
+          <Card className="p-5 space-y-3">
+            <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
               Hiển thị với khách hàng
             </h4>
-            <div className="flex items-center justify-between bg-[#151516] p-4 rounded-xl border border-[#1f1f22]">
+            <div className="flex items-center justify-between bg-[#F8FAFC] p-3.5 rounded-xl border border-[#EDF2F7]">
               <div className="flex items-center gap-2">
                 {contract.client_visible ? (
-                  <Eye className="w-4 h-4 text-[#00E676]" />
+                  <Eye className="w-4 h-4 text-emerald-600" />
                 ) : (
-                  <EyeOff className="w-4 h-4 text-[#606060]" />
+                  <EyeOff className="w-4 h-4 text-[#94A3B8]" />
                 )}
-                <span className="text-xs font-bold">
+                <span className="text-xs font-bold text-[#0F172A]">
                   {contract.client_visible ? "Đang hiển thị" : "Đang ẩn"}
                 </span>
               </div>
 
-              <button
+              <Button
+                variant={contract.client_visible ? "outline" : "primary"}
+                size="sm"
                 disabled={transitioning}
                 onClick={() => triggerToggleVisibility(contract.client_visible)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all border ${
-                  contract.client_visible
-                    ? "bg-[#FF1744]/10 border-[#FF1744]/35 text-[#FF1744] hover:bg-[#FF1744]/20"
-                    : "bg-[#00E676]/10 border-[#00E676]/35 text-[#00E676] hover:bg-[#00E676]/20"
-                }`}
               >
                 {contract.client_visible ? "Ẩn đi" : "Hiển thị"}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
 
           {/* Invoices List Card */}
-          <div className="p-6 rounded-2xl bg-[#0E0E0F] border border-[#151516] space-y-4">
-            <div className="flex items-center justify-between border-b border-[#151516] pb-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+              <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
                 Hóa đơn của hợp đồng
               </h4>
               <Link
                 href={`${roleBasePath}/finance/invoices?contractId=${contract.id}`}
-                className="inline-flex items-center gap-1 text-[10px] text-[#FFC400] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#4F75FF] hover:underline"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-3.5 h-3.5" />
                 <span>Thêm</span>
               </Link>
             </div>
 
             {invoices.length === 0 ? (
-              <div className="py-6 text-center text-xs text-[#606060]">
+              <p className="py-6 text-center text-xs text-[#94A3B8]">
                 Chưa có hóa đơn nào liên kết.
-              </div>
+              </p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {invoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3 rounded-xl bg-[#151516]/40 border border-[#1f1f22] flex items-center justify-between gap-3 text-xs"
+                    className="p-3 rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] flex items-center justify-between gap-3 text-xs"
                   >
-                    <div className="space-y-1">
-                      <p className="font-bold text-white font-mono">
+                    <div className="space-y-0.5">
+                      <p className="font-bold text-[#0F172A] font-mono">
                         {inv.invoice_number}
                       </p>
-                      <p className="text-[10px] text-[#606060]">
+                      <p className="text-[10px] text-[#94A3B8] font-mono">
                         {inv.issue_date}
                       </p>
                     </div>
-                    <div className="text-right space-y-1">
-                      <p className="font-bold text-[#FFC400]">
+                    <div className="text-right space-y-0.5">
+                      <p className="font-extrabold text-[#4F75FF]">
                         {formatCurrency(inv.amount, inv.currency_code)}
                       </p>
                       <Link
                         href={`${roleBasePath}/finance/invoices/${inv.id}`}
-                        className="inline-flex items-center gap-0.5 text-[10px] text-[#606060] hover:text-white"
+                        className="inline-flex items-center gap-0.5 text-[10px] text-[#64748B] hover:text-[#0F172A]"
                       >
                         <span>Chi tiết</span>
                         <ChevronLeft className="w-2.5 h-2.5 rotate-180" />
@@ -452,9 +464,9 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 ))}
               </div>
             )}
-          </div>
+          </Card>
         </div>
-      </main>
+      </div>
 
       {/* Confirmation Modals */}
       <FinanceConfirmDialog

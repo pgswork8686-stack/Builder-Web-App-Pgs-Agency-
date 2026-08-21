@@ -7,7 +7,13 @@ import {
   Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateEmploymentDto, UpdateEmploymentDto } from './dto/employment.dto';
+import {
+  CreateEmploymentDto,
+  UpdateEmploymentDto,
+  UpdatePersonFullDto,
+  AssignUserProjectsDto,
+  UpdateOwnProfileDto,
+} from './dto/employment.dto';
 
 @Injectable()
 export class PeopleService {
@@ -98,9 +104,7 @@ export class PeopleService {
     const client = this.supabaseService.getSystemClient();
     const { data: profile, error } = await client
       .from('profiles')
-      .select(
-        '*, employee_profile:employee_profiles(*, department:departments(name), team:teams(name), manager:profiles!employee_profiles_reports_to_user_id_fkey(full_name))',
-      )
+      .select('*')
       .eq('id', userId)
       .maybeSingle();
 
@@ -119,7 +123,28 @@ export class PeopleService {
       });
     }
 
-    const emp = profile.employee_profile;
+    const { data: emp, error: empErr } = await client
+      .from('employee_profiles')
+      .select('*, department:departments(name), team:teams(name)')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (empErr) {
+      this.logger.warn(
+        `Failed to fetch employee_profile for ${userId}: ${empErr.message}`,
+      );
+    }
+
+    let reportsToFullName: string | null = null;
+    if (emp?.reports_to_user_id) {
+      const { data: mgr } = await client
+        .from('profiles')
+        .select('full_name')
+        .eq('id', emp.reports_to_user_id)
+        .maybeSingle();
+      reportsToFullName = mgr?.full_name ?? null;
+    }
+
     return {
       id: profile.id,
       email: profile.email ?? null,
@@ -137,7 +162,7 @@ export class PeopleService {
             teamName: emp.team?.name ?? null,
             jobTitle: emp.job_title ?? null,
             reportsToUserId: emp.reports_to_user_id ?? null,
-            reportsToFullName: emp.manager?.full_name ?? null,
+            reportsToFullName,
             employmentStatus: emp.employment_status,
             joinedDate: emp.joined_date ?? null,
             leftDate: emp.left_date ?? null,
@@ -487,7 +512,7 @@ export class PeopleService {
       const { data: emp, error } = await client
         .from('employee_profiles')
         .select(
-          '*, department:departments(code, name, description), team:teams(code, name, description), manager:profiles!employee_profiles_reports_to_user_id_fkey(full_name, email)',
+          '*, department:departments(code, name, description), team:teams(code, name, description)',
         )
         .eq('user_id', userId)
         .maybeSingle();
@@ -510,6 +535,24 @@ export class PeopleService {
         };
       }
 
+      let managerInfo: {
+        fullName: string | null;
+        email: string | null;
+      } | null = null;
+      if (emp.reports_to_user_id) {
+        const { data: mgr } = await client
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', emp.reports_to_user_id)
+          .maybeSingle();
+        if (mgr) {
+          managerInfo = {
+            fullName: mgr.full_name ?? null,
+            email: mgr.email ?? null,
+          };
+        }
+      }
+
       return {
         type: 'internal',
         employee: {
@@ -530,13 +573,552 @@ export class PeopleService {
               name: emp.team.name,
             }
           : null,
-        manager: emp.manager
-          ? {
-              fullName: emp.manager.full_name ?? null,
-              email: emp.manager.email ?? null,
-            }
-          : null,
+        manager: managerInfo,
       };
     }
+  }
+
+  // --- ADMIN EXTENDED MANAGEMENT ---
+
+  async updatePersonFull(
+    userId: string,
+    dto: UpdatePersonFullDto,
+    adminUserId: string,
+  ) {
+    const client = this.supabaseService.getSystemClient();
+
+    const { data: currentProfile, error: profileErr } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileErr || !currentProfile) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Không tìm thấy tài khoản người dùng.',
+      });
+    }
+
+    const now = new Date().toISOString();
+    const profileUpdates: any = {};
+    if (dto.fullName !== undefined) profileUpdates.full_name = dto.fullName;
+    if (dto.phone !== undefined) profileUpdates.phone = dto.phone;
+    if (dto.avatarUrl !== undefined) profileUpdates.avatar_url = dto.avatarUrl;
+
+    // Handle account status & role changes ensuring check_role_status_consistency
+    const targetStatus = dto.accountStatus;
+    const targetRole = dto.role !== undefined ? dto.role : currentProfile.role;
+
+    if (
+      targetStatus === 'suspended' ||
+      targetStatus === 'terminated' ||
+      targetStatus === 'rejected'
+    ) {
+      profileUpdates.account_status = 'rejected';
+      profileUpdates.role = null;
+      profileUpdates.approved_at = null;
+      profileUpdates.approved_by = null;
+      profileUpdates.rejected_at = now;
+      profileUpdates.rejected_by = adminUserId;
+      profileUpdates.rejection_reason = 'Khóa tài khoản bởi Quản trị viên';
+    } else if (targetStatus === 'pending') {
+      profileUpdates.account_status = 'pending';
+      profileUpdates.role = null;
+      profileUpdates.approved_at = null;
+      profileUpdates.approved_by = null;
+      profileUpdates.rejected_at = null;
+      profileUpdates.rejected_by = null;
+      profileUpdates.rejection_reason = null;
+    } else if (
+      targetStatus === 'active' ||
+      (dto.role && currentProfile.account_status !== 'active')
+    ) {
+      const activeRole = targetRole || 'employee';
+      profileUpdates.account_status = 'active';
+      profileUpdates.role = activeRole;
+      profileUpdates.approved_at = now;
+      profileUpdates.approved_by = adminUserId;
+      profileUpdates.rejected_at = null;
+      profileUpdates.rejected_by = null;
+      profileUpdates.rejection_reason = null;
+    } else if (dto.role !== undefined) {
+      profileUpdates.role = dto.role;
+    }
+
+    if (Object.keys(profileUpdates).length > 0) {
+      profileUpdates.updated_at = now;
+      const { error: profErr } = await client
+        .from('profiles')
+        .update(profileUpdates)
+        .eq('id', userId);
+
+      if (profErr) {
+        this.logger.error(`Failed to update profile: ${profErr.message}`);
+        throw new InternalServerErrorException({
+          code: 'PROFILE_UPDATE_FAILED',
+          message: 'Không thể cập nhật thông tin tài khoản.',
+        });
+      }
+    }
+
+    // 2. Manage employee profile if not client and not rejected/terminated
+    const effectiveRole =
+      profileUpdates.role !== undefined
+        ? profileUpdates.role
+        : currentProfile.role;
+    const isLocked = profileUpdates.account_status === 'rejected';
+
+    if (isLocked) {
+      // Set employee status to terminated
+      await client
+        .from('employee_profiles')
+        .update({
+          employment_status: 'terminated',
+          left_date: now.split('T')[0],
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('user_id', userId);
+
+      // Clean up Department Head / Team Leader positions
+      await client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId);
+
+      await client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId);
+
+      await client.from('project_memberships').delete().eq('user_id', userId);
+      await client.from('client_memberships').delete().eq('user_id', userId);
+    } else if (effectiveRole === 'client') {
+      // Remove employee profile if changing to client
+      await client.from('employee_profiles').delete().eq('user_id', userId);
+      await client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId);
+      await client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId);
+    } else {
+      // If role changed from team_leader to something else, remove team leader assignment
+      if (effectiveRole !== 'team_leader') {
+        await client
+          .from('teams')
+          .update({
+            leader_user_id: null,
+            updated_by: adminUserId,
+            updated_at: now,
+          })
+          .eq('leader_user_id', userId);
+      }
+
+      // Upsert employee profile if relevant fields provided
+      if (
+        dto.employeeCode !== undefined ||
+        dto.departmentId !== undefined ||
+        dto.teamId !== undefined ||
+        dto.jobTitle !== undefined ||
+        dto.employmentStatus !== undefined ||
+        dto.joinedDate !== undefined
+      ) {
+        const empPayload: any = {
+          user_id: userId,
+          updated_by: adminUserId,
+          updated_at: now,
+        };
+
+        if (dto.departmentId !== undefined)
+          empPayload.department_id = dto.departmentId || null;
+        if (dto.teamId !== undefined) empPayload.team_id = dto.teamId || null;
+        if (dto.jobTitle !== undefined)
+          empPayload.job_title = dto.jobTitle || null;
+        if (dto.employmentStatus)
+          empPayload.employment_status = dto.employmentStatus;
+        if (dto.joinedDate !== undefined)
+          empPayload.joined_date = dto.joinedDate || null;
+
+        // Check if employee record already exists
+        const { data: existingEmp } = await client
+          .from('employee_profiles')
+          .select('user_id, employee_code')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (!existingEmp) {
+          empPayload.created_by = adminUserId;
+          empPayload.employee_code =
+            dto.employeeCode && dto.employeeCode.trim()
+              ? dto.employeeCode.trim().toUpperCase()
+              : `EMP-${userId.slice(0, 6).toUpperCase()}`;
+        }
+
+        const { error: empErr } = await client
+          .from('employee_profiles')
+          .upsert(empPayload, { onConflict: 'user_id' });
+
+        if (empErr) {
+          this.logger.error(
+            `Failed to upsert employee profile: ${empErr.message}`,
+          );
+        }
+      }
+    }
+
+    return this.getPersonByUserId(userId);
+  }
+
+  async deletePerson(userId: string, adminUserId: string) {
+    const client = this.supabaseService.getSystemClient();
+
+    // Check if target exists
+    const { data: target, error: targetErr } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (targetErr || !target) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Không tìm thấy tài khoản người dùng.',
+      });
+    }
+
+    if (target.id === adminUserId) {
+      throw new BadRequestException({
+        code: 'CANNOT_TERMINATE_SELF',
+        message: 'Không thể tự xóa tài khoản của chính mình.',
+      });
+    }
+
+    const now = new Date().toISOString();
+
+    // 1. Clear leadership / management / reviewer / assignee positions
+    await Promise.allSettled([
+      client
+        .from('departments')
+        .update({
+          head_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('head_user_id', userId),
+      client
+        .from('teams')
+        .update({
+          leader_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('leader_user_id', userId),
+      client
+        .from('employee_profiles')
+        .update({
+          reports_to_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('reports_to_user_id', userId),
+      client
+        .from('tasks')
+        .update({
+          assignee_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('tasks')
+        .update({
+          reporter_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('reporter_user_id', userId),
+      client
+        .from('projects')
+        .update({
+          project_manager_user_id: null,
+          updated_by: adminUserId,
+          updated_at: now,
+        })
+        .eq('project_manager_user_id', userId),
+      client
+        .from('leave_requests')
+        .update({ reviewer_user_id: null, updated_at: now })
+        .eq('reviewer_user_id', userId),
+      client
+        .from('leave_requests')
+        .update({ approved_by: null, updated_at: now })
+        .eq('approved_by', userId),
+      client
+        .from('leave_requests')
+        .update({ cancelled_by: null, updated_at: now })
+        .eq('cancelled_by', userId),
+      client
+        .from('support_tickets')
+        .update({
+          assignee_user_id: null,
+          updated_by_user_id: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('calendar_events')
+        .update({
+          assignee_user_id: null,
+          updated_by_user_id: adminUserId,
+          updated_at: now,
+        })
+        .eq('assignee_user_id', userId),
+      client
+        .from('invoices')
+        .update({ approved_by_user_id: null, updated_at: now })
+        .eq('approved_by_user_id', userId),
+      client
+        .from('contracts')
+        .update({ approved_by_user_id: null, updated_at: now })
+        .eq('approved_by_user_id', userId),
+      client
+        .from('profiles')
+        .update({ approved_by: null, updated_at: now })
+        .eq('approved_by', userId),
+      client
+        .from('profiles')
+        .update({ rejected_by: null, updated_at: now })
+        .eq('rejected_by', userId),
+    ]);
+
+    // 2. Remove all related dependent records that belong to this user
+    await Promise.allSettled([
+      client
+        .from('account_approval_events')
+        .delete()
+        .eq('target_user_id', userId),
+      client.from('account_approval_events').delete().eq('actor_id', userId),
+      client.from('project_memberships').delete().eq('user_id', userId),
+      client.from('client_memberships').delete().eq('user_id', userId),
+      client.from('employee_profiles').delete().eq('user_id', userId),
+      client.from('notification_preferences').delete().eq('user_id', userId),
+      client.from('notifications').delete().eq('recipient_user_id', userId),
+      client.from('notifications').delete().eq('created_by', userId),
+      client.from('payroll_records').delete().eq('user_id', userId),
+      client.from('attendance_records').delete().eq('user_id', userId),
+      client.from('leave_requests').delete().eq('user_id', userId),
+      client.from('expenses').delete().eq('submitted_by_user_id', userId),
+      client.from('reimbursements').delete().eq('submitted_by_user_id', userId),
+      client.from('support_tickets').delete().eq('sender_user_id', userId),
+      client.from('calendar_events').delete().eq('creator_user_id', userId),
+      client
+        .from('company_documents')
+        .delete()
+        .eq('uploaded_by_user_id', userId),
+      client
+        .from('task_attachments')
+        .delete()
+        .eq('uploaded_by_user_id', userId),
+      client.from('task_comments').delete().eq('user_id', userId),
+      client.from('task_activity_logs').delete().eq('actor_id', userId),
+      client.from('chat_messages').delete().eq('sender_user_id', userId),
+      client.from('chat_participants').delete().eq('user_id', userId),
+      client.from('chat_reads').delete().eq('user_id', userId),
+      client
+        .from('direct_conversations')
+        .delete()
+        .eq('direct_user_low', userId),
+      client
+        .from('direct_conversations')
+        .delete()
+        .eq('direct_user_high', userId),
+    ]);
+
+    // 3. Delete from Supabase Auth (which cascades to public.profiles)
+    let authDeleted = false;
+    try {
+      if (client.auth?.admin?.deleteUser) {
+        const { error: authErr } = await client.auth.admin.deleteUser(userId);
+        if (!authErr) {
+          authDeleted = true;
+        } else {
+          this.logger.warn(
+            `Auth deleteUser returned error: ${authErr.message}`,
+          );
+        }
+      }
+    } catch (authErr: any) {
+      this.logger.warn(
+        `Supabase auth deleteUser exception: ${authErr?.message || authErr}`,
+      );
+    }
+
+    // 4. If profile still exists in public.profiles, explicitly delete it
+    const { error: deleteProfErr } = await client
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
+
+    if (deleteProfErr && !authDeleted) {
+      this.logger.error(
+        `Failed to delete user profile from database: ${deleteProfErr.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'USER_DELETION_FAILED',
+        message: 'Không thể xóa tài khoản người dùng khỏi cơ sở dữ liệu.',
+      });
+    }
+
+    return {
+      success: true,
+      message:
+        'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
+    };
+  }
+
+  async getUserProjects(userId: string) {
+    const client = this.supabaseService.getSystemClient();
+
+    const { data, error } = await client
+      .from('project_memberships')
+      .select(
+        `
+        id,
+        project_id,
+        project_role,
+        joined_at,
+        project:projects (
+          id,
+          project_code,
+          name,
+          status,
+          priority,
+          start_date,
+          due_date
+        )
+      `,
+      )
+      .eq('user_id', userId);
+
+    if (error) {
+      this.logger.error(`Failed to get user projects: ${error.message}`);
+      return [];
+    }
+
+    return (data || []).map((m: any) => ({
+      membershipId: m.id,
+      projectId: m.project_id,
+      projectRole: m.project_role,
+      joinedAt: m.joined_at,
+      project: m.project,
+    }));
+  }
+
+  async assignUserProjects(
+    userId: string,
+    dto: AssignUserProjectsDto,
+    adminUserId: string,
+  ) {
+    const client = this.supabaseService.getSystemClient();
+
+    // Verify user exists and is active
+    const { data: profile } = await client
+      .from('profiles')
+      .select('id, role, account_status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Không tìm thấy thông tin tài khoản người dùng.',
+      });
+    }
+
+    // Delete existing project memberships for this user
+    await client.from('project_memberships').delete().eq('user_id', userId);
+
+    // Insert new memberships
+    if (dto.projectIds.length > 0) {
+      const inserts = dto.projectIds.map((projId) => ({
+        project_id: projId,
+        user_id: userId,
+        project_role: dto.projectRole || 'member',
+        created_by: adminUserId,
+      }));
+
+      const { error: insErr } = await client
+        .from('project_memberships')
+        .insert(inserts);
+
+      if (insErr) {
+        this.logger.error(`Failed to assign user projects: ${insErr.message}`);
+        throw new InternalServerErrorException({
+          code: 'PROJECT_ASSIGNMENT_FAILED',
+          message: 'Không thể phân bổ dự án cho nhân sự.',
+        });
+      }
+    }
+
+    return this.getUserProjects(userId);
+  }
+
+  // --- OWN PROFILE UPDATE ---
+  async updateOwnProfile(userId: string, dto: UpdateOwnProfileDto) {
+    const client = this.supabaseService.getSystemClient();
+    const now = new Date().toISOString();
+    const updates: any = { updated_at: now };
+    if (dto.fullName !== undefined) updates.full_name = dto.fullName.trim();
+    if (dto.phone !== undefined)
+      updates.phone = dto.phone ? dto.phone.trim() : null;
+    if (dto.avatarUrl !== undefined)
+      updates.avatar_url = dto.avatarUrl ? dto.avatarUrl.trim() : null;
+
+    const { data, error } = await client
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select('id, email, full_name, avatar_url, phone, account_status, role')
+      .single();
+
+    if (error) {
+      this.logger.error(
+        `Failed to update own profile for ${userId}: ${error.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'PROFILE_UPDATE_FAILED',
+        message: 'Không thể cập nhật thông tin cá nhân.',
+      });
+    }
+
+    return {
+      id: data.id,
+      email: data.email,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      phone: data.phone,
+      accountStatus: data.account_status,
+      role: data.role,
+    };
   }
 }

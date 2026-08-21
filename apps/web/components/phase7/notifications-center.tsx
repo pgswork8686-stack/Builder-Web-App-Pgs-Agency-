@@ -2,13 +2,30 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Bell, CheckCheck, Loader2, RefreshCw, Settings } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  Loader2,
+  RefreshCw,
+  Settings,
+  Megaphone,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import {
   type NotificationItem,
   type NotificationPreferences,
   notificationsApi,
 } from "@/lib/api/notifications";
+import { getMe } from "@/lib/api/auth";
 import { NotificationBell } from "./notification-bell";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Dialog } from "@/components/ui/dialog";
 
 function safeActionUrl(url: string | null) {
   if (!url || !url.startsWith("/app/")) return "/app/notifications";
@@ -33,6 +50,28 @@ export function NotificationsCenter() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Admin broadcast states
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastType, setBroadcastType] = useState("announcement");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastActionUrl, setBroadcastActionUrl] = useState("");
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [broadcastSuccessMsg, setBroadcastSuccessMsg] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    getMe()
+      .then((res) => {
+        if (res.account.role === "admin") {
+          setIsAdmin(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -119,150 +158,206 @@ export function NotificationsCenter() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#070707] text-[#FFF8E6]">
-      <header className="sticky top-0 z-20 border-b border-[#151516] bg-[#0E0E0F]/90 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FFC400]">
-              Phase 7
-            </div>
-            <h1 className="mt-1 text-2xl font-black text-white">
-              Trung tâm thông báo
-            </h1>
-            <p className="mt-1 text-sm text-[#606060]">
-              Nhận tín hiệu từ task, bình luận, nghỉ phép, chấm công, tài chính,
-              chat và thay đổi dự án.
-            </p>
-          </div>
-          <NotificationBell />
-        </div>
-      </header>
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
 
-      <main className="mx-auto grid max-w-7xl gap-6 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
-        <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F]">
-          <div className="flex flex-col gap-3 border-b border-[#151516] p-5 sm:flex-row sm:items-center sm:justify-between">
+    try {
+      setBroadcasting(true);
+      setError(null);
+      const res = await notificationsApi.broadcast({
+        title: broadcastTitle.trim(),
+        message: broadcastMessage.trim(),
+        type: broadcastType,
+        actionUrl: broadcastActionUrl.trim() || null,
+      });
+
+      setBroadcastSuccessMsg(
+        res.message || "Đã phát thông báo toàn thể thành công!",
+      );
+      setTimeout(() => setBroadcastSuccessMsg(null), 5000);
+      setIsBroadcastOpen(false);
+      setBroadcastTitle("");
+      setBroadcastMessage("");
+      setBroadcastActionUrl("");
+      setBroadcastType("announcement");
+      await load();
+    } catch (err: any) {
+      setError(err?.message || "Không thể phát thông báo.");
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionHeader
+        title="Trung tâm thông báo"
+        description="Nhận tín hiệu từ công việc, bình luận, nghỉ phép, chấm công, tài chính, chat và thay đổi dự án."
+        action={
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsBroadcastOpen(true)}
+                leftIcon={<Megaphone className="h-3.5 w-3.5" />}
+                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-semibold"
+              >
+                Gửi thông báo toàn công ty
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => void load()}
+              leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
+            >
+              Tải lại
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={saving === "all"}
+              onClick={markAllRead}
+              leftIcon={
+                saving === "all" ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CheckCheck className="h-3.5 w-3.5" />
+                )
+              }
+            >
+              Đọc tất cả
+            </Button>
+          </div>
+        }
+      />
+
+      {broadcastSuccessMsg && (
+        <div className="p-4 rounded-2xl bg-[#E6FBF5] border border-[#A7F3D0] text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-[#00B788] shrink-0" />
+            <span>{broadcastSuccessMsg}</span>
+          </div>
+          <button
+            onClick={() => setBroadcastSuccessMsg(null)}
+            className="text-emerald-600 hover:text-emerald-900 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <Card className="p-6 space-y-4">
+          <div className="flex flex-col gap-3 border-b border-[#EDF2F7] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFC400] text-black">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-base font-extrabold text-[#0F172A]">
                   Luồng thông báo của bạn
                 </h2>
-                <p className="text-xs text-[#606060]">
+                <p className="text-xs text-[#64748B]">
                   Dữ liệu được phân trang từ database, scope theo tài khoản hiện
                   tại.
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
+            <div>
+              <Button
+                variant={unreadOnly ? "primary" : "outline"}
+                size="sm"
                 onClick={() => {
                   setPage(1);
                   setUnreadOnly((value) => !value);
                 }}
-                className={`rounded-xl border px-3 py-2 text-xs font-bold ${
-                  unreadOnly
-                    ? "border-[#FFC400] bg-[#FFC400] text-black"
-                    : "border-[#FFC400]/20 text-[#FFC400]"
-                }`}
               >
                 Chỉ chưa đọc
-              </button>
-              <button
-                type="button"
-                onClick={() => void load()}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400]"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-                Tải lại
-              </button>
-              <button
-                type="button"
-                disabled={saving === "all"}
-                onClick={markAllRead}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#FFC400] px-3 py-2 text-xs font-black text-black disabled:opacity-50"
-              >
-                {saving === "all" ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <CheckCheck className="h-3.5 w-3.5" />
-                )}
-                Đọc tất cả
-              </button>
+              </Button>
             </div>
           </div>
 
           {error ? (
-            <div className="m-5 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">
               {error}
             </div>
           ) : null}
 
           {loading ? (
-            <div className="flex items-center justify-center gap-2 p-12 text-sm text-[#606060]">
-              <Loader2 className="h-4 w-4 animate-spin text-[#FFC400]" />
+            <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#64748B]">
+              <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
               Đang tải thông báo...
             </div>
           ) : items.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="text-lg font-bold text-white">
-                Không có thông báo phù hợp
-              </div>
-              <p className="mt-2 text-sm text-[#606060]">
-                Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại
-                đây.
-              </p>
-            </div>
+            <EmptyState
+              icon={<Bell className="w-8 h-8 text-[#4F75FF]" />}
+              title="Không có thông báo phù hợp"
+              description="Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại đây."
+            />
           ) : (
-            <div className="divide-y divide-[#151516]">
+            <div className="divide-y divide-[#EDF2F7]">
               {items.map((item) => (
-                <article key={item.id} className="p-5">
-                  <div className="flex items-start gap-4">
+                <article key={item.id} className="py-4 first:pt-0 last:pb-0">
+                  <div className="flex items-start gap-3.5">
                     <span
-                      className={`mt-2 h-3 w-3 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#303033]" : "bg-[#FFC400]"
+                      className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <h3 className="font-bold text-white">{item.title}</h3>
-                          <p className="mt-1 text-sm leading-6 text-[#FFF8E6]/75">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-sm text-[#0F172A]">
+                              {item.title}
+                            </h3>
+                            {item.metadata &&
+                              (item.metadata as any).isBroadcast && (
+                                <Badge variant="gold" size="sm">
+                                  Toàn thể công ty
+                                </Badge>
+                              )}
+                          </div>
+                          <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">
                             {item.message}
                           </p>
                         </div>
-                        <div className="shrink-0 text-xs text-[#606060]">
+                        <span className="shrink-0 text-[11px] text-[#94A3B8] font-mono">
                           {formatDateTime(item.createdAt)}
-                        </div>
+                        </span>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-[#151516] px-3 py-1 text-[11px] font-semibold text-[#FFC400]">
+                        <Badge variant="blue" size="sm">
                           {item.type}
-                        </span>
+                        </Badge>
                         {item.entityType ? (
-                          <span className="rounded-full bg-[#151516] px-3 py-1 text-[11px] text-[#606060]">
+                          <Badge variant="default" size="sm">
                             {item.entityType}
-                          </span>
+                          </Badge>
                         ) : null}
-                        <Link
-                          href={safeActionUrl(item.actionUrl)}
-                          onClick={() => void markRead(item)}
-                          className="rounded-xl bg-[#FFC400] px-3 py-2 text-xs font-black text-black"
-                        >
-                          Mở liên kết
-                        </Link>
+                        {item.actionUrl && (
+                          <Link
+                            href={safeActionUrl(item.actionUrl)}
+                            onClick={() => void markRead(item)}
+                          >
+                            <Button variant="secondary" size="sm">
+                              Mở liên kết
+                            </Button>
+                          </Link>
+                        )}
                         {!item.readAt ? (
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             disabled={saving === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-50"
+                            className="text-[#4F75FF]"
                           >
                             {saving === item.id ? "Đang lưu..." : "Đã đọc"}
-                          </button>
+                          </Button>
                         ) : null}
                       </div>
                     </div>
@@ -272,115 +367,246 @@ export function NotificationsCenter() {
             </div>
           )}
 
-          <div className="flex items-center justify-between border-t border-[#151516] p-5">
-            <button
-              type="button"
+          <div className="flex items-center justify-between border-t border-[#EDF2F7] pt-4">
+            <Button
+              variant="outline"
+              size="sm"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
-              className="rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-30"
             >
               Trang trước
-            </button>
-            <div className="text-xs text-[#606060]">
-              Trang {page}/{totalPages}
-            </div>
-            <button
-              type="button"
+            </Button>
+            <span className="text-xs text-[#64748B]">
+              Trang {page}/{totalPages || 1}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
               disabled={page >= totalPages}
               onClick={() => setPage((value) => value + 1)}
-              className="rounded-xl border border-[#FFC400]/20 px-3 py-2 text-xs font-bold text-[#FFC400] disabled:opacity-30"
             >
               Trang sau
-            </button>
+            </Button>
           </div>
-        </section>
+        </Card>
 
         <aside className="space-y-6">
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
+          {/* Admin Broadcast Card */}
+          {isAdmin && (
+            <Card className="p-6 space-y-3.5 border border-[#E0EAFF] bg-[#F8FAFF]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F75FF] text-white">
+                  <Megaphone className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-xs text-[#0F172A]">
+                    Thông báo toàn thể nhân viên
+                  </h3>
+                  <p className="text-[10px] text-[#4F75FF] font-semibold">
+                    Quyền hạn: Admin
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Gửi thông báo & tin tức quan trọng đến toàn bộ nhân sự đang hoạt
+                động trong doanh nghiệp.
+              </p>
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                onClick={() => setIsBroadcastOpen(true)}
+                leftIcon={<Megaphone className="h-3.5 w-3.5" />}
+              >
+                Gửi thông báo toàn thể
+              </Button>
+            </Card>
+          )}
+
+          <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFC400]/10 text-[#FFC400]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <Settings className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-white">Tùy chọn nhận tin</h2>
-                <p className="text-xs text-[#606060]">
-                  Preferences nằm sau Nest, không ghi trực tiếp từ browser.
+                <h2 className="font-bold text-[#0F172A] text-sm">
+                  Tùy chọn nhận tin
+                </h2>
+                <p className="text-[11px] text-[#64748B]">
+                  Preferences quản lý thông qua Nest API.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 space-y-3">
+            <div className="space-y-3 pt-2">
               <button
                 type="button"
                 disabled={!preferences || saving === "preferences"}
                 onClick={toggleInApp}
-                className="flex w-full items-center justify-between rounded-2xl border border-[#151516] p-4 text-left disabled:opacity-50"
+                className="flex w-full items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
-                  <span className="block text-sm font-bold text-white">
+                  <span className="block text-xs font-bold text-[#0F172A]">
                     Thông báo trong app
                   </span>
-                  <span className="text-xs text-[#606060]">
+                  <span className="text-[11px] text-[#64748B]">
                     Áp dụng cho bell, center và realtime.
                   </span>
                 </span>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-black ${
-                    preferences?.inAppEnabled
-                      ? "bg-emerald-400 text-black"
-                      : "bg-[#151516] text-[#606060]"
-                  }`}
+                <Badge
+                  variant={preferences?.inAppEnabled ? "success" : "default"}
+                  size="sm"
                 >
                   {preferences?.inAppEnabled ? "Bật" : "Tắt"}
-                </span>
+                </Badge>
               </button>
 
               <button
                 type="button"
                 disabled={!preferences || saving === "preferences"}
                 onClick={toggleEmail}
-                className="flex w-full items-center justify-between rounded-2xl border border-[#151516] p-4 text-left disabled:opacity-50"
+                className="flex w-full items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
-                  <span className="block text-sm font-bold text-white">
+                  <span className="block text-xs font-bold text-[#0F172A]">
                     Email notification
                   </span>
-                  <span className="text-xs text-[#606060]">
-                    Placeholder preference cho kênh email sau này.
+                  <span className="text-[11px] text-[#64748B]">
+                    Placeholder preference cho email.
                   </span>
                 </span>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-black ${
-                    preferences?.emailEnabled
-                      ? "bg-emerald-400 text-black"
-                      : "bg-[#151516] text-[#606060]"
-                  }`}
+                <Badge
+                  variant={preferences?.emailEnabled ? "success" : "default"}
+                  size="sm"
                 >
                   {preferences?.emailEnabled ? "Bật" : "Tắt"}
-                </span>
+                </Badge>
               </button>
             </div>
-          </section>
+          </Card>
 
-          <section className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-5">
-            <h2 className="font-bold text-white">Đường dẫn nhanh</h2>
-            <div className="mt-4 grid gap-2">
+          <Card className="p-6 space-y-3">
+            <h2 className="font-bold text-[#0F172A] text-sm">
+              Đường dẫn nhanh
+            </h2>
+            <div className="grid gap-2">
               <Link
                 href="/app/chat"
-                className="rounded-2xl border border-[#151516] p-4 text-sm font-semibold text-[#FFC400] hover:border-[#FFC400]/40"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
               >
                 Mở chat nội bộ / project
               </Link>
               <Link
                 href="/app/projects"
-                className="rounded-2xl border border-[#151516] p-4 text-sm font-semibold text-[#FFC400] hover:border-[#FFC400]/40"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
               >
                 Xem workspace dự án
               </Link>
             </div>
-          </section>
+          </Card>
         </aside>
-      </main>
+      </div>
+
+      {/* DIALOG GỬI THÔNG BÁO TOÀN THỂ NHÂN VIÊN */}
+      <Dialog
+        isOpen={isBroadcastOpen}
+        onClose={() => !broadcasting && setIsBroadcastOpen(false)}
+        title={
+          <div className="flex items-center gap-2.5 text-lg font-black text-[#0F172A]">
+            <Megaphone className="w-5 h-5 text-[#4F75FF]" />
+            Gửi thông báo đến toàn thể nhân viên
+          </div>
+        }
+        description="Thông báo này sẽ được gửi realtime và lưu vào danh sách thông báo của tất cả nhân sự đang hoạt động trong agency."
+        maxWidth="lg"
+      >
+        <form onSubmit={handleBroadcast} className="space-y-4 pt-2">
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Tiêu đề thông báo *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="VD: Thông báo nghỉ lễ Quốc Khánh / Họp toàn thể công ty"
+              value={broadcastTitle}
+              onChange={(e) => setBroadcastTitle(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Loại thông báo
+              </label>
+              <select
+                value={broadcastType}
+                onChange={(e) => setBroadcastType(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              >
+                <option value="announcement">
+                  Thông báo chung (Announcement)
+                </option>
+                <option value="urgent">Khẩn cấp (Urgent)</option>
+                <option value="event">Sự kiện công ty (Company Event)</option>
+                <option value="system">
+                  Cập nhật hệ thống (System Update)
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+                Đường dẫn liên kết (Tùy chọn)
+              </label>
+              <input
+                type="text"
+                placeholder="VD: /app/admin/documents hoặc /app/calendar"
+                value={broadcastActionUrl}
+                onChange={(e) => setBroadcastActionUrl(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              Nội dung thông báo chi tiết *
+            </label>
+            <textarea
+              required
+              rows={4}
+              placeholder="Nhập nội dung thông báo gửi đến toàn thể nhân viên..."
+              value={broadcastMessage}
+              onChange={(e) => setBroadcastMessage(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={broadcasting}
+              onClick={() => setIsBroadcastOpen(false)}
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={broadcasting}
+              leftIcon={<Send className="w-3.5 h-3.5" />}
+              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            >
+              Phát thông báo ngay
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }

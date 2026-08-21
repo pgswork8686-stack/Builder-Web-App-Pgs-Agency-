@@ -168,4 +168,93 @@ describe('NotificationsService', () => {
 
     expect(from).not.toHaveBeenCalled();
   });
+
+  it('broadcasts notification to all active profiles', async () => {
+    const activeProfilesQuery = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValue({
+        data: [{ id: 'user-1' }, { id: 'user-2' }],
+        error: null,
+      }),
+    };
+
+    const prefQuery1 = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      maybeSingle: jest.fn().mockResolvedValue({
+        data: { in_app_enabled: true },
+        error: null,
+      }),
+    };
+
+    const insertQuery1 = {
+      insert: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: {
+          id: 'notif-1',
+          recipient_user_id: 'user-1',
+          type: 'announcement',
+          title: 'All-hands Meeting',
+          message: 'Meeting at 3PM',
+          created_at: '2026-08-19T00:00:00Z',
+        },
+        error: null,
+      }),
+    };
+
+    const prefQuery2 = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      maybeSingle: jest.fn().mockResolvedValue({
+        data: { in_app_enabled: true },
+        error: null,
+      }),
+    };
+
+    const insertQuery2 = {
+      insert: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: {
+          id: 'notif-2',
+          recipient_user_id: 'user-2',
+          type: 'announcement',
+          title: 'All-hands Meeting',
+          message: 'Meeting at 3PM',
+          created_at: '2026-08-19T00:00:00Z',
+        },
+        error: null,
+      }),
+    };
+
+    from
+      .mockReturnValueOnce(activeProfilesQuery)
+      .mockReturnValueOnce(prefQuery1)
+      .mockReturnValueOnce(insertQuery1)
+      .mockReturnValueOnce(prefQuery2)
+      .mockReturnValueOnce(insertQuery2);
+
+    const adminUser = {
+      ...user(),
+      role: 'admin' as const,
+    };
+
+    const res = await service.broadcastToAll(
+      {
+        title: 'All-hands Meeting',
+        message: 'Meeting at 3PM',
+        type: 'announcement',
+      },
+      adminUser,
+    );
+
+    expect(res).toEqual({
+      success: true,
+      count: 2,
+      delivered: 2,
+      message: 'Đã phát thông báo thành công đến toàn thể 2 thành viên!',
+    });
+    expect(gateway.emitToUser).toHaveBeenCalledTimes(2);
+  });
 });

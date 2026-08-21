@@ -8,6 +8,7 @@ import {
 import type { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
 import type {
+  BroadcastNotificationDto,
   CreateNotificationEventDto,
   NotificationListQuery,
   NotificationPreferencesUpdateDto,
@@ -341,5 +342,56 @@ export class NotificationsService {
     const mapped = this.mapNotification(data);
     this.gateway?.emitToUser(recipientUserId, 'notifications:new', mapped);
     return mapped;
+  }
+
+  async broadcastToAll(dto: BroadcastNotificationDto, adminUser: RequestUser) {
+    const { data: activeProfiles, error } = await this.client
+      .from('profiles')
+      .select('id')
+      .eq('account_status', 'active');
+
+    if (error) {
+      this.databaseFailure(
+        'BROADCAST_RECIPIENTS_LOOKUP_FAILED',
+        'Không thể truy vấn danh sách người dùng để phát thông báo.',
+        error,
+      );
+    }
+
+    const recipients = (activeProfiles || []).map((p: any) => p.id);
+    if (recipients.length === 0) {
+      return {
+        success: true,
+        count: 0,
+        delivered: 0,
+        message: 'Không tìm thấy tài khoản hoạt động trong hệ thống.',
+      };
+    }
+
+    const createdNotifications = [];
+    for (const recipientId of recipients) {
+      const notification = await this.createForUser({
+        recipientUserId: recipientId,
+        type: dto.type || 'announcement',
+        title: dto.title,
+        message: dto.message,
+        actionUrl: dto.actionUrl ?? null,
+        actorUserId: adminUser.profileId,
+        metadata: {
+          isBroadcast: true,
+          broadcastByRole: adminUser.role,
+        },
+      });
+      if (notification) {
+        createdNotifications.push(notification);
+      }
+    }
+
+    return {
+      success: true,
+      count: recipients.length,
+      delivered: createdNotifications.length,
+      message: `Đã phát thông báo thành công đến toàn thể ${recipients.length} thành viên!`,
+    };
   }
 }

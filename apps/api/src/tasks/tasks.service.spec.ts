@@ -742,5 +742,102 @@ describe('TasksService', () => {
         response: { code: 'TASK_ASSIGNEE_NOT_PROJECT_MEMBER' },
       });
     });
+
+    it('passes when Task in Project A is linked to Item in Project A', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'project_service_items')
+          return queryResult({
+            data: { id: 'item-valid', project_id: PROJECT_ID },
+          });
+        if (table === 'tasks')
+          return queryResult(
+            { data: taskRow({ project_service_item_id: 'item-valid' }) },
+            'single',
+          );
+        return queryResult({});
+      });
+
+      const res = await service.createTask(
+        PROJECT_ID,
+        {
+          title: 'Task with Valid Delivery Item',
+          status: 'todo',
+          priority: 'medium',
+          projectServiceItemId: 'item-valid',
+          sortOrder: 0,
+        },
+        user('admin'),
+      );
+
+      expect(res).toMatchObject({
+        id: TASK_ID,
+        project_service_item_id: 'item-valid',
+      });
+    });
+
+    it('rejects cross-project projectServiceItemId linking on task creation (Project A Task + Project B Item = FAIL)', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'project_service_items')
+          return queryResult({
+            data: { id: 'item-foreign', project_id: OTHER_PROJECT_ID },
+          });
+        return queryResult({});
+      });
+
+      await expect(
+        service.createTask(
+          PROJECT_ID,
+          {
+            title: 'Task with Foreign Delivery Item',
+            status: 'todo',
+            priority: 'medium',
+            projectServiceItemId: 'item-foreign',
+            sortOrder: 0,
+          },
+          user('admin'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'TASK_PROJECT_SERVICE_ITEM_INVALID' },
+      });
+    });
+
+    it('passes when Task has no projectServiceItemId (null/undefined = PASS)', async () => {
+      client.from = jest.fn().mockImplementation((table: string) => {
+        if (table === 'projects')
+          return queryResult({ data: { id: PROJECT_ID } });
+        if (table === 'project_memberships')
+          return queryResult({ data: { project_role: 'project_manager' } });
+        if (table === 'tasks')
+          return queryResult(
+            { data: taskRow({ project_service_item_id: null }) },
+            'single',
+          );
+        return queryResult({});
+      });
+
+      const res = await service.createTask(
+        PROJECT_ID,
+        {
+          title: 'Task without Delivery Item',
+          status: 'todo',
+          priority: 'medium',
+          sortOrder: 0,
+        },
+        user('admin'),
+      );
+
+      expect(res).toMatchObject({
+        id: TASK_ID,
+        project_service_item_id: null,
+      });
+    });
   });
 });

@@ -154,7 +154,7 @@ describe('Phase 3 API (e2e)', () => {
       .post('/api/v1/admin/projects')
       .set(authorized())
       .send({
-        projectCode: ' pgs-2026-001 ',
+        projectCode: ' da_01 ',
         clientCompanyId: COMPANY_ID,
         name: 'Project A',
       })
@@ -162,7 +162,7 @@ describe('Phase 3 API (e2e)', () => {
 
     expect(projectsService.createProject).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectCode: 'PGS-2026-001',
+        projectCode: 'DA_01',
         status: 'draft',
         priority: 'medium',
       }),

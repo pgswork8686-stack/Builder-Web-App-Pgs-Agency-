@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getMe } from "@/lib/api/auth";
 import { Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function AuthResolvePage() {
   const router = useRouter();
@@ -74,32 +76,36 @@ export default function AuthResolvePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#070707] text-white p-6">
-      <div className="flex flex-col items-center gap-4 p-8 bg-[#0E0E0F] border border-[#151516] rounded-2xl shadow-2xl text-center max-w-md w-full">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] text-[#0F172A] p-6">
+      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#EDF2F7]">
         {errorMsg ? (
           <>
-            <h3 className="text-lg font-bold text-red-500">LỖI XÁC THỰC</h3>
-            <p className="text-sm text-[#FFF8E6]/80">{errorMsg}</p>
-            <button
+            <h3 className="text-base font-extrabold text-red-600">
+              LỖI XÁC THỰC
+            </h3>
+            <p className="text-xs text-[#64748B]">{errorMsg}</p>
+            <Button
+              variant="danger"
+              size="sm"
               onClick={() => {
                 const supabase = createClient();
                 supabase.auth
                   .signOut()
                   .then(() => router.replace("/auth/login"));
               }}
-              className="mt-4 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors"
+              className="mt-2"
             >
               Đăng xuất và thử lại
-            </button>
+            </Button>
           </>
         ) : (
           <>
-            <Loader2 className="w-10 h-10 text-[#FFC400] animate-spin" />
-            <h3 className="text-lg font-bold text-white">PGS HUB</h3>
-            <p className="text-xs text-[#FFF8E6]/70">{statusText}</p>
+            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+            <h3 className="text-base font-extrabold text-[#0F172A]">PGS HUB</h3>
+            <p className="text-xs text-[#64748B]">{statusText}</p>
           </>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

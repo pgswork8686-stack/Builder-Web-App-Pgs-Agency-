@@ -56,13 +56,82 @@ describe('OrganizationService', () => {
         service.createDepartment({ code: 'SEO', name: 'SEO Dept' }, 'admin-u1'),
       ).rejects.toThrow(ConflictException);
     });
+
+    it('should reject assigning client as department head', async () => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'departments') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest
+              .fn()
+              .mockResolvedValue({ data: null, error: null }),
+          };
+        }
+        if (table === 'profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: {
+                id: 'client-1',
+                role: 'client',
+                account_status: 'active',
+              },
+              error: null,
+            }),
+          };
+        }
+        return {};
+      });
+
+      await expect(
+        service.createDepartment(
+          { code: 'PB_TEST', name: 'Test Dept', headUserId: 'client-1' },
+          'admin-u1',
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should reject assigning inactive user as department head', async () => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === 'departments') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest
+              .fn()
+              .mockResolvedValue({ data: null, error: null }),
+          };
+        }
+        if (table === 'profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: {
+                id: 'emp-inactive',
+                role: 'employee',
+                account_status: 'inactive',
+              },
+              error: null,
+            }),
+          };
+        }
+        return {};
+      });
+
+      await expect(
+        service.createDepartment(
+          { code: 'PB_TEST', name: 'Test Dept', headUserId: 'emp-inactive' },
+          'admin-u1',
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('createTeam', () => {
     it('should throw BadRequestException if team leader role is not team_leader', async () => {
-      // Mock department exists
-      // Mock team code doesn't exist
-      // Mock profiles lookup returns user with employee role
       mockSupabaseClient.from.mockImplementation((table: string) => {
         if (table === 'departments') {
           return {

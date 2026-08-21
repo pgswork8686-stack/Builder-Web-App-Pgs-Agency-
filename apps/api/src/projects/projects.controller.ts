@@ -24,8 +24,10 @@ import {
   ProjectListQuerySchema,
   UpdateProjectMembershipSchema,
   UpdateProjectSchema,
+  UpdateProjectServiceItemSchema,
   UpdateProjectServiceSchema,
 } from './dto/project.dto';
+import type { AppRole } from '../auth/auth.types';
 import { ProjectsService } from './projects.service';
 
 const ScopedListQuerySchema = z.object({
@@ -89,6 +91,25 @@ export class ProjectsController {
   @Get('admin/projects/:projectId/members')
   @Roles('admin')
   async getMemberships(@Param('projectId', ParseUUIDPipe) projectId: string) {
+    return this.projectsService.getMemberships(projectId);
+  }
+
+  @Get('projects/:projectId/members')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectMembers(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+  ) {
+    if (role === 'client') {
+      await this.projectsService.getClientProjectById(userId, projectId);
+    } else if (role !== 'admin') {
+      await this.projectsService.getInternalProjectById(
+        userId,
+        projectId,
+        role,
+      );
+    }
     return this.projectsService.getMemberships(projectId);
   }
 
@@ -187,10 +208,63 @@ export class ProjectsController {
     );
   }
 
+  @Get('projects/:projectId/service-items')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectServiceItems(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+    @Query('projectServiceId') projectServiceId?: string,
+  ) {
+    return this.projectsService.getProjectServiceItems(
+      userId,
+      role,
+      projectId,
+      projectServiceId,
+    );
+  }
+
+  @Get('projects/:projectId/services/:projectServiceId/items')
+  @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
+  async getProjectServiceItemsByService(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('projectServiceId', ParseUUIDPipe) projectServiceId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+  ) {
+    return this.projectsService.getProjectServiceItems(
+      userId,
+      role,
+      projectId,
+      projectServiceId,
+    );
+  }
+
+  @Patch('projects/:projectId/service-items/:itemId')
+  @Roles('admin', 'team_leader', 'employee')
+  async updateProjectServiceItem(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Body() body: unknown,
+    @CurrentUser('profileId') actorUserId: string,
+    @CurrentUser('role') role: AppRole,
+  ) {
+    const parsed = UpdateProjectServiceItemSchema.safeParse(body);
+    if (!parsed.success) invalidRequest(parsed.error);
+    return this.projectsService.updateProjectServiceItem(
+      actorUserId,
+      role,
+      projectId,
+      itemId,
+      parsed.data,
+    );
+  }
+
   @Get('projects')
-  @Roles('team_leader', 'employee', 'accountant')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
   async getInternalProjects(
     @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
     @Query() rawQuery: Record<string, string>,
   ) {
     const parsed = ScopedListQuerySchema.safeParse(rawQuery);
@@ -199,16 +273,18 @@ export class ProjectsController {
       userId,
       parsed.data.page,
       parsed.data.pageSize,
+      role,
     );
   }
 
   @Get('projects/:projectId')
-  @Roles('team_leader', 'employee', 'accountant')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
   async getInternalProject(
     @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
     @Param('projectId', ParseUUIDPipe) projectId: string,
   ) {
-    return this.projectsService.getInternalProjectById(userId, projectId);
+    return this.projectsService.getInternalProjectById(userId, projectId, role);
   }
 
   @Get('client/me/projects')

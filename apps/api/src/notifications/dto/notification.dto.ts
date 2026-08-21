@@ -55,3 +55,24 @@ export const CreateNotificationEventSchema = z
 export type CreateNotificationEventDto = z.infer<
   typeof CreateNotificationEventSchema
 >;
+
+export const BroadcastNotificationSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(1, 'Tiêu đề thông báo không được để trống')
+      .max(180),
+    message: z
+      .string()
+      .trim()
+      .min(1, 'Nội dung thông báo không được để trống')
+      .max(1200),
+    type: z.string().trim().min(2).max(80).optional().default('announcement'),
+    actionUrl: InternalActionUrlSchema,
+  })
+  .strict();
+
+export type BroadcastNotificationDto = z.infer<
+  typeof BroadcastNotificationSchema
+>;

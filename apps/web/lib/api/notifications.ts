@@ -86,4 +86,21 @@ export const notificationsApi = {
       body: JSON.stringify(payload),
     });
   },
+
+  broadcast(data: {
+    title: string;
+    message: string;
+    type?: string;
+    actionUrl?: string | null;
+  }) {
+    return request<{
+      success: boolean;
+      count: number;
+      delivered: number;
+      message: string;
+    }>("/notifications/broadcast", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };

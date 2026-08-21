@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { getMe, type AccountPayload } from "@/lib/api/auth";
 import { createClient } from "@/lib/supabase/client";
+import { AppShell } from "@/components/app-shell/app-shell";
 
 const roleHome: Record<NonNullable<AccountPayload["role"]>, string> = {
   admin: "/app/admin",
@@ -54,6 +55,9 @@ export default function ProtectedAppLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [account, setAccount] = useState<AccountPayload | null>(null);
+  const [user, setUser] = useState<import("@/lib/api/auth").UserPayload | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
 
@@ -99,6 +103,7 @@ export default function ProtectedAppLayout({
         }
 
         setAccount(me.account);
+        setUser(me.user);
         if (!isAllowedPath(pathname, me.account.role)) {
           router.replace(roleHome[me.account.role]);
         }
@@ -123,14 +128,38 @@ export default function ProtectedAppLayout({
 
   if (checking || !account) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#070707] text-[#FFF8E6]">
-        <div className="rounded-3xl border border-[#151516] bg-[#0E0E0F] p-8 text-center shadow-2xl">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#FFC400]" />
-          <p className="mt-4 text-sm text-[#606060]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] text-[#0F172A]">
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-center shadow-lg">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4F75FF]" />
+          <p className="mt-4 text-xs font-medium text-[#64748B]">
             Đang kiểm tra quyền truy cập...
           </p>
           {error ? (
-            <p className="mt-3 max-w-md text-sm text-red-300">{error}</p>
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <p className="max-w-md text-xs font-semibold text-red-600">
+                {error}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-[#4F75FF] hover:bg-[#3d62ee] rounded-lg transition-colors cursor-pointer"
+                >
+                  Thử lại
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                    router.replace("/auth/login");
+                  }}
+                  className="px-3 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
           ) : null}
         </div>
       </div>
@@ -139,13 +168,13 @@ export default function ProtectedAppLayout({
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#070707] p-6 text-[#FFF8E6]">
-        <div className="max-w-md rounded-3xl border border-red-500/20 bg-[#0E0E0F] p-8 text-center">
-          <ShieldAlert className="mx-auto h-10 w-10 text-red-400" />
-          <h1 className="mt-4 text-xl font-black text-white">
+      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] p-6 text-[#0F172A]">
+        <div className="max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
+          <ShieldAlert className="mx-auto h-10 w-10 text-red-500" />
+          <h1 className="mt-4 text-base font-extrabold text-[#0F172A]">
             Không có quyền truy cập
           </h1>
-          <p className="mt-2 text-sm text-[#606060]">
+          <p className="mt-2 text-xs text-[#64748B]">
             Bạn đang được chuyển về workspace đúng vai trò.
           </p>
         </div>
@@ -153,5 +182,9 @@ export default function ProtectedAppLayout({
     );
   }
 
-  return children;
+  return (
+    <AppShell account={account} user={user}>
+      {children}
+    </AppShell>
+  );
 }
