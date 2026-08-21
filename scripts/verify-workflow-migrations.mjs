@@ -5,9 +5,11 @@ import { fileURLToPath } from "node:url";
 
 import pg from "pg";
 import {
-  assertConfirmedDisposableLocalDatabaseUrl,
+  assertConfirmedLocalSupabaseMigrationDatabaseUrl,
+  assertNoHostedSupabaseEnvironment,
   DISPOSABLE_DATABASE_CONFIRMATION_ENV,
   DISPOSABLE_DATABASE_CONFIRMATION_VALUE,
+  LOCAL_SUPABASE_MIGRATION_ROLE,
 } from "./lib/local-endpoint-guard.mjs";
 
 const { Client } = pg;
@@ -46,6 +48,10 @@ const WORKFLOW_SEQUENCES = [
   "seq_project_workflow_stage_code",
 ];
 
+const ADMIN_ID = "00000000-0000-4000-8000-000000000001";
+const WORKFLOW_FIXTURE_AUTH_EMAILS = ["test-admin@example.invalid"];
+const WORKFLOW_FIXTURE_AUTH_IDS = [ADMIN_ID];
+
 const REQUIRED_RPCS = [
   "workflow_create_template",
   "workflow_clone_template",
@@ -72,7 +78,8 @@ const REQUIRED_INDEXES = [
   "idx_project_workflow_item_deps_workflow_successor",
 ];
 
-const ADMIN_ID = "00000000-0000-4000-8000-000000000001";
+assertNoHostedSupabaseEnvironment(process.env);
+
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
@@ -81,7 +88,7 @@ if (!DATABASE_URL) {
   );
 }
 
-assertConfirmedDisposableLocalDatabaseUrl(DATABASE_URL);
+assertConfirmedLocalSupabaseMigrationDatabaseUrl(DATABASE_URL);
 
 function phase(message) {
   process.stdout.write(`\n=== ${message} ===\n`);
@@ -162,137 +169,20 @@ async function loadManifest() {
 async function bootstrapSupabaseSurface(client) {
   await client.query(`
     DROP SCHEMA IF EXISTS public CASCADE;
-    DROP SCHEMA IF EXISTS supabase_migrations CASCADE;
     CREATE SCHEMA public;
-    GRANT ALL ON SCHEMA public TO postgres;
-    GRANT ALL ON SCHEMA public TO public;
+    GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
-    CREATE SCHEMA IF NOT EXISTS auth;
-    CREATE SCHEMA IF NOT EXISTS storage;
-    CREATE SCHEMA IF NOT EXISTS extensions;
-    CREATE SCHEMA IF NOT EXISTS supabase_migrations;
-
-    CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
-
-    CREATE TABLE IF NOT EXISTS auth.users (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      email TEXT UNIQUE,
-      phone TEXT,
-      email_confirmed_at TIMESTAMPTZ,
-      phone_confirmed_at TIMESTAMPTZ,
-      raw_app_meta_data JSONB DEFAULT '{}'::jsonb,
-      raw_user_meta_data JSONB DEFAULT '{}'::jsonb,
-      is_super_admin BOOLEAN DEFAULT false,
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now()
-    );
-
-    CREATE OR REPLACE FUNCTION auth.uid()
-    RETURNS UUID
-    LANGUAGE sql
-    STABLE
-    SET search_path = ''
-    AS $$
-      SELECT COALESCE(
-        nullif(current_setting('request.jwt.claim.sub', true), ''),
-        '00000000-0000-0000-0000-000000000000'
-      )::uuid
-    $$;
-
-    CREATE OR REPLACE FUNCTION auth.role()
-    RETURNS TEXT
-    LANGUAGE sql
-    STABLE
-    SET search_path = ''
-    AS $$
-      SELECT COALESCE(
-        nullif(current_setting('request.jwt.claim.role', true), ''),
-        'anon'
-      )
-    $$;
-
-    CREATE OR REPLACE FUNCTION auth.jwt()
-    RETURNS JSONB
-    LANGUAGE sql
-    STABLE
-    SET search_path = ''
-    AS $$
-      SELECT COALESCE(
-        nullif(current_setting('request.jwt.claims', true), ''),
-        '{}'
-      )::jsonb
-    $$;
-
-    CREATE TABLE IF NOT EXISTS storage.buckets (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      owner UUID,
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now(),
-      public BOOLEAN DEFAULT false,
-      avif_autodetection BOOLEAN DEFAULT false,
-      file_size_limit BIGINT,
-      allowed_mime_types TEXT[],
-      owner_id TEXT
-    );
-
-    CREATE TABLE IF NOT EXISTS storage.objects (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      bucket_id TEXT REFERENCES storage.buckets(id),
-      name TEXT,
-      owner UUID,
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now(),
-      last_accessed_at TIMESTAMPTZ DEFAULT now(),
-      metadata JSONB,
-      path_tokens TEXT[] GENERATED ALWAYS AS (string_to_array(name, '/')) STORED,
-      version TEXT,
-      owner_id TEXT
-    );
-
-    ALTER TABLE storage.objects DISABLE TRIGGER ALL;
-    ALTER TABLE storage.buckets DISABLE TRIGGER ALL;
-    DELETE FROM storage.objects;
-    DELETE FROM storage.buckets;
-    ALTER TABLE storage.objects ENABLE TRIGGER ALL;
-    ALTER TABLE storage.buckets ENABLE TRIGGER ALL;
-    DELETE FROM auth.users;
-
-    CREATE TABLE supabase_migrations.schema_migrations (
-      version TEXT PRIMARY KEY,
-      statements TEXT[],
-      name TEXT
-    );
-
-    DO $$
-    BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-        CREATE ROLE anon NOLOGIN NOINHERIT;
-      END IF;
-      IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-        CREATE ROLE authenticated NOLOGIN NOINHERIT;
-      END IF;
-      IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
-        CREATE ROLE service_role NOLOGIN NOINHERIT BYPASSRLS;
-      END IF;
-    END
-    $$;
-
-    ALTER ROLE service_role BYPASSRLS;
-
-    GRANT USAGE ON SCHEMA public, auth, storage TO anon, authenticated;
-    GRANT ALL ON SCHEMA public, auth, storage TO service_role;
-    GRANT ALL ON ALL TABLES IN SCHEMA auth, storage TO service_role;
-    GRANT ALL ON ALL SEQUENCES IN SCHEMA auth, storage TO service_role;
-
-    ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+    ALTER DEFAULT PRIVILEGES FOR ROLE ${LOCAL_SUPABASE_MIGRATION_ROLE} IN SCHEMA public
       GRANT ALL ON TABLES TO service_role;
-    ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+    ALTER DEFAULT PRIVILEGES FOR ROLE ${LOCAL_SUPABASE_MIGRATION_ROLE} IN SCHEMA public
       GRANT ALL ON SEQUENCES TO service_role;
-    ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+    ALTER DEFAULT PRIVILEGES FOR ROLE ${LOCAL_SUPABASE_MIGRATION_ROLE} IN SCHEMA public
       GRANT EXECUTE ON FUNCTIONS TO service_role;
   `);
+  await client.query(
+    "DELETE FROM auth.users WHERE id = ANY($1::uuid[]) OR email = ANY($2::text[])",
+    [WORKFLOW_FIXTURE_AUTH_IDS, WORKFLOW_FIXTURE_AUTH_EMAILS],
+  );
 }
 
 async function applyMigrations(client, manifest) {
@@ -302,11 +192,6 @@ async function applyMigrations(client, manifest) {
     process.stdout.write(`Applying ${file}\n`);
     try {
       await client.query(source);
-      await client.query(
-        `INSERT INTO supabase_migrations.schema_migrations(version, statements, name)
-         VALUES ($1, ARRAY[$2], $3)`,
-        [file.slice(0, 14), source, file.slice(15, -4)],
-      );
       applied += 1;
     } catch (error) {
       error.message = `Migration failed: ${file}\n${error.message}`;
@@ -854,13 +739,39 @@ async function main() {
   await client.connect();
   try {
     const database = await client.query(
-      "SELECT current_database() AS name, version() AS version",
+      `SELECT
+         current_database() AS name,
+         current_user AS role,
+         (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) AS is_superuser,
+         has_table_privilege(current_user, 'auth.users', 'TRIGGER') AS can_manage_auth_triggers,
+         has_table_privilege(current_user, 'storage.buckets', 'INSERT') AS can_register_storage_buckets,
+         version() AS version`,
+    );
+    assert.equal(
+      database.rows[0].role,
+      LOCAL_SUPABASE_MIGRATION_ROLE,
+      "Migration verifier must use the local Supabase migration role",
+    );
+    assert.equal(
+      database.rows[0].is_superuser,
+      true,
+      "Local Supabase migration role must retain superuser privileges",
+    );
+    assert.equal(
+      database.rows[0].can_manage_auth_triggers,
+      true,
+      "Local Supabase migration role must manage auth.users triggers",
+    );
+    assert.equal(
+      database.rows[0].can_register_storage_buckets,
+      true,
+      "Local Supabase migration role must register Storage buckets",
     );
     process.stdout.write(
-      `Disposable database: ${database.rows[0].name}\n${database.rows[0].version}\n`,
+      `Disposable database: ${database.rows[0].name}\nMigration role: ${database.rows[0].role}\n${database.rows[0].version}\n`,
     );
 
-    phase("Bootstrap only the Supabase-owned schemas required by migrations");
+    phase("Reset clean public schema while preserving Supabase-owned schemas");
     await bootstrapSupabaseSurface(client);
 
     phase("Apply the fresh migration chain");

@@ -1,6 +1,7 @@
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1", "localhost"]);
 const LOCAL_SUPABASE_DATABASE_PORT = "54322";
 const LOCAL_SUPABASE_DATABASE_NAME = "postgres";
+const LOCAL_SUPABASE_MIGRATION_ROLE = "supabase_admin";
 const DISPOSABLE_DATABASE_CONFIRMATION_ENV = "PGS_RELEASE_DB_DISPOSABLE";
 const DISPOSABLE_DATABASE_CONFIRMATION_VALUE = "confirmed";
 const CONNECTION_TARGET_QUERY_PARAMETERS = new Set([
@@ -11,6 +12,33 @@ const CONNECTION_TARGET_QUERY_PARAMETERS = new Set([
   "database",
   "dbname",
 ]);
+const HOSTED_SUPABASE_ENVIRONMENT_MARKER =
+  /umtgfaqjoqbsdzwpqizq|supabase\.co/iu;
+
+/**
+ * Fail closed when the inherited environment contains a known hosted
+ * Supabase marker. Local release scripts intentionally inspect the complete
+ * environment rather than only the connection variables, because a process
+ * can otherwise accidentally pick up a hosted URL or project reference
+ * through a library, shell profile, or child-process configuration.
+ *
+ * Do not include matched names or values in the error: environment entries
+ * can contain credentials and this guard must never turn a refusal into a
+ * secret disclosure.
+ */
+export function assertNoHostedSupabaseEnvironment(environment = process.env) {
+  for (const [name, value] of Object.entries(environment)) {
+    if (
+      HOSTED_SUPABASE_ENVIRONMENT_MARKER.test(name) ||
+      (typeof value === "string" &&
+        HOSTED_SUPABASE_ENVIRONMENT_MARKER.test(value))
+    ) {
+      throw new Error(
+        "Refusing local-only operation because the process environment contains a hosted Supabase marker.",
+      );
+    }
+  }
+}
 
 function parseUrl(value, label) {
   try {
@@ -81,9 +109,38 @@ export function assertConfirmedDisposableLocalDatabaseUrl(
   return url;
 }
 
+/**
+ * Modern local Supabase images intentionally keep the `postgres` login
+ * non-superuser. Release migrations attach a trigger to auth.users and
+ * register Storage buckets, so the verifier needs the image's local-only
+ * migration role. Keeping this check next to the loopback/disposable check
+ * turns an otherwise late, ambiguous ACL failure into a fail-closed preflight.
+ */
+export function assertConfirmedLocalSupabaseMigrationDatabaseUrl(
+  value,
+  label = "DATABASE_URL",
+  environment = process.env,
+) {
+  const url = assertConfirmedDisposableLocalDatabaseUrl(
+    value,
+    label,
+    environment,
+  );
+  const username = decodeURIComponent(url.username);
+
+  if (username !== LOCAL_SUPABASE_MIGRATION_ROLE) {
+    throw new Error(
+      `${label} must use the local Supabase migration role ${LOCAL_SUPABASE_MIGRATION_ROLE}; the local postgres role cannot manage the auth and storage schemas required by this verifier.`,
+    );
+  }
+
+  return url;
+}
+
 export {
   DISPOSABLE_DATABASE_CONFIRMATION_ENV,
   DISPOSABLE_DATABASE_CONFIRMATION_VALUE,
   LOCAL_SUPABASE_DATABASE_NAME,
   LOCAL_SUPABASE_DATABASE_PORT,
+  LOCAL_SUPABASE_MIGRATION_ROLE,
 };

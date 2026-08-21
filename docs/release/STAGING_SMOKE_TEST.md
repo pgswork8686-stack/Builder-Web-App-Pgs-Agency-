@@ -2,7 +2,7 @@
 
 ## Safety boundary
 
-This smoke test is for the **known local Supabase PostgreSQL environment only**. Do not set `DATABASE_URL` to a hosted database or another local database. The migration verifier destroys and recreates the `public` schema by design; it accepts only a loopback host on port `54322`, database `postgres`, and explicit operator acknowledgement before connecting.
+This smoke test is for the **known local Supabase PostgreSQL environment only**. Do not set `DATABASE_URL` to a hosted database or another local database. The migration verifier destroys and recreates only the `public` schema while preserving Supabase-owned schemas; it accepts only a loopback host on port `54322`, database `postgres`, the local `supabase_admin` migration role, and explicit operator acknowledgement before connecting.
 
 Hosted or production Supabase must not be used for this runbook.
 
@@ -10,7 +10,7 @@ Hosted or production Supabase must not be used for this runbook.
 
 1. Source is on the approved `main` SHA after PR #7 merge.
 2. Docker Desktop is running and the local Supabase stack is healthy.
-3. `DATABASE_URL` targets the local Supabase database on port `54322` named `postgres`; the operator has independently confirmed it is disposable.
+3. `DATABASE_URL` targets the local Supabase database on port `54322` named `postgres` as `supabase_admin`; the operator has independently confirmed it is disposable. The local `postgres` login is non-superuser and is rejected before destructive work begins.
 4. No inherited hosted `SUPABASE_*`, `WEB_URL`, `NEXT_PUBLIC_*`, or `DATABASE_URL` values remain in the shell.
 
 ## Commands
@@ -18,15 +18,18 @@ Hosted or production Supabase must not be used for this runbook.
 ```powershell
 $env:CI = 'true'
 .\node_modules\.bin\supabase.cmd start
-.\node_modules\.bin\supabase.cmd db reset
+.\node_modules\.bin\supabase.cmd db reset --local --no-seed
 
-$env:DATABASE_URL = 'postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres'
+# Insert the local database password reported by `supabase status -o env`.
+# Do not substitute `postgres` or use a hosted credential.
+$env:DATABASE_URL = 'postgresql://supabase_admin:<local-db-password>@127.0.0.1:54322/postgres'
 $env:PGS_RELEASE_DB_DISPOSABLE = 'confirmed'
 pnpm test:release-migrations
+pnpm test:workflow-migrations
 node scripts/seed-local-uat.mjs
 ```
 
-The verifier applies the explicit 54-migration manifest, excluding the legacy monolithic Phase 10 SQL file. It checks tables, RLS, sequences, business constraints, smoke flows, direct browser-role table access, and browser-role execution of public `SECURITY DEFINER` functions.
+The verifier applies the explicit 55-migration manifest, excluding the legacy monolithic Phase 10 SQL file. It checks tables, RLS, sequences, business constraints, smoke flows, direct browser-role table access, backend-only compensation settings, and browser-role execution of public `SECURITY DEFINER` functions.
 
 ## Application smoke
 

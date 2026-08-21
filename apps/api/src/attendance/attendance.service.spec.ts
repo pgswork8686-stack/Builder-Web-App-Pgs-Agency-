@@ -164,6 +164,47 @@ describe('AttendanceService', () => {
   });
 
   describe('Check-Out logic', () => {
+    it('rejects a null GPS coordinate at check-out when location is required', async () => {
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({
+            data: canonicalSettings({ location_required: true }),
+          });
+        }
+        return queryResult({});
+      });
+
+      await expect(
+        service.checkOut(
+          { latitude: null, longitude: 105.8542 },
+          user('employee'),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'ATTENDANCE_LOCATION_REQUIRED' },
+      });
+      expect(client.from).not.toHaveBeenCalledWith('attendance_records');
+      expect(client.rpc).not.toHaveBeenCalled();
+    });
+
+    it('rejects check-out without a photo session when photo evidence is required', async () => {
+      client.from.mockImplementation((table: string) => {
+        if (table === 'attendance_settings') {
+          return queryResult({
+            data: canonicalSettings({ photo_required: true }),
+          });
+        }
+        return queryResult({});
+      });
+
+      await expect(
+        service.checkOut({}, user('employee')),
+      ).rejects.toMatchObject({
+        response: { code: 'ATTENDANCE_PHOTO_REQUIRED' },
+      });
+      expect(client.from).not.toHaveBeenCalledWith('attendance_records');
+      expect(client.rpc).not.toHaveBeenCalled();
+    });
+
     it('rejects check-out if check-in record does not exist', async () => {
       client.from.mockImplementation((table: string) => {
         if (table === 'attendance_settings') {
@@ -227,6 +268,18 @@ describe('AttendanceService', () => {
       expect(recordsQuery.in).toHaveBeenCalledWith(
         'profile.employee_profile.team_id',
         [TEAM_A, TEAM_B],
+      );
+      expect(recordsQuery.select).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'profile:profiles!attendance_records_user_id_fkey!inner(',
+        ),
+        { count: 'exact' },
+      );
+      expect(recordsQuery.select).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'employee_profile:employee_profiles!employee_profiles_user_id_fkey!inner(',
+        ),
+        { count: 'exact' },
       );
     });
 
@@ -762,6 +815,47 @@ describe('AttendanceService', () => {
         earlyLeaveMinutes: 0,
       });
     });
+
+    it.each([
+      ['07:59', '2026-08-21T00:59:00.000Z', 0],
+      ['08:00', '2026-08-21T01:00:00.000Z', 0],
+      ['08:05', '2026-08-21T01:05:00.000Z', 0],
+      ['08:06', '2026-08-21T01:06:00.000Z', 6],
+    ])(
+      'calculates check-in %s against the configured 08:00 + 5-minute grace',
+      (_label, isoTime, expectedLateMinutes) => {
+        const metrics = (service as any).calculateAttendanceMetrics(
+          new Date(isoTime),
+          null,
+          boundarySettings,
+        );
+
+        expect(metrics).toMatchObject({
+          status: 'incomplete',
+          lateMinutes: expectedLateMinutes,
+          earlyLeaveMinutes: 0,
+        });
+      },
+    );
+
+    it.each([
+      ['17:24', '2026-08-21T10:24:00.000Z', 6],
+      ['17:25', '2026-08-21T10:25:00.000Z', 0],
+      ['17:30', '2026-08-21T10:30:00.000Z', 0],
+    ])(
+      'calculates check-out %s against the configured 17:30 + 5-minute grace',
+      (_label, isoTime, expectedEarlyLeaveMinutes) => {
+        const metrics = (service as any).calculateAttendanceMetrics(
+          new Date('2026-08-21T01:00:00.000Z'),
+          new Date(isoTime),
+          boundarySettings,
+        );
+
+        expect(metrics).toMatchObject({
+          earlyLeaveMinutes: expectedEarlyLeaveMinutes,
+        });
+      },
+    );
 
     it('marks 08:06 and 17:24 as late and early leave', () => {
       const metrics = (service as any).calculateAttendanceMetrics(

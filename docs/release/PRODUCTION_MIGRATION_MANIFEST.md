@@ -80,3 +80,19 @@ The following 43 migrations are declared by repository history as the database b
 ### Group D: Security Hardening
 
 54. `20260821050134_harden_security_definer_functions.sql` — Revokes browser execution of existing public `SECURITY DEFINER` functions and closes default function execution for the migration owner
+
+### Group E: Payroll Compensation Inputs
+
+55. `20260821071141_employee_compensation_settings.sql` — Backend-only employee salary and allowance inputs for payroll calculations; RLS enabled, browser roles revoked, and positive/non-negative amount constraints enforced
+
+### Group F: Auth Profile Lookup Grant
+
+56. `20260821081657_grant_authenticated_profile_lookup.sql` — Grants authenticated browser-scoped clients read access to `public.profiles`; row visibility remains constrained by the own-profile RLS policy
+
+### Group G: Storage Buckets
+
+57. `20260821082144_create_company_documents_storage_bucket.sql` — Registers the private `company-documents` Storage bucket used by the Company Documents upload/download API
+
+### Group H: Payroll Run Integrity Hardening
+
+58. `20260821082316_harden_payroll_run_integrity.sql` — Enforces database-level uniqueness on `payroll_runs(period_month)` to prevent duplicate runs for the same period, and introduces transactional atomic state machine functions (`approve_payroll_run`, `mark_payroll_run_paid`) to guarantee consistency between payroll runs and payslip payment statuses without partial failure leaks.

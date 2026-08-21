@@ -33,6 +33,14 @@ export class DocumentsService {
     });
   }
 
+  private handleStorageError(error: any, message: string): never {
+    this.logger.error(`${message}: ${error?.message ?? JSON.stringify(error)}`);
+    throw new InternalServerErrorException({
+      code: 'DOCUMENT_STORAGE_ERROR',
+      message,
+    });
+  }
+
   private sanitizeFilename(value: string): string {
     return (
       value
@@ -114,17 +122,17 @@ export class DocumentsService {
       .from(BUCKET_NAME)
       .createSignedUploadUrl(storagePath);
 
-    if (storageErr || !uploadUrlData) {
-      this.logger.warn(
-        `Storage signed URL creation notice: ${storageErr?.message}`,
+    if (storageErr || !uploadUrlData?.signedUrl || !uploadUrlData.token) {
+      this.handleStorageError(
+        storageErr,
+        'Không thể tạo phiên tải tệp lên kho lưu trữ.',
       );
     }
 
     return {
       storagePath,
-      signedUrl:
-        uploadUrlData?.signedUrl ?? `https://storage.local/${storagePath}`,
-      token: uploadUrlData?.token ?? 'mock-token',
+      signedUrl: uploadUrlData.signedUrl,
+      token: uploadUrlData.token,
     };
   }
 
@@ -198,15 +206,21 @@ export class DocumentsService {
       });
     }
 
-    const { data: downloadData } = await this.client.storage
+    const { data: downloadData, error: storageErr } = await this.client.storage
       .from(doc.storage_bucket || BUCKET_NAME)
       .createSignedUrl(doc.storage_path, 3600); // 1 hour expiry
+
+    if (storageErr || !downloadData?.signedUrl) {
+      this.handleStorageError(
+        storageErr,
+        'Không thể tạo liên kết tải tệp từ kho lưu trữ.',
+      );
+    }
 
     return {
       id: doc.id,
       fileName: doc.file_name,
-      downloadUrl:
-        downloadData?.signedUrl ?? `https://storage.local/${doc.storage_path}`,
+      downloadUrl: downloadData.signedUrl,
     };
   }
 
@@ -215,6 +229,7 @@ export class DocumentsService {
       .from('company_documents')
       .select('*')
       .eq('id', id)
+      .eq('delete_status', 'active')
       .maybeSingle();
 
     if (error || !doc) {
@@ -228,6 +243,23 @@ export class DocumentsService {
       throw new ForbiddenException({
         code: 'DOCUMENT_ACCESS_DENIED',
         message: 'Chỉ Admin hoặc người tải lên mới có quyền xóa tài liệu.',
+      });
+    }
+
+    // A metadata-only delete leaves a still-retrievable object in Storage.
+    // Purge Storage first; if it fails, preserve the active metadata so the
+    // caller can retry a coherent deletion rather than creating an orphan.
+    const { error: storageDeleteErr } = await this.client.storage
+      .from(doc.storage_bucket || BUCKET_NAME)
+      .remove([doc.storage_path]);
+
+    if (storageDeleteErr) {
+      this.logger.error(
+        `Không thể xóa object Storage của tài liệu ${id}: ${storageDeleteErr.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'DOCUMENT_STORAGE_DELETE_FAILED',
+        message: 'Không thể xóa tệp tài liệu khỏi kho lưu trữ.',
       });
     }
 

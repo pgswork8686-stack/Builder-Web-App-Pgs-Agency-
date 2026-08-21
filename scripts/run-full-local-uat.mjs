@@ -4,16 +4,27 @@ import { io } from "socket.io-client";
 import {
   assertConfirmedDisposableLocalDatabaseUrl,
   assertLoopbackUrl,
+  assertNoHostedSupabaseEnvironment,
 } from "./lib/local-endpoint-guard.mjs";
+import { LOCAL_UAT } from "./lib/local-uat-fixtures.mjs";
 const { Client } = pg;
+
+assertNoHostedSupabaseEnvironment(process.env);
 
 const DATABASE_URL =
   "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres";
-const API_BASE = "http://localhost:3001/api/v1";
-const SUPABASE_URL = "http://127.0.0.1:54321";
-const CHAT_SOCKET_URL = "http://localhost:3001/chat";
+const API_BASE =
+  process.env.PGS_LOCAL_UAT_API_BASE ?? "http://localhost:3001/api/v1";
+const SUPABASE_URL =
+  process.env.PGS_LOCAL_UAT_SUPABASE_URL ?? "http://127.0.0.1:54321";
+const SUPABASE_PUBLISHABLE_KEY =
+  process.env.PGS_LOCAL_UAT_SUPABASE_PUBLISHABLE_KEY?.trim();
 
 assertConfirmedDisposableLocalDatabaseUrl(DATABASE_URL);
+assert.ok(
+  SUPABASE_PUBLISHABLE_KEY,
+  "PGS_LOCAL_UAT_SUPABASE_PUBLISHABLE_KEY must be explicitly set for local Auth.",
+);
 const API_BASE_URL = assertLoopbackUrl(API_BASE, "API_BASE", [
   "http:",
   "https:",
@@ -22,7 +33,19 @@ const SUPABASE_BASE_URL = assertLoopbackUrl(SUPABASE_URL, "SUPABASE_URL", [
   "http:",
   "https:",
 ]);
-assertLoopbackUrl(CHAT_SOCKET_URL, "CHAT_SOCKET_URL", ["http:", "https:"]);
+const CHAT_SOCKET_URL =
+  process.env.PGS_LOCAL_UAT_CHAT_SOCKET_URL ??
+  new URL("/chat", API_BASE_URL.origin).toString();
+const CHAT_SOCKET_BASE_URL = assertLoopbackUrl(
+  CHAT_SOCKET_URL,
+  "CHAT_SOCKET_URL",
+  ["http:", "https:"],
+);
+assert.equal(
+  CHAT_SOCKET_BASE_URL.origin,
+  API_BASE_URL.origin,
+  "CHAT_SOCKET_URL must remain on the configured local API origin.",
+);
 
 const db = new Client({ connectionString: DATABASE_URL });
 
@@ -113,7 +136,7 @@ async function loginUser(email, password = "Password123!") {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
+      apikey: SUPABASE_PUBLISHABLE_KEY,
     },
     body: JSON.stringify({ email, password }),
     redirect: "error",
@@ -180,14 +203,27 @@ async function runRealApplicationUAT() {
 
   const services = await api("GET", "/admin/services", tokens.admin);
   assert.equal(services.status, 200);
-  const catalogService = services.data.items?.[0] || services.data[0];
+  const serviceItems = services.data.items ?? services.data;
+  const catalogService = serviceItems.find(
+    (service) =>
+      service.serviceCode === LOCAL_UAT.projectService.serviceCode ||
+      service.service_code === LOCAL_UAT.projectService.serviceCode,
+  );
+  assert.ok(
+    catalogService,
+    `Expected ${LOCAL_UAT.projectService.serviceCode} service fixture.`,
+  );
   console.log(
     `✓ Admin Services Catalog: Found ${catalogService.name} (${catalogService.id})`,
   );
 
   const projects = await api("GET", "/projects", tokens.admin);
   assert.equal(projects.status, 200);
-  const uatProject = projects.data.items?.[0] || projects.data[0];
+  const projectItems = projects.data.items ?? projects.data;
+  const uatProject = projectItems.find(
+    (project) => project.id === LOCAL_UAT.projects.managed.id,
+  );
+  assert.ok(uatProject, "Expected managed local UAT project fixture.");
   console.log(`✓ Admin Projects: Found ${uatProject.name} (${uatProject.id})`);
 
   const settingsRes = await api("GET", "/admin/settings", tokens.admin);
@@ -456,12 +492,16 @@ async function runRealApplicationUAT() {
   console.log("✓ API Set Default Workflow Template: status=201 OK");
 
   // E. Runtime Instantiation & Task Creation via API / DB Helpers
-  const projServiceId = (
-    await db.query(
-      `SELECT id FROM public.project_services WHERE project_id = $1 LIMIT 1;`,
-      [uatProject.id],
-    )
-  ).rows[0].id;
+  const projectServiceResult = await db.query(
+    `SELECT id FROM public.project_services WHERE id = $1::uuid AND project_id = $2::uuid;`,
+    [LOCAL_UAT.projectService.id, uatProject.id],
+  );
+  assert.equal(
+    projectServiceResult.rowCount,
+    1,
+    "Expected fixed local UAT project service fixture.",
+  );
+  const projServiceId = projectServiceResult.rows[0].id;
   const inst = await db.query(
     `SELECT public.workflow_instantiate_project_service($1, $2, $3) AS res;`,
     [uatProject.id, projServiceId, USERS.admin.id],
@@ -631,9 +671,12 @@ async function runRealApplicationUAT() {
   console.log("✓ Client denied expenses API (403): PASS");
 
   // ==========================================
-  // 7. PAYROLL REAL API LIFECYCLE
+  // 7. PAYROLL REAL API LIFECYCLE & CONCURRENCY
   // ==========================================
-  console.log("\n--- [TEST] 7. PAYROLL API LIFECYCLE & RBAC ---");
+  console.log("\n--- [TEST] 7. PAYROLL API LIFECYCLE, INTEGRITY & CONCURRENCY ---");
+  await db.query(
+    `DELETE FROM public.payroll_runs WHERE period_month IN ('2026-08', '2026-09')`,
+  );
   const payGen = await api(
     "POST",
     "/payroll/runs/generate",
@@ -646,41 +689,131 @@ async function runRealApplicationUAT() {
   );
   assert.equal(payGen.status, 201);
   const runId = payGen.data.id;
-  console.log(`✓ Accountant generated Payroll Run via API: ID=${runId}`);
+  assert(payGen.data.total_employees_count > 0, "Payroll run must calculate active employees");
+  assert(payGen.data.payslips?.length > 0, "Payroll run must contain payslips");
+  assert(Number(payGen.data.total_net_amount) > 0, "Payroll total net amount must be positive");
+  console.log(`✓ Accountant generated Payroll Run via API: ID=${runId}, Employees=${payGen.data.total_employees_count}, NetTotal=${payGen.data.total_net_amount}`);
 
+  // Duplicate same-period creation must be rejected
+  const payGenDuplicate = await api(
+    "POST",
+    "/payroll/runs/generate",
+    tokens.accountant,
+    {
+      periodMonth: "2026-08",
+      title: "Bảng lương kỳ tháng 08/2026 Duplicate Test",
+      standardWorkingDays: 22,
+    },
+  );
+  assert.equal(payGenDuplicate.status, 409, "Duplicate payroll period must be denied with 409 Conflict");
+  console.log("✓ Duplicate same-period payroll creation denied (409 Conflict): PASS");
+
+  // Concurrent creation for same period must result in exactly one run in DB
+  const concurrentPeriod = "2026-09";
+  const [concurrentRes1, concurrentRes2] = await Promise.all([
+    api("POST", "/payroll/runs/generate", tokens.accountant, {
+      periodMonth: concurrentPeriod,
+      title: "Bảng lương kỳ tháng 09/2026 Concurrency Test A",
+      standardWorkingDays: 22,
+    }),
+    api("POST", "/payroll/runs/generate", tokens.accountant, {
+      periodMonth: concurrentPeriod,
+      title: "Bảng lương kỳ tháng 09/2026 Concurrency Test B",
+      standardWorkingDays: 22,
+    }),
+  ]);
+  const concurrentStatuses = [concurrentRes1.status, concurrentRes2.status].sort();
+  assert.deepEqual(
+    concurrentStatuses,
+    [201, 409],
+    "Concurrent same-period generation must yield exactly one 201 and one 409",
+  );
+  console.log("✓ Concurrent same-period creation handled atomically (1 Created, 1 Conflict): PASS");
+
+  // Attempt pay on unapproved run (2026-09 is in 'calculated' status)
+  const concurrentRunId = concurrentRes1.status === 201 ? concurrentRes1.data.id : concurrentRes2.data.id;
+  const payUnapproved = await api(
+    "POST",
+    `/payroll/runs/${concurrentRunId}/pay`,
+    tokens.accountant,
+  );
+  assert.equal(payUnapproved.status, 400, "Paying an unapproved payroll run must be rejected");
+  console.log("✓ Paying unapproved payroll run rejected (400 Bad Request): PASS");
+
+  // Approve valid payroll run
   const payApprove = await api(
     "POST",
     `/payroll/runs/${runId}/approve`,
     tokens.accountant,
   );
   assert.equal(payApprove.status, 201);
+  assert.equal(payApprove.data.status, "approved");
+  assert(payApprove.data.approved_at, "approved_at must be populated");
   console.log("✓ Accountant approved Payroll Run via API: PASS");
 
+  // Attempt approve already approved run
+  const payApproveAgain = await api(
+    "POST",
+    `/payroll/runs/${runId}/approve`,
+    tokens.accountant,
+  );
+  assert.equal(payApproveAgain.status, 400, "Approving an already approved run must be rejected");
+  console.log("✓ Re-approving already approved run rejected (400 Bad Request): PASS");
+
+  // Pay approved payroll run
   const payPaid = await api(
     "POST",
     `/payroll/runs/${runId}/pay`,
     tokens.accountant,
   );
   assert.equal(payPaid.status, 201);
+  assert.equal(payPaid.data.status, "paid");
+  assert(payPaid.data.paid_at, "paid_at must be populated");
   console.log("✓ Accountant marked Payroll Run paid via API: PASS");
 
+  // Verify all payslips in the run are marked paid
+  const runDetail = await api("GET", `/payroll/runs/${runId}`, tokens.accountant);
+  assert.equal(runDetail.status, 200);
+  assert(runDetail.data.payslips.every((ps) => ps.payment_status === "paid"), "All payslips must be marked paid");
+  console.log(`✓ All ${runDetail.data.payslips.length} payslips atomically transitioned to paid: PASS`);
+
+  // Second pay attempt must be rejected
+  const payPaidAgain = await api(
+    "POST",
+    `/payroll/runs/${runId}/pay`,
+    tokens.accountant,
+  );
+  assert.equal(payPaidAgain.status, 400, "Paying an already paid run must be rejected");
+  console.log("✓ Re-paying already paid run rejected (400 Bad Request): PASS");
+
+  // Employee queries own payslips
   const empPayslip = await api("GET", "/payroll/me/payslips", tokens.employee);
   assert.equal(empPayslip.status, 200);
+  assert(empPayslip.data.length > 0, "Employee must receive their own payslips");
+  assert(
+    empPayslip.data.every((ps) => ps.user_id === LOCAL_UAT.users.employee.id),
+    "Employee must strictly see only their own payslips",
+  );
   console.log(
-    `✓ Employee accessed own payslip via API: ${empPayslip.data.length} payslips returned`,
+    `✓ Employee accessed own payslip via API: ${empPayslip.data.length} payslips returned, isolation verified: PASS`,
   );
 
+  // RBAC checks
+  const employeeRunsDenied = await api("GET", "/payroll/runs", tokens.employee);
+  assert.equal(employeeRunsDenied.status, 403, "Employee must NOT access payroll runs list");
+  const leaderRunsDenied = await api("GET", "/payroll/runs", tokens.leader);
+  assert.equal(leaderRunsDenied.status, 403, "Team leader must NOT access payroll runs list");
   const clientPayDenied = await api("GET", "/payroll/runs", tokens.client);
-  assert.equal(clientPayDenied.status, 403, "Client must NOT access payroll");
-  console.log("✓ Client denied payroll runs API (403): PASS");
+  assert.equal(clientPayDenied.status, 403, "Client must NOT access payroll runs");
+  const clientPayslipDenied = await api("GET", "/payroll/me/payslips", tokens.client);
+  assert.equal(clientPayslipDenied.status, 403, "Client must NOT access personal payslips");
+  console.log("✓ Unauthorized roles denied payroll access (403): PASS");
 
   // ==========================================
   // 8. SUPPORT TICKET REAL API LIFECYCLE
   // ==========================================
   console.log("\n--- [TEST] 8. SUPPORT TICKET API LIFECYCLE & RBAC ---");
-  const compId = (
-    await db.query("SELECT id FROM public.client_companies LIMIT 1;")
-  ).rows[0].id;
+  const compId = LOCAL_UAT.companies.primary.id;
   const ticketCreate = await api("POST", "/support/tickets", tokens.client, {
     clientCompanyId: compId,
     projectId: uatProject.id,

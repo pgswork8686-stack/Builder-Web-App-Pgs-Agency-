@@ -3,7 +3,12 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { chromium } from "playwright";
-import { assertLoopbackUrl } from "./lib/local-endpoint-guard.mjs";
+import {
+  assertLoopbackUrl,
+  assertNoHostedSupabaseEnvironment,
+} from "./lib/local-endpoint-guard.mjs";
+
+assertNoHostedSupabaseEnvironment(process.env);
 
 const WEB_URL = process.env.WEB_URL ?? "http://localhost:3000";
 const SCREENSHOTS_DIR = "D:/Điệp Web App/pgs-hub/docs/user-guide/screenshots";

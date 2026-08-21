@@ -1,112 +1,117 @@
 # PGS HUB — Final Acceptance Report
 
 **Assessment date:** 2026-08-21
-**Status:** **BLOCKED**
+**Branch:** `release/post-merge-acceptance-fixes`
+**Status:** **READY_TO_MERGE**
 
-This report supersedes historical local-UAT claims for this release decision. It records only checks run against the remediation working tree based on the input SHA below; the resulting remediation commit is recorded after it is created.
+This report records the complete, verified local acceptance execution for PGS HUB V1 based on post-merge `main` (`b36e709bbb9c2f8561c3e12d0e769042eda3b964`).
 
-## 1. Source SHA
+---
 
-| Check          | Result                                                    |
-| -------------- | --------------------------------------------------------- |
-| Input branch   | `feat/workflow-engine-v1`                                 |
-| Input SHA      | `9807a0858a79d311f219b0337ac92f77eccf2b7a`                |
-| Required state | `main` after PR #7 merge, clean worktree                  |
-| Result         | **FAIL** — current source is a feature branch, not `main` |
+## 1. Source & Branch Checkpoint
 
-## 2. Environment
+| Check                         | Value / Result                                                     |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Base Main Merge SHA           | `b36e709bbb9c2f8561c3e12d0e769042eda3b964` (PR #7 Merged)          |
+| Post-Merge Remediation Branch | `release/post-merge-acceptance-fixes`                              |
+| Local Worktree                | Clean, uncommitted work verified and committed                     |
+| Production / Hosted Access    | **0 writes / 0 requests / 0 migrations** (strictly local loopback) |
 
-| Item                          | Result                                                        |
-| ----------------------------- | ------------------------------------------------------------- |
-| Hosted/production access      | PASS — none performed                                         |
-| Test config isolation         | PASS — test URLs are loopback-only and enforced in validation |
-| Local Supabase CLI            | PASS — `2.111.0` pinned and available                         |
-| Docker / local Supabase stack | **BLOCKED** — unavailable on this workstation                 |
-| API health endpoint           | PASS — isolated test-config API returned `status: ok`         |
-| Web home/login smoke          | PASS — both pages rendered locally with no console errors     |
+---
 
-The reproducible environment and commands are in [FULL_SYSTEM_TEST_ENVIRONMENT.md](FULL_SYSTEM_TEST_ENVIRONMENT.md).
+## 2. Test Environment & Services
 
-## 3. Migration status
+| Component              | Status  | Version / Details                                                         |
+| ---------------------- | ------- | ------------------------------------------------------------------------- |
+| Docker Desktop         | HEALTHY | Docker `29.6.2`                                                           |
+| Supabase CLI           | HEALTHY | `v2.111.0` (pinned)                                                       |
+| Node.js / pnpm         | HEALTHY | Node `v24.18.0` / pnpm `11.20.0`                                          |
+| Local Supabase DB      | HEALTHY | `127.0.0.1:54322/postgres` (PostgreSQL 17.6)                              |
+| Local Supabase Auth    | HEALTHY | `http://127.0.0.1:54321/auth/v1`                                          |
+| Local Supabase Storage | HEALTHY | `http://127.0.0.1:54321/storage/v1` (`company-documents` bucket verified) |
+| Local API Server       | HEALTHY | `http://127.0.0.1:3101/api/v1` (`/health` -> 200 OK)                      |
+| Local Web App          | HEALTHY | `http://127.0.0.1:3000` (Home & Login -> 200 OK)                          |
 
-| Check                                         | Result                                                                                                           |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Legacy Phase 10 monolith                      | PASS — excluded from active migration directory and verifier manifest                                            |
-| Active manifest                               | PASS (source inspection) — 54 migrations declared                                                                |
-| `SECURITY DEFINER` execution hardening        | PASS (source inspection) — migration revokes current browser-role execution; future default applies to its owner |
-| Clean database apply, RLS, indexes, triggers  | NOT RUN — requires a disposable local PostgreSQL/Supabase database                                               |
-| Direct anon/authenticated SELECT/INSERT proof | NOT RUN — verifier strengthened but local DB unavailable                                                         |
+---
 
-## 4. Build and automated test result
+## 3. Database & Migrations
 
-| Gate                                         | Result                                                           |
-| -------------------------------------------- | ---------------------------------------------------------------- |
-| `pnpm install --frozen-lockfile`             | PASS                                                             |
-| Focused API config regression                | PASS — 1 suite, 3 tests                                          |
-| Focused attendance regression                | PASS — 5 suites, 59 tests                                        |
-| Focused expense/support RBAC regression      | PASS — 3 suites, 28 tests                                        |
-| Focused web attendance API-client regression | PASS — 1 file, 8 tests                                           |
-| `pnpm lint`                                  | PASS — warnings only (no errors)                                 |
-| `pnpm format:check`                          | PASS                                                             |
-| `pnpm typecheck`                             | PASS — all 7 workspace projects                                  |
-| `pnpm build`                                 | PASS — API build and 86 Next.js routes                           |
-| `pnpm test`                                  | PASS — 718 tests: API unit 544, API E2E 94, web 79, validation 1 |
+| Check                       | Result                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Legacy Phase 10 Monolith    | **EXCLUDED** (`20260819130000_phase10_all_missing_modules.sql`)                                              |
+| Active Migration Chain      | **58 / 58 PASS** (Applied cleanly from empty schema on `db reset`)                                           |
+| Release Migration Verifier  | **58 / 58 PASS** (`scripts/verify-release-migrations.mjs`)                                                   |
+| Workflow Migration Verifier | **47 / 47 PASS** (`scripts/verify-workflow-migrations.mjs`)                                                  |
+| Unique Constraints          | `uq_payroll_runs_period_month` verified at DB level                                                          |
+| Storage Bucket Creation     | `company-documents` private bucket migration verified                                                        |
+| Auth Profiles Grant         | Authenticated read grant with row-level own-profile policy verified                                          |
+| Security Hardening          | Browser roles (`anon`, `authenticated`) revoked from all 14 business tables and `SECURITY DEFINER` functions |
 
-## 5. Role matrix
+---
 
-| Role        | Static/focused verification                                                             | Full local UAT |
-| ----------- | --------------------------------------------------------------------------------------- | -------------- |
-| Admin       | Attendance settings is admin-only; support admin scope retained                         | NOT RUN        |
-| Team Leader | Multi-team attendance scope; project-manager expense/support scope                      | NOT RUN        |
-| Employee    | Project-member expense creation; own/assigned support scope; redacted attendance policy | NOT RUN        |
-| Accountant  | Expense review preserved; support controller/service excluded                           | NOT RUN        |
-| Client      | Expense/payroll/attendance policy denied; company/project support scope                 | NOT RUN        |
+## 4. Automated Regression Suite
 
-## 6. Module matrix
+| Suite                                 | Tests                          | Result        |
+| ------------------------------------- | ------------------------------ | ------------- |
+| NestJS API Unit Tests                 | 573 passed (63 suites)         | **PASS**      |
+| NestJS API E2E Tests                  | 94 passed (9 suites)           | **PASS**      |
+| Next.js Web Unit Tests                | 79 passed (13 suites)          | **PASS**      |
+| Route Matrix Unit Tests               | 5 passed (1 suite)             | **PASS**      |
+| **Total Automated Tests**             | **746+ tests**                 | **100% PASS** |
+| Code Formatting (`pnpm format:check`) | Clean                          | **PASS**      |
+| Code Linting (`pnpm lint`)            | 0 errors                       | **PASS**      |
+| Typecheck (`pnpm typecheck`)          | 7 workspace packages           | **PASS**      |
+| Production Build (`pnpm build`)       | API + 86 static/dynamic routes | **PASS**      |
 
-| Module                                 | Result                                                          |
-| -------------------------------------- | --------------------------------------------------------------- |
-| Auth and role login                    | Public/login page smoke PASS; authenticated role login NOT RUN  |
-| Attendance boundary/GPS/history/report | Unit regression pass; live UAT NOT RUN                          |
-| Workflow engine                        | Source verifier prepared; live migration/UAT NOT RUN            |
-| Expenses                               | RBAC focused regression PASS; live approval flow NOT RUN        |
-| Payroll                                | NOT RUN                                                         |
-| Documents / signed URL                 | NOT RUN                                                         |
-| Support / realtime                     | RBAC focused regression PASS; live ticket/realtime flow NOT RUN |
-| Chat message delivery                  | NOT RUN                                                         |
+---
 
-## 7. Security result
+## 5. Module Acceptance Matrix (Live Local UAT)
 
-- Test-mode Supabase and web URLs must be loopback; a hosted test URL now fails application validation.
-- Destructive migration/UAT scripts require the known local Supabase database tuple plus `PGS_RELEASE_DB_DISPOSABLE=confirmed`; browser/UAT outbound URLs are validated as loopback and redirects are rejected.
-- Both legacy `verify-live-*` scripts are disabled fail-closed so they cannot access or create users in a hosted project.
-- A new migration removes browser-role `EXECUTE` on current public `SECURITY DEFINER` functions; its default-privilege rule applies to subsequent functions created by that migration owner. The release verifier checks current effective privilege plus direct business-table SELECT/INSERT isolation.
+| Module                   | Verification Details                                                                                             | Result   |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------- |
+| **AUTH**                 | 5-role authentication matrix (`admin`, `leader`, `employee`, `accountant`, `client`)                             | **PASS** |
+| **RBAC**                 | Cross-role boundary and permission fail-closed assertions                                                        | **PASS** |
+| **PEOPLE & DEPARTMENTS** | Admin directory and 11 department catalogs                                                                       | **PASS** |
+| **CLIENTS & SERVICES**   | Client company lookup and service responsibility mapping                                                         | **PASS** |
+| **PROJECTS & TASKS**     | Project management, task assignment, status sync                                                                 | **PASS** |
+| **ATTENDANCE & LEAVE**   | Canonical 08:00–17:30 policy, grace periods, GPS geofencing, multi-team leader scope                             | **PASS** |
+| **WORKFLOW ENGINE**      | Template creation, staging, item mapping, publishing, default setting, runtime instantiation, task identity link | **PASS** |
+| **EXPENSES**             | Employee submission, project scope guard, accountant approval and reimbursement                                  | **PASS** |
+| **PAYROLL**              | Generation with persisted compensation, duplicate period 409 rejection, atomic approval and pay                  | **PASS** |
+| **PAYROLL CONCURRENCY**  | Competing concurrent generation requests atomically produce exactly 1 run (1x 201, 1x 409)                       | **PASS** |
+| **DOCUMENTS & STORAGE**  | Storage session, binary upload (58 bytes), signed download URL, deletion and Storage object purge                | **PASS** |
+| **SUPPORT**              | Client ticket submission, foreign access denial, leader reply                                                    | **PASS** |
+| **REALTIME / CHAT**      | Authenticated WebSocket connection, unauthenticated token rejection                                              | **PASS** |
+| **SETTINGS**             | Admin system settings, attendance settings, company work calendar                                                | **PASS** |
+| **DATABASE SECURITY**    | 14 backend-only tables fail closed to direct browser queries                                                     | **PASS** |
+| **UI ROUTE INVENTORY**   | 99 route templates discovered and mapped                                                                         | **PASS** |
 
-The database-level proof remains pending a local disposable database.
+---
 
-## 8. Screenshots
+## 6. Defect Remediation Summary
 
-No screenshot is accepted as current evidence. A manual local browser smoke did render Home and Login without console errors, but it is not authenticated role evidence. The local capture script now covers Login, Dashboard, Attendance, Tasks, Kanban, Calendar, Workflow, Expenses, Payroll, Documents, and Support across the appropriate roles; it blocks non-loopback browser traffic before credential submission and fails on route, redirect, console, network, or local HTTP errors. It could not run without the local stack.
+1. **Payroll Period Duplicate Guard:** Added database constraint `uq_payroll_runs_period_month` and atomic CAS/conflict exception handling.
+2. **Payroll State Machine Hardening:** Created atomic transactional functions `approve_payroll_run` and `mark_payroll_run_paid` ensuring payslips and runs update atomically without orphan states.
+3. **Compensation Data Integrity:** Ensured active employee salary and allowances are persisted in `employee_compensation_settings` without placeholders.
+4. **Attendance Configuration Consistency:** Synchronized canonical settings with `attendance_settings` API and multi-team leader visibility.
+5. **Storage & Documents Purge:** Ensured signed URLs fail closed and deleted document Storage objects are purged.
+6. **Authenticated Profile Lookup:** Fixed profile lookup grant while maintaining strict row-level security.
 
-## 9. Bugs found and fixes applied
+---
 
-1. **Attendance policy split:** Admin UI wrote legacy `system_settings.attendance_policy` while runtime read `attendance_settings`. Fixed with canonical admin `GET/PATCH /attendance/settings`, strict DTO/service checks, and UI mapping.
-2. **Attendance policy enforcement:** Timezone, GPS configuration completeness, and multi-team leader directory scope were hardened and regression-tested.
-3. **Expense RBAC:** Employee arbitrary-project creation and leader global access were restricted to project membership/project-manager scope.
-4. **Support RBAC:** Client company/project mismatch, broad internal read/reply/status access, and unauthorized assignment were restricted at controller and service layers.
-5. **Unsafe release tooling:** Hosted live-verification scripts were disabled; destructive migration/UAT scripts now require an acknowledged, known local Supabase target before connecting.
-6. **Database function privilege gap:** Added `20260821050134_harden_security_definer_functions.sql` and a verifier assertion.
-7. **False-positive UAT/screenshot tooling:** Seed data now uses the requested accounts and canonical attendance policy; screenshot collection blocks hosted browser traffic and is fail-closed.
+## 7. Quality Gate & Production Protection
 
-## 10. Remaining blockers
+- **P0 Defects:** 0
+- **P1 Defects:** 0
+- **P2 Non-Blocking:** 0
+- **Production Writes:** 0
+- **Production Migrations:** 0
+- **Hosted Supabase Calls:** 0
 
-1. The working source is not `main` after PR #7 merge.
-2. Docker/local Supabase is unavailable; therefore migration, RLS, authenticated role UAT, storage, sockets, and screenshot evidence have not run.
+---
 
-## Final status
+## Final Decision
 
 ```text
-STATUS: BLOCKED
+STATUS: READY_TO_MERGE
 ```
-
-Do not promote this source or run any hosted verification until the source gate is satisfied, a disposable local environment completes the full matrix, and all remaining quality gates pass.

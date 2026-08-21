@@ -116,6 +116,36 @@ export class AttendanceService {
     }
   }
 
+  /**
+   * Enforce the client-supplied attendance evidence required by the canonical
+   * policy. Keep this shared by check-in and check-out so one action cannot
+   * bypass a requirement that the other enforces.
+   */
+  private enforceAttendanceEvidencePolicy(
+    dto: Pick<CheckInDto, 'latitude' | 'longitude' | 'photoUploadSessionId'>,
+    settings: Pick<AttendanceSettings, 'location_required' | 'photo_required'>,
+  ) {
+    const hasLocation =
+      dto.latitude !== undefined &&
+      dto.latitude !== null &&
+      dto.longitude !== undefined &&
+      dto.longitude !== null;
+
+    if (settings.location_required && !hasLocation) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_LOCATION_REQUIRED',
+        message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
+      });
+    }
+
+    if (settings.photo_required && !dto.photoUploadSessionId) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_REQUIRED',
+        message: 'Ảnh bằng chứng là bắt buộc theo chính sách chấm công.',
+      });
+    }
+  }
+
   private getAttendanceTimezone(settings?: { timezone?: string | null }) {
     const timezone = settings?.timezone?.trim() || DEFAULT_ATTENDANCE_TIMEZONE;
     try {
@@ -625,30 +655,10 @@ export class AttendanceService {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
 
-    // Check location requirement
-    if (
-      settings?.location_required &&
-      (dto.latitude === undefined ||
-        dto.longitude === undefined ||
-        dto.latitude === null ||
-        dto.longitude === null)
-    ) {
-      throw new BadRequestException({
-        code: 'ATTENDANCE_LOCATION_REQUIRED',
-        message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
-      });
-    }
+    this.enforceAttendanceEvidencePolicy(dto, settings);
 
     // Validate geofence
     this.validateGeofence(dto.latitude, dto.longitude, settings);
-
-    // Check photo requirement
-    if (settings?.photo_required && !dto.photoUploadSessionId) {
-      throw new BadRequestException({
-        code: 'ATTENDANCE_PHOTO_REQUIRED',
-        message: 'Ảnh bằng chứng là bắt buộc theo chính sách chấm công.',
-      });
-    }
 
     // Verify photo session (validates ownership, expiry, MIME/size exact binding)
     // DB derives the photo path internally from the session — no path returned needed here
@@ -719,6 +729,8 @@ export class AttendanceService {
   async checkOut(dto: CheckOutDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
+
+    this.enforceAttendanceEvidencePolicy(dto, settings);
 
     const checkOutTime = new Date();
     const todayStr = this.getVietnamDate(
@@ -935,11 +947,13 @@ export class AttendanceService {
       });
     }
 
-    // Build the DB-side filters with explicit FK constraints to avoid ambiguous relationship errors
+    // Embedded PostgREST filters are left joins by default and would leave
+    // unrelated attendance parent rows in the result. Both relations must be
+    // inner joins so the managed-team filter constrains attendance_records.
     let dbQuery = this.client
       .from('attendance_records')
       .select(
-        '*, profile:profiles!attendance_records_user_id_fkey(id, full_name, email, avatar_url, employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id, department_id))',
+        '*, profile:profiles!attendance_records_user_id_fkey!inner(id, full_name, email, avatar_url, employee_profile:employee_profiles!employee_profiles_user_id_fkey!inner(team_id, department_id))',
         { count: 'exact' },
       );
 
