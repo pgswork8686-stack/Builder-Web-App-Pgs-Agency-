@@ -3,11 +3,13 @@
 ## 1. ARCHITECTURE OVERVIEW & DEPLOYMENT STRATEGY
 
 PGS HUB is an Enterprise Agency Management System structured as a PNPM Monorepo:
+
 - `apps/web`: Next.js 16 (App Router + Turbopack + TailwindCSS v4 + Supabase SSR).
 - `apps/api`: NestJS 11 (Express + WebSockets Socket.IO + elevated Supabase service clients).
 - `supabase`: PostgreSQL 17 database, Supabase Auth, Storage buckets, and Realtime.
 
 ### Vercel Runtime Assessment
+
 1. **Next.js Web Frontend (`apps/web`)**:
    - **Vercel Native Deployment**: Ideal target. Vercel supports Next.js App Router, SSR middleware, dynamic server-rendering, and static asset optimization out-of-the-box.
 2. **NestJS API Backend (`apps/api`)**:
@@ -21,6 +23,7 @@ PGS HUB is an Enterprise Agency Management System structured as a PNPM Monorepo:
 ## 2. VERCEL PROJECT CONFIGURATION (WEB APP)
 
 ### A. Project Import Settings
+
 - **Framework Preset**: `Next.js`
 - **Root Directory**: `apps/web` (or Monorepo Root with Root Directory set to `apps/web`)
 - **Build Command**: `cd ../.. && pnpm --filter web build` (or standard `pnpm run build` with Vercel monorepo detection)
@@ -47,6 +50,7 @@ API_INTERNAL_URL=https://api-preview.pgs.vn/api/v1
 ## 3. NESTJS API RUNTIME PREPARATION
 
 ### Containerized Deployment (Recommended for Socket.IO & Cron)
+
 Deploy `apps/api` via Docker / Node 20+ runtime:
 
 ```bash

@@ -1,9 +1,11 @@
 ﻿# HƯỚNG DẪN NHANH DÀNH CHO NHÂN VIÊN (QUICK START GUIDE)
-*Hệ thống PGS HUB — Dành cho Nhân sự & Thành viên dự án*
+
+_Hệ thống PGS HUB — Dành cho Nhân sự & Thành viên dự án_
 
 ---
 
 ## 1. ĐĂNG NHẬP HỆ THỐNG
+
 1. Truy cập đường dẫn PGS Hub: `http://localhost:3000/auth/login` (hoặc tên miền chính thức của công ty).
 2. Nhập Email công ty và Mật khẩu được cấp.
 3. Chọn **Đăng nhập** để vào Trang tổng quan làm việc.
@@ -11,6 +13,7 @@
 ---
 
 ## 2. CHẤM CÔNG HÀNG NGÀY (ATTENDANCE)
+
 - **Truy cập**: Mục **Chấm công** trên thanh điều hướng bên trái hoặc vào `/app/attendance`.
 - **Quy tắc thời gian**:
   - Giờ bắt đầu làm việc: `08:00`.
@@ -25,6 +28,7 @@
 ---
 
 ## 3. QUẢN LÝ CÔNG VIỆC TRÊN BẢNG KANBAN
+
 - **Truy cập**: Mục **Công việc của tôi** hoặc **Dự án -> Bảng Kanban**.
 - **Thao tác**:
   - Kéo thả thẻ công việc từ cột **Cần làm (Todo)** sang **Đang làm (In Progress)** khi bắt đầu làm.
@@ -34,6 +38,7 @@
 ---
 
 ## 4. GỬI ĐỀ XUẤT CHI PHÍ DỰ ÁN (EXPENSES)
+
 - **Truy cập**: Mục **Chi phí** trong Dự án hoặc `/app/employee/expenses`.
 - **Thao tác**:
   1. Bấm **Tạo đề xuất chi phí mới**.
@@ -44,6 +49,7 @@
 ---
 
 ## 5. TRA CỨU PHIẾU LƯƠNG ĐIỆN TỬ
+
 - **Truy cập**: Mục **Bảng lương** hoặc `/app/employee/payroll`.
 - **Thao tác**:
   - Chọn kỳ lương muốn xem (VD: Kỳ tháng 08/2026).
@@ -52,4 +58,5 @@
 ---
 
 ## 6. GỬI YÊU CẦU HỖ TRỢ KỸ THUẬT
+
 - Khi gặp sự cố kỹ thuật hoặc lỗi hệ thống, gửi yêu cầu nhanh tại mục **Hỗ trợ** để ban quản trị tiếp nhận xử lý trong vòng 15-30 phút.
