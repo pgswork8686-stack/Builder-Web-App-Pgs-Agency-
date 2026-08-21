@@ -101,7 +101,7 @@ export class SupportService {
     const { data: ticket, error: ticketErr } = await this.client
       .from('support_tickets')
       .select(
-        '*, client_company:client_companies(id, name, client_company_code), project:projects(id, name, project_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, user_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, user_code)',
+        '*, client_company:client_companies(id, name, code), project:projects(id, name, project_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, account_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, account_code)',
       )
       .eq('id', id)
       .maybeSingle();
@@ -126,7 +126,7 @@ export class SupportService {
     let msgQuery = this.client
       .from('support_ticket_messages')
       .select(
-        '*, sender:profiles!support_ticket_messages_sender_user_id_fkey(id, full_name, email, user_code, role, avatar_url)',
+        '*, sender:profiles!support_ticket_messages_sender_user_id_fkey(id, full_name, email, account_code, role, avatar_url)',
       )
       .eq('ticket_id', id);
 
@@ -192,7 +192,7 @@ export class SupportService {
         status: 'open',
       })
       .select(
-        '*, client_company:client_companies(id, name, client_company_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, user_code)',
+        '*, client_company:client_companies(id, name, code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, account_code)',
       )
       .single();
 
@@ -224,7 +224,7 @@ export class SupportService {
         is_internal_note: dto.isInternalNote,
       })
       .select(
-        '*, sender:profiles!support_ticket_messages_sender_user_id_fkey(id, full_name, email, user_code, role, avatar_url)',
+        '*, sender:profiles!support_ticket_messages_sender_user_id_fkey(id, full_name, email, account_code, role, avatar_url)',
       )
       .single();
 
@@ -266,7 +266,7 @@ export class SupportService {
       .update(updatePayload)
       .eq('id', id)
       .select(
-        '*, client_company:client_companies(id, name, client_company_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, user_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, user_code)',
+        '*, client_company:client_companies(id, name, code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, account_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, account_code)',
       )
       .single();
 

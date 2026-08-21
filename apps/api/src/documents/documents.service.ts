@@ -47,7 +47,7 @@ export class DocumentsService {
     let dbQuery = this.client
       .from('company_documents')
       .select(
-        '*, department:departments(id, name, department_code), uploaded_by:profiles!company_documents_uploaded_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, department:departments(id, name, department_code), uploaded_by:profiles!company_documents_uploaded_by_user_id_fkey(id, full_name, email, account_code)',
         { count: 'exact' },
       )
       .eq('delete_status', 'active');
@@ -154,7 +154,7 @@ export class DocumentsService {
         delete_status: 'active',
       })
       .select(
-        '*, department:departments(id, name, department_code), uploaded_by:profiles!company_documents_uploaded_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, department:departments(id, name, department_code), uploaded_by:profiles!company_documents_uploaded_by_user_id_fkey(id, full_name, email, account_code)',
       )
       .single();
 

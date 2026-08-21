@@ -33,16 +33,13 @@ PGS HUB is an Enterprise Agency Management System structured as a PNPM Monorepo:
 ### B. Required Environment Variables for Vercel
 
 ```env
-# Next.js Public Endpoints
+# Next.js Public Endpoints (Exact variable names from source)
 NEXT_PUBLIC_APP_URL=https://your-preview-deployment.vercel.app
-NEXT_PUBLIC_API_BASE_URL=https://api-preview.pgs.vn/api/v1
+NEXT_PUBLIC_API_URL=https://api-preview.pgs.vn/api/v1
 
 # Supabase DEV / Preview Credentials (NEVER USE PRODUCTION REFS IN PREVIEW)
 NEXT_PUBLIC_SUPABASE_URL=https://<your-dev-project-ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Internal API Proxy / Backend Bridge (Optional for Next.js SSR fetch)
-API_INTERNAL_URL=https://api-preview.pgs.vn/api/v1
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
 ---
@@ -64,13 +61,14 @@ pnpm --filter api start:prod
 ### Required Environment Variables for API Runtime:
 
 ```env
-APP_ENV=preview
+# APP_ENV must be one of: 'development', 'production', 'test'
+APP_ENV=development
 PORT=3001
 WEB_URL=https://your-preview-deployment.vercel.app
 
 SUPABASE_URL=https://<your-dev-project-ref>.supabase.co
-SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SECRET_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (service_role secret)
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+SUPABASE_SECRET_KEY=sb_secret_... (service_role secret)
 
 INITIAL_ADMIN_EMAIL=admin.dev@pgs.vn
 THROTTLE_TTL=60000
@@ -85,6 +83,6 @@ TRUST_PROXY=true
 - [x] Monorepo passes typecheck: `pnpm -r typecheck` (PASS)
 - [x] Monorepo passes lint: `pnpm -r lint` (PASS)
 - [x] Monorepo passes format check: `pnpm -r format:check` (PASS)
-- [x] Unit & E2E tests pass: `pnpm -r test` (501 unit + 94 e2e + 77 web tests PASS)
+- [x] Unit & E2E tests pass: `pnpm -r test` (501 API Unit + 94 API E2E + 77 Web + 1 Validation = 673 tests PASS)
 - [x] Production build passes: `pnpm -r build` (PASS)
 - [x] Hard Safety: `umtgfaqjoqbsdzwpqizq` (Production) is strictly locked.

@@ -40,7 +40,7 @@ export class SettingsService {
     const { data, error } = await this.client
       .from('system_settings')
       .select(
-        '*, updated_by:profiles!system_settings_updated_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, updated_by:profiles!system_settings_updated_by_user_id_fkey(id, full_name, email, account_code)',
       )
       .order('category', { ascending: true });
 

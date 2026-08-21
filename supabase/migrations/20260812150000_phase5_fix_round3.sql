@@ -193,7 +193,7 @@ BEGIN
     p_note,
     p_status,
     p_late_minutes,
-    p_source,
+    p_source::public.attendance_source,
     p_created_by,
     p_updated_by
   ) RETURNING jsonb_build_object(

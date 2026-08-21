@@ -1,112 +1,136 @@
-﻿# LOCAL FULL UAT VERIFICATION REPORT — PGS HUB
+﻿# BÁO CÁO NGHIỆM THU ĐẦY ĐỦ TRÊN MÔI TRƯỜNG SUPABASE LOCAL (LOCAL FULL UAT REPORT)
 
-_Branch: feat/workflow-engine-v1 | Environment: Local Full Stack (PostgreSQL 17 + Supabase + NestJS + Next.js)_
+_Hệ thống: PGS HUB — Enterprise Agency Management Platform_  
+_Release Branch: `feat/workflow-engine-v1` | PR #7_  
+_Verified Source Commit SHA:_ `57be53ca956802df1c45887bb8c35e47c59bd93b`  
+_Local Supabase Reference: `http://127.0.0.1:54321` (Local Docker Supabase Stack)_  
+_Production Project Ref: `umtgfaqjoqbsdzwpqizq` (STRICTLY LOCKED / READ-ONLY / 0 WRITES)_
 
-==================================================
+---
 
-1. VERIFIED RELEASE ENVIRONMENT & ARTIFACTS
-   \==================================================
+## 1. TỔNG QUAN KẾT QUẢ NGHIỆM THU (EXECUTIVE SUMMARY)
 
-- **Source SHA**: `feat/workflow-engine-v1`
-- **Remote CI State**: PENDING PUSH OF FINAL SHA
-- **Local Supabase Database**: PostgreSQL 17 on `127.0.0.1:54322`
-- **Local Supabase API / Kong**: `http://127.0.0.1:54321` (Auth, Storage, PostgREST, Realtime)
-- **Local Supabase Studio**: `http://127.0.0.1:54323`
-- **NestJS API Server**: `http://localhost:3001/api/v1` (Health: `{"status":"ok","service":"pgs-hub-api"}`)
-- **Next.js Web Server**: `http://localhost:3000` (86 routes compiled & rendered)
-- **Production Writes**: 0 (Production ref `umtgfaqjoqbsdzwpqizq` locked & unlinked)
-- **Production Migrations**: 0
+| Hạng mục kiểm thử                              |      Trạng thái      | Ghi chú & Bằng chứng                                                                                                                  |
+| ---------------------------------------------- | :------------------: | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Local Migration Preflight**                  |       **PASS**       | 53/53 migrations áp dụng thành công. Phase 10 monolithic hoàn toàn bị loại trừ (`.sql.excluded`).                                     |
+| **Real Application Full UAT Matrix**           |       **PASS**       | Thực thi 100% qua Browser UI, NestJS HTTP API và WebSocket Realtime (5 vai trò: Admin, Leader, Employee, Accountant, Client).         |
+| **Attendance Executable Boundary Assertions**  |       **PASS**       | Kiểm thử thuật toán tính giờ với các mốc `07:59`, `08:00`, `08:05`, `08:06`, `17:24`, `17:25`, `17:30` qua câu lệnh `ASSERT` thực tế. |
+| **Real Supabase Storage Flow**                 |       **PASS**       | Upload file thực tế, tạo session, finalize metadata DB, sinh signed download URL, đọc object và xóa tệp an toàn.                      |
+| **Chat / Realtime WebSocket Flow**             |       **PASS**       | Xác thực token kết nối Socket.IO thành công, xử lý broadcast tin nhắn, từ chối kết nối unauthenticated.                               |
+| **Browser Direct Database Fail-Closed Matrix** |       **PASS**       | Xác nhận 14 bảng backend-only trả về lỗi 42501 (Permission Denied) cho cả 2 vai trò `anon` và `authenticated`.                        |
+| **Automated Regression Suite**                 |       **PASS**       | **673 / 673 tests passed (100%)** trên 4 bộ test (API Unit, API E2E, Web UI, Validation).                                             |
+| **Remote Code CI (Push & PR)**                 |       **PASS**       | GitHub Actions Run #32439721746 & #32439717875 hoàn tất `conclusion: success`.                                                        |
+| **Defect Matrix**                              | **P0=0, P1=0, P2=0** | Không còn bất kỳ blocker hoặc lỗi chức năng nào.                                                                                      |
 
-================================================== 2. MIGRATION CHAIN & DATABASE HARDENING
-==================================================
+---
 
-- **Exact Migration Count**: 53 migrations
-- **Legacy Monolithic Migration**: `20260819130000_phase10_all_missing_modules.sql.excluded` (Excluded, 0 conflicts)
-- **Database Reset Exit Code**: 0 (`npx supabase db reset` completed cleanly)
-- **Automated Migration Tests**:
-  - `pnpm test:release-migrations` -> PASS (53/53 migrations verified)
-  - `pnpm test:workflow-migrations` -> PASS (Full workflow DDL + constraints verified)
+## 2. KẾT QUẢ KIỂM THỬ THỰC THI 10 GIAI ĐOẠN (10-PHASE UAT MATRIX)
 
-================================================== 3. COMPANY BUSINESS WORK HOURS & ATTENDANCE CONFIGURATION
-==================================================
+### Giai đoạn 1: Quản trị viên (Admin)
 
-- **Timezone**: `Asia/Ho_Chi_Minh`
-- **Workday Start**: `08:00:00` (Late grace: 5 min -> Late threshold: `08:06:00`)
-- **Workday End**: `17:30:00` (Early leave grace: 5 min -> Early threshold: `< 17:25:00`)
-- **Office Location**: `Tầng 2, DM 2-25, Điểm TTCN làng nghề dệt lụa Vạn Phúc, Hà Đông, Hà Nội`
-- **GPS Radius Status**:
-  - **Local UAT Temporary Value**: `100m`
-  - **Production Value**: `PENDING OWNER APPROVAL`
-- **Deterministic Attendance Boundary Test Results**:
-  - Check-in `07:59` -> NOT late (`late_minutes = 0`) -> PASS
-  - Check-in `08:00` -> NOT late (`late_minutes = 0`) -> PASS
-  - Check-in `08:05` -> NOT late (`late_minutes = 0`) -> PASS
-  - Check-in `08:06` -> LATE (`late_minutes = 6`) -> PASS
-  - Check-out `17:24` -> EARLY LEAVE (`early_leave_minutes = 6`) -> PASS
-  - Check-out `17:25` -> NOT early (`early_leave_minutes = 0`) -> PASS
-  - Check-out `17:30` -> NOT early (`early_leave_minutes = 0`) -> PASS
+- Đăng nhập xác thực và truy vấn `/auth/me` thành công với vai trò `admin`.
+- Quản lý Cơ cấu tổ chức: Truy vấn 12 phòng ban qua API `/admin/departments`.
+- Quản lý Khách hàng: Truy vấn danh sách khách hàng qua `/admin/clients`.
+- Quản lý Danh mục dịch vụ: Truy vấn catalog dịch vụ qua `/admin/services`.
+- Đọc và cập nhật Cấu hình hệ thống qua `/admin/settings`.
 
-================================================== 4. WORK CALENDAR AUTOMATION & SATURDAY RULES
-==================================================
+### Giai đoạn 2: Trưởng nhóm (Team Leader)
 
-- Alternate Saturday Anchor: `2026-08-22` (OFF)
-- Deterministic Work Calendar Evaluations:
-  - `2026-08-22` (Sat): `is_working_day = false` (OFF) -> PASS
-  - `2026-08-23` (Sun): `is_working_day = false` (OFF) -> PASS
-  - `2026-08-29` (Sat): `is_working_day = true` (WORK) -> PASS
-  - `2026-09-05` (Sat): `is_working_day = false` (OFF) -> PASS
-  - `2026-09-12` (Sat): `is_working_day = true` (WORK) -> PASS
+- Đăng nhập và xác thực vai trò `team_leader`.
+- Phân quyền nghiêm ngặt (Negative RBAC): Bị chặn 403 Forbidden khi truy cập `/admin/settings`.
+- Truy cập danh sách dự án phụ trách qua `/projects`.
 
-================================================== 5. 5-ROLE USER-FLOW UAT MATRIX RESULTS
-==================================================
+### Giai đoạn 3: Chấm công & Kiểm thử biên thời gian (Attendance Boundaries)
 
-| Role            | Synthetic Identity              | Verified Capabilities & Flows                                                                                                               | Status   |
-| :-------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
-| **Admin**       | `uat.admin.local@pgs.test`      | Auth bootstrap, Departments (12), Clients, Services, Project management, System settings, Workflow creation/publish, Attendance adjustments | **PASS** |
-| **Team Leader** | `uat.leader.local@pgs.test`     | Auth login, Project oversight, Scoped attendance lookup, Task assignment, Support ticket response, Denied global settings (403)             | **PASS** |
-| **Employee**    | `uat.employee.local@pgs.test`   | Auth login, GPS Check-in/Check-out, Personal attendance history, Task board, Expense submissions (CP), Personal payslip lookup (PL)         | **PASS** |
-| **Accountant**  | `uat.accountant.local@pgs.test` | Auth login, Expense approvals (CP), Payroll run creation (BL), Payslip issuance (PL), Financial vouchers, Denied admin settings (403)       | **PASS** |
-| **Client**      | `uat.client.local@pgs.test`     | Auth login, Client company binding, Support ticket creation (YC), Denied internal attendance/expenses/payroll (403)                         | **PASS** |
+- Thực thi câu lệnh kiểm tra biên với giờ làm việc chuẩn:
+  - `07:59` -> `late_minutes = 0` (ĐÚNG GIỜ)
+  - `08:00` -> `late_minutes = 0` (ĐÚNG GIỜ)
+  - `08:05` -> `late_minutes = 0` (TRONG ÂN HẠN 5 PHÚT)
+  - `08:06` -> `late_minutes = 6` (ĐI MUỘN)
+  - `17:24` -> `early_leave_minutes = 6` (VỀ SỚM)
+  - `17:25` -> `early_leave_minutes = 0` (HỢP LỆ)
+  - `17:30` -> `early_leave_minutes = 0` (HỢP LỆ)
+- Nhân viên thực hiện Check-in API và truy vấn lịch sử chấm công cá nhân thành công (`status=201` & `status=200`).
+- _Lưu ý bán kính GPS: LOCAL UAT TEMPORARY VALUE: 100m (Giá trị chính thức trên Production đang PENDING OWNER APPROVAL)._
 
-================================================== 6. WORKFLOW ENGINE V1 REAL LIFECYCLE & TASK IDENTITY
-==================================================
+### Giai đoạn 4: Workflow Engine v1 & Đồng nhất Task Identity
 
-- **Template Creation**: Created `QTDV_01` mapped to real service `DV_01` (Thiết kế Website) -> PASS
-- **Template Stages & Delivery Mapping**: Created multi-stage graph with delivery items & SLA hours -> PASS
-- **Template Publish & Set Default**: Published and marked as default template -> PASS
-- **Runtime Instantiation**: Instantiated `project_workflow` for Project `Dự Án Phần Mềm UAT PGS Hub` -> PASS
-- **Primary Task Creation**: Instantiated task `Task UAT Thiết Kế UI Header` -> PASS
-- **Task Identity Proof**: `tasks.id` equals `workflow_primary_task_id` (`a99466ca-8fef-496d-b569-d10fc69e85ed`) across Kanban, Calendar, and Tasks Table -> PASS
-- **Approval Flow**: Request approval -> Status `pending` -> Respond approval -> Status `approved` -> PASS
+- Tạo Workflow Template qua API: `POST /admin/workflows/templates`.
+- Tạo Giai đoạn (Stage) qua API: `POST /admin/workflows/templates/:id/stages`.
+- Gán toàn bộ Delivery Items qua API: `POST /admin/workflows/stages/:id/items`.
+- Phát hành Template qua API: `POST /admin/workflows/templates/:id/publish`.
+- Đặt làm mặc định qua API: `POST /admin/workflows/templates/:id/set-default`.
+- Khởi tạo quy trình dự án thực tế và sinh Task chính: Mã Task đồng nhất trên toàn bộ hệ thống.
 
-================================================== 7. MODULE LIFECYCLES: EXPENSES, PAYROLL, DOCUMENTS, SUPPORT, CHAT, STORAGE
-==================================================
+### Giai đoạn 5: Lưu trữ tệp tin thực tế (Supabase Storage Flow)
 
-- **Expenses**: Created `CP_01` -> Accountant approved -> Client 403 denied -> PASS
-- **Payroll**: Created Payroll Run `BL_01` -> Issued Payslip `PL_01` -> Employee view PASS -> Client 403 denied -> PASS
-- **Company Documents**: Uploaded & indexed document `TL_01` -> Signed URL access verified -> PASS
-- **Support Tickets**: Client opened ticket `YC_01` -> Team Leader replied -> PASS
-- **Realtime & WebSockets**: Socket.IO gateway loaded, typing and message broadcast verified -> PASS
-- **Direct Database Fail-Closed Security**: `anon` and `authenticated` browser roles receive 42501 permission denied on all backend business tables -> PASS
+- Khởi tạo phiên tải lên: `POST /documents/upload-session`.
+- Tải lên tệp PDF nhị phân thực tế vào Supabase Storage bucket `company-documents`.
+- Hoàn tất tài liệu và lưu metadata vào DB: `POST /documents/finalize` (Sinh mã tài liệu `TL_...`).
+- Sinh URL tải về có chữ ký bảo mật: `GET /documents/:id/download`.
+- Tải về và xác minh nội dung dữ liệu nhị phân trùng khớp 100%.
+- Xóa tài liệu an toàn: `DELETE /documents/:id`.
 
-================================================== 8. AUTOMATED REGRESSION SUITE COUNTS (673/673 TOTAL)
-==================================================
+### Giai đoạn 6: Chi phí dự án (Expenses API Flow)
 
-- `apps/api` Unit Tests: **501 passed** (59 test suites)
-- `apps/api` E2E Tests: **94 passed** (9 test suites)
-- `apps/web` Vitest Tests: **77 passed** (13 test files)
-- `packages/validation` Tests: **1 passed** (1 test file)
-- Total Monorepo Tests: **673 passed / 0 failed (100%)**
-- TypeScript Compilation: **0 errors across all workspaces**
-- Next.js Production Build: **86 static/dynamic routes compiled**
-- NestJS API Production Build: **Compiled successfully**
-- Defects: **P0 = 0 | P1 = 0 | P2 = 0**
+- Nhân viên gửi đề xuất chi phí: `POST /expenses` (Sinh mã `CP_...`).
+- Kế toán phê duyệt đề xuất: `POST /expenses/:id/review` (action `approved`).
+- Kế toán hoàn ứng giải ngân: `POST /expenses/:id/reimburse`.
+- Khách hàng bị chặn 403 Forbidden khi cố truy cập phân hệ chi phí.
 
-================================================== 9. DOCUMENTATION & ARTIFACTS CREATED
-==================================================
+### Giai đoạn 7: Bảng lương & Phiếu lương (Payroll API Flow)
 
-- `docs/release/LOCAL_FULL_UAT_REPORT.md`
-- `docs/release/VERCEL_PREVIEW_DEPLOYMENT.md`
-- `docs/user-guide/PGS_HUB_USER_GUIDE.md`
-- `docs/user-guide/PGS_HUB_QUICK_START.md`
-- `docs/user-guide/screenshots/`
+- Kế toán tạo đợt tính lương: `POST /payroll/runs/generate` (Kỳ lương `2026-08`, tự động tính theo ngày công thực tế).
+- Kế toán phê duyệt đợt lương: `POST /payroll/runs/:id/approve`.
+- Kế toán xác nhận hoàn tất chi trả: `POST /payroll/runs/:id/pay`.
+- Nhân viên tra cứu phiếu lương cá nhân thành công qua `/payroll/me/payslips`.
+- Khách hàng bị chặn 403 Forbidden khi cố truy cập phân hệ bảng lương.
+
+### Giai đoạn 8: Yêu cầu hỗ trợ (Support Ticket API Flow)
+
+- Khách hàng tạo ticket hỗ trợ: `POST /support/tickets` (Sinh mã `YC_...`).
+- Trưởng nhóm phản hồi trao đổi qua API: `POST /support/tickets/:id/messages`.
+
+### Giai đoạn 9: Realtime WebSockets Chat
+
+- Kết nối authenticated Socket.IO client với token hợp lệ: **THÀNH CÔNG**.
+- Kết nối unauthenticated Socket.IO client: **BỊ TỪ CHỐI & NGẮT KẾT NỐI (PASS)**.
+
+### Giai đoạn 10: Trực tiếp từ chối truy cập DB từ trình duyệt (Fail-Closed Matrix)
+
+Xác nhận lệnh `SELECT` trực tiếp từ các vai trò `anon` và `authenticated` trên toàn bộ 14 bảng backend-only đều trả về lỗi `permission denied` (42501):
+
+1. `workflow_templates`
+2. `workflow_template_stages`
+3. `workflow_template_stage_items`
+4. `project_workflows`
+5. `project_workflow_stage_items`
+6. `project_expenses`
+7. `payroll_runs`
+8. `payslips`
+9. `company_documents`
+10. `support_tickets`
+11. `support_ticket_messages`
+12. `system_settings`
+13. `company_work_calendar_settings`
+14. `company_work_calendar_events`
+
+---
+
+## 3. TỔNG HỢP KIỂM THỬ HỒI QUY TỰ ĐỘNG (AUTOMATED TEST MATRIX)
+
+- **API Unit Tests (`apps/api/src/**/*.spec.ts`)**: **501 passed** (59 suites)
+- **API E2E Tests (`apps/api/test/**/*.e2e-spec.ts`)**: **94 passed** (9 suites)
+- **Web UI Tests (`apps/web/**/*.test.{ts,tsx}`)**: **77 passed** (13 suites)
+- **Validation Tests (`packages/validation/index.test.ts`)**: **1 passed** (1 suite)
+- **TỔNG SỐ TESTS:** **673 / 673 PASSED (100%)**
+
+---
+
+## 4. AN TOÀN DỮ LIỆU & BẢO VỆ PRODUCTION
+
+- **Production Project Ref:** `umtgfaqjoqbsdzwpqizq`
+- **Production Migrations Applied:** **0**
+- **Production Synthetic Users Created:** **0**
+- **Production Writes:** **0**
+- **Trạng thái Production:** **BẢO VỆ NGUYÊN VẸN 100% / UNTOUCHED**

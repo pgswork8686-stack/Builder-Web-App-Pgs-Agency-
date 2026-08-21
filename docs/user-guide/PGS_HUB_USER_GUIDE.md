@@ -1,168 +1,182 @@
 ﻿# SỔ TAY HƯỚNG DẪN SỬ DỤNG PGS HUB
 
-_Phiên bản: feat/workflow-engine-v1 | Ngày phát hành: 21/08/2026_
+_Phiên bản: feat/workflow-engine-v1 | Ngày cập nhật: 21/08/2026_
 
 ---
 
 ## MỤC LỤC
 
-1. [Tổng quan hệ thống](#1-tổng-quan-hệ-thống)
-2. [Đăng ký, Phê duyệt & Đăng nhập](#2-đăng-ký-phê-duyệt--đăng-nhập)
-3. [Chấm công, Địa điểm GPS & Lịch làm việc](#3-chấm-công-địa-điểm-gps--lịch-làm-việc)
-4. [Quản trị Cơ cấu Tổ chức & Nhân sự](#4-quản-trị-cơ-cấu-tổ-chức--nhân-sự)
-5. [Quản lý Khách hàng & Công ty Đối tác](#5-quản-lý-khách-hàng--công-ty-đối-tác)
-6. [Quản lý Dự án & Phân bổ Nguồn lực](#6-quản-lý-dự-án--phân-bổ-nguồn-lực)
-7. [Công việc, Kanban & Lịch biểu Deadline](#7-công-việc-kanban--lịch-biểu-deadline)
-8. [Workflow Engine v1 — Quy trình Mẫu & Thực thi](#8-workflow-engine-v1--quy-trình-mẫu--thực-thi)
-9. [Quản lý Chi phí Dự án (CP)](#9-quản-lý-chi-phí-dự-án-cp)
-10. [Bảng lương & Phiếu lương Điện tử (BL & PL)](#10-bảng-lương--phiếu-lương-điện-tử-bl--pl)
-11. [Kho Tài liệu Doanh nghiệp & Storage (TL)](#11-kho-tài-liệu-doanh-nghiệp--storage-tl)
-12. [Hỗ trợ Kỹ thuật & Yêu cầu Khách hàng (YC)](#12-hỗ-trợ-kỹ-thuật--yêu-cầu-khách-hàng-yc)
-13. [Trò chuyện Nội bộ & Realtime Chat](#13-trò-chuyện-nội-bộ--realtime-chat)
-14. [Trung tâm Tự động hóa & Thông báo](#14-trung-tâm-tự-động-hóa--thông-báo)
-15. [Cài đặt Hệ thống & Chính sách Doanh nghiệp](#15-cài-đặt-hệ-thống--chính-sách-doanh-nghiệp)
-16. [Hướng dẫn theo 5 Phân quyền (Roles Matrix)](#16-hướng-dẫn-theo-5-phân-quyền-roles-matrix)
+1. [Đăng Nhập & Bàn Làm Việc](#1-đăng-nhập--bàn-làm-việc)
+2. [Chấm Công & Giờ Làm Việc Chuẩn](#2-chấm-công--giờ-làm-việc-chuẩn)
+3. [Quản Lý Công Việc & Bảng Kanban](#3-quản-lý-công-việc--bảng-kanban)
+4. [Lịch Công Tác & Hạn Chót (Deadlines)](#4-lịch-công-tác--hạn-chót-deadlines)
+5. [Quy Trình Dịch Vụ Chuẩn (Workflow Engine v1)](#5-quy-trình-dịch-vụ-chuẩn-workflow-engine-v1)
+6. [Quản Lý Chi Phí Dự Án (CP)](#6-quản-lý-chi-phí-dự-án-cp)
+7. [Bảng Lương & Phiếu Lương Điện Tử (BL & PL)](#7-bảng-lương--phiếu-lương-điện-tử-bl--pl)
+8. [Quản Trị Tài Liệu & Lưu Trữ Doanh Nghiệp (TL)](#8-quản-trị-tài-liệu--lưu-trữ-doanh-nghiệp-tl)
+9. [Yêu Cầu Hỗ Trợ & Trao Đổi Thời Gian Thực (YC & Chat)](#9-yêu-cầu-hỗ-trợ--trao-đổi-thời-gian-thực-yc--chat)
+10. [Ma Trận Phân Quyền 5 Vai Trò (Roles Matrix)](#10-ma-trận-phân-quyền-5-vai-trò-roles-matrix)
 
 ---
 
-## 1. TỔNG QUAN HỆ THỐNG
+## 1. ĐĂNG NHẬP & BÀN LÀM VIỆC
 
-PGS HUB là nền tảng quản trị vận hành toàn diện cho Digital Agency, tích hợp quản lý dự án, chấm công GPS, quy trình tự động (Workflow Engine), tài chính - chi phí - bảng lương và cổng tương tác khách hàng thời gian thực.
+### Màn hình Đăng nhập
 
----
+![Màn hình Đăng nhập PGS Hub](screenshots/login.png)
 
-## 2. ĐĂNG KÝ, PHÊ DUYỆT & ĐĂNG NHẬP
+- **Vị trí bấm (WHERE TO CLICK)**: Truy cập URL `http://localhost:3000/auth/login`.
+- **Giao diện hiển thị (WHAT USER SEES)**: Form đăng nhập với 2 trường Email và Mật khẩu, kèm ảnh minh họa PGS Agency.
+- **Dữ liệu nhập (WHAT TO ENTER)**: Email công ty (ví dụ: `uat.employee.local@pgs.test`) và mật khẩu.
+- **Kết quả mong đợi (EXPECTED RESULT)**: Đăng nhập thành công, điều hướng về Dashboard tương ứng với vai trò.
+- **Lỗi thường gặp (COMMON ERROR)**: Sai email hoặc mật khẩu -> Thông báo "Invalid credentials".
+- **Hành động tiếp theo (WHAT TO DO NEXT)**: Bấm "Quên mật khẩu" nếu cần khôi phục mật khẩu.
 
-- **Đăng ký tài khoản**: Người dùng mới truy cập `/auth/sign-up` để điền email, họ tên, mật khẩu.
-- **Trạng thái phê duyệt**: Sau khi đăng ký, tài khoản rơi vào trạng thái `pending`. Quản trị viên (Admin) xem danh sách tại `/app/admin/accounts/pending` để xét duyệt phân quyền (`admin`, `team_leader`, `employee`, `accountant`, `client`).
-- **Đăng nhập**: Sử dụng email và mật khẩu tại `/auth/login`.
+### Trang Tổng quan (Dashboard)
 
----
+![Bàn làm việc PGS Hub](screenshots/dashboard.png)
 
-## 3. CHẤM CÔNG, ĐỊA ĐIỂM GPS & LỊCH LÀM VIỆC
-
-### A. Khung Giờ & Quy Định Đi Muộn / Về Sớm
-
-- **Múi giờ**: `Asia/Ho_Chi_Minh`
-- **Giờ bắt đầu**: `08:00` (Ân hạn 5 phút -> Tính muộn từ `08:06`)
-- **Giờ kết thúc**: `17:30` (Ân hạn 5 phút -> Tính về sớm nếu trước `17:25`)
-- **Văn phòng**: Tầng 2, DM 2-25, Điểm TTCN làng nghề dệt lụa Vạn Phúc, Hà Đông, Hà Nội.
-- **Bán kính GPS**: _LOCAL UAT TEMPORARY VALUE: 100m (Giá trị chính thức trên Production đang PENDING OWNER APPROVAL)._
-
-### B. Lịch Làm Việc Cách Tuần (Alternate Saturdays)
-
-- Các ngày Thứ 2 đến Thứ 6: Đi làm tiêu chuẩn.
-- Thứ 7 tuần chẵn: NGHỈ. Thứ 7 tuần lẻ: ĐI LÀM.
-- Chủ nhật: Nghỉ cố định.
+- **Vị trí bấm**: Menu **Tổng quan** (`/app/dashboard` hoặc `/app/admin`).
+- **Giao diện hiển thị**: Các thẻ thống kê nhanh (dự án, nhiệm vụ trong ngày, yêu cầu chờ duyệt, biểu đồ hiệu suất).
+- **Hành động tiếp theo**: Chọn mục cần xử lý hoặc bấm vào thẻ công việc để mở chi tiết.
 
 ---
 
-## 4. QUẢN TRỊ CƠ CẤU TỔ CHỨC & NHÂN SỰ
+## 2. CHẤM CÔNG & GIỜ LÀM VIỆC CHUẨN
 
-- Quản lý cây phòng ban và đội nhóm tại `/app/admin/organization`.
-- Quản lý hồ sơ nhân sự, mã nhân viên, chức danh, hợp đồng tại `/app/admin/people`.
+![Màn hình Chấm công](screenshots/attendance.png)
 
----
-
-## 5. QUẢN LÝ KHÁCH HÀNG & CÔNG TY ĐỐI TÁC
-
-- Quản lý danh mục đối tác khách hàng tại `/app/admin/clients`.
-- Tạo tài khoản đại diện khách hàng (`client`) và gắn vào công ty.
-
----
-
-## 6. QUẢN LÝ DỰ ÁN & PHÂN BỔ NGUỒN LỰC
-
-- Tạo mới dự án kèm mã dự án duy nhất (VD: `DA_01`).
-- Gán dịch vụ dự án, chỉ định Quản lý dự án (Project Manager) và thành viên.
+- **Vị trí bấm**: Menu **Chấm công** (`/app/attendance`).
+- **Giao diện hiển thị**: Đồng hồ thời gian thực, bản đồ vị trí văn phòng, trạng thái chấm công trong ngày và lịch sử chấm công.
+- **Quy định giờ giấc chuẩn**:
+  - Giờ bắt đầu: `08:00` (Ân hạn 5 phút -> Tính **Đi muộn** từ `08:06` trở đi).
+  - Giờ kết thúc: `17:30` (Ân hạn 5 phút -> Tính **Về sớm** nếu trước `17:25`).
+  - Địa điểm: Văn phòng Tầng 2, DM 2-25 Vạn Phúc, Hà Đông.
+  - _Lưu ý bán kính GPS: LOCAL UAT TEMPORARY VALUE: 100m (Giá trị chính thức trên Production đang PENDING OWNER APPROVAL)._
+- **Thao tác**:
+  - Bấm **Check-in** vào đầu ca sáng.
+  - Bấm **Check-out** khi kết thúc ngày làm việc.
+- **Kết quả mong đợi**: Hệ thống ghi nhận chính xác thời gian và cập nhật số phút đi muộn / về sớm tự động.
+- **Lỗi thường gặp**: "OUTSIDE_ALLOWED_LOCATION" -> Thiết bị chưa bật định vị GPS hoặc nằm ngoài vùng chấm công.
 
 ---
 
-## 7. CÔNG VIỆC, KANBAN & LỊCH BIỂU DEADLINE
+## 3. QUẢN LÝ CÔNG VIỆC & BẢNG KANBAN
 
-- Bảng Kanban trực quan kéo thả theo trạng thái (`todo`, `in_progress`, `review`, `done`).
-- Lịch biểu theo dõi tiến độ và phân phối công việc cho nhân sự.
+### Danh sách Công việc (Tasks)
 
----
+![Danh sách công việc](screenshots/tasks.png)
 
-## 8. WORKFLOW ENGINE V1 — QUY TRÌNH MẪU & THỰC THI
+- **Vị trí bấm**: Menu **Công việc** (`/app/admin/tasks` hoặc `/app/employee/tasks`).
+- **Giao diện hiển thị**: Bảng lọc công việc theo dự án, trạng thái, người thực hiện và hạn nộp.
+- **Dữ liệu nhập**: Tên công việc, người phụ trách, thời hạn bàn giao, mô tả chi tiết.
+- **Kết quả mong đợi**: Công việc mới được tạo, đồng bộ mã nhiệm vụ trên toàn hệ thống.
 
-- Thiết lập quy trình mẫu theo từng dịch vụ tại `/app/admin/workflows`.
-- Tự động sinh danh sách công việc (Primary Tasks) và điều phối phê duyệt giai đoạn đa cấp.
-- Task Identity đồng nhất: Task ID của quy trình đồng bộ xuyên suốt Kanban, Lịch và Danh sách công việc.
+### Bảng Kanban (Kanban Board)
 
----
+![Bảng Kanban dự án](screenshots/kanban.png)
 
-## 9. QUẢN LÝ CHI PHÍ DỰ ÁN (CP)
-
-- Nhân viên gửi đề xuất chi phí kèm hóa đơn/chứng từ tại `/app/employee/expenses`.
-- Kế toán xét duyệt, từ chối và quản lý chi tiêu dự án tại `/app/accountant/finance/project-expenses`.
-
----
-
-## 10. BẢNG LƯƠNG & PHIẾU LƯƠNG ĐIỆN TỬ (BL & PL)
-
-- Kế toán tạo kỳ lương (`BL_01`), nhập chỉ số ngày công và phê duyệt tại `/app/accountant/payroll`.
-- Nhân viên tra cứu phiếu lương cá nhân an toàn, bảo mật tại `/app/employee/payroll`.
+- **Vị trí bấm**: Menu **Bảng Kanban** (`/app/admin/kanban`).
+- **Giao diện hiển thị**: 4 cột trạng thái: **Cần làm (Todo)**, **Đang làm (In Progress)**, **Đang duyệt (Review)**, **Hoàn thành (Done)**.
+- **Thao tác**: Kéo và thả thẻ công việc từ cột này sang cột khác để chuyển trạng thái tức thời.
 
 ---
 
-## 11. KHO TÀI LIỆU DOANH NGHIỆP & STORAGE (TL)
+## 4. LỊCH CÔNG TÁC & HẠN CHÓT (DEADLINES)
 
-- Quản trị văn bản, tài liệu, quy chế công ty có mã lưu trữ `TL_01`.
-- Bảo mật đường dẫn tải xuống qua URL ký số tạm thời (Signed URL).
+![Lịch công tác và Deadlines](screenshots/calendar.png)
 
----
-
-## 12. HỖ TRỢ KỸ THUẬT & YÊU CẦU KHÁCH HÀNG (YC)
-
-- Khách hàng tạo phiếu yêu cầu hỗ trợ `YC_01` trực tiếp tại `/app/client/support`.
-- Đội ngũ kỹ thuật tiếp nhận, trao đổi và xử lý theo SLA.
-
----
-
-## 13. TRÒ CHUYỆN NỘI BỘ & REALTIME CHAT
-
-- Kênh chat nhóm theo dự án và trò chuyện trực tiếp 1-1.
-- Hiển thị trạng thái đang soạn tin (typing) và tin nhắn cập nhật tức thời qua WebSockets.
+- **Vị trí bấm**: Menu **Lịch biểu** (`/app/admin/calendar`).
+- **Giao diện hiển thị**: Khung nhìn theo tháng/tuần hiển thị các hạn chót của dự án và lịch làm việc cách tuần của công ty.
+- **Quy tắc lịch**:
+  - Thứ 2 đến Thứ 6: Làm việc bình thường.
+  - Thứ 7 tuần chẵn: NGHỈ. Thứ 7 tuần lẻ: ĐI LÀM.
+  - Chủ nhật: Nghỉ cố định.
 
 ---
 
-## 14. TRUNG TÂM TỰ ĐỘNG HÓA & THÔNG BÁO
+## 5. QUY TRÌNH DỊCH VỤ CHUẨN (WORKFLOW ENGINE V1)
 
-- Hệ thống gửi thông báo tự động khi có task mới, yêu cầu duyệt chi phí hoặc duyệt giai đoạn.
+![Quản trị Quy trình](screenshots/workflow.png)
+
+- **Vị trí bấm**: Menu **Quy trình** (`/app/admin/workflows`).
+- **Giao diện hiển thị**: Cây quy trình dịch vụ gồm các Giai đoạn (Stages), Đầu việc chuẩn (Stage Items) và Các cổng duyệt (Approval Gates).
+- **Thao tác**:
+  1. Tạo Template quy trình gắn với dịch vụ cụ thể.
+  2. Thêm các giai đoạn, thiết lập thời hạn SLA và ràng buộc bắt buộc.
+  3. Gán các Delivery Items vào giai đoạn.
+  4. Bấm **Phát hành (Publish)** và **Đặt làm mặc định (Set Default)**.
+  5. Khi khởi tạo dự án, hệ thống tự động sinh quy trình và tạo nhiệm vụ có mã đồng nhất.
 
 ---
 
-## 15. CÀI ĐẶT HỆ THỐNG & CHÍNH SÁCH DOANH NGHIỆP
+## 6. QUẢN LÝ CHI PHÍ DỰ ÁN (CP)
 
-- Quản trị cấu hình ngày lễ, giờ làm việc và quy tắc chấm công toàn công ty tại `/app/admin/settings`.
+![Quản lý Chi phí & Tài chính](screenshots/expenses.png)
+
+- **Vị trí bấm**: Menu **Tài chính / Chi phí** (`/app/admin/finance` hoặc `/app/employee/expenses`).
+- **Thao tác tạo đề xuất (Nhân viên)**:
+  1. Bấm **Tạo đề nghị chi phí**.
+  2. Chọn Dự án, nhập số tiền, phân loại (Công tác, Phần mềm, Thiết bị, Ăn uống...).
+  3. Đính kèm biên lai hóa đơn chứng từ.
+  4. Bấm **Gửi phê duyệt**. Mã chi phí tự động sinh: `CP_01`, `CP_02`...
+- **Thao tác phê duyệt (Kế toán / Admin)**:
+  - Xem chi tiết đề xuất và bấm **Duyệt chi phí (Approve)** hoặc **Từ chối (Reject)**.
+  - Sau khi chuyển khoản, bấm **Hoàn ứng (Reimburse)** để kết thúc hồ sơ.
 
 ---
 
-## 16. HƯỚNG DẪN THEO 5 PHÂN QUYỀN (ROLES MATRIX)
+## 7. BẢNG LƯƠNG & PHIẾU LƯƠNG ĐIỆN TỬ (BL & PL)
 
-### 1. Quản Trị Viên (Admin)
+- **Vị trí bấm**: Menu **Bảng lương** (`/app/admin/payroll` hoặc `/app/accountant/payroll`).
+- **Thao tác tạo kỳ lương (Kế toán)**:
+  1. Bấm **Tạo đợt tính lương**.
+  2. Chọn tháng (ví dụ: `2026-08`), đặt tiêu đề và số ngày công tiêu chuẩn (mặc định 22 ngày).
+  3. Hệ thống tự động tổng hợp ngày công thực tế từ dữ liệu Chấm công, tính toán Lương Gross và Lương Net cho toàn thể nhân viên.
+  4. Kế toán kiểm tra, bấm **Phê duyệt đợt lương (Approve)** -> Bấm **Xác nhận chi trả (Mark Paid)**.
+- **Thao tác xem phiếu lương (Nhân viên)**:
+  - Truy cập `/app/employee/payroll` để xem phiếu lương cá nhân của chính mình.
+  - Không thể xem phiếu lương của đồng nghiệp khác (Bảo mật nghiêm ngặt).
 
-- Toàn quyền cấu hình hệ thống, duyệt tài khoản, quản trị dự án, duyệt quy trình mẫu và cài đặt ngày công.
-- Truy cập menu Quản Trị: `/app/admin/*`.
+---
 
-### 2. Trưởng Nhóm (Team Leader)
+## 8. QUẢN TRỊ TÀI LIỆU & LƯU TRỮ DOANH NGHIỆP (TL)
 
-- Quản lý tiến độ dự án được phân công, điều phối task thành viên, duyệt báo cáo và phản hồi hỗ trợ khách hàng.
-- Truy cập menu Trưởng Nhóm: `/app/team-leader/*`.
+- **Vị trí bấm**: Menu **Tài liệu** (`/app/admin/documents`).
+- **Thao tác**:
+  1. Bấm **Tải lên tài liệu**.
+  2. Nhập tiêu đề, phân loại (Chính sách, Hợp đồng mẫu, Tài sản thương hiệu...), chọn mức truy cập (`public_company`, `internal_only`, `management_only`).
+  3. Tệp tin được tải trực tiếp lên Supabase Storage bucket an toàn. Mã tài liệu tự sinh: `TL_01`, `TL_02`...
+  4. Bấm **Tải về** để nhận đường dẫn có chữ ký bảo mật thời hạn 1 giờ.
 
-### 3. Nhân Viên (Employee)
+---
 
-- Thực hiện chấm công GPS hàng ngày, nhận nhiệm vụ trên Kanban, cập nhật tiến độ công việc, gửi đề xuất chi phí và xem phiếu lương.
-- Truy cập menu Nhân Viên: `/app/employee/*` & `/app/attendance`.
+## 9. YÊU CẦU HỖ TRỢ & TRAO ĐỔI THỜI GIAN THỰC (YC & CHAT)
 
-### 4. Kế Toán (Accountant)
+![Hỗ trợ & Trao đổi Realtime](screenshots/support.png)
 
-- Quản lý hóa đơn, thanh toán, duyệt chi phí dự án, tính lương và phát hành phiếu lương.
-- Truy cập menu Kế Toán: `/app/accountant/*`.
+- **Vị trí bấm**: Menu **Hỗ trợ / Chat** (`/app/chat` hoặc `/app/support`).
+- **Thao tác gửi ticket (Khách hàng)**:
+  1. Bấm **Tạo yêu cầu hỗ trợ mới**.
+  2. Nhập tiêu đề, mô tả vấn đề, mức độ ưu tiên. Mã ticket tự sinh: `YC_01`, `YC_02`...
+- **Thao tác phản hồi (Trưởng nhóm / Kỹ thuật)**:
+  - Trả lời tin nhắn trực tiếp với khách hàng hoặc tạo ghi chú nội bộ (Internal Note - Khách hàng không nhìn thấy).
+- **Trò chuyện Realtime (Chat WebSockets)**:
+  - Nhắn tin tức thời theo phòng dự án hoặc trao đổi trực tiếp giữa các thành viên với chỉ báo đang gõ (typing indicator) và trạng thái online.
 
-### 5. Khách Hàng (Client)
+---
 
-- Xem tiến độ dự án của doanh nghiệp mình, duyệt bàn giao sản phẩm/dịch vụ, gửi yêu cầu hỗ trợ (Support Ticket).
-- Truy cập menu Khách Hàng: `/app/client/*`.
+## 10. MA TRẬN PHÂN QUYỀN 5 VAI TRÒ (ROLES MATRIX)
+
+| Phân hệ chức năng                             | Quản trị viên (Admin) | Trưởng nhóm (Leader) | Nhân viên (Employee)  |  Kế toán (Accountant)  |   Khách hàng (Client)    |
+| --------------------------------------------- | :-------------------: | :------------------: | :-------------------: | :--------------------: | :----------------------: |
+| **Quản trị người dùng & Phê duyệt tài khoản** |      Toàn quyền       |        Không         |         Không         |         Không          |          Không           |
+| **Cấu hình hệ thống & Lịch làm việc**         |      Toàn quyền       |        Không         |         Không         |         Không          |          Không           |
+| **Chấm công GPS**                             |      Xem toàn bộ      |     Xem đội nhóm     |   Chấm công cá nhân   |   Chấm công cá nhân    |          Không           |
+| **Quản trị Quy trình (Workflow Templates)**   |      Toàn quyền       |    Xem & Thực thi    |    Xem & Thực thi     |          Xem           |   Xem (Phần được gán)    |
+| **Quản lý Công việc & Bảng Kanban**           |      Toàn quyền       |   Toàn quyền dự án   | Cập nhật việc cá nhân | Cập nhật việc cá nhân  |    Xem tiến độ dự án     |
+| **Đề xuất Chi phí Dự án (CP)**                |       Phê duyệt       |       Đề xuất        |        Đề xuất        |    Duyệt & Hoàn ứng    |          Không           |
+| **Bảng lương & Phiếu lương (BL & PL)**        |      Xem toàn bộ      |  Xem phiếu cá nhân   |   Xem phiếu cá nhân   |   Tạo đợt & Chi trả    |          Không           |
+| **Kho Tài liệu Doanh nghiệp (TL)**            |      Toàn quyền       |  Tải lên & Quản lý   |     Tải lên & Xem     | Xem tài liệu tài chính |  Xem tài liệu công khai  |
+| **Yêu cầu Hỗ trợ (YC)**                       |      Toàn quyền       | Tiếp nhận & Phản hồi |   Phản hồi theo gán   |         Không          | Tạo ticket & Nhận hỗ trợ |
+| **Chat Realtime WebSockets**                  |     Toàn bộ kênh      | Kênh dự án & Direct  |  Kênh dự án & Direct  |     Kênh được mời      |   Kênh dự án của mình    |

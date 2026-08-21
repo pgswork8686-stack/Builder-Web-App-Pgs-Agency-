@@ -42,7 +42,7 @@ export class ExpensesService {
     let dbQuery = this.client
       .from('project_expenses')
       .select(
-        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, user_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, account_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, account_code)',
         { count: 'exact' },
       );
 
@@ -101,7 +101,7 @@ export class ExpensesService {
     const { data, error } = await this.client
       .from('project_expenses')
       .select(
-        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, user_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, account_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, account_code)',
       )
       .eq('id', id)
       .maybeSingle();
@@ -167,7 +167,7 @@ export class ExpensesService {
         status: 'pending',
       })
       .select(
-        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, account_code)',
       )
       .single();
 
@@ -206,7 +206,7 @@ export class ExpensesService {
       .update(updatePayload)
       .eq('id', id)
       .select(
-        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, user_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, user_code)',
+        '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, account_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, account_code)',
       )
       .single();
 
