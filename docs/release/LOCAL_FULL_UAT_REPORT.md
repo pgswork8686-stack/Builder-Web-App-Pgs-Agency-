@@ -4,8 +4,8 @@
 ==================================================
 1. VERIFIED RELEASE ENVIRONMENT & ARTIFACTS
 ==================================================
-- **Source SHA**: `c15c813d9e104321b7d0eccb318f077c1758f5a6`
-- **Remote CI State**: GREEN (53-migration clean chain)
+- **Source SHA**: `feat/workflow-engine-v1`
+- **Remote CI State**: PENDING PUSH OF FINAL SHA
 - **Local Supabase Database**: PostgreSQL 17 on `127.0.0.1:54322`
 - **Local Supabase API / Kong**: `http://127.0.0.1:54321` (Auth, Storage, PostgREST, Realtime)
 - **Local Supabase Studio**: `http://127.0.0.1:54323`
@@ -31,7 +31,9 @@
 - **Workday Start**: `08:00:00` (Late grace: 5 min -> Late threshold: `08:06:00`)
 - **Workday End**: `17:30:00` (Early leave grace: 5 min -> Early threshold: `< 17:25:00`)
 - **Office Location**: `Tầng 2, DM 2-25, Điểm TTCN làng nghề dệt lụa Vạn Phúc, Hà Đông, Hà Nội`
-- **Allowed GPS Radius**: `100m`
+- **GPS Radius Status**:
+  - **Local UAT Temporary Value**: `100m`
+  - **Production Value**: `PENDING OWNER APPROVAL`
 - **Deterministic Attendance Boundary Test Results**:
   - Check-in `07:59` -> NOT late (`late_minutes = 0`) -> PASS
   - Check-in `08:00` -> NOT late (`late_minutes = 0`) -> PASS
@@ -85,13 +87,14 @@
 - **Direct Database Fail-Closed Security**: `anon` and `authenticated` browser roles receive 42501 permission denied on all backend business tables -> PASS
 
 ==================================================
-8. AUTOMATED REGRESSION SUITE COUNTS
+8. AUTOMATED REGRESSION SUITE COUNTS (673/673 TOTAL)
 ==================================================
 - `apps/api` Unit Tests: **501 passed** (59 test suites)
 - `apps/api` E2E Tests: **94 passed** (9 test suites)
-- `apps/web` Tests: **77 passed** (13 test files)
-- Total Automated Tests: **672 passed, 0 failed**
-- TypeScript Compilation: **0 errors**
+- `apps/web` Vitest Tests: **77 passed** (13 test files)
+- `packages/validation` Tests: **1 passed** (1 test file)
+- Total Monorepo Tests: **673 passed / 0 failed (100%)**
+- TypeScript Compilation: **0 errors across all workspaces**
 - Next.js Production Build: **86 static/dynamic routes compiled**
 - NestJS API Production Build: **Compiled successfully**
 - Defects: **P0 = 0 | P1 = 0 | P2 = 0**
@@ -99,8 +102,8 @@
 ==================================================
 9. DOCUMENTATION & ARTIFACTS CREATED
 ==================================================
-- `docs/release/LOCAL_FULL_UAT_REPORT.md` (This document)
-- `docs/release/VERCEL_PREVIEW_DEPLOYMENT.md` (Vercel deployment & runtime guide)
-- `docs/user-guide/PGS_HUB_USER_GUIDE.md` (Comprehensive 16-section real-flow manual)
-- `docs/user-guide/PGS_HUB_QUICK_START.md` (Employee quick start guide)
-- `docs/user-guide/screenshots/` (Local screenshots directory)
+- `docs/release/LOCAL_FULL_UAT_REPORT.md`
+- `docs/release/VERCEL_PREVIEW_DEPLOYMENT.md`
+- `docs/user-guide/PGS_HUB_USER_GUIDE.md`
+- `docs/user-guide/PGS_HUB_QUICK_START.md`
+- `docs/user-guide/screenshots/`

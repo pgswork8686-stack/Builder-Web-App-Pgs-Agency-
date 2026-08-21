@@ -42,7 +42,7 @@ PGS HUB là nền tảng quản trị vận hành toàn diện cho Digital Agenc
 - **Giờ bắt đầu**: `08:00` (Ân hạn 5 phút -> Tính muộn từ `08:06`)
 - **Giờ kết thúc**: `17:30` (Ân hạn 5 phút -> Tính về sớm nếu trước `17:25`)
 - **Văn phòng**: Tầng 2, DM 2-25, Điểm TTCN làng nghề dệt lụa Vạn Phúc, Hà Đông, Hà Nội.
-- **Bán kính GPS**: 100m.
+- **Bán kính GPS**: *LOCAL UAT TEMPORARY VALUE: 100m (Giá trị chính thức trên Production đang PENDING OWNER APPROVAL).*
 
 ### B. Lịch Làm Việc Cách Tuần (Alternate Saturdays)
 - Các ngày Thứ 2 đến Thứ 6: Đi làm tiêu chuẩn.
