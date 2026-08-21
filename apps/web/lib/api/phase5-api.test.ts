@@ -11,6 +11,34 @@ describe("Phase 5 Attendance API client — Fix Round 3 contract", () => {
     requestMock.mockReset();
   });
 
+  it("reads canonical attendance settings from the admin-only endpoint", () => {
+    attendanceApi.getSettings();
+    expect(requestMock).toHaveBeenCalledWith("/attendance/settings");
+  });
+
+  it("updates canonical settings with a PATCH instead of legacy system_settings", () => {
+    attendanceApi.updateSettings({
+      workdayStartTime: "08:00",
+      workdayEndTime: "17:30",
+      lateGraceMinutes: 5,
+      earlyLeaveGraceMinutes: 5,
+      locationRequired: true,
+      locationRadiusMeters: 100,
+    });
+
+    expect(requestMock).toHaveBeenCalledWith("/attendance/settings", {
+      method: "PATCH",
+      body: JSON.stringify({
+        workdayStartTime: "08:00",
+        workdayEndTime: "17:30",
+        lateGraceMinutes: 5,
+        earlyLeaveGraceMinutes: 5,
+        locationRequired: true,
+        locationRadiusMeters: 100,
+      }),
+    });
+  });
+
   // T1: fileSize is sent in request body
   it("T1: getPhotoUploadSignature sends fileName, mimeType AND fileSize", () => {
     attendanceApi.getPhotoUploadSignature("photo.jpg", "image/jpeg", 102400);

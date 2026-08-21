@@ -30,7 +30,7 @@ export class SupportController {
   constructor(private readonly supportService: SupportService) {}
 
   @Get('tickets')
-  @Roles('admin', 'accountant', 'team_leader', 'employee', 'client')
+  @Roles('admin', 'team_leader', 'employee', 'client')
   async listTickets(
     @Query() rawQuery: unknown,
     @CurrentUser() user: RequestUser,
@@ -45,7 +45,7 @@ export class SupportController {
   }
 
   @Get('tickets/:id')
-  @Roles('admin', 'accountant', 'team_leader', 'employee', 'client')
+  @Roles('admin', 'team_leader', 'employee', 'client')
   async getTicketById(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: RequestUser,
@@ -54,7 +54,7 @@ export class SupportController {
   }
 
   @Post('tickets')
-  @Roles('admin', 'team_leader', 'employee', 'client')
+  @Roles('admin', 'client')
   async createTicket(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const result = CreateSupportTicketSchema.safeParse(body);
     if (!result.success) {
@@ -82,7 +82,7 @@ export class SupportController {
   }
 
   @Patch('tickets/:id/status')
-  @Roles('admin', 'team_leader', 'employee')
+  @Roles('admin', 'team_leader')
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: unknown,

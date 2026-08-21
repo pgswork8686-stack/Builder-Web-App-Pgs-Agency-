@@ -159,4 +159,224 @@ describe('ExpensesService — Real Authorization Logic', () => {
       expect(result.status).toBe('approved');
     });
   });
+
+  describe('Project Membership Scoping', () => {
+    it('blocks an employee from creating an expense for a project they do not belong to', async () => {
+      const employeeUser = makeUser({ role: 'employee' });
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_A }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null }));
+
+      await expect(
+        service.createExpense(
+          {
+            projectId: PROJECT_A,
+            title: 'Unscoped expense',
+            amount: 100000,
+            currencyCode: 'VND',
+            expenseCategory: 'general',
+          },
+          employeeUser,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(fromMock.mock.calls.map(([table]) => table)).toEqual([
+        'projects',
+        'project_memberships',
+      ]);
+    });
+
+    it('allows an employee to create an expense for a project they belong to', async () => {
+      const employeeUser = makeUser({ role: 'employee' });
+      const createdExpense = {
+        id: EXPENSE_A,
+        project_id: PROJECT_A,
+        submitted_by_user_id: employeeUser.profileId,
+        status: 'pending',
+      };
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_A }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: { id: 'membership-1', project_role: 'member' },
+          error: null,
+        }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: createdExpense, error: null }),
+      );
+
+      const result = await service.createExpense(
+        {
+          projectId: PROJECT_A,
+          title: 'Member scoped expense',
+          amount: 100000,
+          currencyCode: 'VND',
+          expenseCategory: 'general',
+        },
+        employeeUser,
+      );
+
+      expect(result.id).toBe(EXPENSE_A);
+    });
+
+    it('limits a team leader list to projects where they are project_manager', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+      const membershipQuery = mockQueryChain({
+        data: [{ project_id: PROJECT_A }],
+        error: null,
+      });
+      const expensesQuery = mockQueryChain({ data: [], error: null, count: 0 });
+
+      fromMock
+        .mockReturnValueOnce(membershipQuery)
+        .mockReturnValueOnce(expensesQuery);
+
+      await service.listExpenses({ page: 1, pageSize: 20 }, leaderUser);
+
+      expect(fromMock.mock.calls.map(([table]) => table)).toEqual([
+        'project_memberships',
+        'project_expenses',
+      ]);
+      expect(membershipQuery.eq).toHaveBeenCalledWith(
+        'project_role',
+        'project_manager',
+      );
+      expect(expensesQuery.in).toHaveBeenCalledWith('project_id', [PROJECT_A]);
+    });
+
+    it('returns an empty list before querying expenses when a team leader manages no projects', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: [], error: null }));
+
+      await expect(
+        service.listExpenses({ page: 2, pageSize: 10 }, leaderUser),
+      ).resolves.toEqual({
+        items: [],
+        total: 0,
+        page: 2,
+        pageSize: 10,
+        totalPages: 0,
+      });
+      expect(fromMock).toHaveBeenCalledTimes(1);
+      expect(fromMock).toHaveBeenCalledWith('project_memberships');
+    });
+
+    it('blocks a team leader from reading an expense outside their managed projects', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: {
+            id: EXPENSE_A,
+            project_id: PROJECT_A,
+            submitted_by_user_id: USER_B_ID,
+            status: 'pending',
+          },
+          error: null,
+        }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: { id: 'membership-1', project_role: 'member' },
+          error: null,
+        }),
+      );
+
+      await expect(
+        service.getExpenseById(EXPENSE_A, leaderUser),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('allows a team leader to read an expense for a project they manage', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+      const expense = {
+        id: EXPENSE_A,
+        project_id: PROJECT_A,
+        submitted_by_user_id: USER_B_ID,
+        status: 'pending',
+      };
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: expense, error: null }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: { id: 'membership-1', project_role: 'project_manager' },
+          error: null,
+        }),
+      );
+
+      await expect(service.getExpenseById(EXPENSE_A, leaderUser)).resolves.toBe(
+        expense,
+      );
+    });
+
+    it('blocks a team leader from creating an expense for a project they do not manage', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_A }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: { id: 'membership-1', project_role: 'member' },
+          error: null,
+        }),
+      );
+
+      await expect(
+        service.createExpense(
+          {
+            projectId: PROJECT_A,
+            title: 'Leader unscoped expense',
+            amount: 100000,
+            currencyCode: 'VND',
+            expenseCategory: 'general',
+          },
+          leaderUser,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('allows a team leader to create an expense for a project they manage', async () => {
+      const leaderUser = makeUser({ role: 'team_leader' });
+      const createdExpense = {
+        id: EXPENSE_A,
+        project_id: PROJECT_A,
+        submitted_by_user_id: leaderUser.profileId,
+        status: 'pending',
+      };
+
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_A }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({
+          data: { id: 'membership-1', project_role: 'project_manager' },
+          error: null,
+        }),
+      );
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: createdExpense, error: null }),
+      );
+
+      const result = await service.createExpense(
+        {
+          projectId: PROJECT_A,
+          title: 'Managed project expense',
+          amount: 100000,
+          currencyCode: 'VND',
+          expenseCategory: 'general',
+        },
+        leaderUser,
+      );
+
+      expect(result.id).toBe(EXPENSE_A);
+    });
+  });
 });

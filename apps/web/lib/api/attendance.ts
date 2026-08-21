@@ -44,6 +44,36 @@ export interface AttendanceSummary {
   };
 }
 
+/** Canonical singleton returned by the admin-only attendance settings API. */
+export interface AttendanceSettings {
+  id: string;
+  timezone: string;
+  workday_start_time: string | null;
+  workday_end_time: string | null;
+  late_grace_minutes: number | null;
+  early_leave_grace_minutes: number | null;
+  location_required: boolean;
+  photo_required: boolean;
+  location_radius_meters: number | string | null;
+  office_latitude: number | string | null;
+  office_longitude: number | string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateAttendanceSettings {
+  timezone?: string;
+  workdayStartTime?: string | null;
+  workdayEndTime?: string | null;
+  lateGraceMinutes?: number | null;
+  earlyLeaveGraceMinutes?: number | null;
+  locationRequired?: boolean;
+  photoRequired?: boolean;
+  locationRadiusMeters?: number | null;
+  officeLatitude?: number | null;
+  officeLongitude?: number | null;
+}
+
 export interface AttendanceQuery {
   from?: string;
   to?: string;
@@ -56,6 +86,19 @@ export interface AttendanceQuery {
 }
 
 export const attendanceApi = {
+  getSettings: (): Promise<AttendanceSettings> => {
+    return request("/attendance/settings");
+  },
+
+  updateSettings: (
+    payload: UpdateAttendanceSettings,
+  ): Promise<AttendanceSettings> => {
+    return request("/attendance/settings", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  },
+
   getSummary: (): Promise<AttendanceSummary> => {
     return request("/attendance/summary");
   },

@@ -16,8 +16,43 @@ import {
   CheckOutDto,
   AttendanceQuery,
   AttendanceAdjustmentDto,
+  UpdateAttendanceSettingsDto,
 } from './dto/attendance.dto';
 import * as crypto from 'crypto';
+
+const DEFAULT_ATTENDANCE_TIMEZONE = 'Asia/Ho_Chi_Minh';
+
+const ATTENDANCE_SETTINGS_COLUMNS = [
+  'id',
+  'timezone',
+  'workday_start_time',
+  'workday_end_time',
+  'late_grace_minutes',
+  'early_leave_grace_minutes',
+  'location_required',
+  'photo_required',
+  'location_radius_meters',
+  'office_latitude',
+  'office_longitude',
+  'created_at',
+  'updated_at',
+].join(',');
+
+export interface AttendanceSettings {
+  id: string;
+  timezone: string;
+  workday_start_time: string | null;
+  workday_end_time: string | null;
+  late_grace_minutes: number | null;
+  early_leave_grace_minutes: number | null;
+  location_required: boolean;
+  photo_required: boolean;
+  location_radius_meters: number | string | null;
+  office_latitude: number | string | null;
+  office_longitude: number | string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 @Injectable()
 export class AttendanceService {
@@ -33,27 +68,37 @@ export class AttendanceService {
     return this.supabaseService.getSystemClient();
   }
 
-  // Get active attendance settings
-  private async getSettings() {
+  /** Read the one canonical attendance_settings row; never select arbitrary schema columns. */
+  private async getSettings(): Promise<AttendanceSettings> {
     const { data, error } = await this.client
       .from('attendance_settings')
-      .select('*')
-      .limit(1)
+      .select(ATTENDANCE_SETTINGS_COLUMNS)
+      // The database trigger protects the singleton. A limit of two makes a
+      // corrupted duplicate state fail .maybeSingle() instead of choosing one.
+      .limit(2)
       .maybeSingle();
 
     if (error) {
+      this.logger.error(`Failed to read attendance settings: ${error.message}`);
       throw new InternalServerErrorException({
-        code: 'ATTENDANCE_WRITE_FAILED',
+        code: 'ATTENDANCE_SETTINGS_LOOKUP_FAILED',
         message: 'Không thể đọc cấu hình chấm công.',
       });
     }
 
-    return data;
+    if (!data) {
+      throw new InternalServerErrorException({
+        code: 'ATTENDANCE_SETTINGS_NOT_CONFIGURED',
+        message: 'Chưa có cấu hình chấm công hợp lệ.',
+      });
+    }
+
+    return data as unknown as AttendanceSettings;
   }
 
   // Check if user is a client (reject client access to attendance)
   private enforceInternalUser(user: RequestUser) {
-    if (user.role === 'client') {
+    if (user.role === 'client' || !user.role) {
       throw new ForbiddenException({
         code: 'ATTENDANCE_ACCESS_DENIED',
         message: 'Khách hàng không có quyền truy cập chức năng chấm công.',
@@ -61,10 +106,66 @@ export class AttendanceService {
     }
   }
 
-  // Get local date string for Asia/Ho_Chi_Minh timezone
-  private getVietnamDate(date: Date = new Date()): string {
+  private enforceSettingsAdmin(user: RequestUser) {
+    if (user.role !== 'admin') {
+      throw new ForbiddenException({
+        code: 'ATTENDANCE_SETTINGS_ACCESS_DENIED',
+        message:
+          'Chỉ quản trị viên mới có thể xem hoặc cập nhật cấu hình chấm công.',
+      });
+    }
+  }
+
+  /**
+   * Enforce the client-supplied attendance evidence required by the canonical
+   * policy. Keep this shared by check-in and check-out so one action cannot
+   * bypass a requirement that the other enforces.
+   */
+  private enforceAttendanceEvidencePolicy(
+    dto: Pick<CheckInDto, 'latitude' | 'longitude' | 'photoUploadSessionId'>,
+    settings: Pick<AttendanceSettings, 'location_required' | 'photo_required'>,
+  ) {
+    const hasLocation =
+      dto.latitude !== undefined &&
+      dto.latitude !== null &&
+      dto.longitude !== undefined &&
+      dto.longitude !== null;
+
+    if (settings.location_required && !hasLocation) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_LOCATION_REQUIRED',
+        message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
+      });
+    }
+
+    if (settings.photo_required && !dto.photoUploadSessionId) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_PHOTO_REQUIRED',
+        message: 'Ảnh bằng chứng là bắt buộc theo chính sách chấm công.',
+      });
+    }
+  }
+
+  private getAttendanceTimezone(settings?: { timezone?: string | null }) {
+    const timezone = settings?.timezone?.trim() || DEFAULT_ATTENDANCE_TIMEZONE;
+    try {
+      Intl.DateTimeFormat('en-US', { timeZone: timezone });
+      return timezone;
+    } catch {
+      throw new InternalServerErrorException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message: 'Múi giờ trong cấu hình chấm công không hợp lệ.',
+      });
+    }
+  }
+
+  // Get local date string for the configured attendance timezone.
+  private getVietnamDate(
+    date: Date = new Date(),
+    timezone = DEFAULT_ATTENDANCE_TIMEZONE,
+  ): string {
     const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Ho_Chi_Minh',
+      timeZone: timezone,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -128,10 +229,13 @@ export class AttendanceService {
     return hours * 60 + minutes;
   }
 
-  // Get minutes of day from date in Ho Chi Minh timezone
-  private getVietnamMinutesOfDay(date: Date): number {
+  // Get minutes of day from date in the configured attendance timezone.
+  private getVietnamMinutesOfDay(
+    date: Date,
+    timezone = DEFAULT_ATTENDANCE_TIMEZONE,
+  ): number {
     const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Ho_Chi_Minh',
+      timeZone: timezone,
       hour: 'numeric',
       minute: 'numeric',
       hour12: false,
@@ -165,12 +269,13 @@ export class AttendanceService {
       );
     }
 
-    // BLOCKER 1: Remove Invented HR Policy (late/early metrics remain 0 if workday_start/end is unconfigured)
+    // Nullable policy values remain unconfigured rather than receiving invented defaults.
     const hasWorkdayStart = !!settings?.workday_start_time;
     const hasWorkdayEnd = !!settings?.workday_end_time;
+    const timezone = this.getAttendanceTimezone(settings);
 
     if (checkInAt && hasWorkdayStart) {
-      const checkInMinutes = this.getVietnamMinutesOfDay(checkInAt);
+      const checkInMinutes = this.getVietnamMinutesOfDay(checkInAt, timezone);
       const policyStartMinutes = this.getMinutesFromTime(
         settings.workday_start_time,
       );
@@ -183,7 +288,7 @@ export class AttendanceService {
     }
 
     if (checkOutAt && hasWorkdayEnd) {
-      const checkOutMinutes = this.getVietnamMinutesOfDay(checkOutAt);
+      const checkOutMinutes = this.getVietnamMinutesOfDay(checkOutAt, timezone);
       const policyEndMinutes = this.getMinutesFromTime(
         settings.workday_end_time,
       );
@@ -370,35 +475,190 @@ export class AttendanceService {
     }
   }
 
+  private assertCoherentSettings(settings: AttendanceSettings) {
+    const workdayStart = settings.workday_start_time ?? null;
+    const workdayEnd = settings.workday_end_time ?? null;
+    if ((workdayStart === null) !== (workdayEnd === null)) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message:
+          'Giờ bắt đầu và kết thúc phải cùng được cấu hình hoặc cùng để trống.',
+      });
+    }
+
+    if (workdayStart !== null && workdayEnd !== null) {
+      const startMinutes = this.getMinutesFromTime(workdayStart);
+      const endMinutes = this.getMinutesFromTime(workdayEnd);
+      if (
+        !Number.isFinite(startMinutes) ||
+        !Number.isFinite(endMinutes) ||
+        endMinutes <= startMinutes
+      ) {
+        throw new BadRequestException({
+          code: 'ATTENDANCE_SETTINGS_INVALID',
+          message: 'Giờ kết thúc phải sau giờ bắt đầu.',
+        });
+      }
+    }
+
+    const hasLatitude =
+      settings.office_latitude !== null &&
+      settings.office_latitude !== undefined;
+    const hasLongitude =
+      settings.office_longitude !== null &&
+      settings.office_longitude !== undefined;
+    if (hasLatitude !== hasLongitude) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message:
+          'Vĩ độ và kinh độ văn phòng phải cùng được cấu hình hoặc cùng để trống.',
+      });
+    }
+
+    const hasRadius =
+      settings.location_radius_meters !== null &&
+      settings.location_radius_meters !== undefined;
+    if (hasLatitude !== hasRadius) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message:
+          'Vị trí văn phòng và bán kính GPS phải cùng được cấu hình hoặc cùng để trống.',
+      });
+    }
+
+    if (settings.location_required && !hasLatitude) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message:
+          'Bắt buộc GPS chỉ có thể được bật khi đã cấu hình vị trí và bán kính văn phòng.',
+      });
+    }
+
+    if (
+      hasLatitude &&
+      hasLongitude &&
+      (!Number.isFinite(Number(settings.office_latitude)) ||
+        !Number.isFinite(Number(settings.office_longitude)) ||
+        !Number.isFinite(Number(settings.location_radius_meters)) ||
+        Number(settings.location_radius_meters) <= 0)
+    ) {
+      throw new BadRequestException({
+        code: 'ATTENDANCE_SETTINGS_INVALID',
+        message: 'Tọa độ hoặc bán kính GPS không hợp lệ.',
+      });
+    }
+  }
+
+  private buildAttendanceSettingsUpdate(
+    current: AttendanceSettings,
+    dto: UpdateAttendanceSettingsDto,
+  ): Record<string, unknown> {
+    const finalSettings: AttendanceSettings = { ...current };
+
+    if (dto.timezone !== undefined) finalSettings.timezone = dto.timezone;
+    if (dto.workdayStartTime !== undefined)
+      finalSettings.workday_start_time = dto.workdayStartTime;
+    if (dto.workdayEndTime !== undefined)
+      finalSettings.workday_end_time = dto.workdayEndTime;
+    if (dto.lateGraceMinutes !== undefined)
+      finalSettings.late_grace_minutes = dto.lateGraceMinutes;
+    if (dto.earlyLeaveGraceMinutes !== undefined)
+      finalSettings.early_leave_grace_minutes = dto.earlyLeaveGraceMinutes;
+    if (dto.locationRequired !== undefined)
+      finalSettings.location_required = dto.locationRequired;
+    if (dto.photoRequired !== undefined)
+      finalSettings.photo_required = dto.photoRequired;
+    if (dto.locationRadiusMeters !== undefined)
+      finalSettings.location_radius_meters = dto.locationRadiusMeters;
+    if (dto.officeLatitude !== undefined)
+      finalSettings.office_latitude = dto.officeLatitude;
+    if (dto.officeLongitude !== undefined)
+      finalSettings.office_longitude = dto.officeLongitude;
+
+    this.getAttendanceTimezone(finalSettings);
+    this.assertCoherentSettings(finalSettings);
+
+    const update: Record<string, unknown> = {};
+    if (dto.timezone !== undefined) update.timezone = dto.timezone;
+    if (dto.workdayStartTime !== undefined)
+      update.workday_start_time = dto.workdayStartTime;
+    if (dto.workdayEndTime !== undefined)
+      update.workday_end_time = dto.workdayEndTime;
+    if (dto.lateGraceMinutes !== undefined)
+      update.late_grace_minutes = dto.lateGraceMinutes;
+    if (dto.earlyLeaveGraceMinutes !== undefined)
+      update.early_leave_grace_minutes = dto.earlyLeaveGraceMinutes;
+    if (dto.locationRequired !== undefined)
+      update.location_required = dto.locationRequired;
+    if (dto.photoRequired !== undefined)
+      update.photo_required = dto.photoRequired;
+    if (dto.locationRadiusMeters !== undefined)
+      update.location_radius_meters = dto.locationRadiusMeters;
+    if (dto.officeLatitude !== undefined)
+      update.office_latitude = dto.officeLatitude;
+    if (dto.officeLongitude !== undefined)
+      update.office_longitude = dto.officeLongitude;
+
+    return update;
+  }
+
+  async getAttendanceSettings(user: RequestUser) {
+    this.enforceSettingsAdmin(user);
+    return this.getSettings();
+  }
+
+  async getAttendancePolicy(user: RequestUser) {
+    this.enforceInternalUser(user);
+    const settings = await this.getSettings();
+
+    return {
+      timezone: this.getAttendanceTimezone(settings),
+      workdayStartTime: settings.workday_start_time,
+      workdayEndTime: settings.workday_end_time,
+      lateGraceMinutes: settings.late_grace_minutes,
+      earlyLeaveGraceMinutes: settings.early_leave_grace_minutes,
+      locationRequired: settings.location_required,
+      photoRequired: settings.photo_required,
+    };
+  }
+
+  async updateAttendanceSettings(
+    dto: UpdateAttendanceSettingsDto,
+    user: RequestUser,
+  ) {
+    this.enforceSettingsAdmin(user);
+
+    const current = await this.getSettings();
+    const update = this.buildAttendanceSettingsUpdate(current, dto);
+    const { data, error } = await this.client
+      .from('attendance_settings')
+      .update(update)
+      .eq('id', current.id)
+      .select(ATTENDANCE_SETTINGS_COLUMNS)
+      .single();
+
+    if (error || !data) {
+      this.logger.error(
+        `Failed to update attendance settings: ${error?.message ?? 'no row returned'}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'ATTENDANCE_SETTINGS_UPDATE_FAILED',
+        message: 'Không thể cập nhật cấu hình chấm công.',
+      });
+    }
+
+    return data as unknown as AttendanceSettings;
+  }
+
   // Check In API implementation using atomic DB RPC
   async checkIn(dto: CheckInDto, user: RequestUser) {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
 
-    // Check location requirement
-    if (
-      settings?.location_required &&
-      (dto.latitude === undefined ||
-        dto.longitude === undefined ||
-        dto.latitude === null ||
-        dto.longitude === null)
-    ) {
-      throw new BadRequestException({
-        code: 'ATTENDANCE_LOCATION_REQUIRED',
-        message: 'Tọa độ GPS là bắt buộc theo chính sách chấm công.',
-      });
-    }
+    this.enforceAttendanceEvidencePolicy(dto, settings);
 
     // Validate geofence
     this.validateGeofence(dto.latitude, dto.longitude, settings);
-
-    // Check photo requirement
-    if (settings?.photo_required && !dto.photoUploadSessionId) {
-      throw new BadRequestException({
-        code: 'ATTENDANCE_PHOTO_REQUIRED',
-        message: 'Ảnh bằng chứng là bắt buộc theo chính sách chấm công.',
-      });
-    }
 
     // Verify photo session (validates ownership, expiry, MIME/size exact binding)
     // DB derives the photo path internally from the session — no path returned needed here
@@ -407,8 +667,11 @@ export class AttendanceService {
       user.profileId,
     );
 
-    const todayStr = this.getVietnamDate();
     const checkInTime = new Date();
+    const todayStr = this.getVietnamDate(
+      checkInTime,
+      this.getAttendanceTimezone(settings),
+    );
 
     const { status, lateMinutes } = this.calculateAttendanceMetrics(
       checkInTime,
@@ -467,8 +730,13 @@ export class AttendanceService {
     this.enforceInternalUser(user);
     const settings = await this.getSettings();
 
-    const todayStr = this.getVietnamDate();
+    this.enforceAttendanceEvidencePolicy(dto, settings);
+
     const checkOutTime = new Date();
+    const todayStr = this.getVietnamDate(
+      checkOutTime,
+      this.getAttendanceTimezone(settings),
+    );
 
     // Query current day check-in record first (pre-check for Nest validation)
     const { data: record, error: findError } = await this.client
@@ -635,25 +903,35 @@ export class AttendanceService {
       });
     }
 
-    // Resolve team leader scope first
-    let teamIdConstraint: string | null = null;
+    // Resolve every team led by the user before applying the directory scope.
+    // A leader can own more than one team, so maybeSingle() would incorrectly
+    // deny all of their attendance records in that valid state.
+    let teamIds: string[] = [];
 
     if (isLeader) {
-      const { data: team, error: teamError } = await this.client
+      const { data: teams, error: teamError } = await this.client
         .from('teams')
         .select('id')
-        .eq('leader_user_id', user.profileId)
-        .maybeSingle();
+        .eq('leader_user_id', user.profileId);
 
-      if (teamError || !team) {
-        teamIdConstraint = '00000000-0000-0000-0000-000000000000';
-      } else {
-        teamIdConstraint = team.id;
+      if (teamError) {
+        this.logger.error(
+          `Failed to resolve team leader scope: ${teamError.message}`,
+        );
+        throw new InternalServerErrorException({
+          code: 'ATTENDANCE_WRITE_FAILED',
+          message: 'Không thể xác định phạm vi đội nhóm của bạn.',
+        });
       }
+
+      teamIds =
+        teams
+          ?.map((team: { id?: unknown }) => team.id)
+          .filter((id): id is string => typeof id === 'string') ?? [];
     }
 
     // Raise access denied if team leader queries a different teamId
-    if (query.teamId && isLeader && query.teamId !== teamIdConstraint) {
+    if (query.teamId && isLeader && !teamIds.includes(query.teamId)) {
       throw new ForbiddenException({
         code: 'ATTENDANCE_ACCESS_DENIED',
         message: 'Bạn chỉ có quyền xem chấm công của đội nhóm của bạn.',
@@ -669,11 +947,13 @@ export class AttendanceService {
       });
     }
 
-    // Build the DB-side filters with explicit FK constraints to avoid ambiguous relationship errors
+    // Embedded PostgREST filters are left joins by default and would leave
+    // unrelated attendance parent rows in the result. Both relations must be
+    // inner joins so the managed-team filter constrains attendance_records.
     let dbQuery = this.client
       .from('attendance_records')
       .select(
-        '*, profile:profiles!attendance_records_user_id_fkey(id, full_name, email, avatar_url, employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id, department_id))',
+        '*, profile:profiles!attendance_records_user_id_fkey!inner(id, full_name, email, avatar_url, employee_profile:employee_profiles!employee_profiles_user_id_fkey!inner(team_id, department_id))',
         { count: 'exact' },
       );
 
@@ -692,10 +972,13 @@ export class AttendanceService {
 
     // Apply scoping at DB layer
     if (isLeader) {
-      dbQuery = dbQuery.eq(
-        'profile.employee_profile.team_id',
-        teamIdConstraint,
-      );
+      dbQuery =
+        teamIds.length > 0
+          ? dbQuery.in('profile.employee_profile.team_id', teamIds)
+          : dbQuery.eq(
+              'profile.employee_profile.team_id',
+              '00000000-0000-0000-0000-000000000000',
+            );
     } else if (query.teamId) {
       dbQuery = dbQuery.eq('profile.employee_profile.team_id', query.teamId);
     }
@@ -871,7 +1154,11 @@ export class AttendanceService {
   async getSummary(user: RequestUser) {
     this.enforceInternalUser(user);
 
-    const todayStr = this.getVietnamDate();
+    const settings = await this.getSettings();
+    const todayStr = this.getVietnamDate(
+      new Date(),
+      this.getAttendanceTimezone(settings),
+    );
 
     // Check-in status today
     const { data: todayRecord, error: todayError } = await this.client
@@ -964,7 +1251,11 @@ export class AttendanceService {
       });
     }
 
-    const todayStr = this.getVietnamDate();
+    const settings = await this.getSettings();
+    const todayStr = this.getVietnamDate(
+      new Date(),
+      this.getAttendanceTimezone(settings),
+    );
     const [year, month] = todayStr.split('-');
 
     // Safe extension from MIME

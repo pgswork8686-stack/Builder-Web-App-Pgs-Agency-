@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { PayrollService } from './payroll.service';
 import {
   GeneratePayrollRunSchema,
   PayrollRunQuerySchema,
+  UpsertEmployeeCompensationSchema,
 } from './dto/payroll.dto';
 
 @Controller('payroll')
@@ -45,6 +47,33 @@ export class PayrollController {
     @CurrentUser() user: RequestUser,
   ) {
     return this.payrollService.getPayrollRunById(id, user);
+  }
+
+  @Get('compensations')
+  @Roles('admin', 'accountant')
+  async listCompensations(@CurrentUser() user: RequestUser) {
+    return this.payrollService.listEmployeeCompensations(user);
+  }
+
+  @Put('compensations/:userId')
+  @Roles('admin', 'accountant')
+  async upsertCompensation(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = UpsertEmployeeCompensationSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+
+    return this.payrollService.upsertEmployeeCompensation(
+      userId,
+      result.data,
+      user,
+    );
   }
 
   @Post('runs/generate')

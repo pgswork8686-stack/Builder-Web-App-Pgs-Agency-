@@ -14,6 +14,7 @@
     "test": "pnpm -r --if-present test",
     "test:workflow-migrations": "node scripts/verify-workflow-migrations.mjs",
     "test:release-migrations": "node scripts/verify-release-migrations.mjs",
+    "test:ui-route-matrix": "node scripts/verify-local-ui-route-matrix.mjs",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css}\""
   },
@@ -26,6 +27,7 @@
     "playwright": "^1.62.1",
     "prettier": "^3.0.0",
     "socket.io-client": "^4.8.3",
+    "supabase": "2.111.0",
     "typescript": "^5.9.3"
   }
 }

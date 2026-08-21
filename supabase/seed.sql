@@ -1,0 +1,3 @@
+-- Intentionally empty. The release schema is reset from migrations only.
+-- Populate deterministic local UAT data explicitly with:
+--   node scripts/seed-local-uat.mjs

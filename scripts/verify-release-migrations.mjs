@@ -4,6 +4,13 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
+import {
+  assertConfirmedLocalSupabaseMigrationDatabaseUrl,
+  assertNoHostedSupabaseEnvironment,
+  DISPOSABLE_DATABASE_CONFIRMATION_ENV,
+  DISPOSABLE_DATABASE_CONFIRMATION_VALUE,
+  LOCAL_SUPABASE_MIGRATION_ROLE,
+} from "./lib/local-endpoint-guard.mjs";
 
 const { Client } = pg;
 
@@ -26,6 +33,26 @@ const PHASE10_REPLACEMENT_MIGRATIONS = [
   "20260820133000_support_v1.sql",
   "20260820134000_system_settings_v1.sql",
   "20260820135000_release_db_performance_hardening.sql",
+];
+
+const SECURITY_HARDENING_MIGRATIONS = [
+  "20260821050134_harden_security_definer_functions.sql",
+];
+
+const PAYROLL_COMPENSATION_MIGRATIONS = [
+  "20260821071141_employee_compensation_settings.sql",
+];
+
+const PROFILE_LOOKUP_GRANT_MIGRATIONS = [
+  "20260821081657_grant_authenticated_profile_lookup.sql",
+];
+
+const STORAGE_BUCKET_MIGRATIONS = [
+  "20260821082144_create_company_documents_storage_bucket.sql",
+];
+
+const PAYROLL_HARDENING_MIGRATIONS = [
+  "20260821082316_harden_payroll_run_integrity.sql",
 ];
 
 const RELEASE_TABLES = [
@@ -51,6 +78,7 @@ const RELEASE_TABLES = [
   "support_tickets",
   "support_ticket_messages",
   "system_settings",
+  "employee_compensation_settings",
 ];
 
 const RELEASE_SEQUENCES = [
@@ -66,13 +94,24 @@ const RELEASE_SEQUENCES = [
 ];
 
 const ADMIN_ID = "00000000-0000-4000-8000-000000000001";
+const RELEASE_FIXTURE_AUTH_EMAILS = [
+  "admin@example.com",
+  "employee.test@example.com",
+  "client.test@example.com",
+];
+const RELEASE_FIXTURE_AUTH_IDS = [ADMIN_ID];
+
+assertNoHostedSupabaseEnvironment(process.env);
+
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
   throw new Error(
-    "DATABASE_URL is required and must point to a disposable PostgreSQL database.",
+    `DATABASE_URL is required. This destructive verifier only accepts the local Supabase PostgreSQL tuple (loopback host, port 54322, database postgres) with ${DISPOSABLE_DATABASE_CONFIRMATION_ENV}=${DISPOSABLE_DATABASE_CONFIRMATION_VALUE}.`,
   );
 }
+
+assertConfirmedLocalSupabaseMigrationDatabaseUrl(DATABASE_URL);
 
 function phase(message) {
   process.stdout.write(`\n=== ${message} ===\n`);
@@ -103,12 +142,33 @@ async function loadManifest() {
     ...baseline,
     ...WORKFLOW_MIGRATIONS,
     ...PHASE10_REPLACEMENT_MIGRATIONS,
+    ...SECURITY_HARDENING_MIGRATIONS,
+    ...PAYROLL_COMPENSATION_MIGRATIONS,
+    ...PROFILE_LOOKUP_GRANT_MIGRATIONS,
+    ...STORAGE_BUCKET_MIGRATIONS,
+    ...PAYROLL_HARDENING_MIGRATIONS,
   ];
 
   assert(
     !manifest.includes(LEGACY_PHASE10),
     "Release manifest must strictly exclude legacy monolithic Phase10",
   );
+  assert.equal(
+    new Set(manifest).size,
+    manifest.length,
+    "Release manifest must not contain duplicate migrations",
+  );
+  assert.equal(
+    manifest.length,
+    58,
+    "Release manifest must contain the 58 accepted local migrations",
+  );
+  for (const file of manifest) {
+    assert(
+      allFiles.includes(file),
+      `Required release migration missing: ${file}`,
+    );
+  }
 
   for (const file of manifest) {
     process.stdout.write(`${file}\n`);
@@ -119,7 +179,10 @@ async function loadManifest() {
   try {
     phase10Sql = await readFile(join(MIGRATIONS_DIR, LEGACY_PHASE10), "utf8");
   } catch {
-    phase10Sql = await readFile(join(ROOT, "supabase", `${LEGACY_PHASE10}.excluded`), "utf8");
+    phase10Sql = await readFile(
+      join(ROOT, "supabase", `${LEGACY_PHASE10}.excluded`),
+      "utf8",
+    );
   }
   const phase10Created = extractCreatedPublicObjects(phase10Sql);
 
@@ -146,37 +209,46 @@ async function createClient() {
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
 
-  const isProduction =
-    /umtgfaqjoqbsdzwpqizq/u.test(DATABASE_URL) ||
-    /supabase\.co/u.test(DATABASE_URL);
-  if (isProduction) {
-    throw new Error(
-      "Refusing to execute migration verification against Production database!",
-    );
-  }
-
   const dbInfo = await client.query(
-    "SELECT current_database() AS db, version() AS version",
+    `SELECT
+       current_database() AS db,
+       current_user AS role,
+       (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) AS is_superuser,
+       has_table_privilege(current_user, 'auth.users', 'TRIGGER') AS can_manage_auth_triggers,
+       has_table_privilege(current_user, 'storage.buckets', 'INSERT') AS can_register_storage_buckets,
+       version() AS version`,
+  );
+  assert.equal(
+    dbInfo.rows[0].role,
+    LOCAL_SUPABASE_MIGRATION_ROLE,
+    "Migration verifier must use the local Supabase migration role",
+  );
+  assert.equal(
+    dbInfo.rows[0].is_superuser,
+    true,
+    "Local Supabase migration role must retain superuser privileges",
+  );
+  assert.equal(
+    dbInfo.rows[0].can_manage_auth_triggers,
+    true,
+    "Local Supabase migration role must manage auth.users triggers",
+  );
+  assert.equal(
+    dbInfo.rows[0].can_register_storage_buckets,
+    true,
+    "Local Supabase migration role must register Storage buckets",
   );
   process.stdout.write(`Disposable database: ${dbInfo.rows[0].db}\n`);
+  process.stdout.write(`Migration role: ${dbInfo.rows[0].role}\n`);
   process.stdout.write(`${dbInfo.rows[0].version}\n`);
   return client;
 }
 
 async function bootstrapSupabaseSurface(client) {
-  phase("Bootstrap clean Supabase environment");
+  phase("Reset clean public schema while preserving Supabase-owned schemas");
   await client.query(`
     DROP SCHEMA IF EXISTS public CASCADE;
-    DROP SCHEMA IF EXISTS supabase_migrations CASCADE;
-
     CREATE SCHEMA public;
-    CREATE SCHEMA IF NOT EXISTS auth;
-    CREATE SCHEMA IF NOT EXISTS storage;
-    CREATE SCHEMA IF NOT EXISTS extensions;
-    CREATE SCHEMA IF NOT EXISTS supabase_migrations;
-
-    CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
     DO $$
     BEGIN
@@ -191,71 +263,15 @@ async function bootstrapSupabaseSurface(client) {
       END IF;
     END $$;
 
-    GRANT ALL ON SCHEMA public TO anon, authenticated, service_role;
-    GRANT ALL ON SCHEMA extensions TO anon, authenticated, service_role;
+    GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
-
-    CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$
-      SELECT COALESCE(
-        current_setting('request.jwt.claim.sub', true),
-        (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
-      )::uuid;
-    $$;
-
-    CREATE OR REPLACE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$
-      SELECT COALESCE(
-        current_setting('request.jwt.claims', true)::jsonb,
-        jsonb_build_object('sub', current_setting('request.jwt.claim.sub', true))
-      );
-    $$;
-
-    CREATE TABLE IF NOT EXISTS auth.users (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      email TEXT UNIQUE,
-      phone TEXT,
-      email_confirmed_at TIMESTAMPTZ,
-      phone_confirmed_at TIMESTAMPTZ,
-      raw_app_meta_data JSONB DEFAULT '{}'::jsonb,
-      raw_user_meta_data JSONB DEFAULT '{}'::jsonb,
-      is_super_admin BOOLEAN DEFAULT false,
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now()
-    );
-
-    CREATE TABLE IF NOT EXISTS storage.buckets (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      owner UUID REFERENCES auth.users(id),
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now(),
-      public BOOLEAN DEFAULT false,
-      avif_autodetection BOOLEAN DEFAULT false,
-      file_size_limit BIGINT,
-      allowed_mime_types TEXT[]
-    );
-
-    CREATE TABLE IF NOT EXISTS storage.objects (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      bucket_id TEXT REFERENCES storage.buckets(id),
-      name TEXT,
-      owner UUID REFERENCES auth.users(id),
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now(),
-      last_accessed_at TIMESTAMPTZ DEFAULT now(),
-      metadata JSONB,
-      path_tokens TEXT[] GENERATED ALWAYS AS (string_to_array(name, '/')) STORED
-    );
-
-    ALTER TABLE storage.objects DISABLE TRIGGER ALL;
-    ALTER TABLE storage.buckets DISABLE TRIGGER ALL;
-    DELETE FROM storage.objects;
-    DELETE FROM storage.buckets;
-    ALTER TABLE storage.objects ENABLE TRIGGER ALL;
-    ALTER TABLE storage.buckets ENABLE TRIGGER ALL;
-    DELETE FROM auth.users;
   `);
+  await client.query(
+    "DELETE FROM auth.users WHERE id = ANY($1::uuid[]) OR email = ANY($2::text[])",
+    [RELEASE_FIXTURE_AUTH_IDS, RELEASE_FIXTURE_AUTH_EMAILS],
+  );
 }
 
 async function applyMigrations(client, manifest) {
@@ -328,10 +344,207 @@ async function assertReleaseSchema(client) {
         'chk_company_documents_code_format',
         'chk_support_tickets_code_format',
         'chk_workflow_templates_code_format',
-        'chk_workflow_template_stages_code_format'
+        'chk_workflow_template_stages_code_format',
+        'chk_employee_compensation_base_salary_positive',
+        'chk_employee_compensation_allowances_nonnegative'
       )
   `);
-  assert(constraints.rowCount >= 5, "Business code regex constraints must be present");
+  assert(
+    constraints.rowCount >= 5,
+    "Business code regex constraints must be present",
+  );
+
+  const compensationConstraints = await client.query(`
+    SELECT conname
+    FROM pg_constraint
+    WHERE connamespace = 'public'::regnamespace
+      AND conrelid = 'public.employee_compensation_settings'::regclass
+      AND conname IN (
+        'chk_employee_compensation_base_salary_positive',
+        'chk_employee_compensation_allowances_nonnegative'
+      )
+    ORDER BY conname
+  `);
+  assert.deepEqual(
+    compensationConstraints.rows.map((row) => row.conname),
+    [
+      "chk_employee_compensation_allowances_nonnegative",
+      "chk_employee_compensation_base_salary_positive",
+    ],
+    "Employee compensation constraints must be present",
+  );
+
+  const compensationColumns = await client.query(`
+    SELECT column_name, is_nullable, column_default
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'employee_compensation_settings'
+      AND column_name IN ('base_salary', 'allowances')
+    ORDER BY column_name
+  `);
+  assert.deepEqual(
+    compensationColumns.rows,
+    [
+      {
+        column_name: "allowances",
+        is_nullable: "NO",
+        column_default: null,
+      },
+      {
+        column_name: "base_salary",
+        is_nullable: "NO",
+        column_default: null,
+      },
+    ],
+    "Employee compensation salary inputs must be explicit non-null values",
+  );
+
+  const compensationForeignKey = await client.query(`
+    SELECT pg_get_constraintdef(oid) AS definition
+    FROM pg_constraint
+    WHERE conrelid = 'public.employee_compensation_settings'::regclass
+      AND contype = 'f'
+    ORDER BY conname
+  `);
+  assert(
+    compensationForeignKey.rows.some((row) =>
+      /FOREIGN KEY \(user_id\) REFERENCES (?:public\.)?employee_profiles\(user_id\) ON DELETE CASCADE/u.test(
+        row.definition,
+      ),
+    ),
+    "Employee compensation user_id must cascade from employee_profiles(user_id)",
+  );
+
+  const compensationRolePrivileges = await client.query(`
+    WITH roles(role_name) AS (
+      VALUES ('anon'::text), ('authenticated'::text), ('service_role'::text)
+    ), privileges(privilege_type) AS (
+      SELECT unnest(ARRAY[
+        'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER'
+      ]::text[])
+    )
+    SELECT roles.role_name, privileges.privilege_type
+    FROM roles
+    CROSS JOIN privileges
+    WHERE has_table_privilege(
+      roles.role_name,
+      'public.employee_compensation_settings',
+      privileges.privilege_type
+    )
+    ORDER BY roles.role_name, privileges.privilege_type
+  `);
+  const browserCompensationPrivileges = compensationRolePrivileges.rows.filter(
+    (row) => row.role_name !== "service_role",
+  );
+  assert.equal(
+    browserCompensationPrivileges.length,
+    0,
+    "PUBLIC, anon, and authenticated must have no employee compensation table privileges",
+  );
+  assert.equal(
+    compensationRolePrivileges.rows.filter(
+      (row) => row.role_name === "service_role",
+    ).length,
+    7,
+    "service_role must retain all employee compensation table privileges",
+  );
+
+  const profileLookupPrivileges = await client.query(`
+    SELECT
+      has_table_privilege('authenticated', 'public.profiles', 'SELECT') AS authenticated_can_select_profiles,
+      has_table_privilege('anon', 'public.profiles', 'SELECT') AS anon_can_select_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'INSERT') AS authenticated_can_insert_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'UPDATE') AS authenticated_can_update_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'DELETE') AS authenticated_can_delete_profiles
+  `);
+  assert.equal(
+    profileLookupPrivileges.rows[0].authenticated_can_select_profiles,
+    true,
+    "authenticated must be able to SELECT public.profiles so AuthGuard can evaluate the own-row RLS policy",
+  );
+  assert.deepEqual(
+    {
+      anonCanSelectProfiles:
+        profileLookupPrivileges.rows[0].anon_can_select_profiles,
+      authenticatedCanInsertProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_insert_profiles,
+      authenticatedCanUpdateProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_update_profiles,
+      authenticatedCanDeleteProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_delete_profiles,
+    },
+    {
+      anonCanSelectProfiles: false,
+      authenticatedCanInsertProfiles: false,
+      authenticatedCanUpdateProfiles: false,
+      authenticatedCanDeleteProfiles: false,
+    },
+    "Profile browser grant must stay read-only for authenticated users and closed to anon",
+  );
+
+  const documentBucket = await client.query(`
+    SELECT id, name, public, file_size_limit
+    FROM storage.buckets
+    WHERE id = 'company-documents'
+  `);
+  assert.deepEqual(
+    documentBucket.rows,
+    [
+      {
+        id: "company-documents",
+        name: "company-documents",
+        public: false,
+        file_size_limit: "52428800",
+      },
+    ],
+    "Company Documents Storage bucket must exist as a private local/production bucket",
+  );
+
+  const payrollPeriodConstraint = await client.query(`
+    SELECT conname
+    FROM pg_constraint
+    WHERE connamespace = 'public'::regnamespace
+      AND conrelid = 'public.payroll_runs'::regclass
+      AND conname = 'uq_payroll_runs_period_month'
+  `);
+  assert.equal(
+    payrollPeriodConstraint.rowCount,
+    1,
+    "Payroll runs must enforce unique period_month at database level",
+  );
+
+  const payrollRpcs = await client.query(`
+    SELECT proname
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND proname IN ('approve_payroll_run', 'mark_payroll_run_paid')
+    ORDER BY proname
+  `);
+  assert.deepEqual(
+    payrollRpcs.rows.map((row) => row.proname),
+    ["approve_payroll_run", "mark_payroll_run_paid"],
+    "Payroll transactional state functions must be defined in schema public",
+  );
+
+  const exposedSecurityDefiners = await client.query(`
+    SELECT
+      p.oid::regprocedure::text AS identity,
+      role.rolname
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    CROSS JOIN pg_roles role
+    WHERE n.nspname = 'public'
+      AND p.prosecdef
+      AND role.rolname IN ('anon', 'authenticated')
+      AND has_function_privilege(role.rolname, p.oid, 'EXECUTE')
+    ORDER BY identity, role.rolname
+  `);
+  assert.equal(
+    exposedSecurityDefiners.rowCount,
+    0,
+    "Browser roles must not execute public SECURITY DEFINER functions",
+  );
 }
 
 async function expectDatabaseError(action, accepted, label) {
@@ -353,6 +566,20 @@ async function assertRoleIsolation(client) {
   for (const role of ["anon", "authenticated"]) {
     await client.query(`SET ROLE ${role}`);
     try {
+      const unexpectedTablePrivileges = await client.query(
+        `SELECT table_name
+         FROM unnest($1::text[]) AS release_table(table_name)
+         WHERE has_table_privilege(current_user, format('public.%I', table_name), 'SELECT')
+            OR has_table_privilege(current_user, format('public.%I', table_name), 'INSERT')
+         ORDER BY table_name`,
+        [RELEASE_TABLES],
+      );
+      assert.equal(
+        unexpectedTablePrivileges.rowCount,
+        0,
+        `${role} must not receive direct SELECT or INSERT on release business tables`,
+      );
+
       await expectDatabaseError(
         () => client.query("SELECT * FROM public.workflow_templates LIMIT 1"),
         ["42501", "permission denied"],
@@ -382,6 +609,34 @@ async function assertRoleIsolation(client) {
         () => client.query("SELECT * FROM public.system_settings LIMIT 1"),
         ["42501", "permission denied"],
         `${role} direct Settings SELECT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            "SELECT * FROM public.employee_compensation_settings LIMIT 1",
+          ),
+        ["42501", "permission denied"],
+        `${role} direct Compensation SELECT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            `INSERT INTO public.system_settings (key, category, value)
+             VALUES ($1, 'security', '{}'::jsonb)`,
+            [`release-security-probe-${role}`],
+          ),
+        ["42501", "permission denied", "row-level security"],
+        `${role} direct Settings INSERT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            `INSERT INTO public.employee_compensation_settings (
+               user_id, base_salary, allowances
+             ) VALUES (gen_random_uuid(), 1, 0)`,
+          ),
+        ["42501", "permission denied", "row-level security"],
+        `${role} direct Compensation INSERT`,
       );
     } finally {
       await client.query("RESET ROLE");
@@ -460,7 +715,10 @@ async function seedDisposableData(client) {
   const service = await client.query(`
     SELECT id, service_code FROM public.services LIMIT 1
   `);
-  assert(service.rowCount === 1, "Service catalog seed must have at least one service");
+  assert(
+    service.rowCount === 1,
+    "Service catalog seed must have at least one service",
+  );
 
   const projectService = await client.query(
     `INSERT INTO public.project_services (
@@ -484,7 +742,10 @@ async function seedDisposableData(client) {
     `SELECT count(*) FROM public.project_service_items WHERE project_service_id = $1`,
     [projectService.rows[0].id],
   );
-  assert(Number(projectItemsResult.rows[0].count) >= 2, "Project service items must be automatically snapshotted");
+  assert(
+    Number(projectItemsResult.rows[0].count) >= 2,
+    "Project service items must be automatically snapshotted",
+  );
 
   return {
     projectId: project.rows[0].id,
@@ -505,7 +766,12 @@ async function runReleaseSmoke(client, seed) {
     // 1. Workflow Smoke
     const templateResult = await client.query(
       `SELECT * FROM public.workflow_create_template($1, $2, $3, $4)`,
-      [seed.serviceId, "RELEASE_WORKFLOW", "Disposable release smoke", ADMIN_ID],
+      [
+        seed.serviceId,
+        "RELEASE_WORKFLOW",
+        "Disposable release smoke",
+        ADMIN_ID,
+      ],
     );
     const template = templateResult.rows[0];
     assert.match(template.workflow_code, /^QTDV_[0-9]+$/u);
@@ -587,7 +853,7 @@ async function runReleaseSmoke(client, seed) {
       `INSERT INTO public.payroll_runs (
          period_month, period_start_date, period_end_date, title, total_gross_amount, total_net_amount
        ) VALUES (
-         '2026-08', '2026-08-01', '2026-08-31', 'Bảng lương tháng 08/2026', 20000000, 18500000
+         '1999-01', '1999-01-01', '1999-01-31', 'Bảng lương smoke 01/1999', 20000000, 18500000
        ) RETURNING id, run_code, status`,
     );
     assert.match(payrollRun.rows[0].run_code, /^BL_[0-9]+$/u);
@@ -601,6 +867,35 @@ async function runReleaseSmoke(client, seed) {
     );
     assert.match(payslip.rows[0].payslip_code, /^PL_[0-9]+$/u);
     assert.equal(payslip.rows[0].payroll_run_code, payrollRun.rows[0].run_code);
+
+    const compensation = await client.query(
+      `INSERT INTO public.employee_compensation_settings (
+         user_id, base_salary, allowances, updated_by_user_id
+       ) VALUES ($1, 20000000, 500000, $2)
+       RETURNING user_id, base_salary, allowances`,
+      [seed.employeeId, ADMIN_ID],
+    );
+    assert.equal(compensation.rowCount, 1);
+    assert.equal(String(compensation.rows[0].base_salary), "20000000.00");
+    assert.equal(String(compensation.rows[0].allowances), "500000.00");
+    await expectDatabaseError(
+      () =>
+        client.query(
+          "UPDATE public.employee_compensation_settings SET base_salary = 0 WHERE user_id = $1",
+          [seed.employeeId],
+        ),
+      ["23514", "chk_employee_compensation_base_salary_positive"],
+      "Non-positive employee compensation base salary",
+    );
+    await expectDatabaseError(
+      () =>
+        client.query(
+          "UPDATE public.employee_compensation_settings SET allowances = -1 WHERE user_id = $1",
+          [seed.employeeId],
+        ),
+      ["23514", "chk_employee_compensation_allowances_nonnegative"],
+      "Negative employee compensation allowances",
+    );
 
     // 4. Company Documents Smoke
     const document = await client.query(
@@ -643,12 +938,13 @@ async function runReleaseSmoke(client, seed) {
 
     process.stdout.write(
       `Smoke Results:\n` +
-      `- Workflow: Template ${template.workflow_code} -> Runtime QTDA\n` +
-      `- Expenses: ${expense.rows[0].expense_code} approved\n` +
-      `- Payroll: Run ${payrollRun.rows[0].run_code} -> Payslip ${payslip.rows[0].payslip_code}\n` +
-      `- Documents: ${document.rows[0].document_code}\n` +
-      `- Support: Ticket ${ticket.rows[0].ticket_code} with response message\n` +
-      `- Settings: Initial configurations active\n`
+        `- Workflow: Template ${template.workflow_code} -> Runtime QTDA\n` +
+        `- Expenses: ${expense.rows[0].expense_code} approved\n` +
+        `- Payroll: Run ${payrollRun.rows[0].run_code} -> Payslip ${payslip.rows[0].payslip_code}\n` +
+        `- Compensation: backend-only row created; invalid salary/allowance rejected\n` +
+        `- Documents: ${document.rows[0].document_code}\n` +
+        `- Support: Ticket ${ticket.rows[0].ticket_code} with response message\n` +
+        `- Settings: Initial configurations active\n`,
     );
   } finally {
     await client.query("RESET ROLE");
@@ -674,7 +970,9 @@ async function main() {
       "PASS: Clean chain, legacy Phase10 excluded, all modular replacement schemas + Workflow engine verified.\n",
     );
   } catch (error) {
-    process.stderr.write(`\nRELEASE MIGRATION PREFLIGHT FAILED\n${error.stack ?? error.message}\n`);
+    process.stderr.write(
+      `\nRELEASE MIGRATION PREFLIGHT FAILED\n${error.stack ?? error.message}\n`,
+    );
     process.exitCode = 1;
   } finally {
     if (client) {

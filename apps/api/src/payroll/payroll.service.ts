@@ -1,13 +1,20 @@
 import {
+  BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { RequestUser } from '../auth/auth.types';
 import { SupabaseService } from '../supabase/supabase.service';
-import { GeneratePayrollRunDto, PayrollRunQuery } from './dto/payroll.dto';
+import {
+  GeneratePayrollRunDto,
+  PayrollRunQuery,
+  UpsertEmployeeCompensationDto,
+} from './dto/payroll.dto';
 
 @Injectable()
 export class PayrollService {
@@ -113,6 +120,120 @@ export class PayrollService {
     };
   }
 
+  async listEmployeeCompensations(user: RequestUser) {
+    if (user.role !== 'admin' && user.role !== 'accountant') {
+      throw new ForbiddenException({
+        code: 'PAYROLL_ACCESS_DENIED',
+        message:
+          'Chỉ Admin hoặc Kế toán mới có quyền xem cấu hình lương nhân sự.',
+      });
+    }
+
+    const { data, error } = await this.client
+      .from('employee_profiles')
+      .select(
+        'user_id, employee_code, job_title, employment_status, profile:profiles!employee_profiles_user_id_fkey(id, full_name, email, account_code), compensation:employee_compensation_settings(base_salary, allowances, updated_at, updated_by_user_id, updated_by:profiles!employee_compensation_settings_updated_by_user_id_fkey(id, full_name, email, account_code))',
+      )
+      .eq('employment_status', 'active')
+      .order('employee_code', { ascending: true });
+
+    if (error) {
+      this.handleDbError(error, 'Không thể tải cấu hình lương nhân sự.');
+    }
+
+    return {
+      items: (data || []).map((employee: any) => {
+        const compensation = Array.isArray(employee.compensation)
+          ? employee.compensation[0]
+          : employee.compensation;
+
+        return {
+          userId: employee.user_id,
+          employeeCode: employee.employee_code,
+          fullName: employee.profile?.full_name ?? null,
+          email: employee.profile?.email ?? null,
+          accountCode: employee.profile?.account_code ?? null,
+          jobTitle: employee.job_title ?? null,
+          employmentStatus: employee.employment_status,
+          baseSalary: compensation ? Number(compensation.base_salary) : null,
+          allowances: compensation ? Number(compensation.allowances) : null,
+          updatedAt: compensation?.updated_at ?? null,
+          updatedBy: compensation?.updated_by
+            ? {
+                id: compensation.updated_by.id,
+                fullName: compensation.updated_by.full_name ?? null,
+                email: compensation.updated_by.email ?? null,
+                accountCode: compensation.updated_by.account_code ?? null,
+              }
+            : null,
+        };
+      }),
+    };
+  }
+
+  async upsertEmployeeCompensation(
+    employeeUserId: string,
+    dto: UpsertEmployeeCompensationDto,
+    user: RequestUser,
+  ) {
+    if (user.role !== 'admin' && user.role !== 'accountant') {
+      throw new ForbiddenException({
+        code: 'PAYROLL_ACCESS_DENIED',
+        message:
+          'Chỉ Admin hoặc Kế toán mới có quyền cập nhật cấu hình lương nhân sự.',
+      });
+    }
+
+    const { data: employee, error: employeeError } = await this.client
+      .from('employee_profiles')
+      .select('user_id, employment_status')
+      .eq('user_id', employeeUserId)
+      .maybeSingle();
+
+    if (employeeError) {
+      this.handleDbError(
+        employeeError,
+        'Không thể kiểm tra hồ sơ nhân sự trước khi cập nhật cấu hình lương.',
+      );
+    }
+
+    if (!employee) {
+      throw new NotFoundException({
+        code: 'PAYROLL_EMPLOYEE_NOT_FOUND',
+        message: 'Không tìm thấy hồ sơ nhân sự để cấu hình lương.',
+      });
+    }
+
+    if (employee.employment_status !== 'active') {
+      throw new BadRequestException({
+        code: 'PAYROLL_EMPLOYEE_NOT_ACTIVE',
+        message:
+          'Chỉ có thể cấu hình lương cho nhân sự đang ở trạng thái hoạt động.',
+      });
+    }
+
+    const { data, error } = await this.client
+      .from('employee_compensation_settings')
+      .upsert(
+        {
+          user_id: employeeUserId,
+          base_salary: dto.baseSalary,
+          allowances: dto.allowances,
+          updated_by_user_id: user.profileId,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' },
+      )
+      .select()
+      .single();
+
+    if (error) {
+      this.handleDbError(error, 'Không thể lưu cấu hình lương nhân sự.');
+    }
+
+    return data;
+  }
+
   async generatePayrollRun(dto: GeneratePayrollRunDto, user: RequestUser) {
     if (user.role !== 'admin' && user.role !== 'accountant') {
       throw new ForbiddenException({
@@ -129,61 +250,139 @@ export class PayrollService {
     const lastDay = new Date(year, month, 0).getDate();
     const endDate = `${dto.periodMonth}-${String(lastDay).padStart(2, '0')}`;
 
-    // Check existing run
-    const { data: existingRun } = await this.client
+    // Check existing run for the exact period
+    const { data: existingRun, error: existingRunError } = await this.client
       .from('payroll_runs')
       .select('id, status')
       .eq('period_month', dto.periodMonth)
       .maybeSingle();
 
-    if (existingRun && existingRun.status !== 'draft') {
-      throw new ForbiddenException({
-        code: 'PAYROLL_ALREADY_LOCKED',
-        message: `Đợt lương tháng ${dto.periodMonth} đã được phê duyệt hoặc chi trả, không thể tính lại.`,
-      });
+    if (existingRunError) {
+      this.handleDbError(
+        existingRunError,
+        'Không thể kiểm tra đợt lương hiện có.',
+      );
     }
 
-    let runId = existingRun?.id;
-    if (!runId) {
-      const { data: newRun, error: createErr } = await this.client
-        .from('payroll_runs')
-        .insert({
-          period_month: dto.periodMonth,
-          period_start_date: startDate,
-          period_end_date: endDate,
-          title: dto.title,
-          status: 'calculated',
-          created_by: user.profileId,
-        })
-        .select()
-        .single();
-
-      if (createErr || !newRun) {
-        this.handleDbError(createErr, 'Không thể tạo đợt tính lương.');
-      }
-      runId = newRun.id;
-    } else {
-      // Delete existing payslips for recalculation
-      await this.client.from('payslips').delete().eq('payroll_run_id', runId);
+    if (existingRun) {
+      throw new ConflictException({
+        code: 'PAYROLL_RUN_DUPLICATE_PERIOD',
+        message: `Đợt lương tháng ${dto.periodMonth} đã tồn tại trong hệ thống.`,
+      });
     }
 
     // Query all active employee profiles
     const { data: employees, error: empErr } = await this.client
       .from('employee_profiles')
       .select('user_id, job_title')
-      .eq('employment_status', 'active');
+      .eq('employment_status', 'active')
+      .order('user_id', { ascending: true });
 
     if (empErr) {
       this.handleDbError(empErr, 'Không thể truy vấn danh sách nhân sự.');
     }
+
+    const employeeIds = (employees || []).map((employee: any) =>
+      String(employee.user_id),
+    );
+    const compensationByEmployeeId = new Map<
+      string,
+      { baseSalary: number; allowances: number }
+    >();
+
+    if (employeeIds.length > 0) {
+      const { data: compensations, error: compensationErr } = await this.client
+        .from('employee_compensation_settings')
+        .select('user_id, base_salary, allowances')
+        .in('user_id', employeeIds);
+
+      if (compensationErr) {
+        this.handleDbError(
+          compensationErr,
+          'Không thể truy vấn cấu hình lương nhân sự.',
+        );
+      }
+
+      for (const compensation of compensations || []) {
+        const baseSalary = Number(compensation.base_salary);
+        const allowances = Number(compensation.allowances);
+
+        if (
+          Number.isFinite(baseSalary) &&
+          baseSalary > 0 &&
+          Number.isFinite(allowances) &&
+          allowances >= 0
+        ) {
+          compensationByEmployeeId.set(String(compensation.user_id), {
+            baseSalary,
+            allowances,
+          });
+        }
+      }
+    }
+
+    const missingEmployeeIds = employeeIds.filter(
+      (employeeId) => !compensationByEmployeeId.has(employeeId),
+    );
+
+    if (missingEmployeeIds.length > 0) {
+      throw new UnprocessableEntityException({
+        code: 'PAYROLL_COMPENSATION_MISSING',
+        message: `Không thể tính lương tháng ${dto.periodMonth} vì ${missingEmployeeIds.length} nhân sự đang hoạt động chưa có cấu hình lương hợp lệ.`,
+        missingEmployeeIds,
+      });
+    }
+
+    // Insert new payroll run
+    const { data: newRun, error: createErr } = await this.client
+      .from('payroll_runs')
+      .insert({
+        period_month: dto.periodMonth,
+        period_start_date: startDate,
+        period_end_date: endDate,
+        title: dto.title,
+        status: 'calculated',
+        created_by: user.profileId,
+      })
+      .select()
+      .single();
+
+    if (createErr) {
+      if (
+        createErr.code === '23505' ||
+        createErr.message?.includes('uq_payroll_runs_period_month')
+      ) {
+        throw new ConflictException({
+          code: 'PAYROLL_RUN_DUPLICATE_PERIOD',
+          message: `Đợt lương tháng ${dto.periodMonth} đã tồn tại trong hệ thống.`,
+        });
+      }
+      this.handleDbError(createErr, 'Không thể tạo đợt tính lương.');
+    }
+
+    if (!newRun || typeof newRun.id !== 'string') {
+      throw new InternalServerErrorException({
+        code: 'PAYROLL_RUN_CREATION_FAILED',
+        message: 'Không thể tạo đợt tính lương.',
+      });
+    }
+
+    const runId = newRun.id;
 
     const payslipInserts = [];
     let totalGross = 0;
     let totalNet = 0;
 
     for (const emp of employees || []) {
-      const baseSalary = 10000000;
-      const allowances = 1000000;
+      const compensation = compensationByEmployeeId.get(String(emp.user_id));
+      if (!compensation) {
+        throw new InternalServerErrorException({
+          code: 'PAYROLL_COMPENSATION_RESOLUTION_FAILED',
+          message: 'Không thể áp dụng cấu hình lương đã được xác thực.',
+        });
+      }
+
+      const { baseSalary, allowances } = compensation;
       const standardDays = dto.standardWorkingDays || 22;
 
       // Query actual attendance days in this month
@@ -235,6 +434,8 @@ export class PayrollService {
         .insert(payslipInserts);
 
       if (insertErr) {
+        // Rollback payroll run creation to avoid partial inconsistency
+        await this.client.from('payroll_runs').delete().eq('id', runId);
         this.handleDbError(insertErr, 'Không thể lưu danh sách phiếu lương.');
       }
     }
@@ -268,18 +469,39 @@ export class PayrollService {
       });
     }
 
-    const { data, error } = await this.client
-      .from('payroll_runs')
-      .update({
-        status: 'approved',
-        approved_by_user_id: user.profileId,
-        approved_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await this.client.rpc('approve_payroll_run', {
+      p_run_id: id,
+      p_approved_by: user.profileId,
+    });
 
     if (error) {
+      if (
+        error.code === 'P0002' ||
+        error.message?.includes('PAYROLL_RUN_NOT_FOUND')
+      ) {
+        throw new NotFoundException({
+          code: 'PAYROLL_RUN_NOT_FOUND',
+          message: 'Không tìm thấy đợt lương.',
+        });
+      }
+      if (error.message?.includes('PAYROLL_ALREADY_APPROVED')) {
+        throw new BadRequestException({
+          code: 'PAYROLL_ALREADY_APPROVED',
+          message: 'Đợt lương đã được phê duyệt trước đó.',
+        });
+      }
+      if (error.message?.includes('PAYROLL_ALREADY_PAID')) {
+        throw new BadRequestException({
+          code: 'PAYROLL_ALREADY_PAID',
+          message: 'Đợt lương đã được chi trả, không thể duyệt lại.',
+        });
+      }
+      if (error.message?.includes('PAYROLL_INVALID_STATE_TRANSITION')) {
+        throw new BadRequestException({
+          code: 'PAYROLL_INVALID_STATE_TRANSITION',
+          message: 'Trạng thái đợt lương không hợp lệ để phê duyệt.',
+        });
+      }
       this.handleDbError(error, 'Không thể phê duyệt đợt lương.');
     }
 
@@ -295,23 +517,32 @@ export class PayrollService {
       });
     }
 
-    // Update all payslips to paid
-    await this.client
-      .from('payslips')
-      .update({ payment_status: 'paid' })
-      .eq('payroll_run_id', id);
-
-    const { data, error } = await this.client
-      .from('payroll_runs')
-      .update({
-        status: 'paid',
-        paid_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await this.client.rpc('mark_payroll_run_paid', {
+      p_run_id: id,
+    });
 
     if (error) {
+      if (
+        error.code === 'P0002' ||
+        error.message?.includes('PAYROLL_RUN_NOT_FOUND')
+      ) {
+        throw new NotFoundException({
+          code: 'PAYROLL_RUN_NOT_FOUND',
+          message: 'Không tìm thấy đợt lương.',
+        });
+      }
+      if (error.message?.includes('PAYROLL_ALREADY_PAID')) {
+        throw new BadRequestException({
+          code: 'PAYROLL_ALREADY_PAID',
+          message: 'Đợt lương đã được chi trả trước đó.',
+        });
+      }
+      if (error.message?.includes('PAYROLL_NOT_APPROVED')) {
+        throw new BadRequestException({
+          code: 'PAYROLL_NOT_APPROVED',
+          message: 'Chỉ có thể chi trả đợt lương đã được phê duyệt.',
+        });
+      }
       this.handleDbError(error, 'Không thể hoàn tất chi trả đợt lương.');
     }
 

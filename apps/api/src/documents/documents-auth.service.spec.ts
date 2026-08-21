@@ -153,5 +153,90 @@ describe('DocumentsService — Real Authorization Logic', () => {
       const result = await service.getDownloadUrl(DOC_ID, employeeUser);
       expect(result.downloadUrl).toBeDefined();
     });
+
+    it('fails closed when Storage cannot create a signed upload URL', async () => {
+      const bucket = {
+        createSignedUploadUrl: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'storage unavailable' },
+        }),
+      };
+      storageMock.from.mockReturnValue(bucket);
+
+      await expect(
+        service.createUploadSession(
+          {
+            title: 'Storage failure proof',
+            category: 'general',
+            fileName: 'storage-failure.pdf',
+            mimeType: 'application/pdf',
+            sizeBytes: 1024,
+            version: '1.0',
+            accessLevel: 'public_company',
+          },
+          makeUser({ role: 'employee' }),
+        ),
+      ).rejects.toMatchObject({
+        response: { code: 'DOCUMENT_STORAGE_ERROR' },
+      });
+    });
+  });
+
+  describe('Document deletion storage integrity', () => {
+    const activeDocument = {
+      id: DOC_ID,
+      uploaded_by_user_id: USER_ID,
+      storage_bucket: 'company-documents',
+      storage_path: 'general/delete-proof.pdf',
+      delete_status: 'active',
+    };
+
+    it('purges the Storage object before marking metadata deleted', async () => {
+      const bucket = {
+        remove: jest.fn().mockResolvedValue({ data: [], error: null }),
+      };
+      storageMock.from.mockReturnValue(bucket);
+      const metadataUpdate = mockQueryChain({ data: null, error: null });
+      fromMock
+        .mockReturnValueOnce(
+          mockQueryChain({ data: activeDocument, error: null }),
+        )
+        .mockReturnValueOnce(metadataUpdate);
+
+      await expect(
+        service.removeDocument(DOC_ID, makeUser({ role: 'employee' })),
+      ).resolves.toEqual({ ok: true, id: DOC_ID });
+
+      expect(storageMock.from).toHaveBeenCalledWith('company-documents');
+      expect(bucket.remove).toHaveBeenCalledWith(['general/delete-proof.pdf']);
+      expect(metadataUpdate.update).toHaveBeenCalledWith({
+        delete_status: 'deleted',
+      });
+      expect(metadataUpdate.eq).toHaveBeenCalledWith('id', DOC_ID);
+    });
+
+    it('does not soft-delete metadata when the Storage purge fails', async () => {
+      const bucket = {
+        remove: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'storage unavailable' },
+        }),
+      };
+      storageMock.from.mockReturnValue(bucket);
+      const metadataQuery = mockQueryChain({
+        data: activeDocument,
+        error: null,
+      });
+      fromMock.mockReturnValueOnce(metadataQuery);
+
+      await expect(
+        service.removeDocument(DOC_ID, makeUser({ role: 'employee' })),
+      ).rejects.toMatchObject({
+        response: { code: 'DOCUMENT_STORAGE_DELETE_FAILED' },
+      });
+
+      expect(fromMock).toHaveBeenCalledTimes(1);
+      expect(bucket.remove).toHaveBeenCalledWith(['general/delete-proof.pdf']);
+    });
   });
 });

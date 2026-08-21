@@ -1,71 +1,47 @@
-# PGS HUB — BÁO CÁO NGHIỆM THU NGUỒN & QUY TRÌNH KIỂM THỬ STAGING
+# PGS HUB — Disposable Staging Smoke Test
 
+## Safety boundary
+
+This smoke test is for the **known local Supabase PostgreSQL environment only**. Do not set `DATABASE_URL` to a hosted database or another local database. The migration verifier destroys and recreates only the `public` schema while preserving Supabase-owned schemas; it accepts only a loopback host on port `54322`, database `postgres`, the local `supabase_admin` migration role, and explicit operator acknowledgement before connecting.
+
+Hosted or production Supabase must not be used for this runbook.
+
+## Preconditions
+
+1. Source is on the approved `main` SHA after PR #7 merge.
+2. Docker Desktop is running and the local Supabase stack is healthy.
+3. `DATABASE_URL` targets the local Supabase database on port `54322` named `postgres` as `supabase_admin`; the operator has independently confirmed it is disposable. The local `postgres` login is non-superuser and is rejected before destructive work begins.
+4. No inherited hosted `SUPABASE_*`, `WEB_URL`, `NEXT_PUBLIC_*`, or `DATABASE_URL` values remain in the shell.
+
+## Commands
+
+```powershell
+$env:CI = 'true'
+.\node_modules\.bin\supabase.cmd start
+.\node_modules\.bin\supabase.cmd db reset --local --no-seed
+
+# Insert the local database password reported by `supabase status -o env`.
+# Do not substitute `postgres` or use a hosted credential.
+$env:DATABASE_URL = 'postgresql://supabase_admin:<local-db-password>@127.0.0.1:54322/postgres'
+$env:PGS_RELEASE_DB_DISPOSABLE = 'confirmed'
+pnpm test:release-migrations
+pnpm test:workflow-migrations
+node scripts/seed-local-uat.mjs
 ```
-================================================================================
-SOURCE VERIFICATION & RELEASE READINESS HEADER
-================================================================================
-LAST CI VERIFIED SHA: a8db2e22842cead9a4e137a60d5aa3dac0d98a2e
-CURRENT SOURCE HEAD: a8db2e22842cead9a4e137a60d5aa3dac0d98a2e
-REMOTE CI RUN ID: 32351345836 (Status: SUCCESS, 673/673 Tests Passed)
-DEPLOYMENT: DEFERRED PENDING APPROVAL (APPROVE_PRODUCTION_RELEASE)
-DISPOSABLE DB PREFLIGHT: PASS (53/53 Migrations Verified on Isolated PostgreSQL)
-STAGING DB: PENDING CLOUD INSTANCE PROVISIONING (COST / RESOURCE APPROVAL)
-PRODUCTION DEPLOY: DEFERRED / GATED
-PRODUCTION DATABASE: umtgfaqjoqbsdzwpqizq (BẢO VỆ NGUYÊN VẸN — 0 WRITES)
-PHASE 10 MONOLITHIC MIGRATION: EXCLUDED & REPLACED BY 5 MODULAR MIGRATIONS
-================================================================================
+
+The verifier applies the explicit 55-migration manifest, excluding the legacy monolithic Phase 10 SQL file. It checks tables, RLS, sequences, business constraints, smoke flows, direct browser-role table access, backend-only compensation settings, and browser-role execution of public `SECURITY DEFINER` functions.
+
+## Application smoke
+
+Start API and web in separate terminals with explicit local `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` values from `supabase status -o env`. In the terminal that runs UAT, set the same three `NEXT_PUBLIC_*` variables and `PGS_RELEASE_DB_DISPOSABLE=confirmed`. Then run:
+
+```powershell
+node scripts/run-full-local-uat.mjs
+node scripts/capture-screenshots.mjs
 ```
 
----
+The UAT seed uses the deterministic accounts `admin@test.local`, `leader@test.local`, `employee@test.local`, `accountant@test.local`, and `client@test.local`. Screenshot capture blocks non-loopback HTTP(S)/WebSocket requests before credential submission and fails on an HTTP error, redirect, off-origin page, console error, page error, or failed local network request.
 
-## 1. THỰC TRẠNG CI & CHẤT LƯỢNG MÃ NGUỒN (CI FACTS)
+## Evidence rule
 
-- **Remote CI Run**: [Run #32351345836](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/32351345836)
-- **Tổng số Tests**: **673/673 passed (100%)**
-  - **API Unit Tests**: 501/501 passed
-  - **API E2E Tests**: 94/94 passed
-  - **Web Tests**: 77/77 passed
-  - **Validation Package Tests**: 1/1 passed
-- **Lint Errors**: 0 errors
-- **TypeScript**: 0 errors across 7/7 workspaces.
-- **Build**: Next.js (86/86 routes) + NestJS API compile 100% thành công.
-
----
-
-## 2. NGUYÊN TẮC AN TOÀN DATABASE & BẢO VỆ DỮ LIỆU
-
-> [!IMPORTANT]
-> **AN TOÀN DỮ LIỆU**: Toàn bộ database Production `umtgfaqjoqbsdzwpqizq` được bảo vệ nguyên vẹn. Không có thao tác ghi dữ liệu, không chạy migration production, không apply Phase 10 monolithic.
-
----
-
-## 3. QUY TRÌNH KIỂM THỬ TRÊN REAL STAGING DATABASE (KHI ĐƯỢC CẤP TÀI NGUYÊN)
-
-Khi tài khoản Supabase / Cloud cung cấp database Staging instance riêng biệt (khác Production `umtgfaqjoqbsdzwpqizq`):
-
-1. **Khởi tạo biến môi trường**:
-   ```bash
-   export DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[STAGING_PROJECT_REF].supabase.co:5432/postgres"
-   ```
-2. **Chạy bộ kiểm thử migration release tự động**:
-
-   ```bash
-   pnpm test:release-migrations
-   ```
-
-   _Lệnh này sẽ tự động chạy toàn bộ chuỗi 53 release migration, xác minh cách ly legacy Phase 10, kiểm tra RLS lockdown, và thực hiện end-to-end smoke test trên Workflow Engine, Expenses, Payroll, Documents, Support, và Settings._
-
-3. **Chạy toàn bộ UAT test suites**:
-   ```bash
-   pnpm test
-   ```
-
----
-
-## 4. TỔNG KẾT GATE NGHIỆM THU
-
-- **Trạng thái Mã Nguồn**: **SOURCE VERIFICATION PASS (100% GREEN)**
-- **Disposable Preflight**: **PASS (53 Migrations applied with 0 errors)**
-- **P0 Blockers**: **0**
-- **P1 Operational Bugs**: **0**
-- **Production Gate**: **LOCKED / READ-ONLY** (Chờ lệnh `APPROVE_PRODUCTION_RELEASE = YES`).
+Record exact command output, SHA, timestamps, and screenshots in [FINAL_ACCEPTANCE_REPORT.md](FINAL_ACCEPTANCE_REPORT.md). A historical CI claim or a prior source SHA is not a substitute for this run.

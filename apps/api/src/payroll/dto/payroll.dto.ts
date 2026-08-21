@@ -12,6 +12,25 @@ export const GeneratePayrollRunSchema = z
 
 export type GeneratePayrollRunDto = z.infer<typeof GeneratePayrollRunSchema>;
 
+const PayrollAmountSchema = z
+  .number()
+  .finite()
+  .int('Số tiền lương phải là số nguyên VND.')
+  .max(9_999_999_999_999, 'Số tiền lương vượt quá giới hạn cho phép.');
+
+export const UpsertEmployeeCompensationSchema = z
+  .object({
+    baseSalary: PayrollAmountSchema.positive(
+      'Lương cơ bản phải lớn hơn 0 VND.',
+    ),
+    allowances: PayrollAmountSchema.min(0, 'Phụ cấp không được âm.'),
+  })
+  .strict();
+
+export type UpsertEmployeeCompensationDto = z.infer<
+  typeof UpsertEmployeeCompensationSchema
+>;
+
 export const UpdatePayslipAdjustmentSchema = z
   .object({
     allowances: z.number().min(0).optional(),
