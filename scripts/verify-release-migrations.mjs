@@ -4,6 +4,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
+import {
+  assertConfirmedDisposableLocalDatabaseUrl,
+  DISPOSABLE_DATABASE_CONFIRMATION_ENV,
+  DISPOSABLE_DATABASE_CONFIRMATION_VALUE,
+} from "./lib/local-endpoint-guard.mjs";
 
 const { Client } = pg;
 
@@ -26,6 +31,10 @@ const PHASE10_REPLACEMENT_MIGRATIONS = [
   "20260820133000_support_v1.sql",
   "20260820134000_system_settings_v1.sql",
   "20260820135000_release_db_performance_hardening.sql",
+];
+
+const SECURITY_HARDENING_MIGRATIONS = [
+  "20260821050134_harden_security_definer_functions.sql",
 ];
 
 const RELEASE_TABLES = [
@@ -70,9 +79,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
   throw new Error(
-    "DATABASE_URL is required and must point to a disposable PostgreSQL database.",
+    `DATABASE_URL is required. This destructive verifier only accepts the local Supabase PostgreSQL tuple (loopback host, port 54322, database postgres) with ${DISPOSABLE_DATABASE_CONFIRMATION_ENV}=${DISPOSABLE_DATABASE_CONFIRMATION_VALUE}.`,
   );
 }
+
+assertConfirmedDisposableLocalDatabaseUrl(DATABASE_URL);
 
 function phase(message) {
   process.stdout.write(`\n=== ${message} ===\n`);
@@ -103,6 +114,7 @@ async function loadManifest() {
     ...baseline,
     ...WORKFLOW_MIGRATIONS,
     ...PHASE10_REPLACEMENT_MIGRATIONS,
+    ...SECURITY_HARDENING_MIGRATIONS,
   ];
 
   assert(
@@ -119,7 +131,10 @@ async function loadManifest() {
   try {
     phase10Sql = await readFile(join(MIGRATIONS_DIR, LEGACY_PHASE10), "utf8");
   } catch {
-    phase10Sql = await readFile(join(ROOT, "supabase", `${LEGACY_PHASE10}.excluded`), "utf8");
+    phase10Sql = await readFile(
+      join(ROOT, "supabase", `${LEGACY_PHASE10}.excluded`),
+      "utf8",
+    );
   }
   const phase10Created = extractCreatedPublicObjects(phase10Sql);
 
@@ -145,15 +160,6 @@ async function loadManifest() {
 async function createClient() {
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
-
-  const isProduction =
-    /umtgfaqjoqbsdzwpqizq/u.test(DATABASE_URL) ||
-    /supabase\.co/u.test(DATABASE_URL);
-  if (isProduction) {
-    throw new Error(
-      "Refusing to execute migration verification against Production database!",
-    );
-  }
 
   const dbInfo = await client.query(
     "SELECT current_database() AS db, version() AS version",
@@ -331,7 +337,29 @@ async function assertReleaseSchema(client) {
         'chk_workflow_template_stages_code_format'
       )
   `);
-  assert(constraints.rowCount >= 5, "Business code regex constraints must be present");
+  assert(
+    constraints.rowCount >= 5,
+    "Business code regex constraints must be present",
+  );
+
+  const exposedSecurityDefiners = await client.query(`
+    SELECT
+      p.oid::regprocedure::text AS identity,
+      role.rolname
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    CROSS JOIN pg_roles role
+    WHERE n.nspname = 'public'
+      AND p.prosecdef
+      AND role.rolname IN ('anon', 'authenticated')
+      AND has_function_privilege(role.rolname, p.oid, 'EXECUTE')
+    ORDER BY identity, role.rolname
+  `);
+  assert.equal(
+    exposedSecurityDefiners.rowCount,
+    0,
+    "Browser roles must not execute public SECURITY DEFINER functions",
+  );
 }
 
 async function expectDatabaseError(action, accepted, label) {
@@ -353,6 +381,20 @@ async function assertRoleIsolation(client) {
   for (const role of ["anon", "authenticated"]) {
     await client.query(`SET ROLE ${role}`);
     try {
+      const unexpectedTablePrivileges = await client.query(
+        `SELECT table_name
+         FROM unnest($1::text[]) AS release_table(table_name)
+         WHERE has_table_privilege(current_user, format('public.%I', table_name), 'SELECT')
+            OR has_table_privilege(current_user, format('public.%I', table_name), 'INSERT')
+         ORDER BY table_name`,
+        [RELEASE_TABLES],
+      );
+      assert.equal(
+        unexpectedTablePrivileges.rowCount,
+        0,
+        `${role} must not receive direct SELECT or INSERT on release business tables`,
+      );
+
       await expectDatabaseError(
         () => client.query("SELECT * FROM public.workflow_templates LIMIT 1"),
         ["42501", "permission denied"],
@@ -382,6 +424,16 @@ async function assertRoleIsolation(client) {
         () => client.query("SELECT * FROM public.system_settings LIMIT 1"),
         ["42501", "permission denied"],
         `${role} direct Settings SELECT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            `INSERT INTO public.system_settings (key, category, value)
+             VALUES ($1, 'security', '{}'::jsonb)`,
+            [`release-security-probe-${role}`],
+          ),
+        ["42501", "permission denied", "row-level security"],
+        `${role} direct Settings INSERT`,
       );
     } finally {
       await client.query("RESET ROLE");
@@ -460,7 +512,10 @@ async function seedDisposableData(client) {
   const service = await client.query(`
     SELECT id, service_code FROM public.services LIMIT 1
   `);
-  assert(service.rowCount === 1, "Service catalog seed must have at least one service");
+  assert(
+    service.rowCount === 1,
+    "Service catalog seed must have at least one service",
+  );
 
   const projectService = await client.query(
     `INSERT INTO public.project_services (
@@ -484,7 +539,10 @@ async function seedDisposableData(client) {
     `SELECT count(*) FROM public.project_service_items WHERE project_service_id = $1`,
     [projectService.rows[0].id],
   );
-  assert(Number(projectItemsResult.rows[0].count) >= 2, "Project service items must be automatically snapshotted");
+  assert(
+    Number(projectItemsResult.rows[0].count) >= 2,
+    "Project service items must be automatically snapshotted",
+  );
 
   return {
     projectId: project.rows[0].id,
@@ -505,7 +563,12 @@ async function runReleaseSmoke(client, seed) {
     // 1. Workflow Smoke
     const templateResult = await client.query(
       `SELECT * FROM public.workflow_create_template($1, $2, $3, $4)`,
-      [seed.serviceId, "RELEASE_WORKFLOW", "Disposable release smoke", ADMIN_ID],
+      [
+        seed.serviceId,
+        "RELEASE_WORKFLOW",
+        "Disposable release smoke",
+        ADMIN_ID,
+      ],
     );
     const template = templateResult.rows[0];
     assert.match(template.workflow_code, /^QTDV_[0-9]+$/u);
@@ -643,12 +706,12 @@ async function runReleaseSmoke(client, seed) {
 
     process.stdout.write(
       `Smoke Results:\n` +
-      `- Workflow: Template ${template.workflow_code} -> Runtime QTDA\n` +
-      `- Expenses: ${expense.rows[0].expense_code} approved\n` +
-      `- Payroll: Run ${payrollRun.rows[0].run_code} -> Payslip ${payslip.rows[0].payslip_code}\n` +
-      `- Documents: ${document.rows[0].document_code}\n` +
-      `- Support: Ticket ${ticket.rows[0].ticket_code} with response message\n` +
-      `- Settings: Initial configurations active\n`
+        `- Workflow: Template ${template.workflow_code} -> Runtime QTDA\n` +
+        `- Expenses: ${expense.rows[0].expense_code} approved\n` +
+        `- Payroll: Run ${payrollRun.rows[0].run_code} -> Payslip ${payslip.rows[0].payslip_code}\n` +
+        `- Documents: ${document.rows[0].document_code}\n` +
+        `- Support: Ticket ${ticket.rows[0].ticket_code} with response message\n` +
+        `- Settings: Initial configurations active\n`,
     );
   } finally {
     await client.query("RESET ROLE");
@@ -674,7 +737,9 @@ async function main() {
       "PASS: Clean chain, legacy Phase10 excluded, all modular replacement schemas + Workflow engine verified.\n",
     );
   } catch (error) {
-    process.stderr.write(`\nRELEASE MIGRATION PREFLIGHT FAILED\n${error.stack ?? error.message}\n`);
+    process.stderr.write(
+      `\nRELEASE MIGRATION PREFLIGHT FAILED\n${error.stack ?? error.message}\n`,
+    );
     process.exitCode = 1;
   } finally {
     if (client) {

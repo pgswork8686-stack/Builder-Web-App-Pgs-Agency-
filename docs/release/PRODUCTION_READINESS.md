@@ -1,50 +1,19 @@
-# PGS HUB — BẢNG KIỂM TRA SẴN SÀNG RELEASE (PRODUCTION READINESS CHECKLIST)
+# PGS HUB — Production Readiness
 
-## 1. Quality Gates & Build Verification
+## Current gate
 
-- [x] Remote CI Quality Gates: **PASS (100%)**
-- [x] Test Suite Coverage: **PASS (673/673 tests passed across API Unit, API E2E, Web UI, Validation)**
-  - API Unit: 501 passed
-  - API E2E: 94 passed
-  - Web UI: 77 passed
-  - Validation: 1 passed
-- [x] TypeScript & Next.js Builds: **0 Errors / 86 Web Routes + API Modules OK**
-- [x] Prettier & ESLint: **0 Errors, 0 Format Drift**
+```text
+STATUS: BLOCKED
+```
 
-## 2. Database & Migration Security
+The active release assessment is [FINAL_ACCEPTANCE_REPORT.md](FINAL_ACCEPTANCE_REPORT.md). This repository must not contact or modify a production Supabase project from local release scripts.
 
-- [x] Database Production `umtgfaqjoqbsdzwpqizq`: **100% Read-only Protection (0 unauthorized writes)**
-- [x] Legacy Phase 10 Migration `20260819130000_phase10_all_missing_modules.sql`: **Strictly Excluded & Isolated**
-- [x] Modular Replacement Migrations: **Created, Tested & Verified (Expenses, Payroll, Documents, Support, Settings, Performance Hardening)**
-- [x] Clean Disposable Database Preflight: **53 Migrations Applied with 0 Failures**
-- [x] Staging Cloud Database: **Pending instance creation approval (runbook and automated tests ready in `scripts/verify-release-migrations.mjs`)**
-- [x] RLS Architecture: **Backend-only (service_role), Browser roles revoked (anon/authenticated fail-closed)**
-- [x] Business Code Sequences: **Database-driven format constraints (`CP_`, `BL_`, `PL_`, `TL_`, `YC_`, `QTDV_`, `GDDA_`, `QTDA_`)**
+Before production can be considered, all of the following must be true:
 
-## 3. Core Business Logic & UAT
+1. The exact tested SHA is on `main` after the approved PR #7 merge.
+2. The disposable local migration, RLS, role-UAT, storage, socket, and UI matrices pass on that SHA.
+3. `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, and `pnpm test` pass.
+4. The release report has current command output and screenshots.
+5. A separate explicit production authorization is granted.
 
-- [x] Work Calendar Rules: **22/08 OFF, 29/08 WORK, 05/09 OFF, 12/09 WORK, Sunday OFF**
-- [x] Deadline Alert: **Non-blocking warning banner on non-working dates**
-- [x] Workflow Engine V1: **Template graph, Cycle detection, published immutability, runtime snapshot, task idempotency, atomic approvals**
-- [x] Role-Based Access Control (RBAC): **5 distinct roles strictly isolated across all domains**
-
-## 4. Release Pipeline & Production Gate Status
-
-- **Automated Regression:** **PASS (673/673 tests passed)**
-- **Live Staging UAT:** **PENDING (Awaiting cloud staging DB provisioning)**
-- **Main Branch Status:** **NOT YET MERGED / 82 COMMITS AHEAD IN PR #7**
-- **Production Database `umtgfaqjoqbsdzwpqizq`:** **100% UNTOUCHED / READ-ONLY (0 writes)**
-- **Current Pipeline Stage:** `READY FOR STAGING PROVISIONING`
-  _(NOT FULL UAT — NOT MAIN SYNCED — NOT READY FOR PRODUCTION APPLY UNTIL STAGING UAT IS PROVEN)_
-
----
-
-## 5. Required Release Sequence (Strict Gate Order)
-
-1. **Provision Real Staging Database** (Submit cost/plan approval if enabling Supabase Branching).
-2. **Apply Release Migration Manifest to Staging** (53 clean migrations, NEVER monolithic Phase 10).
-3. **Deploy Staging App & Conduct Full Role UAT** (Admin, Team Leader, Employee, Accountant, Client).
-4. **Fix Any Staging Findings & Re-verify CI**.
-5. **Merge PR #7 into `main`** upon successful non-production verification.
-6. **Verify `main` CI on exact merged HEAD**.
-7. **STOP & Require Explicit Authorization** (`APPROVE_PRODUCTION_RELEASE = YES`) before touching Production.
+Use [FULL_SYSTEM_TEST_ENVIRONMENT.md](FULL_SYSTEM_TEST_ENVIRONMENT.md) for the safe local runbook. Do not treat historical CI totals or UAT claims as current evidence.

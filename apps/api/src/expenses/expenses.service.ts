@@ -31,12 +31,85 @@ export class ExpensesService {
     });
   }
 
+  /**
+   * Expense access is deliberately based on the per-project membership, rather
+   * than the user's global application role. A team leader must also be the
+   * project's manager; an employee may submit only as a project member.
+   */
+  private async requireExpenseProjectMembership(
+    projectId: string,
+    user: RequestUser,
+  ) {
+    const { data: membership, error } = await this.client
+      .from('project_memberships')
+      .select('id, project_role')
+      .eq('project_id', projectId)
+      .eq('user_id', user.profileId)
+      .maybeSingle();
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra quyền dự án.');
+    }
+
+    if (!membership) {
+      throw new ForbiddenException({
+        code: 'EXPENSE_ACCESS_DENIED',
+        message:
+          user.role === 'team_leader'
+            ? 'Trưởng nhóm chỉ có quyền truy cập chi phí của dự án do mình quản lý.'
+            : 'Bạn chỉ có quyền tạo đề nghị chi phí cho dự án mà mình là thành viên.',
+      });
+    }
+
+    if (
+      user.role === 'team_leader' &&
+      membership.project_role !== 'project_manager'
+    ) {
+      throw new ForbiddenException({
+        code: 'EXPENSE_ACCESS_DENIED',
+        message:
+          'Trưởng nhóm chỉ có quyền truy cập chi phí của dự án do mình quản lý.',
+      });
+    }
+  }
+
+  private async getManagedProjectIds(user: RequestUser): Promise<string[]> {
+    const { data: memberships, error } = await this.client
+      .from('project_memberships')
+      .select('project_id')
+      .eq('user_id', user.profileId)
+      .eq('project_role', 'project_manager');
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra quyền dự án.');
+    }
+
+    return (memberships ?? []).map((membership) => membership.project_id);
+  }
+
   async listExpenses(query: ExpenseQuery, user: RequestUser) {
     if (user.role === 'client') {
       throw new ForbiddenException({
         code: 'EXPENSE_ACCESS_DENIED',
         message: 'Khách hàng không có quyền truy cập đề nghị chi phí.',
       });
+    }
+
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+    const managedProjectIds =
+      user.role === 'team_leader'
+        ? await this.getManagedProjectIds(user)
+        : undefined;
+
+    if (managedProjectIds?.length === 0) {
+      return {
+        items: [],
+        total: 0,
+        page,
+        pageSize,
+        totalPages: 0,
+      };
     }
 
     let dbQuery = this.client
@@ -46,9 +119,15 @@ export class ExpensesService {
         { count: 'exact' },
       );
 
-    // Non-admin/non-accountants can only see expenses they submitted or for projects they lead
+    // Employees can only see expenses they submitted.
     if (user.role === 'employee') {
       dbQuery = dbQuery.eq('submitted_by_user_id', user.profileId);
+    }
+
+    // A global team_leader role is not sufficient: list only projects that
+    // explicitly designate this user as a project manager.
+    if (managedProjectIds) {
+      dbQuery = dbQuery.in('project_id', managedProjectIds);
     }
 
     if (query.projectId) {
@@ -67,8 +146,6 @@ export class ExpensesService {
       dbQuery = dbQuery.lte('expense_date', query.to);
     }
 
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 20;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
@@ -127,6 +204,10 @@ export class ExpensesService {
       });
     }
 
+    if (user.role === 'team_leader') {
+      await this.requireExpenseProjectMembership(data.project_id, user);
+    }
+
     return data;
   }
 
@@ -150,6 +231,10 @@ export class ExpensesService {
         code: 'PROJECT_NOT_FOUND',
         message: 'Không tìm thấy dự án tương ứng.',
       });
+    }
+
+    if (user.role === 'employee' || user.role === 'team_leader') {
+      await this.requireExpenseProjectMembership(dto.projectId, user);
     }
 
     const { data, error } = await this.client

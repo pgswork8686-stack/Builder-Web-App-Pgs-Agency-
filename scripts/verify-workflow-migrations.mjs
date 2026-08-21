@@ -4,6 +4,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
+import {
+  assertConfirmedDisposableLocalDatabaseUrl,
+  DISPOSABLE_DATABASE_CONFIRMATION_ENV,
+  DISPOSABLE_DATABASE_CONFIRMATION_VALUE,
+} from "./lib/local-endpoint-guard.mjs";
 
 const { Client } = pg;
 
@@ -72,9 +77,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
   throw new Error(
-    "DATABASE_URL is required and must point to a disposable PostgreSQL database.",
+    `DATABASE_URL is required. This destructive verifier only accepts the local Supabase PostgreSQL tuple (loopback host, port 54322, database postgres) with ${DISPOSABLE_DATABASE_CONFIRMATION_ENV}=${DISPOSABLE_DATABASE_CONFIRMATION_VALUE}.`,
   );
 }
+
+assertConfirmedDisposableLocalDatabaseUrl(DATABASE_URL);
 
 function phase(message) {
   process.stdout.write(`\n=== ${message} ===\n`);
@@ -123,7 +130,10 @@ async function loadManifest() {
   try {
     phase10Source = await readFile(join(MIGRATIONS_DIR, PHASE10), "utf8");
   } catch {
-    phase10Source = await readFile(join(ROOT, "supabase", `${PHASE10}.excluded`), "utf8");
+    phase10Source = await readFile(
+      join(ROOT, "supabase", `${PHASE10}.excluded`),
+      "utf8",
+    );
   }
   const workflowSource = (
     await Promise.all(
@@ -665,13 +675,7 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
 
     const itemDepResult = await client.query(
       `SELECT * FROM public.workflow_add_item_dependency($1, $2, $3, $4, $5)`,
-      [
-        template.id,
-        itemAlpha.id,
-        itemBeta.id,
-        2,
-        ADMIN_ID,
-      ],
+      [template.id, itemAlpha.id, itemBeta.id, 2, ADMIN_ID],
     );
     assert.equal(itemDepResult.rowCount, 1);
 
@@ -734,7 +738,10 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
       [seed.projectId, seed.projectServiceId, ADMIN_ID],
     );
     const runtimeWorkflowId = instantiateResult.rows[0].result.workflowId;
-    assert(runtimeWorkflowId, "workflow_instantiate_project_service must return workflowId");
+    assert(
+      runtimeWorkflowId,
+      "workflow_instantiate_project_service must return workflowId",
+    );
     const runtimeWorkflowRow = await client.query(
       `SELECT * FROM public.project_workflows WHERE id = $1`,
       [runtimeWorkflowId],
@@ -765,7 +772,9 @@ async function runTemplateAndRuntimeSmoke(client, seed) {
     );
     assert.equal(runtimeItems.rowCount, 2);
 
-    const readyItem = runtimeItems.rows.find((i) => i.status === 'ready') ?? runtimeItems.rows[0];
+    const readyItem =
+      runtimeItems.rows.find((i) => i.status === "ready") ??
+      runtimeItems.rows[0];
 
     // Task Idempotency: Create Primary Task
     const taskResult = await client.query(

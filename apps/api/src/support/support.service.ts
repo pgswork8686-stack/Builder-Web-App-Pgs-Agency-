@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -32,6 +33,37 @@ export class SupportService {
     });
   }
 
+  private denySupportAccess(): never {
+    throw new ForbiddenException({
+      code: 'SUPPORT_ACCESS_DENIED',
+      message: 'Bạn không có quyền truy cập yêu cầu hỗ trợ này.',
+    });
+  }
+
+  private ticketNotFound(): never {
+    throw new NotFoundException({
+      code: 'TICKET_NOT_FOUND',
+      message: 'Không tìm thấy yêu cầu hỗ trợ.',
+    });
+  }
+
+  private assertSupportParticipant(user: RequestUser): void {
+    if (
+      user.role !== 'admin' &&
+      user.role !== 'team_leader' &&
+      user.role !== 'employee' &&
+      user.role !== 'client'
+    ) {
+      this.denySupportAccess();
+    }
+  }
+
+  private assertTicketCreator(user: RequestUser): void {
+    if (user.role !== 'admin' && user.role !== 'client') {
+      this.denySupportAccess();
+    }
+  }
+
   private async getClientCompanyIds(profileId: string): Promise<string[]> {
     const { data, error } = await this.client
       .from('client_memberships')
@@ -45,7 +77,164 @@ export class SupportService {
     return (data || []).map((m: any) => m.client_company_id);
   }
 
+  private async getManagedProjectIds(profileId: string): Promise<string[]> {
+    const { data, error } = await this.client
+      .from('project_memberships')
+      .select('project_id')
+      .eq('user_id', profileId)
+      .eq('project_role', 'project_manager');
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra phạm vi dự án quản lý.');
+    }
+
+    return (data || []).map((membership: any) => membership.project_id);
+  }
+
+  private async isProjectManager(
+    projectId: string,
+    profileId: string,
+  ): Promise<boolean> {
+    const { data, error } = await this.client
+      .from('project_memberships')
+      .select('project_id')
+      .eq('project_id', projectId)
+      .eq('user_id', profileId)
+      .eq('project_role', 'project_manager')
+      .maybeSingle();
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra phạm vi dự án quản lý.');
+    }
+
+    return Boolean(data);
+  }
+
+  private async assertTicketReadAccess(ticket: any, user: RequestUser) {
+    this.assertSupportParticipant(user);
+
+    if (user.role === 'admin') {
+      return;
+    }
+
+    if (user.role === 'client') {
+      const companyIds = await this.getClientCompanyIds(user.profileId);
+      if (!companyIds.includes(ticket.client_company_id)) {
+        this.ticketNotFound();
+      }
+      return;
+    }
+
+    if (user.role === 'team_leader') {
+      if (
+        !ticket.project_id ||
+        !(await this.isProjectManager(ticket.project_id, user.profileId))
+      ) {
+        this.ticketNotFound();
+      }
+      return;
+    }
+
+    if (
+      ticket.creator_user_id !== user.profileId &&
+      ticket.assignee_user_id !== user.profileId
+    ) {
+      this.ticketNotFound();
+    }
+  }
+
+  private async assertTicketManageAccess(ticket: any, user: RequestUser) {
+    if (user.role === 'admin') {
+      return;
+    }
+
+    if (
+      user.role !== 'team_leader' ||
+      !ticket.project_id ||
+      !(await this.isProjectManager(ticket.project_id, user.profileId))
+    ) {
+      this.denySupportAccess();
+    }
+  }
+
+  private async getTicketForAccess(id: string) {
+    const { data, error } = await this.client
+      .from('support_tickets')
+      .select(
+        'id, client_company_id, project_id, creator_user_id, assignee_user_id',
+      )
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra quyền yêu cầu hỗ trợ.');
+    }
+    if (!data) {
+      this.ticketNotFound();
+    }
+
+    return data;
+  }
+
+  private async getProjectClientCompanyId(projectId: string): Promise<string> {
+    const { data: project, error } = await this.client
+      .from('projects')
+      .select('id, client_company_id')
+      .eq('id', projectId)
+      .maybeSingle();
+
+    if (error) {
+      this.handleDbError(error, 'Không thể kiểm tra dự án của yêu cầu hỗ trợ.');
+    }
+    if (!project) {
+      throw new NotFoundException({
+        code: 'PROJECT_NOT_FOUND',
+        message: 'Không tìm thấy dự án.',
+      });
+    }
+
+    return project.client_company_id;
+  }
+
+  private rejectProjectCompanyMismatch(): never {
+    throw new BadRequestException({
+      code: 'SUPPORT_PROJECT_COMPANY_MISMATCH',
+      message: 'Dự án phải thuộc cùng công ty khách hàng của yêu cầu hỗ trợ.',
+    });
+  }
+
+  private emptyTicketPage(query: SupportTicketQuery) {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+    return {
+      items: [],
+      total: 0,
+      page,
+      pageSize,
+      totalPages: 0,
+    };
+  }
+
   async listTickets(query: SupportTicketQuery, user: RequestUser) {
+    this.assertSupportParticipant(user);
+
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+    let clientCompanyIds: string[] | undefined;
+    let managedProjectIds: string[] | undefined;
+
+    if (user.role === 'client') {
+      clientCompanyIds = await this.getClientCompanyIds(user.profileId);
+      if (clientCompanyIds.length === 0) {
+        return this.emptyTicketPage(query);
+      }
+    } else if (user.role === 'team_leader') {
+      managedProjectIds = await this.getManagedProjectIds(user.profileId);
+      if (managedProjectIds.length === 0) {
+        return this.emptyTicketPage(query);
+      }
+    }
+
     let dbQuery = this.client
       .from('support_tickets')
       .select(
@@ -53,9 +242,14 @@ export class SupportService {
         { count: 'exact' },
       );
 
-    if (user.role === 'client') {
-      const companyIds = await this.getClientCompanyIds(user.profileId);
-      dbQuery = dbQuery.in('client_company_id', companyIds);
+    if (clientCompanyIds) {
+      dbQuery = dbQuery.in('client_company_id', clientCompanyIds);
+    } else if (managedProjectIds) {
+      dbQuery = dbQuery.in('project_id', managedProjectIds);
+    } else if (user.role === 'employee') {
+      dbQuery = dbQuery.or(
+        `creator_user_id.eq.${user.profileId},assignee_user_id.eq.${user.profileId}`,
+      );
     }
 
     if (query.status) {
@@ -70,14 +264,15 @@ export class SupportService {
     if (query.clientCompanyId) {
       dbQuery = dbQuery.eq('client_company_id', query.clientCompanyId);
     }
-    if (query.search) {
+    // `.or()` accepts raw PostgREST syntax; commas and parentheses could turn
+    // a search value into an additional predicate, so remove those delimiters.
+    const safeSearch = query.search?.trim().replace(/[(),]/g, '');
+    if (safeSearch) {
       dbQuery = dbQuery.or(
-        `title.ilike.%${query.search}%,description.ilike.%${query.search}%,ticket_code.ilike.%${query.search}%`,
+        `title.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,ticket_code.ilike.%${safeSearch}%`,
       );
     }
 
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 20;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
@@ -98,6 +293,8 @@ export class SupportService {
   }
 
   async getTicketById(id: string, user: RequestUser) {
+    this.assertSupportParticipant(user);
+
     const { data: ticket, error: ticketErr } = await this.client
       .from('support_tickets')
       .select(
@@ -106,22 +303,14 @@ export class SupportService {
       .eq('id', id)
       .maybeSingle();
 
-    if (ticketErr || !ticket) {
-      throw new NotFoundException({
-        code: 'TICKET_NOT_FOUND',
-        message: 'Không tìm thấy yêu cầu hỗ trợ.',
-      });
+    if (ticketErr) {
+      this.handleDbError(ticketErr, 'Không thể truy vấn yêu cầu hỗ trợ.');
+    }
+    if (!ticket) {
+      this.ticketNotFound();
     }
 
-    if (user.role === 'client') {
-      const companyIds = await this.getClientCompanyIds(user.profileId);
-      if (!companyIds.includes(ticket.client_company_id)) {
-        throw new NotFoundException({
-          code: 'TICKET_NOT_FOUND',
-          message: 'Không tìm thấy yêu cầu hỗ trợ.',
-        });
-      }
-    }
+    await this.assertTicketReadAccess(ticket, user);
 
     let msgQuery = this.client
       .from('support_ticket_messages')
@@ -149,19 +338,43 @@ export class SupportService {
   }
 
   async createTicket(dto: CreateSupportTicketDto, user: RequestUser) {
+    this.assertTicketCreator(user);
+
     let companyId = dto.clientCompanyId;
+    let clientCompanyIds: string[] | undefined;
 
     if (user.role === 'client') {
-      const companyIds = await this.getClientCompanyIds(user.profileId);
-      if (companyIds.length === 0) {
+      clientCompanyIds = await this.getClientCompanyIds(user.profileId);
+      if (clientCompanyIds.length === 0) {
         throw new ForbiddenException({
           code: 'NO_CLIENT_COMPANY',
           message:
             'Tài khoản khách hàng chưa được liên kết với doanh nghiệp nào.',
         });
       }
-      companyId =
-        companyId && companyIds.includes(companyId) ? companyId : companyIds[0];
+      if (companyId && !clientCompanyIds.includes(companyId)) {
+        this.denySupportAccess();
+      }
+    }
+
+    if (dto.projectId) {
+      const projectCompanyId = await this.getProjectClientCompanyId(
+        dto.projectId,
+      );
+      if (companyId && companyId !== projectCompanyId) {
+        this.rejectProjectCompanyMismatch();
+      }
+      if (
+        user.role === 'client' &&
+        !clientCompanyIds?.includes(projectCompanyId)
+      ) {
+        this.denySupportAccess();
+      }
+      companyId = projectCompanyId;
+    }
+
+    if (user.role === 'client') {
+      companyId = companyId || clientCompanyIds![0];
     } else if (!companyId) {
       // For internal staff creating ticket on behalf of client, company is required
       const { data: firstCompany } = await this.client
@@ -177,6 +390,13 @@ export class SupportService {
           message: 'Chưa có công ty khách hàng nào trong hệ thống.',
         });
       }
+    }
+
+    if (!companyId) {
+      throw new NotFoundException({
+        code: 'CLIENT_COMPANY_NOT_FOUND',
+        message: 'Chưa có công ty khách hàng nào trong hệ thống.',
+      });
     }
 
     const { data, error } = await this.client
@@ -208,12 +428,9 @@ export class SupportService {
     dto: CreateTicketMessageDto,
     user: RequestUser,
   ) {
-    // Verify ticket access first
-    await this.getTicketById(ticketId, user);
-
-    if (user.role === 'client' && dto.isInternalNote) {
-      dto.isInternalNote = false; // Clients cannot create internal notes
-    }
+    this.assertSupportParticipant(user);
+    const ticket = await this.getTicketForAccess(ticketId);
+    await this.assertTicketReadAccess(ticket, user);
 
     const { data, error } = await this.client
       .from('support_ticket_messages')
@@ -221,7 +438,8 @@ export class SupportService {
         ticket_id: ticketId,
         sender_user_id: user.profileId,
         content: dto.content,
-        is_internal_note: dto.isInternalNote,
+        // Clients may never create internal-only messages.
+        is_internal_note: user.role === 'client' ? false : dto.isInternalNote,
       })
       .select(
         '*, sender:profiles!support_ticket_messages_sender_user_id_fkey(id, full_name, email, account_code, role, avatar_url)',
@@ -240,13 +458,18 @@ export class SupportService {
     dto: UpdateTicketStatusDto,
     user: RequestUser,
   ) {
-    if (user.role === 'client') {
+    if (user.role !== 'admin' && user.role !== 'team_leader') {
+      this.denySupportAccess();
+    }
+    if (user.role === 'team_leader' && dto.assigneeUserId !== undefined) {
       throw new ForbiddenException({
-        code: 'SUPPORT_ACCESS_DENIED',
-        message:
-          'Khách hàng không có quyền thay đổi trạng thái quản trị ticket.',
+        code: 'SUPPORT_ASSIGNMENT_DENIED',
+        message: 'Chỉ Admin mới có quyền phân công yêu cầu hỗ trợ.',
       });
     }
+
+    const ticket = await this.getTicketForAccess(id);
+    await this.assertTicketManageAccess(ticket, user);
 
     const updatePayload: Record<string, any> = {
       status: dto.status,

@@ -1,21 +1,19 @@
 import pg from "pg";
+import { assertConfirmedDisposableLocalDatabaseUrl } from "./lib/local-endpoint-guard.mjs";
 const { Client } = pg;
 
 const DATABASE_URL = "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres";
 
-if (DATABASE_URL.includes("umtgfaqjoqbsdzwpqizq") || DATABASE_URL.includes("supabase.co")) {
-  console.error("FAIL FAST: Remote production guard triggered!");
-  process.exit(1);
-}
+assertConfirmedDisposableLocalDatabaseUrl(DATABASE_URL);
 
 const client = new Client({ connectionString: DATABASE_URL });
 
 const USERS = [
-  { id: "00000000-0000-4000-8000-000000000001", email: "uat.admin.local@pgs.test", role: "admin", full_name: "UAT Admin Local" },
-  { id: "00000000-0000-4000-8000-000000000002", email: "uat.leader.local@pgs.test", role: "team_leader", full_name: "UAT Leader Local" },
-  { id: "00000000-0000-4000-8000-000000000003", email: "uat.employee.local@pgs.test", role: "employee", full_name: "UAT Employee Local" },
-  { id: "00000000-0000-4000-8000-000000000004", email: "uat.accountant.local@pgs.test", role: "accountant", full_name: "UAT Accountant Local" },
-  { id: "00000000-0000-4000-8000-000000000005", email: "uat.client.local@pgs.test", role: "client", full_name: "UAT Client Local" },
+  { id: "00000000-0000-4000-8000-000000000001", email: "admin@test.local", role: "admin", full_name: "UAT Admin Local" },
+  { id: "00000000-0000-4000-8000-000000000002", email: "leader@test.local", role: "team_leader", full_name: "UAT Leader Local" },
+  { id: "00000000-0000-4000-8000-000000000003", email: "employee@test.local", role: "employee", full_name: "UAT Employee Local" },
+  { id: "00000000-0000-4000-8000-000000000004", email: "accountant@test.local", role: "accountant", full_name: "UAT Accountant Local" },
+  { id: "00000000-0000-4000-8000-000000000005", email: "client@test.local", role: "client", full_name: "UAT Client Local" },
 ];
 
 async function seed() {
@@ -78,31 +76,19 @@ async function seed() {
     }
   }
 
-  // System Settings: Office Address + Work Hours
-  console.log("Configuring approved business settings (timezone, work hours, office geo)...");
+  // System Settings: Office Address
+  console.log("Configuring approved business settings and canonical attendance policy...");
   await client.query(`
     INSERT INTO public.system_settings (key, category, description, value)
     VALUES
       (
         'company_info', 'general', 'Company information and office coordinates',
         jsonb_build_object(
-          'company_name', 'PGS Agency Hub',
+          'name', 'PGS Agency',
           'address', 'Tầng 2, DM 2-25, Điểm TTCN làng nghề dệt lụa Vạn Phúc, Hà Đông, Hà Nội',
           'office_lat', 20.9768,
           'office_lng', 105.7725,
           'allowed_radius_meters', 100
-        )
-      ),
-      (
-        'work_hours', 'attendance', 'Company standard work hours and boundary thresholds',
-        jsonb_build_object(
-          'timezone', 'Asia/Ho_Chi_Minh',
-          'workday_start_time', '08:00',
-          'workday_end_time', '17:30',
-          'late_grace_minutes', 5,
-          'early_leave_grace_minutes', 5,
-          'late_threshold_time', '08:06',
-          'early_leave_threshold_time', '17:25'
         )
       )
     ON CONFLICT (key) DO UPDATE SET
@@ -110,6 +96,29 @@ async function seed() {
       category = EXCLUDED.category,
       updated_at = now();
   `);
+
+  const attendanceSettings = await client.query(`
+    UPDATE public.attendance_settings
+    SET timezone = 'Asia/Ho_Chi_Minh',
+        workday_start_time = '08:00:00',
+        workday_end_time = '17:30:00',
+        late_grace_minutes = 5,
+        early_leave_grace_minutes = 5,
+        location_required = true,
+        location_radius_meters = 100,
+        office_latitude = 20.9768,
+        office_longitude = 105.7725,
+        updated_at = now()
+    WHERE id = (
+      SELECT id FROM public.attendance_settings
+      ORDER BY created_at ASC, id ASC
+      LIMIT 1
+    )
+    RETURNING id;
+  `);
+  if (attendanceSettings.rowCount !== 1) {
+    throw new Error("Expected exactly one canonical attendance_settings row.");
+  }
 
   // Departments & Employee Profiles
   console.log("Setting up Department & Employee Profiles...");
@@ -120,15 +129,35 @@ async function seed() {
   `);
   const deptId = deptRes.rows[0]?.id;
 
+  const leaderUser = USERS.find(u => u.role === 'team_leader');
+  const teamRes = await client.query(`
+    INSERT INTO public.teams (
+      department_id, code, name, leader_user_id, description, created_by, updated_by
+    ) VALUES ($1, 'UAT_ENG', 'Đội Kỹ Thuật UAT', $2, 'Đội kiểm thử chấm công UAT', $3, $3)
+    ON CONFLICT (department_id, code) DO UPDATE SET
+      leader_user_id = EXCLUDED.leader_user_id,
+      name = EXCLUDED.name,
+      updated_by = EXCLUDED.updated_by,
+      updated_at = now()
+    RETURNING id;
+  `, [deptId, leaderUser.id, adminUser.id]);
+  const teamId = teamRes.rows[0]?.id;
+
   for (const role of ['admin', 'team_leader', 'employee', 'accountant']) {
     const user = USERS.find(u => u.role === role);
     await client.query(`
-      INSERT INTO public.employee_profiles (user_id, department_id, job_title)
-      VALUES ($1, $2, $3)
+      INSERT INTO public.employee_profiles (user_id, department_id, team_id, job_title)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT (user_id) DO UPDATE SET
         department_id = EXCLUDED.department_id,
+        team_id = EXCLUDED.team_id,
         job_title = EXCLUDED.job_title;
-    `, [user.id, deptId, role.toUpperCase()]);
+    `, [
+      user.id,
+      deptId,
+      role === 'team_leader' || role === 'employee' ? teamId : null,
+      role.toUpperCase(),
+    ]);
   }
 
   // Client Company
@@ -150,7 +179,6 @@ async function seed() {
 
   // Project & Project Memberships
   console.log("Creating UAT Project...");
-  const leaderUser = USERS.find(u => u.role === 'team_leader');
   const empUser = USERS.find(u => u.role === 'employee');
 
   const projRes = await client.query(`

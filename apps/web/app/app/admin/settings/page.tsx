@@ -14,14 +14,10 @@ import {
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  fetchAllSettings,
-  bulkUpdateSettings,
-  SystemSetting,
-} from "@/lib/api/settings";
+import { fetchAllSettings, bulkUpdateSettings } from "@/lib/api/settings";
+import { attendanceApi } from "@/lib/api/attendance";
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<SystemSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -34,10 +30,19 @@ export default function AdminSettingsPage() {
     "Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Phường Hà Đông, Thành phố Hà Nội, Việt Nam",
   );
 
-  const [radiusMeters, setRadiusMeters] = useState(150);
-  const [allowRemote, setAllowRemote] = useState(true);
-  const [workStartTime, setWorkStartTime] = useState("08:30");
-  const [workEndTime, setWorkEndTime] = useState("17:30");
+  // These fields map directly to the canonical attendance_settings singleton.
+  // Empty numeric/time fields intentionally remain unconfigured rather than
+  // silently recreating obsolete policy defaults.
+  const [timezone, setTimezone] = useState("Asia/Ho_Chi_Minh");
+  const [radiusMeters, setRadiusMeters] = useState("");
+  const [officeLatitude, setOfficeLatitude] = useState("");
+  const [officeLongitude, setOfficeLongitude] = useState("");
+  const [locationRequired, setLocationRequired] = useState(false);
+  const [photoRequired, setPhotoRequired] = useState(false);
+  const [workStartTime, setWorkStartTime] = useState("");
+  const [workEndTime, setWorkEndTime] = useState("");
+  const [lateGraceMinutes, setLateGraceMinutes] = useState("");
+  const [earlyLeaveGraceMinutes, setEarlyLeaveGraceMinutes] = useState("");
 
   const [sessionTimeout, setSessionTimeout] = useState(24);
   const [rateLimitRpm, setRateLimitRpm] = useState(120);
@@ -45,8 +50,43 @@ export default function AdminSettingsPage() {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const data = await fetchAllSettings();
-      setSettings(data);
+      const [data, attendanceSettings] = await Promise.all([
+        fetchAllSettings(),
+        attendanceApi.getSettings(),
+      ]);
+
+      setTimezone(attendanceSettings.timezone);
+      setRadiusMeters(
+        attendanceSettings.location_radius_meters === null
+          ? ""
+          : String(attendanceSettings.location_radius_meters),
+      );
+      setOfficeLatitude(
+        attendanceSettings.office_latitude === null
+          ? ""
+          : String(attendanceSettings.office_latitude),
+      );
+      setOfficeLongitude(
+        attendanceSettings.office_longitude === null
+          ? ""
+          : String(attendanceSettings.office_longitude),
+      );
+      setLocationRequired(attendanceSettings.location_required);
+      setPhotoRequired(attendanceSettings.photo_required);
+      setWorkStartTime(
+        attendanceSettings.workday_start_time?.slice(0, 5) ?? "",
+      );
+      setWorkEndTime(attendanceSettings.workday_end_time?.slice(0, 5) ?? "");
+      setLateGraceMinutes(
+        attendanceSettings.late_grace_minutes === null
+          ? ""
+          : String(attendanceSettings.late_grace_minutes),
+      );
+      setEarlyLeaveGraceMinutes(
+        attendanceSettings.early_leave_grace_minutes === null
+          ? ""
+          : String(attendanceSettings.early_leave_grace_minutes),
+      );
 
       data.forEach((s) => {
         if (s.key === "company_info" && s.value) {
@@ -57,11 +97,6 @@ export default function AdminSettingsPage() {
             s.value.address ||
               "Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Phường Hà Đông, Thành phố Hà Nội, Việt Nam",
           );
-        } else if (s.key === "attendance_policy" && s.value) {
-          setRadiusMeters(s.value.radius_meters || 150);
-          setAllowRemote(Boolean(s.value.allow_remote));
-          setWorkStartTime(s.value.work_start_time || "08:30");
-          setWorkEndTime(s.value.work_end_time || "17:30");
         } else if (s.key === "security_policy" && s.value) {
           setSessionTimeout(s.value.session_timeout_hours || 24);
           setRateLimitRpm(s.value.rate_limit_rpm || 120);
@@ -84,38 +119,44 @@ export default function AdminSettingsPage() {
       setSaving(true);
       setSavedSuccess(false);
 
-      await bulkUpdateSettings([
-        {
-          key: "company_info",
-          category: "general",
-          value: {
-            name: companyName,
-            hotline: companyHotline,
-            email: companyEmail,
-            address: companyAddress,
+      const optionalNumber = (value: string) =>
+        value.trim() === "" ? null : Number(value);
+
+      await Promise.all([
+        bulkUpdateSettings([
+          {
+            key: "company_info",
+            category: "general",
+            value: {
+              name: companyName,
+              hotline: companyHotline,
+              email: companyEmail,
+              address: companyAddress,
+            },
+            description: "Thông tin liên hệ chung của công ty",
           },
-          description: "Thông tin liên hệ chung của công ty",
-        },
-        {
-          key: "attendance_policy",
-          category: "attendance",
-          value: {
-            radius_meters: Number(radiusMeters),
-            allow_remote: allowRemote,
-            work_start_time: workStartTime,
-            work_end_time: workEndTime,
+          {
+            key: "security_policy",
+            category: "security",
+            value: {
+              session_timeout_hours: Number(sessionTimeout),
+              rate_limit_rpm: Number(rateLimitRpm),
+            },
+            description: "Cấu hình chính sách bảo mật hệ thống",
           },
-          description: "Quy định chấm công và geofencing",
-        },
-        {
-          key: "security_policy",
-          category: "security",
-          value: {
-            session_timeout_hours: Number(sessionTimeout),
-            rate_limit_rpm: Number(rateLimitRpm),
-          },
-          description: "Cấu hình chính sách bảo mật hệ thống",
-        },
+        ]),
+        attendanceApi.updateSettings({
+          timezone,
+          workdayStartTime: workStartTime || null,
+          workdayEndTime: workEndTime || null,
+          lateGraceMinutes: optionalNumber(lateGraceMinutes),
+          earlyLeaveGraceMinutes: optionalNumber(earlyLeaveGraceMinutes),
+          locationRequired,
+          photoRequired,
+          locationRadiusMeters: optionalNumber(radiusMeters),
+          officeLatitude: optionalNumber(officeLatitude),
+          officeLongitude: optionalNumber(officeLongitude),
+        }),
       ]);
 
       setSavedSuccess(true);
@@ -280,14 +321,13 @@ export default function AdminSettingsPage() {
             <div className="space-y-3.5 pt-2">
               <div>
                 <label className="text-xs font-bold text-[#334155] block mb-1.5">
-                  Bán kính Geofence hợp lệ (Mét)
+                  Múi giờ chấm công
                 </label>
                 <input
-                  type="number"
-                  value={radiusMeters}
-                  onChange={(e) => setRadiusMeters(Number(e.target.value))}
-                  min="50"
-                  max="1000"
+                  type="text"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  aria-label="Múi giờ chấm công"
                   className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
@@ -317,19 +357,97 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 pt-2">
-                <input
-                  type="checkbox"
-                  id="allowRemote"
-                  checked={allowRemote}
-                  onChange={(e) => setAllowRemote(e.target.checked)}
-                  className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
-                />
-                <label
-                  htmlFor="allowRemote"
-                  className="text-xs font-semibold text-[#334155] cursor-pointer"
-                >
-                  Cho phép làm việc từ xa (Work From Home) khi có phê duyệt
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="text-xs font-bold text-[#334155] block mb-1.5">
+                    Dung sai đi muộn (phút)
+                  </label>
+                  <input
+                    type="number"
+                    value={lateGraceMinutes}
+                    onChange={(e) => setLateGraceMinutes(e.target.value)}
+                    min="0"
+                    max="1440"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#334155] block mb-1.5">
+                    Dung sai về sớm (phút)
+                  </label>
+                  <input
+                    type="number"
+                    value={earlyLeaveGraceMinutes}
+                    onChange={(e) => setEarlyLeaveGraceMinutes(e.target.value)}
+                    min="0"
+                    max="1440"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label className="text-xs font-bold text-[#334155] block mb-1.5">
+                    Bán kính Geofence (mét)
+                  </label>
+                  <input
+                    type="number"
+                    value={radiusMeters}
+                    onChange={(e) => setRadiusMeters(e.target.value)}
+                    min="1"
+                    max="100000"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#334155] block mb-1.5">
+                    Vĩ độ văn phòng
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={officeLatitude}
+                    onChange={(e) => setOfficeLatitude(e.target.value)}
+                    min="-90"
+                    max="90"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#334155] block mb-1.5">
+                    Kinh độ văn phòng
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={officeLongitude}
+                    onChange={(e) => setOfficeLongitude(e.target.value)}
+                    min="-180"
+                    max="180"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5 pt-2">
+                <label className="flex items-center gap-2.5 text-xs font-semibold text-[#334155] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={locationRequired}
+                    onChange={(e) => setLocationRequired(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                  />
+                  Bắt buộc GPS khi chấm công
+                </label>
+                <label className="flex items-center gap-2.5 text-xs font-semibold text-[#334155] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={photoRequired}
+                    onChange={(e) => setPhotoRequired(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                  />
+                  Bắt buộc ảnh bằng chứng khi chấm công
                 </label>
               </div>
             </div>

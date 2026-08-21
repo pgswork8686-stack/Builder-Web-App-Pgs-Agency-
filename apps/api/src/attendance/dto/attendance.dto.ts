@@ -96,3 +96,130 @@ export const AttendanceAdjustmentSchema = z
 export type AttendanceAdjustmentDto = z.infer<
   typeof AttendanceAdjustmentSchema
 >;
+
+const TimeOfDaySchema = z
+  .string()
+  .trim()
+  .regex(
+    /^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/,
+    'Giờ phải theo định dạng HH:MM hoặc HH:MM:SS.',
+  )
+  .transform((value) => (value.length === 5 ? `${value}:00` : value));
+
+const TimezoneSchema = z
+  .string()
+  .trim()
+  .min(1, 'Múi giờ không được để trống.')
+  .max(100, 'Múi giờ không hợp lệ.')
+  .refine(
+    (timezone) => {
+      try {
+        Intl.DateTimeFormat('en-US', { timeZone: timezone });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'Múi giờ phải là IANA timezone hợp lệ.' },
+  );
+
+function timeOfDayToMinutes(value: string): number {
+  const [hours, minutes] = value.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * PATCH payload for the canonical attendance_settings singleton.
+ *
+ * Field names are API camelCase; AttendanceService maps them only to the
+ * corresponding production table columns. Nullable values intentionally stay
+ * nullable because an unset HR policy must not be replaced with an invented
+ * default.
+ */
+export const UpdateAttendanceSettingsSchema = z
+  .object({
+    timezone: TimezoneSchema.optional(),
+    workdayStartTime: TimeOfDaySchema.nullable().optional(),
+    workdayEndTime: TimeOfDaySchema.nullable().optional(),
+    lateGraceMinutes: z
+      .number()
+      .int()
+      .min(0)
+      .max(24 * 60)
+      .nullable()
+      .optional(),
+    earlyLeaveGraceMinutes: z
+      .number()
+      .int()
+      .min(0)
+      .max(24 * 60)
+      .nullable()
+      .optional(),
+    locationRequired: z.boolean().optional(),
+    photoRequired: z.boolean().optional(),
+    locationRadiusMeters: z
+      .number()
+      .finite()
+      .positive()
+      .max(100_000)
+      .nullable()
+      .optional(),
+    officeLatitude: z.number().finite().min(-90).max(90).nullable().optional(),
+    officeLongitude: z
+      .number()
+      .finite()
+      .min(-180)
+      .max(180)
+      .nullable()
+      .optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const start = value.workdayStartTime;
+    const end = value.workdayEndTime;
+    if (start !== undefined && end !== undefined) {
+      if ((start === null) !== (end === null)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['workdayEndTime'],
+          message:
+            'Giờ bắt đầu và kết thúc phải cùng được cấu hình hoặc cùng để trống.',
+        });
+      } else if (
+        start !== null &&
+        end !== null &&
+        timeOfDayToMinutes(end) <= timeOfDayToMinutes(start)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['workdayEndTime'],
+          message: 'Giờ kết thúc phải sau giờ bắt đầu.',
+        });
+      }
+    }
+
+    const hasBothCoordinates =
+      value.officeLatitude !== undefined && value.officeLongitude !== undefined;
+    if (
+      hasBothCoordinates &&
+      (value.officeLatitude === null) !== (value.officeLongitude === null)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['officeLongitude'],
+        message:
+          'Vĩ độ và kinh độ văn phòng phải cùng được cấu hình hoặc cùng để trống.',
+      });
+    }
+
+    if (!Object.values(value).some((field) => field !== undefined)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Cần cung cấp ít nhất một trường cấu hình để cập nhật.',
+      });
+    }
+  });
+
+export type UpdateAttendanceSettingsDto = z.infer<
+  typeof UpdateAttendanceSettingsSchema
+>;

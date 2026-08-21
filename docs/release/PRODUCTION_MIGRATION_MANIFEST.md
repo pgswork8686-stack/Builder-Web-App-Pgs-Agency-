@@ -1,8 +1,8 @@
 # PGS HUB — Production Release Migration Manifest
 
-## Baseline Applied in Production
+## Historical Baseline Declared in This Repository
 
-The following 43 migrations constitute the active production database baseline (up to `20260819150700`):
+The following 43 migrations are declared by repository history as the database baseline (up to `20260819150700`). This release assessment did not contact a production database, so it does not independently verify that assertion.
 
 1. `20260810170000_phase1_auth.sql`
 2. `20260810180000_phase1_auth_fix_round1.sql`
@@ -76,3 +76,7 @@ The following 43 migrations constitute the active production database baseline (
 ### Group C: Performance Hardening
 
 53. `20260820135000_release_db_performance_hardening.sql` — Drop duplicate indexes and verify FK indexing
+
+### Group D: Security Hardening
+
+54. `20260821050134_harden_security_definer_functions.sql` — Revokes browser execution of existing public `SECURITY DEFINER` functions and closes default function execution for the migration owner

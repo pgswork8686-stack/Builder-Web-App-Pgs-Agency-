@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Query,
   Param,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
+import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { RequestUser } from '../auth/auth.types';
@@ -20,6 +22,7 @@ import {
   AttendanceSignedUploadSchema,
   AttendanceQuerySchema,
   AttendanceAdjustmentSchema,
+  UpdateAttendanceSettingsSchema,
 } from './dto/attendance.dto';
 
 @Controller('attendance')
@@ -47,6 +50,39 @@ export class AttendanceController {
       );
     }
     return this.attendanceService.checkOut(result.data, user);
+  }
+
+  /** Canonical attendance_settings singleton. Administrators only. */
+  @Get('settings')
+  @Roles('admin')
+  async getSettings(@CurrentUser() user: RequestUser) {
+    return this.attendanceService.getAttendanceSettings(user);
+  }
+
+  /** Update the canonical attendance_settings singleton. Administrators only. */
+  @Patch('settings')
+  @Roles('admin')
+  async updateSettings(
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = UpdateAttendanceSettingsSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((error) => error.message).join(', '),
+      );
+    }
+    return this.attendanceService.updateAttendanceSettings(result.data, user);
+  }
+
+  /**
+   * Internal staff can read only the requirements needed by the check-in UI.
+   * It deliberately excludes the office coordinates and geofence radius.
+   */
+  @Get('policy')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
+  async getPolicy(@CurrentUser() user: RequestUser) {
+    return this.attendanceService.getAttendancePolicy(user);
   }
 
   @Get('me')
