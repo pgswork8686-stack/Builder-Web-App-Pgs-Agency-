@@ -96,3 +96,15 @@ The following 43 migrations are declared by repository history as the database b
 ### Group H: Payroll Run Integrity Hardening
 
 58. `20260821082316_harden_payroll_run_integrity.sql` — Enforces database-level uniqueness on `payroll_runs(period_month)` to prevent duplicate runs for the same period, and introduces transactional atomic state machine functions (`approve_payroll_run`, `mark_payroll_run_paid`) to guarantee consistency between payroll runs and payslip payment statuses without partial failure leaks.
+
+### Group I: PGS Work Calendar Monthly Alternating Saturday Schedule
+
+59. `20260821100000_pgs_work_calendar_saturday_schedule.sql` — Implements PGS Saturday calendar rule where Saturdays alternate starting with Saturday #1 of every calendar month as a working day, resetting monthly (e.g. Aug 29 WORK and Sep 5 WORK).
+
+### Group J: Employee Compensation History & Salary Versioning
+
+60. `20260821101000_employee_compensation_history.sql` — Supports versioned salary history with effective dates (first day of month YYYY-MM-01) and explicit payroll eligibility without fallback defaults; RLS enabled, backend-only service_role access.
+
+### Group K: Payroll Attendance, Compliance & Bonus Audit Fields
+
+61. `20260821102000_payroll_attendance_and_compliance.sql` — Adds audit columns to payslips (attendance penalty amount, attendance bonus amount, late occurrences, late minutes, absence days, early leave occurrences, early leave minutes, bonus eligibility) and introduces monthly employee compliance reviews.

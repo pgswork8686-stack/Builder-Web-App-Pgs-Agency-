@@ -743,6 +743,25 @@ async function seedCompensationFixture() {
       ],
     );
     assert.equal(result.rowCount, 1);
+
+    await client.query(
+      `
+        INSERT INTO public.employee_compensation_history (
+          user_id, base_salary, allowances, effective_from, payroll_eligible, updated_by_user_id
+        ) VALUES ($1::uuid, $2::numeric, $3::numeric, '2026-01-01'::date, true, $4::uuid)
+        ON CONFLICT (user_id, effective_from) DO UPDATE
+        SET base_salary = EXCLUDED.base_salary,
+            allowances = EXCLUDED.allowances,
+            updated_by_user_id = EXCLUDED.updated_by_user_id,
+            updated_at = now()
+      `,
+      [
+        user.id,
+        compensation.baseSalary,
+        compensation.allowances,
+        LOCAL_UAT.users.admin.id,
+      ],
+    );
   }
 }
 

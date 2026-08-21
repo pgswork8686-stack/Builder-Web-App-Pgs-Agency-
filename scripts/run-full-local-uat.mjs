@@ -677,6 +677,43 @@ async function runRealApplicationUAT() {
   await db.query(
     `DELETE FROM public.payroll_runs WHERE period_month IN ('2026-08', '2026-09')`,
   );
+  // 7A. Test Work Calendar Saturday Schedule API
+  const satAug29Res = await api("GET", "/work-calendar?from=2026-08-29&to=2026-08-29", tokens.employee);
+  assert.equal(satAug29Res.status, 200);
+  assert.equal(satAug29Res.data.days?.[0]?.isWorkingDay, true, "Saturday Aug 29 2026 (#5 Saturday) must resolve as working day");
+
+  const satSep05Res = await api("GET", "/work-calendar?from=2026-09-05&to=2026-09-05", tokens.employee);
+  assert.equal(satSep05Res.status, 200);
+  assert.equal(satSep05Res.data.days?.[0]?.isWorkingDay, true, "Saturday Sep 05 2026 (#1 Saturday) must resolve as working day");
+  console.log("✓ Work Calendar Saturday monthly reset resolved via API: PASS");
+
+  // 7B. Test Compensation History & Revisions API
+  const compList = await api("GET", "/payroll/compensations", tokens.accountant);
+  assert.equal(compList.status, 200);
+  assert(compList.data.items?.length > 0, "Compensation list must return active employees");
+
+  const revRes = await api("POST", `/payroll/compensations/${USERS.employee.id}/revisions`, tokens.accountant, {
+    baseSalary: 23000000,
+    allowances: 1500000,
+    effectiveFrom: "2026-08-01",
+    payrollEligible: true,
+    notes: "UAT salary revision",
+  });
+  assert.equal(revRes.status, 201, "Creating compensation revision must succeed");
+
+  const histRes = await api("GET", `/payroll/compensations/${USERS.employee.id}/history`, tokens.accountant);
+  assert.equal(histRes.status, 200);
+  assert(histRes.data.history?.length >= 1, "Must return compensation version history");
+  console.log("✓ Compensation revision & version history API: PASS");
+
+  // 7C. Test Monthly Reviews API
+  const revUpdateRes = await api("PUT", `/payroll/monthly-reviews/${USERS.employee.id}?periodMonth=2026-08`, tokens.accountant, {
+    disciplineBonusEligible: true,
+    earlyLeaveMakeupConfirmed: true,
+  });
+  assert.equal(revUpdateRes.status, 200, "Updating monthly review must succeed");
+  console.log("✓ Monthly discipline & compliance review API: PASS");
+
   const payGen = await api(
     "POST",
     "/payroll/runs/generate",
@@ -684,7 +721,6 @@ async function runRealApplicationUAT() {
     {
       periodMonth: "2026-08",
       title: "Bảng lương kỳ tháng 08/2026 API UAT",
-      standardWorkingDays: 22,
     },
   );
   assert.equal(payGen.status, 201);
@@ -692,7 +728,10 @@ async function runRealApplicationUAT() {
   assert(payGen.data.total_employees_count > 0, "Payroll run must calculate active employees");
   assert(payGen.data.payslips?.length > 0, "Payroll run must contain payslips");
   assert(Number(payGen.data.total_net_amount) > 0, "Payroll total net amount must be positive");
-  console.log(`✓ Accountant generated Payroll Run via API: ID=${runId}, Employees=${payGen.data.total_employees_count}, NetTotal=${payGen.data.total_net_amount}`);
+  const empSlip = payGen.data.payslips.find((p) => p.user_id === USERS.employee.id);
+  assert.ok(empSlip, "Must calculate payslip for employee");
+  assert(empSlip.standard_working_days > 0, "Standard working days must be dynamically calculated from calendar");
+  console.log(`✓ Accountant generated Payroll Run via API: ID=${runId}, StandardDays=${empSlip.standard_working_days}, Employees=${payGen.data.total_employees_count}, NetTotal=${payGen.data.total_net_amount}`);
 
   // Duplicate same-period creation must be rejected
   const payGenDuplicate = await api(
@@ -903,6 +942,9 @@ async function runRealApplicationUAT() {
     "system_settings",
     "company_work_calendar_settings",
     "company_work_calendar_events",
+    "employee_compensation_settings",
+    "employee_compensation_history",
+    "employee_monthly_payroll_reviews",
   ];
 
   for (const role of ["anon", "authenticated"]) {

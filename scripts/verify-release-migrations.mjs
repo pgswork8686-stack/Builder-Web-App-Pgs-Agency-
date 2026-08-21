@@ -55,6 +55,12 @@ const PAYROLL_HARDENING_MIGRATIONS = [
   "20260821082316_harden_payroll_run_integrity.sql",
 ];
 
+const BUSINESS_RULES_MIGRATIONS = [
+  "20260821100000_pgs_work_calendar_saturday_schedule.sql",
+  "20260821101000_employee_compensation_history.sql",
+  "20260821102000_payroll_attendance_and_compliance.sql",
+];
+
 const RELEASE_TABLES = [
   // Workflow
   "workflow_templates",
@@ -79,6 +85,8 @@ const RELEASE_TABLES = [
   "support_ticket_messages",
   "system_settings",
   "employee_compensation_settings",
+  "employee_compensation_history",
+  "employee_monthly_payroll_reviews",
 ];
 
 const RELEASE_SEQUENCES = [
@@ -147,6 +155,7 @@ async function loadManifest() {
     ...PROFILE_LOOKUP_GRANT_MIGRATIONS,
     ...STORAGE_BUCKET_MIGRATIONS,
     ...PAYROLL_HARDENING_MIGRATIONS,
+    ...BUSINESS_RULES_MIGRATIONS,
   ];
 
   assert(
@@ -160,8 +169,8 @@ async function loadManifest() {
   );
   assert.equal(
     manifest.length,
-    58,
-    "Release manifest must contain the 58 accepted local migrations",
+    61,
+    "Release manifest must contain the 61 accepted local migrations",
   );
   for (const file of manifest) {
     assert(
@@ -545,6 +554,68 @@ async function assertReleaseSchema(client) {
     0,
     "Browser roles must not execute public SECURITY DEFINER functions",
   );
+
+  const workCalendarSaturdayMode = await client.query(`
+    SELECT column_name, column_default, is_nullable
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'company_work_calendar_settings'
+      AND column_name = 'saturday_schedule_mode'
+  `);
+  assert.equal(
+    workCalendarSaturdayMode.rowCount,
+    1,
+    "company_work_calendar_settings must have saturday_schedule_mode column",
+  );
+
+  const payslipAuditColumns = await client.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'payslips'
+      AND column_name IN (
+        'attendance_penalty_amount',
+        'attendance_bonus_amount',
+        'late_occurrences',
+        'late_minutes',
+        'absence_days',
+        'early_leave_occurrences',
+        'early_leave_minutes',
+        'attendance_bonus_eligible'
+      )
+    ORDER BY column_name
+  `);
+  assert.equal(
+    payslipAuditColumns.rowCount,
+    8,
+    "Payslips must contain all 8 attendance penalty, bonus and audit columns",
+  );
+
+  const compensationHistoryConstraints = await client.query(`
+    SELECT conname
+    FROM pg_constraint
+    WHERE connamespace = 'public'::regnamespace
+      AND conrelid = 'public.employee_compensation_history'::regclass
+      AND conname = 'uq_employee_compensation_history_user_effective'
+  `);
+  assert.equal(
+    compensationHistoryConstraints.rowCount,
+    1,
+    "employee_compensation_history must enforce UNIQUE(user_id, effective_from)",
+  );
+
+  const monthlyReviewConstraints = await client.query(`
+    SELECT conname
+    FROM pg_constraint
+    WHERE connamespace = 'public'::regnamespace
+      AND conrelid = 'public.employee_monthly_payroll_reviews'::regclass
+      AND conname = 'uq_employee_monthly_payroll_reviews'
+  `);
+  assert.equal(
+    monthlyReviewConstraints.rowCount,
+    1,
+    "employee_monthly_payroll_reviews must enforce UNIQUE(user_id, period_month)",
+  );
 }
 
 async function expectDatabaseError(action, accepted, label) {
@@ -621,6 +692,22 @@ async function assertRoleIsolation(client) {
       await expectDatabaseError(
         () =>
           client.query(
+            "SELECT * FROM public.employee_compensation_history LIMIT 1",
+          ),
+        ["42501", "permission denied"],
+        `${role} direct Compensation History SELECT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            "SELECT * FROM public.employee_monthly_payroll_reviews LIMIT 1",
+          ),
+        ["42501", "permission denied"],
+        `${role} direct Monthly Reviews SELECT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
             `INSERT INTO public.system_settings (key, category, value)
              VALUES ($1, 'security', '{}'::jsonb)`,
             [`release-security-probe-${role}`],
@@ -637,6 +724,26 @@ async function assertRoleIsolation(client) {
           ),
         ["42501", "permission denied", "row-level security"],
         `${role} direct Compensation INSERT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            `INSERT INTO public.employee_compensation_history (
+               user_id, base_salary, allowances, effective_from
+             ) VALUES (gen_random_uuid(), 1, 0, '2026-08-01')`,
+          ),
+        ["42501", "permission denied", "row-level security"],
+        `${role} direct Compensation History INSERT`,
+      );
+      await expectDatabaseError(
+        () =>
+          client.query(
+            `INSERT INTO public.employee_monthly_payroll_reviews (
+               user_id, period_month
+             ) VALUES (gen_random_uuid(), '2026-08')`,
+          ),
+        ["42501", "permission denied", "row-level security"],
+        `${role} direct Monthly Reviews INSERT`,
       );
     } finally {
       await client.query("RESET ROLE");
@@ -848,7 +955,64 @@ async function runReleaseSmoke(client, seed) {
       [expense.rows[0].id, ADMIN_ID],
     );
 
-    // 3. Payroll Smoke
+    // 3. Payroll & Business Rules Smoke
+    // 3A. Saturday Schedule Verification
+    const satAug29 = await client.query(
+      `SELECT * FROM public.resolve_company_workday('2026-08-29'::date)`,
+    );
+    assert.equal(
+      satAug29.rows[0].is_working_day,
+      true,
+      "Saturday Aug 29 2026 (#5 Saturday) must resolve as working day",
+    );
+
+    const satSep05 = await client.query(
+      `SELECT * FROM public.resolve_company_workday('2026-09-05'::date)`,
+    );
+    assert.equal(
+      satSep05.rows[0].is_working_day,
+      true,
+      "Saturday Sep 05 2026 (#1 Saturday) must resolve as working day (monthly reset)",
+    );
+
+    const satSep12 = await client.query(
+      `SELECT * FROM public.resolve_company_workday('2026-09-12'::date)`,
+    );
+    assert.equal(
+      satSep12.rows[0].is_working_day,
+      false,
+      "Saturday Sep 12 2026 (#2 Saturday) must resolve as OFF",
+    );
+
+    // 3B. Compensation History Versioning
+    const compHistory = await client.query(
+      `INSERT INTO public.employee_compensation_history (
+         user_id, base_salary, allowances, effective_from, payroll_eligible, created_by_user_id
+       ) VALUES ($1, 25000000, 2000000, '2026-08-01', true, $2)
+       RETURNING id, base_salary, allowances, effective_from`,
+      [seed.employeeId, ADMIN_ID],
+    );
+    assert.equal(compHistory.rowCount, 1);
+    assert.equal(String(compHistory.rows[0].base_salary), "25000000.00");
+
+    const effectiveComp = await client.query(
+      `SELECT * FROM public.get_effective_employee_compensation($1, '2026-08-15'::date)`,
+      [seed.employeeId],
+    );
+    assert.equal(effectiveComp.rowCount, 1);
+    assert.equal(String(effectiveComp.rows[0].base_salary), "25000000.00");
+
+    // 3C. Monthly Reviews
+    const monthlyReview = await client.query(
+      `INSERT INTO public.employee_monthly_payroll_reviews (
+         user_id, period_month, discipline_bonus_eligible, early_leave_makeup_confirmed
+       ) VALUES ($1, '2026-08', true, true)
+       RETURNING id, discipline_bonus_eligible`,
+      [seed.employeeId],
+    );
+    assert.equal(monthlyReview.rowCount, 1);
+    assert.equal(monthlyReview.rows[0].discipline_bonus_eligible, true);
+
     const payrollRun = await client.query(
       `INSERT INTO public.payroll_runs (
          period_month, period_start_date, period_end_date, title, total_gross_amount, total_net_amount
@@ -860,18 +1024,23 @@ async function runReleaseSmoke(client, seed) {
 
     const payslip = await client.query(
       `INSERT INTO public.payslips (
-         payroll_run_id, user_id, employee_profile_id, base_salary, gross_salary, net_salary
-       ) VALUES ($1, $2, $2, 20000000, 20000000, 18500000)
-       RETURNING id, payslip_code, payroll_run_code, user_code`,
+         payroll_run_id, user_id, employee_profile_id, base_salary, gross_salary, net_salary,
+         attendance_penalty_amount, attendance_bonus_amount, late_occurrences, late_minutes,
+         absence_days, attendance_bonus_eligible
+       ) VALUES ($1, $2, $2, 20000000, 20250000, 18750000, 0, 250000, 1, 3, 0, true)
+       RETURNING id, payslip_code, payroll_run_code, user_code, attendance_bonus_amount, attendance_bonus_eligible`,
       [payrollRun.rows[0].id, seed.employeeId],
     );
     assert.match(payslip.rows[0].payslip_code, /^PL_[0-9]+$/u);
     assert.equal(payslip.rows[0].payroll_run_code, payrollRun.rows[0].run_code);
+    assert.equal(String(payslip.rows[0].attendance_bonus_amount), "250000.00");
+    assert.equal(payslip.rows[0].attendance_bonus_eligible, true);
 
     const compensation = await client.query(
       `INSERT INTO public.employee_compensation_settings (
          user_id, base_salary, allowances, updated_by_user_id
        ) VALUES ($1, 20000000, 500000, $2)
+       ON CONFLICT (user_id) DO UPDATE SET base_salary = 20000000
        RETURNING user_id, base_salary, allowances`,
       [seed.employeeId, ADMIN_ID],
     );

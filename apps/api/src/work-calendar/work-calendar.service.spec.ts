@@ -76,17 +76,17 @@ describe('WorkCalendarService', () => {
     jest.clearAllMocks();
   });
 
-  // Test 1: 2026-08-22 -> false -> alternate Saturday off
-  it('1. should resolve 2026-08-22 as alternate Saturday off (is_working_day: false)', async () => {
+  // Test 1: 2026-08-22 -> false -> Saturday #4 off
+  it('1. should resolve 2026-08-22 as Saturday #4 off (is_working_day: false)', async () => {
     const client = supabaseMock.getSystemClient();
     client.rpc.mockResolvedValueOnce({
       data: [
         {
           work_date: '2026-08-22',
           is_working_day: false,
-          reason: 'alternate_saturday',
+          reason: 'monthly_alternating_saturday',
           event_type: null,
-          event_title: 'Nghỉ thứ 7 cách tuần',
+          event_title: 'Nghỉ thứ 7 theo lịch PGS',
           source_type: 'system',
         },
       ],
@@ -96,20 +96,20 @@ describe('WorkCalendarService', () => {
     const res = await service.resolveDay('2026-08-22');
     expect(res.date).toBe('2026-08-22');
     expect(res.isWorkingDay).toBe(false);
-    expect(res.reason).toBe('alternate_saturday');
+    expect(res.reason).toBe('monthly_alternating_saturday');
   });
 
-  // Test 2: 2026-08-29 -> true -> alternate Saturday working
-  it('2. should resolve 2026-08-29 as working Saturday (is_working_day: true)', async () => {
+  // Test 2: 2026-08-29 -> true -> Saturday #5 working
+  it('2. should resolve 2026-08-29 as Saturday #5 working (is_working_day: true)', async () => {
     const client = supabaseMock.getSystemClient();
     client.rpc.mockResolvedValueOnce({
       data: [
         {
           work_date: '2026-08-29',
           is_working_day: true,
-          reason: 'alternate_saturday',
+          reason: 'monthly_alternating_saturday',
           event_type: null,
-          event_title: 'Thứ 7 đi làm theo lịch cách tuần',
+          event_title: 'Thứ 7 làm việc theo lịch PGS',
           source_type: 'system',
         },
       ],
@@ -119,20 +119,20 @@ describe('WorkCalendarService', () => {
     const res = await service.resolveDay('2026-08-29');
     expect(res.date).toBe('2026-08-29');
     expect(res.isWorkingDay).toBe(true);
-    expect(res.reason).toBe('alternate_saturday');
+    expect(res.reason).toBe('monthly_alternating_saturday');
   });
 
-  // Test 3: 2026-09-05 -> false -> alternate Saturday off
-  it('3. should resolve 2026-09-05 as alternate Saturday off (is_working_day: false)', async () => {
+  // Test 3: 2026-09-05 -> true -> Saturday #1 working (Cross-month reset)
+  it('3. should resolve 2026-09-05 as Saturday #1 working with monthly reset (is_working_day: true)', async () => {
     const client = supabaseMock.getSystemClient();
     client.rpc.mockResolvedValueOnce({
       data: [
         {
           work_date: '2026-09-05',
-          is_working_day: false,
-          reason: 'alternate_saturday',
+          is_working_day: true,
+          reason: 'monthly_alternating_saturday',
           event_type: null,
-          event_title: 'Nghỉ thứ 7 cách tuần',
+          event_title: 'Thứ 7 làm việc theo lịch PGS',
           source_type: 'system',
         },
       ],
@@ -141,8 +141,8 @@ describe('WorkCalendarService', () => {
 
     const res = await service.resolveDay('2026-09-05');
     expect(res.date).toBe('2026-09-05');
-    expect(res.isWorkingDay).toBe(false);
-    expect(res.reason).toBe('alternate_saturday');
+    expect(res.isWorkingDay).toBe(true);
+    expect(res.reason).toBe('monthly_alternating_saturday');
   });
 
   // Test 4: weekday T2-T6 -> working

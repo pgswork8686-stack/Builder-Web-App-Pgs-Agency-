@@ -6,7 +6,7 @@ export const GeneratePayrollRunSchema = z
       .string()
       .regex(/^\d{4}-\d{2}$/, 'Tháng tính lương phải theo định dạng YYYY-MM.'),
     title: z.string().trim().min(3).max(200),
-    standardWorkingDays: z.number().int().min(15).max(31).default(22),
+    standardWorkingDays: z.number().int().min(15).max(31).optional(),
   })
   .strict();
 
@@ -18,17 +18,55 @@ const PayrollAmountSchema = z
   .int('Số tiền lương phải là số nguyên VND.')
   .max(9_999_999_999_999, 'Số tiền lương vượt quá giới hạn cho phép.');
 
+const FirstDayOfMonthDateSchema = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-01$/,
+    'Ngày hiệu lực phải là ngày đầu tiên của tháng (định dạng YYYY-MM-01).',
+  );
+
+export const CreateCompensationRevisionSchema = z
+  .object({
+    baseSalary: PayrollAmountSchema.positive(
+      'Lương cơ bản phải lớn hơn 0 VND.',
+    ),
+    allowances: PayrollAmountSchema.min(0, 'Phụ cấp không được âm.').default(0),
+    effectiveFrom: FirstDayOfMonthDateSchema,
+    payrollEligible: z.boolean().default(true),
+    notes: z.string().trim().max(1000).optional().nullable(),
+  })
+  .strict();
+
+export type CreateCompensationRevisionDto = z.infer<
+  typeof CreateCompensationRevisionSchema
+>;
+
 export const UpsertEmployeeCompensationSchema = z
   .object({
     baseSalary: PayrollAmountSchema.positive(
       'Lương cơ bản phải lớn hơn 0 VND.',
     ),
-    allowances: PayrollAmountSchema.min(0, 'Phụ cấp không được âm.'),
+    allowances: PayrollAmountSchema.min(0, 'Phụ cấp không được âm.').default(0),
+    effectiveFrom: FirstDayOfMonthDateSchema.optional(),
+    payrollEligible: z.boolean().optional(),
+    notes: z.string().trim().max(1000).optional().nullable(),
   })
   .strict();
 
 export type UpsertEmployeeCompensationDto = z.infer<
   typeof UpsertEmployeeCompensationSchema
+>;
+
+export const UpsertMonthlyPayrollReviewSchema = z
+  .object({
+    disciplineBonusEligible: z.boolean().default(true),
+    earlyLeaveMakeupConfirmed: z.boolean().default(true),
+    notes: z.string().trim().max(1000).optional().nullable(),
+  })
+  .strict();
+
+export type UpsertMonthlyPayrollReviewDto = z.infer<
+  typeof UpsertMonthlyPayrollReviewSchema
 >;
 
 export const UpdatePayslipAdjustmentSchema = z

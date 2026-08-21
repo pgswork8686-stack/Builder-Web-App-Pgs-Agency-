@@ -217,6 +217,8 @@ export class WorkCalendarService implements OnModuleInit, OnModuleDestroy {
     if (dto.timezone !== undefined) updatePayload.timezone = dto.timezone;
     if (dto.weekdayWorkingDays !== undefined)
       updatePayload.weekday_working_days = dto.weekdayWorkingDays;
+    if (dto.saturdayScheduleMode !== undefined)
+      updatePayload.saturday_schedule_mode = dto.saturdayScheduleMode;
     if (dto.alternateSaturdayEnabled !== undefined)
       updatePayload.alternate_saturday_enabled = dto.alternateSaturdayEnabled;
     if (dto.alternateSaturdayAnchorDate !== undefined)
