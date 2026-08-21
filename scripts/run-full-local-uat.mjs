@@ -673,10 +673,170 @@ async function runRealApplicationUAT() {
   // ==========================================
   // 7. PAYROLL REAL API LIFECYCLE & CONCURRENCY
   // ==========================================
-  console.log("\n--- [TEST] 7. PAYROLL API LIFECYCLE, INTEGRITY & CONCURRENCY ---");
+  console.log(
+    "\n--- [TEST] 7. PAYROLL API LIFECYCLE, INTEGRITY & CONCURRENCY ---",
+  );
   await db.query(
     `DELETE FROM public.payroll_runs WHERE period_month IN ('2026-08', '2026-09')`,
   );
+  // 7A. Test Work Calendar Saturday Schedule API
+  const satAug29Res = await api(
+    "GET",
+    "/work-calendar?from=2026-08-29&to=2026-08-29",
+    tokens.employee,
+  );
+  assert.equal(satAug29Res.status, 200);
+  assert.equal(
+    satAug29Res.data.days?.[0]?.isWorkingDay,
+    true,
+    "Saturday Aug 29 2026 (#5 Saturday) must resolve as working day",
+  );
+
+  const satSep05Res = await api(
+    "GET",
+    "/work-calendar?from=2026-09-05&to=2026-09-05",
+    tokens.employee,
+  );
+  assert.equal(satSep05Res.status, 200);
+  assert.equal(
+    satSep05Res.data.days?.[0]?.isWorkingDay,
+    true,
+    "Saturday Sep 05 2026 (#1 Saturday) must resolve as working day",
+  );
+  console.log("✓ Work Calendar Saturday monthly reset resolved via API: PASS");
+
+  // 7B. Test Compensation History & Revisions API
+  const compList = await api(
+    "GET",
+    "/payroll/compensations",
+    tokens.accountant,
+  );
+  assert.equal(compList.status, 200);
+  assert(
+    compList.data.items?.length > 0,
+    "Compensation list must return active employees",
+  );
+
+  const revRes = await api(
+    "POST",
+    `/payroll/compensations/${USERS.employee.id}/revisions`,
+    tokens.accountant,
+    {
+      baseSalary: 23000000,
+      allowances: 1500000,
+      effectiveFrom: "2026-08-01",
+      payrollEligible: true,
+      notes: "UAT salary revision",
+    },
+  );
+  assert.equal(
+    revRes.status,
+    201,
+    "Creating compensation revision must succeed",
+  );
+
+  const duplicateRevision = await api(
+    "POST",
+    `/payroll/compensations/${USERS.employee.id}/revisions`,
+    tokens.accountant,
+    {
+      baseSalary: 99000000,
+      allowances: 0,
+      effectiveFrom: "2026-08-01",
+      payrollEligible: false,
+      notes: "Must not overwrite the first revision",
+    },
+  );
+  assert.equal(
+    duplicateRevision.status,
+    409,
+    "Duplicate salary revision must return 409",
+  );
+  assert.equal(
+    duplicateRevision.data.code,
+    "PAYROLL_COMPENSATION_REVISION_EXISTS",
+    "Duplicate salary revision must return the deterministic conflict code",
+  );
+
+  const persistedRevision = await db.query(
+    `
+      SELECT base_salary, allowances, payroll_eligible, notes
+      FROM public.employee_compensation_history
+      WHERE user_id = $1::uuid
+        AND effective_from = '2026-08-01'::date
+    `,
+    [USERS.employee.id],
+  );
+  assert.equal(
+    persistedRevision.rowCount,
+    1,
+    "Exactly one salary revision must exist for the effective date",
+  );
+  assert.equal(String(persistedRevision.rows[0].base_salary), "23000000.00");
+  assert.equal(String(persistedRevision.rows[0].allowances), "1500000.00");
+  assert.equal(persistedRevision.rows[0].payroll_eligible, true);
+  assert.equal(persistedRevision.rows[0].notes, "UAT salary revision");
+
+  const historyBeforeMissingEffectiveDate = await db.query(
+    `SELECT count(*)::int AS count FROM public.employee_compensation_history WHERE user_id = $1::uuid`,
+    [USERS.employee.id],
+  );
+  const missingEffectiveDate = await api(
+    "PUT",
+    `/payroll/compensations/${USERS.employee.id}`,
+    tokens.accountant,
+    {
+      baseSalary: 27000000,
+      allowances: 500000,
+      payrollEligible: true,
+    },
+  );
+  assert.equal(
+    missingEffectiveDate.status,
+    400,
+    "Legacy PUT must require effectiveFrom",
+  );
+  const historyAfterMissingEffectiveDate = await db.query(
+    `SELECT count(*)::int AS count FROM public.employee_compensation_history WHERE user_id = $1::uuid`,
+    [USERS.employee.id],
+  );
+  assert.equal(
+    historyAfterMissingEffectiveDate.rows[0].count,
+    historyBeforeMissingEffectiveDate.rows[0].count,
+    "Missing effectiveFrom must not write compensation history",
+  );
+
+  const histRes = await api(
+    "GET",
+    `/payroll/compensations/${USERS.employee.id}/history`,
+    tokens.accountant,
+  );
+  assert.equal(histRes.status, 200);
+  assert(
+    histRes.data.history?.length >= 1,
+    "Must return compensation version history",
+  );
+  console.log(
+    "✓ Compensation history is append-only and requires an explicit effective date: PASS",
+  );
+
+  // 7C. Test Monthly Reviews API
+  const revUpdateRes = await api(
+    "PUT",
+    `/payroll/monthly-reviews/${USERS.employee.id}?periodMonth=2026-08`,
+    tokens.accountant,
+    {
+      disciplineBonusEligible: true,
+      earlyLeaveMakeupConfirmed: true,
+    },
+  );
+  assert.equal(
+    revUpdateRes.status,
+    200,
+    "Updating monthly review must succeed",
+  );
+  console.log("✓ Monthly discipline & compliance review API: PASS");
+
   const payGen = await api(
     "POST",
     "/payroll/runs/generate",
@@ -684,15 +844,30 @@ async function runRealApplicationUAT() {
     {
       periodMonth: "2026-08",
       title: "Bảng lương kỳ tháng 08/2026 API UAT",
-      standardWorkingDays: 22,
     },
   );
   assert.equal(payGen.status, 201);
   const runId = payGen.data.id;
-  assert(payGen.data.total_employees_count > 0, "Payroll run must calculate active employees");
+  assert(
+    payGen.data.total_employees_count > 0,
+    "Payroll run must calculate active employees",
+  );
   assert(payGen.data.payslips?.length > 0, "Payroll run must contain payslips");
-  assert(Number(payGen.data.total_net_amount) > 0, "Payroll total net amount must be positive");
-  console.log(`✓ Accountant generated Payroll Run via API: ID=${runId}, Employees=${payGen.data.total_employees_count}, NetTotal=${payGen.data.total_net_amount}`);
+  assert(
+    Number(payGen.data.total_net_amount) > 0,
+    "Payroll total net amount must be positive",
+  );
+  const empSlip = payGen.data.payslips.find(
+    (p) => p.user_id === USERS.employee.id,
+  );
+  assert.ok(empSlip, "Must calculate payslip for employee");
+  assert(
+    empSlip.standard_working_days > 0,
+    "Standard working days must be dynamically calculated from calendar",
+  );
+  console.log(
+    `✓ Accountant generated Payroll Run via API: ID=${runId}, StandardDays=${empSlip.standard_working_days}, Employees=${payGen.data.total_employees_count}, NetTotal=${payGen.data.total_net_amount}`,
+  );
 
   // Duplicate same-period creation must be rejected
   const payGenDuplicate = await api(
@@ -702,11 +877,16 @@ async function runRealApplicationUAT() {
     {
       periodMonth: "2026-08",
       title: "Bảng lương kỳ tháng 08/2026 Duplicate Test",
-      standardWorkingDays: 22,
     },
   );
-  assert.equal(payGenDuplicate.status, 409, "Duplicate payroll period must be denied with 409 Conflict");
-  console.log("✓ Duplicate same-period payroll creation denied (409 Conflict): PASS");
+  assert.equal(
+    payGenDuplicate.status,
+    409,
+    "Duplicate payroll period must be denied with 409 Conflict",
+  );
+  console.log(
+    "✓ Duplicate same-period payroll creation denied (409 Conflict): PASS",
+  );
 
   // Concurrent creation for same period must result in exactly one run in DB
   const concurrentPeriod = "2026-09";
@@ -714,31 +894,43 @@ async function runRealApplicationUAT() {
     api("POST", "/payroll/runs/generate", tokens.accountant, {
       periodMonth: concurrentPeriod,
       title: "Bảng lương kỳ tháng 09/2026 Concurrency Test A",
-      standardWorkingDays: 22,
     }),
     api("POST", "/payroll/runs/generate", tokens.accountant, {
       periodMonth: concurrentPeriod,
       title: "Bảng lương kỳ tháng 09/2026 Concurrency Test B",
-      standardWorkingDays: 22,
     }),
   ]);
-  const concurrentStatuses = [concurrentRes1.status, concurrentRes2.status].sort();
+  const concurrentStatuses = [
+    concurrentRes1.status,
+    concurrentRes2.status,
+  ].sort();
   assert.deepEqual(
     concurrentStatuses,
     [201, 409],
     "Concurrent same-period generation must yield exactly one 201 and one 409",
   );
-  console.log("✓ Concurrent same-period creation handled atomically (1 Created, 1 Conflict): PASS");
+  console.log(
+    "✓ Concurrent same-period creation handled atomically (1 Created, 1 Conflict): PASS",
+  );
 
   // Attempt pay on unapproved run (2026-09 is in 'calculated' status)
-  const concurrentRunId = concurrentRes1.status === 201 ? concurrentRes1.data.id : concurrentRes2.data.id;
+  const concurrentRunId =
+    concurrentRes1.status === 201
+      ? concurrentRes1.data.id
+      : concurrentRes2.data.id;
   const payUnapproved = await api(
     "POST",
     `/payroll/runs/${concurrentRunId}/pay`,
     tokens.accountant,
   );
-  assert.equal(payUnapproved.status, 400, "Paying an unapproved payroll run must be rejected");
-  console.log("✓ Paying unapproved payroll run rejected (400 Bad Request): PASS");
+  assert.equal(
+    payUnapproved.status,
+    400,
+    "Paying an unapproved payroll run must be rejected",
+  );
+  console.log(
+    "✓ Paying unapproved payroll run rejected (400 Bad Request): PASS",
+  );
 
   // Approve valid payroll run
   const payApprove = await api(
@@ -757,8 +949,14 @@ async function runRealApplicationUAT() {
     `/payroll/runs/${runId}/approve`,
     tokens.accountant,
   );
-  assert.equal(payApproveAgain.status, 400, "Approving an already approved run must be rejected");
-  console.log("✓ Re-approving already approved run rejected (400 Bad Request): PASS");
+  assert.equal(
+    payApproveAgain.status,
+    400,
+    "Approving an already approved run must be rejected",
+  );
+  console.log(
+    "✓ Re-approving already approved run rejected (400 Bad Request): PASS",
+  );
 
   // Pay approved payroll run
   const payPaid = await api(
@@ -772,10 +970,19 @@ async function runRealApplicationUAT() {
   console.log("✓ Accountant marked Payroll Run paid via API: PASS");
 
   // Verify all payslips in the run are marked paid
-  const runDetail = await api("GET", `/payroll/runs/${runId}`, tokens.accountant);
+  const runDetail = await api(
+    "GET",
+    `/payroll/runs/${runId}`,
+    tokens.accountant,
+  );
   assert.equal(runDetail.status, 200);
-  assert(runDetail.data.payslips.every((ps) => ps.payment_status === "paid"), "All payslips must be marked paid");
-  console.log(`✓ All ${runDetail.data.payslips.length} payslips atomically transitioned to paid: PASS`);
+  assert(
+    runDetail.data.payslips.every((ps) => ps.payment_status === "paid"),
+    "All payslips must be marked paid",
+  );
+  console.log(
+    `✓ All ${runDetail.data.payslips.length} payslips atomically transitioned to paid: PASS`,
+  );
 
   // Second pay attempt must be rejected
   const payPaidAgain = await api(
@@ -783,13 +990,20 @@ async function runRealApplicationUAT() {
     `/payroll/runs/${runId}/pay`,
     tokens.accountant,
   );
-  assert.equal(payPaidAgain.status, 400, "Paying an already paid run must be rejected");
+  assert.equal(
+    payPaidAgain.status,
+    400,
+    "Paying an already paid run must be rejected",
+  );
   console.log("✓ Re-paying already paid run rejected (400 Bad Request): PASS");
 
   // Employee queries own payslips
   const empPayslip = await api("GET", "/payroll/me/payslips", tokens.employee);
   assert.equal(empPayslip.status, 200);
-  assert(empPayslip.data.length > 0, "Employee must receive their own payslips");
+  assert(
+    empPayslip.data.length > 0,
+    "Employee must receive their own payslips",
+  );
   assert(
     empPayslip.data.every((ps) => ps.user_id === LOCAL_UAT.users.employee.id),
     "Employee must strictly see only their own payslips",
@@ -800,13 +1014,33 @@ async function runRealApplicationUAT() {
 
   // RBAC checks
   const employeeRunsDenied = await api("GET", "/payroll/runs", tokens.employee);
-  assert.equal(employeeRunsDenied.status, 403, "Employee must NOT access payroll runs list");
+  assert.equal(
+    employeeRunsDenied.status,
+    403,
+    "Employee must NOT access payroll runs list",
+  );
   const leaderRunsDenied = await api("GET", "/payroll/runs", tokens.leader);
-  assert.equal(leaderRunsDenied.status, 403, "Team leader must NOT access payroll runs list");
+  assert.equal(
+    leaderRunsDenied.status,
+    403,
+    "Team leader must NOT access payroll runs list",
+  );
   const clientPayDenied = await api("GET", "/payroll/runs", tokens.client);
-  assert.equal(clientPayDenied.status, 403, "Client must NOT access payroll runs");
-  const clientPayslipDenied = await api("GET", "/payroll/me/payslips", tokens.client);
-  assert.equal(clientPayslipDenied.status, 403, "Client must NOT access personal payslips");
+  assert.equal(
+    clientPayDenied.status,
+    403,
+    "Client must NOT access payroll runs",
+  );
+  const clientPayslipDenied = await api(
+    "GET",
+    "/payroll/me/payslips",
+    tokens.client,
+  );
+  assert.equal(
+    clientPayslipDenied.status,
+    403,
+    "Client must NOT access personal payslips",
+  );
   console.log("✓ Unauthorized roles denied payroll access (403): PASS");
 
   // ==========================================
@@ -903,6 +1137,9 @@ async function runRealApplicationUAT() {
     "system_settings",
     "company_work_calendar_settings",
     "company_work_calendar_events",
+    "employee_compensation_settings",
+    "employee_compensation_history",
+    "employee_monthly_payroll_reviews",
   ];
 
   for (const role of ["anon", "authenticated"]) {

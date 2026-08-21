@@ -167,7 +167,11 @@ describe("WorkflowBuilder", () => {
 
     render(<WorkflowBuilder />);
     await selectService();
-    fireEvent.change(screen.getByLabelText("Workflow Name"), {
+    const nameInput = screen.getByLabelText("Workflow Name");
+    await waitFor(() =>
+      expect((nameInput as HTMLInputElement).value).toBe("Delivery Workflow"),
+    );
+    fireEvent.change(nameInput, {
       target: { value: " Updated Delivery Workflow " },
     });
     fireEvent.change(screen.getByLabelText("Workflow Description"), {

@@ -41,6 +41,14 @@ export const UpdateWorkCalendarSettingsSchema = z
       .array(z.number().int().min(1).max(7))
       .min(1)
       .optional(),
+    saturdayScheduleMode: z
+      .enum([
+        'monthly_alternating_reset',
+        'anchor_alternating',
+        'all_working',
+        'all_off',
+      ])
+      .optional(),
     alternateSaturdayEnabled: z.boolean().optional(),
     alternateSaturdayAnchorDate: IsoDateSchema.nullable().optional(),
     alternateSaturdayAnchorIsWorking: z.boolean().optional(),

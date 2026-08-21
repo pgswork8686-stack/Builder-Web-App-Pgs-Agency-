@@ -18,9 +18,11 @@ import type { RequestUser } from '../auth/auth.types';
 import { Roles } from '../auth/roles.decorator';
 import { PayrollService } from './payroll.service';
 import {
+  CreateCompensationRevisionSchema,
   GeneratePayrollRunSchema,
   PayrollRunQuerySchema,
   UpsertEmployeeCompensationSchema,
+  UpsertMonthlyPayrollReviewSchema,
 } from './dto/payroll.dto';
 
 @Controller('payroll')
@@ -55,6 +57,36 @@ export class PayrollController {
     return this.payrollService.listEmployeeCompensations(user);
   }
 
+  @Get('compensations/:userId/history')
+  @Roles('admin', 'accountant')
+  async getCompensationHistory(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.payrollService.getEmployeeCompensationHistory(userId, user);
+  }
+
+  @Post('compensations/:userId/revisions')
+  @Roles('admin', 'accountant')
+  async createCompensationRevision(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = CreateCompensationRevisionSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+
+    return this.payrollService.createEmployeeCompensationRevision(
+      userId,
+      result.data,
+      user,
+    );
+  }
+
   @Put('compensations/:userId')
   @Roles('admin', 'accountant')
   async upsertCompensation(
@@ -71,6 +103,44 @@ export class PayrollController {
 
     return this.payrollService.upsertEmployeeCompensation(
       userId,
+      result.data,
+      user,
+    );
+  }
+
+  @Get('monthly-reviews')
+  @Roles('admin', 'accountant')
+  async listMonthlyReviews(
+    @Query('periodMonth') periodMonth: string,
+    @CurrentUser() user: RequestUser,
+  ) {
+    if (!periodMonth || !/^\d{4}-\d{2}$/.test(periodMonth)) {
+      throw new BadRequestException('periodMonth phải theo định dạng YYYY-MM.');
+    }
+    return this.payrollService.listMonthlyPayrollReviews(periodMonth, user);
+  }
+
+  @Put('monthly-reviews/:userId')
+  @Roles('admin', 'accountant')
+  async upsertMonthlyReview(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Query('periodMonth') periodMonth: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    if (!periodMonth || !/^\d{4}-\d{2}$/.test(periodMonth)) {
+      throw new BadRequestException('periodMonth phải theo định dạng YYYY-MM.');
+    }
+    const result = UpsertMonthlyPayrollReviewSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((e) => e.message).join(', '),
+      );
+    }
+
+    return this.payrollService.upsertMonthlyPayrollReview(
+      userId,
+      periodMonth,
       result.data,
       user,
     );

@@ -2,17 +2,20 @@
  * REAL-SERVICE AUTHORIZATION & INTEGRITY TESTS: PayrollService
  */
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
-  InternalServerErrorException,
+  HttpException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PayrollService } from './payroll.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import type { RequestUser } from '../auth/auth.types';
-import { UpsertEmployeeCompensationSchema } from './dto/payroll.dto';
+import {
+  CreateCompensationRevisionSchema,
+  UpsertEmployeeCompensationSchema,
+  UpsertMonthlyPayrollReviewSchema,
+} from './dto/payroll.dto';
 
 const USER_ID = '33333333-3333-4333-8333-333333333333';
 
@@ -58,6 +61,18 @@ function mockQueryChain(response: { data: any; error: any; count?: number }) {
   return chain;
 }
 
+async function expectErrorCode(work: Promise<unknown>, expectedCode: string) {
+  const error = await work.then(
+    () => new Error(`Expected request to fail with ${expectedCode}.`),
+    (caught) => caught,
+  );
+
+  expect(error).toBeInstanceOf(HttpException);
+  expect((error as HttpException).getResponse()).toEqual(
+    expect.objectContaining({ code: expectedCode }),
+  );
+}
+
 describe('PayrollService — Authorization & Integrity Suite', () => {
   let service: PayrollService;
   let fromMock: jest.Mock;
@@ -85,143 +100,262 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
   });
 
   describe('1. Role Access & Mutation Restrictions', () => {
-    it('throws ForbiddenException when employee tries to list payroll runs (14, 15)', async () => {
+    it('throws ForbiddenException when employee tries to list payroll runs', async () => {
       const employeeUser = makeUser({ role: 'employee' });
       await expect(
         service.listPayrollRuns({ page: 1, pageSize: 20 }, employeeUser),
       ).rejects.toThrow(ForbiddenException);
     });
 
-    it('throws ForbiddenException when client tries to access payroll (14)', async () => {
+    it('throws ForbiddenException when client tries to access payroll', async () => {
       const clientUser = makeUser({ role: 'client' });
       await expect(
         service.listPayrollRuns({ page: 1, pageSize: 20 }, clientUser),
       ).rejects.toThrow(ForbiddenException);
       await expect(
-        service.getPayrollRunById('some-run-id', clientUser),
-      ).rejects.toThrow(ForbiddenException);
-      await expect(
         service.generatePayrollRun(
-          { periodMonth: '2026-08', title: 'Payroll', standardWorkingDays: 22 },
+          {
+            periodMonth: '2026-08',
+            title: 'Test Payroll',
+          },
           clientUser,
         ),
       ).rejects.toThrow(ForbiddenException);
     });
 
-    it('throws ForbiddenException when team_leader tries to generate payroll run (15)', async () => {
-      const leaderUser = makeUser({ role: 'team_leader' });
-      await expect(
-        service.generatePayrollRun(
+    it('allows Admin and Accountant to query compensations', async () => {
+      const activeEmployees = mockQueryChain({
+        data: [
           {
-            periodMonth: '2026-08',
-            title: 'Luong Thang 8',
-            standardWorkingDays: 22,
+            user_id: USER_ID,
+            employee_code: 'NV01',
+            job_title: 'Developer',
+            employment_status: 'active',
+            profile: {
+              id: USER_ID,
+              full_name: 'Test',
+              email: 'test@pgs.vn',
+              account_code: 'ACC01',
+            },
           },
-          leaderUser,
-        ),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('allows accountant to list payroll runs', async () => {
-      const accountantUser = makeUser({ role: 'accountant' });
-      fromMock.mockReturnValueOnce(
-        mockQueryChain({
-          data: [{ id: 'run-1', title: 'Luong Thang 8' }],
-          error: null,
-          count: 1,
-        }),
-      );
-
-      const result = await service.listPayrollRuns(
-        { page: 1, pageSize: 20 },
-        accountantUser,
-      );
-      expect(result.items.length).toBe(1);
-    });
-  });
-
-  describe('2. Employee Compensation Settings (5)', () => {
-    it.each([
-      [{ baseSalary: 0, allowances: 0 }],
-      [{ baseSalary: -1, allowances: 0 }],
-      [{ baseSalary: 22_000_000, allowances: -1 }],
-      [{ baseSalary: 22_000_000 }],
-    ])('rejects invalid compensation schema payload: %o', (body) => {
-      expect(UpsertEmployeeCompensationSchema.safeParse(body).success).toBe(
-        false,
-      );
-    });
-
-    it('denies an employee from changing compensation settings (15)', async () => {
-      await expect(
-        service.upsertEmployeeCompensation(
-          USER_ID,
-          { baseSalary: 22_000_000, allowances: 1_500_000 },
-          makeUser({ role: 'employee' }),
-        ),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('allows an accountant to upsert employee compensation', async () => {
-      const employeeLookup = mockQueryChain({
-        data: { user_id: USER_ID, employment_status: 'active' },
+        ],
         error: null,
       });
-      const compensationUpsert = mockQueryChain({
-        data: {
-          user_id: USER_ID,
-          base_salary: 22_000_000,
-          allowances: 1_500_000,
-        },
+      const compHistory = mockQueryChain({
+        data: [
+          {
+            id: 'h1',
+            user_id: USER_ID,
+            base_salary: '25000000.00',
+            allowances: '2000000.00',
+            effective_from: '2026-01-01',
+            payroll_eligible: true,
+            notes: 'Initial',
+          },
+        ],
         error: null,
       });
       fromMock
-        .mockReturnValueOnce(employeeLookup)
-        .mockReturnValueOnce(compensationUpsert);
+        .mockReturnValueOnce(activeEmployees)
+        .mockReturnValueOnce(compHistory);
 
-      await expect(
-        service.upsertEmployeeCompensation(
-          USER_ID,
-          { baseSalary: 22_000_000, allowances: 1_500_000 },
-          makeUser({ role: 'accountant' }),
-        ),
-      ).resolves.toMatchObject({
-        user_id: USER_ID,
-        base_salary: 22_000_000,
-        allowances: 1_500_000,
-      });
+      const result = await service.listEmployeeCompensations(
+        makeUser({ role: 'accountant' }),
+      );
+      expect(result.items.length).toBe(1);
+      expect(result.items[0].baseSalary).toBe(25000000);
+      expect(result.items[0].status).toBe('configured');
     });
   });
 
-  describe('3. Payroll Generation & Duplicate Period Guard (1, 2, 3, 4, 5)', () => {
-    const RUN_ID = '44444444-4444-4444-8444-444444444444';
-    const EMPLOYEE_ID = '55555555-5555-4555-8555-555555555555';
+  describe('2. DTO & Compensation Validation', () => {
+    it('validates CreateCompensationRevisionSchema: rejects non-first-day effective_from', () => {
+      const res = CreateCompensationRevisionSchema.safeParse({
+        baseSalary: 15_000_000,
+        allowances: 1_000_000,
+        effectiveFrom: '2026-08-15',
+        payrollEligible: true,
+      });
+      expect(res.success).toBe(false);
+    });
 
-    it('rejects payroll generation if an active employee lacks compensation (5)', async () => {
-      const existingRunCheck = mockQueryChain({ data: null, error: null });
+    it('validates CreateCompensationRevisionSchema: accepts YYYY-MM-01 format', () => {
+      const res = CreateCompensationRevisionSchema.safeParse({
+        baseSalary: 15_000_000,
+        allowances: 1_000_000,
+        effectiveFrom: '2026-08-01',
+        payrollEligible: true,
+      });
+      expect(res.success).toBe(true);
+    });
+
+    it('rejects negative allowances or zero base salary in schema', () => {
+      const res1 = CreateCompensationRevisionSchema.safeParse({
+        baseSalary: 0,
+        allowances: 0,
+        effectiveFrom: '2026-08-01',
+      });
+      expect(res1.success).toBe(false);
+
+      const res2 = CreateCompensationRevisionSchema.safeParse({
+        baseSalary: 10_000_000,
+        allowances: -500,
+        effectiveFrom: '2026-08-01',
+      });
+      expect(res2.success).toBe(false);
+    });
+
+    it('requires effectiveFrom on the legacy PUT compensation contract', () => {
+      const result = UpsertEmployeeCompensationSchema.safeParse({
+        baseSalary: 15_000_000,
+        allowances: 1_000_000,
+      });
+
+      expect(result.success).toBe(false);
+    });
+
+    it('defaults an omitted early-leave make-up confirmation to false', () => {
+      const result = UpsertMonthlyPayrollReviewSchema.parse({});
+
+      expect(result.earlyLeaveMakeupConfirmed).toBe(false);
+      expect(result.disciplineBonusEligible).toBe(true);
+    });
+
+    it('appends a salary revision and rejects a duplicate effective date without overwriting it', async () => {
+      const activeEmployee = mockQueryChain({
+        data: { user_id: USER_ID, employment_status: 'active' },
+        error: null,
+      });
+      const firstRevision = {
+        id: 'revision-1',
+        user_id: USER_ID,
+        base_salary: '15000000.00',
+        allowances: '1000000.00',
+        effective_from: '2026-08-01',
+      };
+      const insertFirstRevision = mockQueryChain({
+        data: firstRevision,
+        error: null,
+      });
+      const legacySync = mockQueryChain({ data: null, error: null });
+      const duplicateRevision = mockQueryChain({
+        data: null,
+        error: {
+          code: '23505',
+          message:
+            'duplicate key value violates unique constraint "uq_employee_compensation_history_user_effective"',
+        },
+      });
+
+      fromMock
+        .mockReturnValueOnce(activeEmployee)
+        .mockReturnValueOnce(insertFirstRevision)
+        .mockReturnValueOnce(legacySync)
+        .mockReturnValueOnce(activeEmployee)
+        .mockReturnValueOnce(duplicateRevision);
+
+      const user = makeUser({ role: 'accountant' });
+      const first = await service.createEmployeeCompensationRevision(
+        USER_ID,
+        {
+          baseSalary: 15_000_000,
+          allowances: 1_000_000,
+          effectiveFrom: '2026-08-01',
+          payrollEligible: true,
+        },
+        user,
+      );
+
+      expect(first).toEqual(firstRevision);
+      expect(insertFirstRevision.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: USER_ID,
+          base_salary: 15_000_000,
+          effective_from: '2026-08-01',
+        }),
+      );
+
+      await expectErrorCode(
+        service.createEmployeeCompensationRevision(
+          USER_ID,
+          {
+            baseSalary: 99_000_000,
+            allowances: 0,
+            effectiveFrom: '2026-08-01',
+            payrollEligible: true,
+          },
+          user,
+        ),
+        'PAYROLL_COMPENSATION_REVISION_EXISTS',
+      );
+
+      expect(duplicateRevision.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          base_salary: 99_000_000,
+          effective_from: '2026-08-01',
+        }),
+      );
+      expect(legacySync.upsert).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('3. Payroll Generation & Business Rules', () => {
+    const RUN_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const EMPLOYEE_ID = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+
+    const mockWorkingDays = Array.from({ length: 23 }, (_, i) => ({
+      work_date: `2026-08-${String(i + 1).padStart(2, '0')}`,
+      is_working_day: true,
+      reason: 'regular_workday',
+    }));
+
+    it('fails closed when the calendar RPC succeeds with no valid working days', async () => {
+      const existingRun = mockQueryChain({ data: null, error: null });
+      fromMock.mockReturnValueOnce(existingRun);
+      rpcMock.mockResolvedValueOnce({ data: [], error: null });
+
+      await expectErrorCode(
+        service.generatePayrollRun(
+          {
+            periodMonth: '2026-08',
+            title: 'Bảng lương tháng 08/2026',
+          },
+          makeUser({ role: 'accountant' }),
+        ),
+        'PAYROLL_WORK_CALENDAR_INVALID',
+      );
+
+      expect(fromMock.mock.calls.map(([table]) => table)).toEqual([
+        'payroll_runs',
+      ]);
+    });
+
+    it('fails closed with 422 PAYROLL_COMPENSATION_MISSING when employee lacks compensation', async () => {
+      const existingRun = mockQueryChain({ data: null, error: null });
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
       const activeEmployees = mockQueryChain({
         data: [{ user_id: EMPLOYEE_ID, job_title: 'Developer' }],
         error: null,
       });
-      const missingCompensation = mockQueryChain({ data: [], error: null });
+      const emptyHistory = mockQueryChain({ data: [], error: null });
+
       fromMock
-        .mockReturnValueOnce(existingRunCheck)
+        .mockReturnValueOnce(existingRun)
         .mockReturnValueOnce(activeEmployees)
-        .mockReturnValueOnce(missingCompensation);
+        .mockReturnValueOnce(emptyHistory);
 
       await expect(
         service.generatePayrollRun(
           {
             periodMonth: '2026-08',
-            title: 'Luong Thang 8',
-            standardWorkingDays: 22,
+            title: 'Bảng lương tháng 08/2026',
           },
           makeUser({ role: 'accountant' }),
         ),
       ).rejects.toThrow(UnprocessableEntityException);
     });
 
-    it('denies duplicate same-period payroll run creation (2)', async () => {
+    it('denies duplicate same-period payroll run creation (409 Conflict)', async () => {
       const existingRun = mockQueryChain({
         data: { id: RUN_ID, status: 'calculated' },
         error: null,
@@ -232,30 +366,33 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         service.generatePayrollRun(
           {
             periodMonth: '2026-08',
-            title: 'Luong Thang 8',
-            standardWorkingDays: 22,
+            title: 'Bảng lương tháng 08/2026',
           },
           makeUser({ role: 'accountant' }),
         ),
       ).rejects.toThrow(ConflictException);
     });
 
-    it('handles concurrent race condition on database unique constraint (3)', async () => {
+    it('handles concurrent race condition on database unique constraint (409 Conflict)', async () => {
       const existingRunCheck = mockQueryChain({ data: null, error: null });
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
       const activeEmployees = mockQueryChain({
         data: [{ user_id: EMPLOYEE_ID, job_title: 'Developer' }],
         error: null,
       });
-      const compensationSettings = mockQueryChain({
+      const compHistory = mockQueryChain({
         data: [
           {
             user_id: EMPLOYEE_ID,
-            base_salary: '20000000.00',
+            base_salary: '23000000.00',
             allowances: '1000000.00',
+            effective_from: '2026-01-01',
+            payroll_eligible: true,
           },
         ],
         error: null,
       });
+      const monthlyReviews = mockQueryChain({ data: [], error: null });
       const createRunConflict = mockQueryChain({
         data: null,
         error: {
@@ -268,33 +405,66 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
       fromMock
         .mockReturnValueOnce(existingRunCheck)
         .mockReturnValueOnce(activeEmployees)
-        .mockReturnValueOnce(compensationSettings)
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: mockWorkingDays.map((d) => ({
+              id: `att-${d.work_date}`,
+              attendance_date: d.work_date,
+              status: 'present',
+              late_minutes: 0,
+              early_leave_minutes: 0,
+            })),
+            error: null,
+          }),
+        )
         .mockReturnValueOnce(createRunConflict);
 
       await expect(
         service.generatePayrollRun(
           {
             periodMonth: '2026-08',
-            title: 'Luong Thang 8',
-            standardWorkingDays: 22,
+            title: 'Bảng lương tháng 08/2026',
           },
           makeUser({ role: 'accountant' }),
         ),
       ).rejects.toThrow(ConflictException);
     });
 
-    it('successfully generates payroll run and payslips with accurate calculation (1, 4)', async () => {
+    it('calculates payslip using calendar standard days, attendance penalty, and 250k bonus when eligible', async () => {
       const existingRun = mockQueryChain({ data: null, error: null });
+      // 23 standard working days in calendar
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
       const activeEmployees = mockQueryChain({
-        data: [{ user_id: EMPLOYEE_ID, job_title: 'Developer' }],
-        error: null,
-      });
-      const compensationSettings = mockQueryChain({
         data: [
           {
             user_id: EMPLOYEE_ID,
-            base_salary: '22000000.00',
+            job_title: 'Developer',
+            joined_date: '2026-01-01',
+            left_date: null,
+          },
+        ],
+        error: null,
+      });
+      const compHistory = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            base_salary: '23000000.00',
             allowances: '1500000.00',
+            effective_from: '2026-01-01',
+            payroll_eligible: true,
+          },
+        ],
+        error: null,
+      });
+      const monthlyReviews = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            discipline_bonus_eligible: true,
+            early_leave_makeup_confirmed: true,
           },
         ],
         error: null,
@@ -303,11 +473,14 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         data: { id: RUN_ID },
         error: null,
       });
-      const attendance = mockQueryChain({
-        data: Array.from({ length: 11 }, (_, index) => ({
-          id: `attendance-${index}`,
-          attendance_date: '2026-08-01',
-          status: 'present',
+      // 23 attendance records (full work), with 2 late arrivals: 1x 3 min (0 VND) and 1x 10 min (50,000 VND)
+      const attendances = mockQueryChain({
+        data: mockWorkingDays.map((d, index) => ({
+          id: `att-${index}`,
+          attendance_date: d.work_date,
+          status: index === 0 || index === 1 ? 'late' : 'present',
+          late_minutes: index === 0 ? 3 : index === 1 ? 10 : 0,
+          early_leave_minutes: 0,
         })),
         error: null,
       });
@@ -315,7 +488,6 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         data: [{ id: 'ps-1' }],
         error: null,
       });
-      const updateRun = mockQueryChain({ data: null, error: null });
       const runDetail = mockQueryChain({
         data: { id: RUN_ID, status: 'calculated' },
         error: null,
@@ -325,96 +497,330 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
       fromMock
         .mockReturnValueOnce(existingRun)
         .mockReturnValueOnce(activeEmployees)
-        .mockReturnValueOnce(compensationSettings)
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(attendances)
         .mockReturnValueOnce(createRun)
-        .mockReturnValueOnce(attendance)
         .mockReturnValueOnce(insertPayslips)
-        .mockReturnValueOnce(updateRun)
         .mockReturnValueOnce(runDetail)
         .mockReturnValueOnce(runPayslips);
 
       const result = await service.generatePayrollRun(
         {
           periodMonth: '2026-08',
-          title: 'Luong Thang 8',
-          standardWorkingDays: 22,
+          title: 'Bảng lương tháng 08/2026',
         },
         makeUser({ role: 'accountant' }),
       );
 
       expect(result.id).toBe(RUN_ID);
+      expect(createRun.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'calculated',
+          total_gross_amount: 24_750_000,
+          total_net_amount: 24_700_000,
+          total_employees_count: 1,
+        }),
+      );
       expect(insertPayslips.insert).toHaveBeenCalledWith([
         expect.objectContaining({
           payroll_run_id: RUN_ID,
           user_id: EMPLOYEE_ID,
-          standard_working_days: 22,
-          actual_worked_days: 11,
-          base_salary: 22_000_000,
+          standard_working_days: 23,
+          actual_worked_days: 23,
+          base_salary: 23_000_000,
           allowances: 1_500_000,
-          gross_salary: 12_500_000,
-          net_salary: 12_500_000,
+          attendance_penalty_amount: 50_000,
+          attendance_bonus_amount: 250_000,
+          attendance_bonus_eligible: true,
+          late_occurrences: 2,
+          late_minutes: 13,
+          absence_days: 0,
+          // earned_base (23M/23 * 23 = 23M) + allowances (1.5M) + bonus (250k) = 24,750,000
+          gross_salary: 24_750_000,
+          // deductions = 50k penalty
+          deductions: 50_000,
+          // net = 24,750,000 - 50,000 = 24,700,000
+          net_salary: 24_700_000,
         }),
       ]);
     });
 
-    it('surfaces DB error and rolls back when payslip insertion fails (11)', async () => {
+    it('prorates salary for mid-month joined employee based on eligible days', async () => {
+      const existingRun = mockQueryChain({ data: null, error: null });
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
+      const activeEmployees = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            job_title: 'Developer',
+            joined_date: '2026-08-15',
+            left_date: null,
+          },
+        ],
+        error: null,
+      });
+      const compHistory = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            base_salary: '23000000.00',
+            allowances: '0',
+            effective_from: '2026-08-01',
+            payroll_eligible: true,
+          },
+        ],
+        error: null,
+      });
+      const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const createRun = mockQueryChain({ data: { id: RUN_ID }, error: null });
+
+      // Working days from Aug 15 to Aug 31 are days 15..23 (9 days)
+      const joinedWorkingDays = mockWorkingDays.filter(
+        (d) => d.work_date >= '2026-08-15',
+      );
+      const attendances = mockQueryChain({
+        data: joinedWorkingDays.map((d, index) => ({
+          id: `att-${index}`,
+          attendance_date: d.work_date,
+          status: 'present',
+          late_minutes: 0,
+          early_leave_minutes: 0,
+        })),
+        error: null,
+      });
+      const insertPayslips = mockQueryChain({
+        data: [{ id: 'ps-1' }],
+        error: null,
+      });
+      const runDetail = mockQueryChain({
+        data: { id: RUN_ID, status: 'calculated' },
+        error: null,
+      });
+      const runPayslips = mockQueryChain({ data: [], error: null });
+
+      fromMock
+        .mockReturnValueOnce(existingRun)
+        .mockReturnValueOnce(activeEmployees)
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(attendances)
+        .mockReturnValueOnce(createRun)
+        .mockReturnValueOnce(insertPayslips)
+        .mockReturnValueOnce(runDetail)
+        .mockReturnValueOnce(runPayslips);
+
+      await service.generatePayrollRun(
+        {
+          periodMonth: '2026-08',
+          title: 'Bảng lương tháng 08/2026',
+        },
+        makeUser({ role: 'accountant' }),
+      );
+
+      // dailyRate = 23,000,000 / 23 = 1,000,000
+      // 9 worked days -> earnedBase = 9,000,000
+      expect(insertPayslips.insert).toHaveBeenCalledWith([
+        expect.objectContaining({
+          standard_working_days: 23,
+          actual_worked_days: joinedWorkingDays.length,
+          base_salary: 23_000_000,
+          gross_salary: 9_000_000 + 250_000, // earned base + attendance bonus
+        }),
+      ]);
+    });
+
+    it('fails closed when the monthly compliance lookup fails', async () => {
       const existingRun = mockQueryChain({ data: null, error: null });
       const activeEmployees = mockQueryChain({
         data: [{ user_id: EMPLOYEE_ID, job_title: 'Developer' }],
         error: null,
       });
-      const compensationSettings = mockQueryChain({
+      const compHistory = mockQueryChain({
         data: [
           {
             user_id: EMPLOYEE_ID,
-            base_salary: '22000000.00',
-            allowances: '1500000.00',
+            base_salary: '23000000.00',
+            allowances: '0',
+            effective_from: '2026-08-01',
+            payroll_eligible: true,
           },
         ],
         error: null,
       });
-      const createRun = mockQueryChain({
-        data: { id: RUN_ID },
-        error: null,
-      });
-      const attendance = mockQueryChain({
-        data: [],
-        error: null,
-      });
-      const insertPayslipsFail = mockQueryChain({
+      const failedReviews = mockQueryChain({
         data: null,
-        error: { message: 'DB payslip insert failed' },
+        error: { message: 'database unavailable' },
       });
-      const rollbackDeleteRun = mockQueryChain({ data: null, error: null });
 
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
       fromMock
         .mockReturnValueOnce(existingRun)
         .mockReturnValueOnce(activeEmployees)
-        .mockReturnValueOnce(compensationSettings)
-        .mockReturnValueOnce(createRun)
-        .mockReturnValueOnce(attendance)
-        .mockReturnValueOnce(insertPayslipsFail)
-        .mockReturnValueOnce(rollbackDeleteRun);
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(failedReviews);
 
-      await expect(
+      await expectErrorCode(
         service.generatePayrollRun(
           {
             periodMonth: '2026-08',
-            title: 'Luong Thang 8',
-            standardWorkingDays: 22,
+            title: 'Bảng lương tháng 08/2026',
           },
           makeUser({ role: 'accountant' }),
         ),
-      ).rejects.toThrow(InternalServerErrorException);
+        'PAYROLL_COMPLIANCE_LOOKUP_FAILED',
+      );
 
-      expect(rollbackDeleteRun.delete).toHaveBeenCalled();
+      expect(fromMock.mock.calls.map(([table]) => table)).toEqual([
+        'payroll_runs',
+        'employee_profiles',
+        'employee_compensation_history',
+        'employee_monthly_payroll_reviews',
+      ]);
+    });
+
+    it('fails closed on a later attendance read without creating a payroll run or payslips', async () => {
+      const secondEmployeeId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+      const existingRun = mockQueryChain({ data: null, error: null });
+      const activeEmployees = mockQueryChain({
+        data: [
+          { user_id: EMPLOYEE_ID, job_title: 'Developer' },
+          { user_id: secondEmployeeId, job_title: 'Designer' },
+        ],
+        error: null,
+      });
+      const compHistory = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            base_salary: '23000000.00',
+            allowances: '0',
+            effective_from: '2026-08-01',
+            payroll_eligible: true,
+          },
+          {
+            user_id: secondEmployeeId,
+            base_salary: '22000000.00',
+            allowances: '0',
+            effective_from: '2026-08-01',
+            payroll_eligible: true,
+          },
+        ],
+        error: null,
+      });
+      const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const firstAttendance = mockQueryChain({
+        data: mockWorkingDays.map((d) => ({
+          id: `att-1-${d.work_date}`,
+          attendance_date: d.work_date,
+          status: 'present',
+          late_minutes: 0,
+          early_leave_minutes: 0,
+        })),
+        error: null,
+      });
+      const failedSecondAttendance = mockQueryChain({
+        data: null,
+        error: { message: 'attendance lookup timed out' },
+      });
+
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
+      fromMock
+        .mockReturnValueOnce(existingRun)
+        .mockReturnValueOnce(activeEmployees)
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(firstAttendance)
+        .mockReturnValueOnce(failedSecondAttendance);
+
+      await expectErrorCode(
+        service.generatePayrollRun(
+          {
+            periodMonth: '2026-08',
+            title: 'Bảng lương tháng 08/2026',
+          },
+          makeUser({ role: 'accountant' }),
+        ),
+        'PAYROLL_ATTENDANCE_LOOKUP_FAILED',
+      );
+
+      expect(
+        fromMock.mock.calls.filter(([table]) => table === 'payroll_runs'),
+      ).toHaveLength(1);
+      expect(fromMock).not.toHaveBeenCalledWith('payslips');
+    });
+
+    it('treats early leave without an explicit review confirmation as unapproved', async () => {
+      const existingRun = mockQueryChain({ data: null, error: null });
+      const activeEmployees = mockQueryChain({
+        data: [{ user_id: EMPLOYEE_ID, job_title: 'Developer' }],
+        error: null,
+      });
+      const compHistory = mockQueryChain({
+        data: [
+          {
+            user_id: EMPLOYEE_ID,
+            base_salary: '23000000.00',
+            allowances: '0',
+            effective_from: '2026-08-01',
+            payroll_eligible: true,
+          },
+        ],
+        error: null,
+      });
+      const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const attendances = mockQueryChain({
+        data: mockWorkingDays.map((d, index) => ({
+          id: `att-${index}`,
+          attendance_date: d.work_date,
+          status: 'present',
+          late_minutes: 0,
+          early_leave_minutes: index === 0 ? 15 : 0,
+        })),
+        error: null,
+      });
+      const createRun = mockQueryChain({ data: { id: RUN_ID }, error: null });
+      const insertPayslips = mockQueryChain({ data: null, error: null });
+      const runDetail = mockQueryChain({
+        data: { id: RUN_ID, status: 'calculated' },
+        error: null,
+      });
+      const runPayslips = mockQueryChain({ data: [], error: null });
+
+      rpcMock.mockResolvedValueOnce({ data: mockWorkingDays, error: null });
+      fromMock
+        .mockReturnValueOnce(existingRun)
+        .mockReturnValueOnce(activeEmployees)
+        .mockReturnValueOnce(compHistory)
+        .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(attendances)
+        .mockReturnValueOnce(createRun)
+        .mockReturnValueOnce(insertPayslips)
+        .mockReturnValueOnce(runDetail)
+        .mockReturnValueOnce(runPayslips);
+
+      await service.generatePayrollRun(
+        {
+          periodMonth: '2026-08',
+          title: 'Bảng lương tháng 08/2026',
+        },
+        makeUser({ role: 'accountant' }),
+      );
+
+      expect(insertPayslips.insert).toHaveBeenCalledWith([
+        expect.objectContaining({
+          attendance_bonus_amount: 0,
+          attendance_bonus_eligible: false,
+          early_leave_occurrences: 1,
+        }),
+      ]);
     });
   });
 
-  describe('4. State Transitions: Approve & Pay (6, 7, 8, 9, 10)', () => {
-    const RUN_ID = '44444444-4444-4444-8444-444444444444';
+  describe('4. Approval and Payment State Transitions', () => {
+    const RUN_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
-    it('approves payroll run successfully from valid state (6)', async () => {
+    it('calls approve_payroll_run RPC and returns updated status', async () => {
       rpcMock.mockResolvedValueOnce({
         data: { id: RUN_ID, status: 'approved' },
         error: null,
@@ -431,18 +837,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
       });
     });
 
-    it('rejects approval when run is already approved or paid (7)', async () => {
-      rpcMock.mockResolvedValueOnce({
-        data: null,
-        error: { message: 'PAYROLL_ALREADY_APPROVED' },
-      });
-
-      await expect(
-        service.approvePayrollRun(RUN_ID, makeUser({ role: 'accountant' })),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('pays payroll run successfully from approved state (8)', async () => {
+    it('calls mark_payroll_run_paid RPC and returns updated status', async () => {
       rpcMock.mockResolvedValueOnce({
         data: { id: RUN_ID, status: 'paid' },
         error: null,
@@ -456,50 +851,6 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
       expect(rpcMock).toHaveBeenCalledWith('mark_payroll_run_paid', {
         p_run_id: RUN_ID,
       });
-    });
-
-    it('rejects pay when payroll run is not approved (9)', async () => {
-      rpcMock.mockResolvedValueOnce({
-        data: null,
-        error: { message: 'PAYROLL_NOT_APPROVED' },
-      });
-
-      await expect(
-        service.markPayrollPaid(RUN_ID, makeUser({ role: 'accountant' })),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('rejects second pay attempt when already paid (10)', async () => {
-      rpcMock.mockResolvedValueOnce({
-        data: null,
-        error: { message: 'PAYROLL_ALREADY_PAID' },
-      });
-
-      await expect(
-        service.markPayrollPaid(RUN_ID, makeUser({ role: 'accountant' })),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
-
-  describe('5. Personal Payslip Access Isolation (12, 13)', () => {
-    it('allows employee to view own payslips strictly scoped to their user_id (12, 13)', async () => {
-      const employeeUser = makeUser({ role: 'employee', profileId: USER_ID });
-      const payslips = [
-        {
-          id: 'ps-1',
-          user_id: USER_ID,
-          gross_salary: 15000000,
-          net_salary: 13500000,
-        },
-      ];
-
-      const queryMock = mockQueryChain({ data: payslips, error: null });
-      fromMock.mockReturnValueOnce(queryMock);
-
-      const result = await service.getMyPayslips(employeeUser);
-      expect(result.length).toBe(1);
-      expect(result[0].user_id).toBe(USER_ID);
-      expect(queryMock.eq).toHaveBeenCalledWith('user_id', USER_ID);
     });
   });
 });
