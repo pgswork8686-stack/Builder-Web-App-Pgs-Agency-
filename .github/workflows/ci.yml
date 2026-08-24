@@ -178,3 +178,46 @@ jobs:
           expect_failure invalid-admin-email --env INITIAL_ADMIN_EMAIL=not-an-email
           expect_failure invalid-port --env PORT=70000
           expect_failure invalid-throttle-limit --env THROTTLE_LIMIT=0
+
+  cpanel-artifact:
+    name: cPanel Node 22 artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality-gates
+
+    env:
+      APP_ENV: test
+      PORT: "3001"
+      WEB_URL: http://localhost:3000
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_PUBLISHABLE_KEY: test-publishable-key
+      SUPABASE_SECRET_KEY: test-secret-key
+      INITIAL_ADMIN_EMAIL: admin@example.com
+      THROTTLE_TTL: "60000"
+      THROTTLE_LIMIT: "120"
+      TRUST_PROXY: "false"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+          run_install: false
+
+      - name: Setup target Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.0
+          cache: pnpm
+
+      - name: Install repository dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and scan cPanel artifact
+        run: pnpm build:cpanel-api
+
+      - name: Verify packaged API on Node 22.23.0
+        run: pnpm test:cpanel-api

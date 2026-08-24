@@ -13,6 +13,8 @@ build/
 .tmp-production-api/
 .tmp*/
 cache/
+artifacts/
+.tmp-cpanel-api-runtime/
 
 # local environment
 .env
