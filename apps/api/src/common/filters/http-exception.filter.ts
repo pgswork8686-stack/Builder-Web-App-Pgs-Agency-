@@ -27,9 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const requestId =
-      (request.headers['x-request-id'] as string) ||
-      (request as any).requestId ||
-      'unknown';
+      (request as Request & { requestId?: string }).requestId || 'unknown';
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code = 'INTERNAL_SERVER_ERROR';

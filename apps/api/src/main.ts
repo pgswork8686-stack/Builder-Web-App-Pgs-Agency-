@@ -14,6 +14,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const isProduction = configService.appEnv === 'production';
 
+  app.enableShutdownHooks(['SIGTERM', 'SIGINT']);
+
   // Security Headers via Helmet
   app.use(
     helmet({
