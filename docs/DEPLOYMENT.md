@@ -29,8 +29,8 @@ PORT=3001
 WEB_URL=https://app.example.com
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
-SUPABASE_SECRET_KEY=your-supabase-service-role-key
-INITIAL_ADMIN_EMAIL=pgsword6868@gmail.com
+SUPABASE_SECRET_KEY=your-supabase-secret-key-placeholder
+INITIAL_ADMIN_EMAIL=initial-admin@example.com
 ```
 
 Do not expose `SUPABASE_SECRET_KEY` to the web service.
@@ -47,8 +47,8 @@ pnpm build
 Create two services from the same repository:
 
 1. API service
-   - Dockerfile: `Dockerfile`
-   - Target: `api`
+   - Dockerfile: `apps/api/Dockerfile`
+   - Build context: repository root
    - Port: `3001`
    - Health check: `/api/v1/health`
 2. Web service
@@ -58,6 +58,10 @@ Create two services from the same repository:
    - Public domain: the app domain
 
 Set `WEB_URL` on the API to the exact public web origin so CORS and Socket.IO allow the frontend.
+
+For the production API procedure, use
+[`deployment/api-coolify-runbook.md`](deployment/api-coolify-runbook.md) and
+[`deployment/api-production-checklist.md`](deployment/api-production-checklist.md).
 
 ## Supabase Auth redirect URLs
 

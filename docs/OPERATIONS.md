@@ -19,7 +19,7 @@
 ### Login or account bootstrap fails
 
 - Confirm Supabase Auth provider settings and redirect URLs.
-- Confirm the singleton admin email is set to `pgsword6868@gmail.com`.
+- Confirm the configured `INITIAL_ADMIN_EMAIL` matches the approved owner address.
 - Check API auth guard logs and Supabase Auth user state.
 
 ### Migration failure

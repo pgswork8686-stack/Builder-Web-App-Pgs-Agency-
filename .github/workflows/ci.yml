@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'feat/**'
+      - "feat/**"
   pull_request:
     branches:
       - main
@@ -24,15 +24,15 @@ jobs:
 
     env:
       APP_ENV: test
-      PORT: '3001'
+      PORT: "3001"
       WEB_URL: http://localhost:3000
       SUPABASE_URL: http://127.0.0.1:54321
       SUPABASE_PUBLISHABLE_KEY: test-publishable-key
       SUPABASE_SECRET_KEY: test-secret-key
       INITIAL_ADMIN_EMAIL: admin@example.com
-      THROTTLE_TTL: '60000'
-      THROTTLE_LIMIT: '120'
-      TRUST_PROXY: 'false'
+      THROTTLE_TTL: "60000"
+      THROTTLE_LIMIT: "120"
+      TRUST_PROXY: "false"
 
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
@@ -72,3 +72,109 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  api-container:
+    name: API production container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality-gates
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build production API image
+        run: docker build --file apps/api/Dockerfile --tag pgs-hub-api:ci .
+
+      - name: Smoke test health and graceful SIGTERM
+        shell: bash
+        run: |
+          set -euo pipefail
+          container=pgs-hub-api-ci
+          cleanup() {
+            docker rm --force "$container" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker run --detach --name "$container" --publish 3001:3001 \
+            --env APP_ENV=production \
+            --env PORT=3001 \
+            --env WEB_URL=https://app.example.com \
+            --env SUPABASE_URL=https://example.supabase.co \
+            --env SUPABASE_PUBLISHABLE_KEY=test-placeholder \
+            --env SUPABASE_SECRET_KEY=test-placeholder \
+            --env INITIAL_ADMIN_EMAIL=admin@example.com \
+            --env THROTTLE_TTL=60000 \
+            --env THROTTLE_LIMIT=120 \
+            --env TRUST_PROXY=true \
+            pgs-hub-api:ci
+
+          for attempt in $(seq 1 40); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' "$container")
+            if [ "$status" = healthy ]; then
+              break
+            fi
+            if [ "$(docker inspect --format '{{.State.Status}}' "$container")" = exited ]; then
+              docker logs "$container"
+              exit 1
+            fi
+            sleep 2
+          done
+          test "$(docker inspect --format '{{.State.Health.Status}}' "$container")" = healthy
+
+          node -e "fetch('http://127.0.0.1:3001/api/v1/health', { headers: { 'X-Request-Id': 'ci-smoke' } }).then(async (response) => { const body = await response.json(); if (!response.ok || body.status !== 'ok' || response.headers.get('x-request-id') !== 'ci-smoke') process.exit(1) }).catch(() => process.exit(1))"
+
+          docker stop --time 10 "$container"
+          test "$(docker inspect --format '{{.State.ExitCode}}' "$container")" = 0
+
+      - name: Verify production environment fails fast
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=pgs-hub-api:ci
+          secret_marker=ci-secret-must-not-appear
+          common=(
+            --env APP_ENV=production
+            --env PORT=3001
+            --env WEB_URL=https://app.example.com
+            --env SUPABASE_URL=https://example.supabase.co
+            --env SUPABASE_PUBLISHABLE_KEY=test-placeholder
+            --env SUPABASE_SECRET_KEY="$secret_marker"
+            --env INITIAL_ADMIN_EMAIL=admin@example.com
+            --env THROTTLE_TTL=60000
+            --env THROTTLE_LIMIT=120
+            --env TRUST_PROXY=true
+          )
+
+          expect_failure() {
+            name=$1
+            shift
+            if docker run --rm "${common[@]}" "$@" "$image" >"$name.log" 2>&1; then
+              echo "Expected $name to fail startup"
+              exit 1
+            fi
+            if grep --fixed-strings "$secret_marker" "$name.log"; then
+              echo "Secret marker leaked during $name"
+              exit 1
+            fi
+          }
+
+          if docker run --rm \
+            --env APP_ENV=production \
+            --env PORT=3001 \
+            --env WEB_URL=https://app.example.com \
+            --env SUPABASE_URL=https://example.supabase.co \
+            --env SUPABASE_PUBLISHABLE_KEY=test-placeholder \
+            --env INITIAL_ADMIN_EMAIL=admin@example.com \
+            --env THROTTLE_TTL=60000 \
+            --env THROTTLE_LIMIT=120 \
+            --env TRUST_PROXY=true \
+            "$image" >missing-secret.log 2>&1; then
+            echo 'Expected missing SUPABASE_SECRET_KEY to fail startup'
+            exit 1
+          fi
+
+          expect_failure invalid-web-url --env WEB_URL=not-a-url
+          expect_failure invalid-admin-email --env INITIAL_ADMIN_EMAIL=not-an-email
+          expect_failure invalid-port --env PORT=70000
+          expect_failure invalid-throttle-limit --env THROTTLE_LIMIT=0

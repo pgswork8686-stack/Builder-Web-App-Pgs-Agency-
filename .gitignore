@@ -48,3 +48,9 @@ apps/web/CLAUDE.md
 
 # supabase temp
 supabase/.temp/
+
+# local database backups (never commit)
+backups/
+**/backups/
+*.dump
+*.backup
