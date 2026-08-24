@@ -1,51 +1,52 @@
 # PGS Hub API Coolify runbook
 
-This is a future deployment runbook. It does not authorize a deployment, DNS change, migration, or production data write. Deploy the API as a long-running NestJS process because its Socket.IO connections are stateful and long-lived.
+This is a future deployment runbook. It does not authorize deployment, DNS/firewall changes, migration, or production data writes. The preferred production path is:
+
+```text
+Internet -> Cloudflare TLS/DDoS/WAF/rate limit/WebSocket proxy
+         -> Cloudflare Tunnel -> VPS-private Coolify/API -> NestJS :3001
+```
+
+Deploy the API as a long-running NestJS service because Socket.IO connections are stateful and long-lived. See the [Tunnel runbook](cloudflare-tunnel-runbook.md), [DNS plan](cloudflare-dns-plan.md), and [edge security policy](cloudflare-security-policy.md).
 
 ## A. VPS baseline
 
-- Ubuntu 24.04 LTS
-- 2 vCPU
-- 4 GB RAM
-- 40–80 GB SSD
-- Public IPv4
-- Preferred region: Singapore or another nearby Southeast Asia region
+- Ubuntu 24.04 LTS; 2 vCPU; 4 GB RAM; 40–80 GB SSD.
+- Keep the OS patched, use SSH keys, and disable password SSH where practical.
+- Never expose application port 3001 publicly. The Tunnel connector initiates outbound traffic; public API ports 80/443 are not required by this route.
+- Restrict Coolify management separately according to the owner-approved administration design.
 
-Keep the OS patched, use SSH keys, disable password SSH where practical, and expose only the ports needed for SSH and the Coolify HTTPS proxy. Do not expose application port 3001 publicly.
+## B. DNS and exposure
 
-## B. DNS
+Do not create an API A/AAAA record pointing at the VPS. Create `api.<company-domain>` as a Cloudflare Tunnel public-hostname route in the separately approved infrastructure phase. Cloudflare remains authoritative; the Vercel web hostname stays DNS Only. Do not hardcode a company domain before approval.
 
-After the owner finalizes the company domain, create this record:
+The API service must be reachable only from the chosen Tunnel connector topology:
 
-```text
-Type: A
-Name: api.<company-domain>
-Value: VPS_PUBLIC_IP
-```
+- Recommended host connector: publish the API to a verified loopback-only host port and target `http://127.0.0.1:<local-port>`.
+- Alternative connector container: attach it to the private Docker network and target `http://<api-service-name>:3001`.
 
-Wait for DNS resolution before requesting TLS. Do not hardcode a domain before approval.
+Do not assume `localhost` across containers and do not attach the API to an unnecessary public proxy/network.
 
 ## C. Coolify application
-
-Use these values:
 
 ```text
 Source: GitHub repository
 Repository: pgswork8686-stack/Builder-Web-App-Pgs-Agency-
-Branch: main
+Branch/revision: exact reviewed main SHA
 Build type: Dockerfile
 Dockerfile location: apps/api/Dockerfile
 Build context: repository root
 Container port: 3001
-Public access: HTTPS only
+Public access: private/Tunnel only
 Persistent volume: none
+Health path: /api/v1/health
 ```
 
-Deploy an exact reviewed main Git SHA. The API process is `node dist/main.js`; do not override it with a development or serverless command.
+The process is `node dist/main.js`; do not override it with a development or serverless command. Verify the effective Docker port binding/network before continuing.
 
 ## D. Environment variables
 
-Configure these names in the Coolify API application. Obtain values through the approved secret channel; do not copy them into source, GitHub Actions, build arguments, or documentation.
+Obtain values through the approved secret channel and store them only in Coolify's runtime secret environment—not source, GitHub Actions, build arguments, or docs.
 
 ```text
 APP_ENV
@@ -53,30 +54,25 @@ PORT
 WEB_URL
 SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY
-SUPABASE_SECRET_KEY     SECRET
+SUPABASE_SECRET_KEY      SECRET
 INITIAL_ADMIN_EMAIL
 THROTTLE_TTL
 THROTTLE_LIMIT
 TRUST_PROXY
-CALENDARIFIC_API_KEY   OPTIONAL
+CALENDARIFIC_API_KEY    OPTIONAL
 ```
 
-Required deployment settings include `APP_ENV=production`, `PORT=3001`, and `TRUST_PROXY=true`. `WEB_URL` must be the exact HTTPS web origin with no path. Production startup fails if required values are absent or invalid. Do not use local `.env` files in production.
+Set `APP_ENV=production`, `PORT=3001`, `TRUST_PROXY=true`, and exact HTTPS `WEB_URL` with no path. Startup fails on missing/invalid required values. Do not use a production `.env` file.
 
-## E. HTTPS
+Express trusts one proxy hop, not arbitrary chains. The canonical resolver accepts a valid single `CF-Connecting-IP` only from an immediate loopback/private peer, otherwise it uses a normalized safe fallback. This depends on the origin being closed; do not put a public proxy in front of the private application peer that forwards attacker-controlled Cloudflare headers.
 
-Attach `api.<company-domain>` to the Coolify application, enable the Coolify reverse proxy and automatic Let's Encrypt certificate, and redirect HTTP to HTTPS. Route public traffic through the proxy only; do not publish port 3001 on the VPS firewall.
+## E. TLS
 
-## F. Health check
+Public TLS terminates at Cloudflare. Private HTTP from `cloudflared` to loopback/the isolated Docker network is acceptable. If local-origin HTTPS is chosen, verification stays enabled; `noTLSVerify=true` is not a production configuration.
 
-Configure:
+## F. Health and smoke
 
-```text
-Path: /api/v1/health
-Expected HTTP status: 200
-```
-
-Expected body shape:
+Expected `GET /api/v1/health` status is 200 with body shape:
 
 ```json
 {
@@ -86,37 +82,27 @@ Expected body shape:
 }
 ```
 
-This is liveness only. Monitor Supabase dependency readiness separately; do not make container restarts depend on public Internet availability.
+This is liveness only; monitor Supabase readiness separately. Through the Cloudflare hostname:
 
-## G. REST, CORS, auth, storage, and WebSocket smoke
+1. Verify health and `X-Request-Id`.
+2. Verify exact `WEB_URL` CORS allows the deployed web and rejects an unrelated origin.
+3. Use an approved smoke user for one read-only authenticated REST request.
+4. Perform any Storage write smoke only with separate approval and a named cleanup plan.
+5. Connect Socket.IO `/chat` using the Supabase access token in `auth.token`; verify auth, authorized `chat.join`, send/receive, disconnect, reconnect, re-authenticate, rejoin, and receive again.
+6. Check `/notifications` and `/project-workspace` connections where applicable.
+7. Inspect logs for errors or token/header leakage.
+8. From an external network, prove the VPS IP cannot serve the API on 3001 or any unapproved direct 80/443 route.
 
-Use test records approved for production smoke testing; do not reuse local placeholders.
+Cloudflare must pass WebSocket upgrades. Production origin is exact; never set `WEB_URL=*`.
 
-1. Request `GET https://api.<company-domain>/api/v1/health` and verify HTTP 200.
-2. From the deployed web origin, make an API request and verify the exact `WEB_URL` origin is allowed. Verify an unrelated origin is rejected.
-3. Sign in as an approved smoke user and call one permitted read-only REST endpoint. Confirm `X-Request-Id` is returned.
-4. Perform one approved Storage read/upload smoke according to the production checklist, then remove only the smoke object if removal was pre-approved.
-5. In browser developer tools, connect Socket.IO to `https://api.<company-domain>/chat` using the signed-in user's Supabase access token in `auth.token`. Do not place the token in the URL or logs.
-6. Emit `chat.join` with an authorized conversation UUID and verify `{ ok: true }`. Verify an unauthorized conversation is denied.
-7. Send a smoke message through the normal REST/UI flow and verify the other authorized client receives the chat event.
-8. Disconnect the network or socket, restore it, let the Socket.IO client reconnect, re-authenticate, rejoin the conversation, and verify another message is received.
-9. Disconnect both clients cleanly and inspect logs for errors or token leakage.
+## G. Direct HTTPS emergency fallback
 
-The reverse proxy must support WebSocket upgrade headers and long-lived connections. Production origins remain exact; never replace `WEB_URL` with `*`.
+A direct Coolify HTTPS proxy is not the normal architecture. Preserve it only as a written emergency option: explicit owner authorization, valid certificate, strict firewall/allowlisting where feasible, application auth/CORS retained, no public 3001, monitoring enabled, and a short time-bound plan to restore Tunnel and close origin access. Never enable it automatically after a Tunnel failure.
 
-## H. Rollback
+## H. Logs, secrets, and rollback
 
-1. Identify the previous known-good application Git SHA/image from Coolify deployment history.
-2. Redeploy that exact application revision.
-3. Verify health, authentication, REST, CORS, and WebSocket behavior.
-4. Record the failed and restored SHAs and retain relevant logs.
+Production request logs contain bounded normalized client IP, request ID, method, path, status, duration, service, and environment. They exclude raw forwarding headers, authorization, cookies, bodies, passwords, and tokens.
 
-Application rollback does not automatically roll production database migrations backward. The production database is already migrated. Use a separately reviewed forward-fix database procedure if schema remediation is ever required; never couple ordinary application rollback to destructive migration rollback.
+Rotate secrets in the Coolify runtime environment. Never paste values into tickets, chat, screenshots, or command history.
 
-## I. Logs and health
-
-Inspect the Coolify application logs, underlying container stdout/stderr logs, deployment events, and container health status. Production request logs include timestamp, level, service, environment, request ID, method, path, status, and duration. They intentionally exclude authorization headers, cookies, bodies, passwords, and tokens.
-
-## J. Secrets rotation
-
-Store and rotate secrets in the Coolify application environment, not GitHub or source. After rotating a Supabase secret, restart/redeploy the API, verify health and authentication, and inspect logs for failures. Never paste secret values into tickets, chat, screenshots, or command history.
+For an API failure, redeploy the previous known-good application SHA/image and re-run health/auth/REST/CORS/WebSocket checks. Roll back WAF, rate rules, Tunnel route, and `cloudflared` independently as described in the Tunnel runbook. Never couple an edge/network rollback to a destructive database rollback.

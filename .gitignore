@@ -34,6 +34,16 @@ yarn-error.log*
 # misc
 .DS_Store
 *.pem
+*.key
+
+# Cloudflare Tunnel credentials and local origin certificates
+.cloudflared/
+**/.cloudflared/
+certs/
+**/certs/
+cloudflared-cert.pem
+*.cfargotunnel.com.json
+tunnel-credentials*.json
 
 # vercel
 .vercel

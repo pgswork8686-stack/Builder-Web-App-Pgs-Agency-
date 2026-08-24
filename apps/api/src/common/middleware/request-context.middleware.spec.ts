@@ -24,13 +24,19 @@ describe('RequestContextMiddleware', () => {
   it('returns the resolved request ID on the response', () => {
     const configService = {
       appEnv: 'test',
+      trustProxy: true,
     } as ConfigService;
     const middleware = new RequestContextMiddleware(configService);
     const req = {
-      headers: { 'x-request-id': 'smoke-test' },
       method: 'GET',
       path: '/api/v1/health',
       originalUrl: '/api/v1/health?token=must-not-be-logged',
+      ip: '198.51.100.4',
+      socket: { remoteAddress: '172.20.0.3' },
+      headers: {
+        'x-request-id': 'smoke-test',
+        'cf-connecting-ip': '203.0.113.9',
+      },
     } as unknown as Request;
     const listeners = new Map<string, () => void>();
     const setHeader = jest.fn();
@@ -46,6 +52,12 @@ describe('RequestContextMiddleware', () => {
     middleware.use(req, res, next);
 
     expect(setHeader).toHaveBeenCalledWith('X-Request-Id', 'smoke-test');
+    expect(
+      (req as Request & { clientIp: string; requestId: string }).clientIp,
+    ).toBe('203.0.113.9');
+    expect(
+      (req as Request & { clientIp: string; requestId: string }).requestId,
+    ).toBe('smoke-test');
     expect(next).toHaveBeenCalledTimes(1);
     expect(listeners.has('finish')).toBe(true);
   });
