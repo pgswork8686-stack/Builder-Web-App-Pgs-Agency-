@@ -45,6 +45,8 @@ backups/
 **/.tmp*
 cache
 **/cache
+artifacts
+**/artifacts
 
 docs/user-guide/screenshots
 Dockerfile
