@@ -47,6 +47,11 @@
 
 ## Post-deploy
 
+- [ ] Confirm `https://apihub.pgsagency.vn/package.json` returns 404, blocked, or an application-controlled response—not raw file contents
+- [ ] Confirm `https://apihub.pgsagency.vn/package-lock.json` returns 404, blocked, or an application-controlled response—not raw file contents
+- [ ] Confirm `https://apihub.pgsagency.vn/DEPLOYMENT_INFO.txt` returns 404, blocked, or an application-controlled response—not raw file contents
+- [ ] Confirm `https://apihub.pgsagency.vn/dist/main.js` returns 404, blocked, or an application-controlled response—not raw file contents
+- [ ] If any internal application file is publicly downloadable, classify deployment as `BLOCKED` until the application-root/web-server exposure is corrected
 - [ ] Logs are clean and contain no secrets/tokens
 - [ ] CPU and memory remain reasonable
 - [ ] Application survives a cPanel UI restart
