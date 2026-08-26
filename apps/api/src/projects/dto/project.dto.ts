@@ -2,9 +2,11 @@ import { z } from 'zod';
 
 export const ProjectStatusSchema = z.enum([
   'draft',
+  'pending_approval',
   'active',
   'on_hold',
   'completed',
+  'archived',
   'cancelled',
 ]);
 export const ProjectPrioritySchema = z.enum([
@@ -91,6 +93,7 @@ export const CreateProjectSchema = z
     status: ProjectStatusSchema.default('draft'),
     priority: ProjectPrioritySchema.default('medium'),
     projectManagerUserId: z.string().uuid().nullable().optional(),
+    departmentId: z.string().uuid().nullable().optional(),
     startDate: DateSchema.nullable().optional(),
     dueDate: DateSchema.nullable().optional(),
   })
@@ -107,6 +110,7 @@ export const UpdateProjectSchema = z
     status: ProjectStatusSchema.optional(),
     priority: ProjectPrioritySchema.optional(),
     projectManagerUserId: z.string().uuid().nullable().optional(),
+    departmentId: z.string().uuid().nullable().optional(),
     startDate: DateSchema.nullable().optional(),
     dueDate: DateSchema.nullable().optional(),
   })
@@ -127,6 +131,7 @@ export const ProjectListQuerySchema = z.object({
   status: ProjectStatusSchema.optional(),
   priority: ProjectPrioritySchema.optional(),
   projectManagerUserId: z.string().uuid().optional(),
+  departmentId: z.string().uuid().optional(),
   page: PageSchema,
   pageSize: PageSizeSchema,
 });

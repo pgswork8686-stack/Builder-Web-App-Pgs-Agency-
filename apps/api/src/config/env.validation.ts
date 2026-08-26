@@ -22,6 +22,15 @@ function isLoopbackUrl(value: string): boolean {
   }
 }
 
+function isPostgresUrl(value: string): boolean {
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === 'postgres:' || protocol === 'postgresql:';
+  } catch {
+    return false;
+  }
+}
+
 const envSchema = z
   .object({
     APP_ENV: z
@@ -36,6 +45,14 @@ const envSchema = z
     WEB_URL: z
       .string()
       .url('WEB_URL must be a valid URL (e.g., http://localhost:3000)'),
+    DATABASE_URL: z
+      .string()
+      .trim()
+      .min(1, 'DATABASE_URL is required')
+      .refine(isPostgresUrl, {
+        message:
+          'DATABASE_URL must be a valid PostgreSQL URL (postgres:// or postgresql://)',
+      }),
     SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
     SUPABASE_PUBLISHABLE_KEY: z
       .string()
@@ -45,6 +62,10 @@ const envSchema = z
       .string()
       .trim()
       .min(1, 'SUPABASE_SECRET_KEY is required'),
+    JWT_SECRET: z
+      .string()
+      .trim()
+      .min(32, 'JWT_SECRET must be at least 32 characters'),
     INITIAL_ADMIN_EMAIL: z
       .string()
       .email('INITIAL_ADMIN_EMAIL must be a valid email address'),
@@ -78,6 +99,7 @@ const envSchema = z
     }
 
     for (const [key, value] of [
+      ['DATABASE_URL', config.DATABASE_URL],
       ['SUPABASE_URL', config.SUPABASE_URL],
       ['WEB_URL', config.WEB_URL],
     ] as const) {

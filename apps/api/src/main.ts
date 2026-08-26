@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ForbiddenException, Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { json, urlencoded } from 'express';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -80,7 +80,12 @@ async function bootstrap() {
       ) {
         callback(null, true);
       } else {
-        callback(new Error('Blocked by CORS policy'));
+        callback(
+          new ForbiddenException({
+            code: 'CORS_ORIGIN_DENIED',
+            message: 'Origin is not allowed.',
+          }),
+        );
       }
     },
     credentials: true,

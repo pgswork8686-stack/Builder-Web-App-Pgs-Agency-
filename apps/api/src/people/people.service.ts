@@ -789,211 +789,43 @@ export class PeopleService {
     return this.getPersonByUserId(userId);
   }
 
-  async deletePerson(userId: string, adminUserId: string) {
+  async terminatePerson(userId: string, adminUserId: string, reason?: string) {
     const client = this.supabaseService.getSystemClient();
 
-    // Check if target exists
-    const { data: target, error: targetErr } = await client
-      .from('profiles')
-      .select('id, role, account_status')
-      .eq('id', userId)
-      .maybeSingle();
+    const { data, error } = await client.rpc('phase1_terminate_account', {
+      p_target_user_id: userId,
+      p_actor_user_id: adminUserId,
+      p_reason: reason ?? 'Chấm dứt quyền truy cập bởi quản trị viên',
+    });
 
-    if (targetErr || !target) {
+    const message = String(error?.message ?? '');
+    if (message.includes('ACCOUNT_TERMINATION_TARGET_NOT_FOUND')) {
       throw new NotFoundException({
         code: 'USER_NOT_FOUND',
         message: 'Không tìm thấy tài khoản người dùng.',
       });
     }
-
-    if (target.id === adminUserId) {
+    if (message.includes('ACCOUNT_TERMINATION_SELF_DENIED')) {
       throw new BadRequestException({
         code: 'CANNOT_TERMINATE_SELF',
-        message: 'Không thể tự xóa tài khoản của chính mình.',
+        message: 'Không thể tự chấm dứt tài khoản của chính mình.',
       });
     }
-
-    const now = new Date().toISOString();
-
-    // 1. Clear leadership / management / reviewer / assignee positions
-    await Promise.allSettled([
-      client
-        .from('departments')
-        .update({
-          head_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('head_user_id', userId),
-      client
-        .from('teams')
-        .update({
-          leader_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('leader_user_id', userId),
-      client
-        .from('employee_profiles')
-        .update({
-          reports_to_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('reports_to_user_id', userId),
-      client
-        .from('tasks')
-        .update({
-          assignee_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('assignee_user_id', userId),
-      client
-        .from('tasks')
-        .update({
-          reporter_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('reporter_user_id', userId),
-      client
-        .from('projects')
-        .update({
-          project_manager_user_id: null,
-          updated_by: adminUserId,
-          updated_at: now,
-        })
-        .eq('project_manager_user_id', userId),
-      client
-        .from('leave_requests')
-        .update({ reviewer_user_id: null, updated_at: now })
-        .eq('reviewer_user_id', userId),
-      client
-        .from('leave_requests')
-        .update({ approved_by: null, updated_at: now })
-        .eq('approved_by', userId),
-      client
-        .from('leave_requests')
-        .update({ cancelled_by: null, updated_at: now })
-        .eq('cancelled_by', userId),
-      client
-        .from('support_tickets')
-        .update({
-          assignee_user_id: null,
-          updated_by_user_id: adminUserId,
-          updated_at: now,
-        })
-        .eq('assignee_user_id', userId),
-      client
-        .from('calendar_events')
-        .update({
-          assignee_user_id: null,
-          updated_by_user_id: adminUserId,
-          updated_at: now,
-        })
-        .eq('assignee_user_id', userId),
-      client
-        .from('invoices')
-        .update({ approved_by_user_id: null, updated_at: now })
-        .eq('approved_by_user_id', userId),
-      client
-        .from('contracts')
-        .update({ approved_by_user_id: null, updated_at: now })
-        .eq('approved_by_user_id', userId),
-      client
-        .from('profiles')
-        .update({ approved_by: null, updated_at: now })
-        .eq('approved_by', userId),
-      client
-        .from('profiles')
-        .update({ rejected_by: null, updated_at: now })
-        .eq('rejected_by', userId),
-    ]);
-
-    // 2. Remove all related dependent records that belong to this user
-    await Promise.allSettled([
-      client
-        .from('account_approval_events')
-        .delete()
-        .eq('target_user_id', userId),
-      client.from('account_approval_events').delete().eq('actor_id', userId),
-      client.from('project_memberships').delete().eq('user_id', userId),
-      client.from('client_memberships').delete().eq('user_id', userId),
-      client.from('employee_profiles').delete().eq('user_id', userId),
-      client.from('notification_preferences').delete().eq('user_id', userId),
-      client.from('notifications').delete().eq('recipient_user_id', userId),
-      client.from('notifications').delete().eq('created_by', userId),
-      client.from('payroll_records').delete().eq('user_id', userId),
-      client.from('attendance_records').delete().eq('user_id', userId),
-      client.from('leave_requests').delete().eq('user_id', userId),
-      client.from('expenses').delete().eq('submitted_by_user_id', userId),
-      client.from('reimbursements').delete().eq('submitted_by_user_id', userId),
-      client.from('support_tickets').delete().eq('sender_user_id', userId),
-      client.from('calendar_events').delete().eq('creator_user_id', userId),
-      client
-        .from('company_documents')
-        .delete()
-        .eq('uploaded_by_user_id', userId),
-      client
-        .from('task_attachments')
-        .delete()
-        .eq('uploaded_by_user_id', userId),
-      client.from('task_comments').delete().eq('user_id', userId),
-      client.from('task_activity_logs').delete().eq('actor_id', userId),
-      client.from('chat_messages').delete().eq('sender_user_id', userId),
-      client.from('chat_participants').delete().eq('user_id', userId),
-      client.from('chat_reads').delete().eq('user_id', userId),
-      client
-        .from('direct_conversations')
-        .delete()
-        .eq('direct_user_low', userId),
-      client
-        .from('direct_conversations')
-        .delete()
-        .eq('direct_user_high', userId),
-    ]);
-
-    // 3. Delete from Supabase Auth (which cascades to public.profiles)
-    let authDeleted = false;
-    try {
-      if (client.auth?.admin?.deleteUser) {
-        const { error: authErr } = await client.auth.admin.deleteUser(userId);
-        if (!authErr) {
-          authDeleted = true;
-        } else {
-          this.logger.warn(
-            `Auth deleteUser returned error: ${authErr.message}`,
-          );
-        }
-      }
-    } catch (authErr: any) {
-      this.logger.warn(
-        `Supabase auth deleteUser exception: ${authErr?.message || authErr}`,
-      );
+    if (message.includes('ACCOUNT_TERMINATION_LAST_ADMIN_DENIED')) {
+      throw new ConflictException({
+        code: 'LAST_ACTIVE_ADMIN_REQUIRED',
+        message: 'Không thể chấm dứt quản trị viên hoạt động cuối cùng.',
+      });
     }
-
-    // 4. If profile still exists in public.profiles, explicitly delete it
-    const { error: deleteProfErr } = await client
-      .from('profiles')
-      .delete()
-      .eq('id', userId);
-
-    if (deleteProfErr && !authDeleted) {
-      this.logger.error(
-        `Failed to delete user profile from database: ${deleteProfErr.message}`,
-      );
+    if (error) {
+      this.logger.error(`Account termination failed: ${error.message}`);
       throw new InternalServerErrorException({
-        code: 'USER_DELETION_FAILED',
-        message: 'Không thể xóa tài khoản người dùng khỏi cơ sở dữ liệu.',
+        code: 'ACCOUNT_TERMINATION_FAILED',
+        message: 'Không thể chấm dứt quyền truy cập tài khoản lúc này.',
       });
     }
 
-    return {
-      success: true,
-      message:
-        'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
-    };
+    return data;
   }
 
   async getUserProjects(userId: string) {
@@ -1055,29 +887,37 @@ export class PeopleService {
       });
     }
 
-    // Delete existing project memberships for this user
-    await client.from('project_memberships').delete().eq('user_id', userId);
+    const { error: assignmentError } = await client.rpc(
+      'phase1_replace_user_project_memberships',
+      {
+        p_target_user_id: userId,
+        p_project_ids: dto.projectIds,
+        p_project_role: dto.projectRole || 'member',
+        p_actor_user_id: adminUserId,
+      },
+    );
 
-    // Insert new memberships
-    if (dto.projectIds.length > 0) {
-      const inserts = dto.projectIds.map((projId) => ({
-        project_id: projId,
-        user_id: userId,
-        project_role: dto.projectRole || 'member',
-        created_by: adminUserId,
-      }));
-
-      const { error: insErr } = await client
-        .from('project_memberships')
-        .insert(inserts);
-
-      if (insErr) {
-        this.logger.error(`Failed to assign user projects: ${insErr.message}`);
-        throw new InternalServerErrorException({
-          code: 'PROJECT_ASSIGNMENT_FAILED',
-          message: 'Không thể phân bổ dự án cho nhân sự.',
+    if (assignmentError) {
+      const message = String(assignmentError.message ?? '');
+      if (message.includes('PROJECT_ASSIGNMENT_PROJECT_NOT_FOUND')) {
+        throw new NotFoundException({
+          code: 'PROJECT_NOT_FOUND',
+          message: 'Một hoặc nhiều dự án được chọn không tồn tại.',
         });
       }
+      if (message.includes('PROJECT_MANAGER_MEMBERSHIP_REQUIRED')) {
+        throw new ConflictException({
+          code: 'PROJECT_MANAGER_CONSISTENCY_REQUIRED',
+          message: 'Không thể gỡ quản lý dự án chính khỏi thành viên dự án.',
+        });
+      }
+      this.logger.error(
+        `Failed to assign user projects: ${assignmentError.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'PROJECT_ASSIGNMENT_FAILED',
+        message: 'Không thể phân bổ dự án cho nhân sự.',
+      });
     }
 
     return this.getUserProjects(userId);

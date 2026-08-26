@@ -98,6 +98,14 @@ export class ClientsController {
     );
   }
 
+  @Delete('admin/clients/:clientId')
+  @Roles('admin')
+  async deleteClientCompany(
+    @Param('clientId', ParseUUIDPipe) clientId: string,
+  ) {
+    return this.clientsService.deleteClientCompany(clientId);
+  }
+
   // --- ADMIN CLIENT MEMBERSHIPS ---
   @Get('admin/clients/:clientId/members')
   @Roles('admin')

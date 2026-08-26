@@ -11,6 +11,7 @@ describe('PeopleService', () => {
     jest.clearAllMocks();
 
     mockSupabaseClient = {
+      rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
       from: jest.fn().mockImplementation(() => ({
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
@@ -310,63 +311,47 @@ describe('PeopleService', () => {
     });
   });
 
-  describe('deletePerson (Lock & Terminate Account)', () => {
+  describe('terminatePerson', () => {
     it('should throw BadRequestException when admin tries to terminate themselves', async () => {
-      mockSupabaseClient.from.mockImplementation((table: string) => {
-        if (table === 'profiles') {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({
-              data: { id: 'admin-1', role: 'admin', account_status: 'active' },
-              error: null,
-            }),
-          };
-        }
-        return {};
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'ACCOUNT_TERMINATION_SELF_DENIED' },
       });
 
-      await expect(service.deletePerson('admin-1', 'admin-1')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.terminatePerson('admin-1', 'admin-1'),
+      ).rejects.toThrow(BadRequestException);
     });
 
-    it('should successfully permanently delete user from database and auth', async () => {
-      const createChain = () => {
-        const chain: any = {
-          then: (resolve: any) => resolve({ data: null, error: null }),
-        };
-        for (const method of ['select', 'eq', 'update', 'delete']) {
-          chain[method] = jest.fn(() => chain);
-        }
-        chain.maybeSingle = jest.fn().mockResolvedValue({
-          data: {
-            id: 'user-1',
-            role: 'employee',
-            account_status: 'active',
-          },
-          error: null,
-        });
-        return chain;
-      };
-
-      const tableChains: Record<string, any> = {};
-      mockSupabaseClient.from.mockImplementation((table: string) => {
-        if (!tableChains[table]) {
-          tableChains[table] = createChain();
-        }
-        return tableChains[table];
-      });
-
-      const res = await service.deletePerson('user-1', 'admin-1');
-
-      expect(res).toEqual({
+    it('terminates access through one atomic RPC without deleting history', async () => {
+      const result = {
         success: true,
-        message:
-          'Đã xóa vĩnh viễn tài khoản người dùng khỏi hệ thống và cơ sở dữ liệu thành công.',
+        alreadyTerminated: false,
+        userId: 'user-1',
+        accountStatus: 'rejected',
+        employmentStatus: 'terminated',
+      };
+      mockSupabaseClient.rpc.mockResolvedValueOnce({
+        data: result,
+        error: null,
       });
-      expect(tableChains['profiles'].delete).toHaveBeenCalled();
-      expect(tableChains['employee_profiles'].delete).toHaveBeenCalled();
+
+      const res = await service.terminatePerson(
+        'user-1',
+        'admin-1',
+        'Nhân sự đã nghỉ việc',
+      );
+
+      expect(res).toEqual(result);
+      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+        'phase1_terminate_account',
+        {
+          p_target_user_id: 'user-1',
+          p_actor_user_id: 'admin-1',
+          p_reason: 'Nhân sự đã nghỉ việc',
+        },
+      );
+      expect(mockSupabaseClient.from).not.toHaveBeenCalled();
     });
   });
 

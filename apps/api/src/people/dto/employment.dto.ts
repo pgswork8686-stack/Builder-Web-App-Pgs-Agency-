@@ -94,6 +94,17 @@ export const UpdatePersonFullSchema = z.object({
 
 export type UpdatePersonFullDto = z.infer<typeof UpdatePersonFullSchema>;
 
+export const TerminatePersonSchema = z.object({
+  reason: z
+    .string()
+    .trim()
+    .min(3, 'Lý do chấm dứt tối thiểu 3 ký tự.')
+    .max(500, 'Lý do chấm dứt tối đa 500 ký tự.')
+    .optional(),
+});
+
+export type TerminatePersonDto = z.infer<typeof TerminatePersonSchema>;
+
 export const AssignUserProjectsSchema = z.object({
   projectIds: z.array(z.string().uuid('Project ID không hợp lệ')),
   projectRole: z

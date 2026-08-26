@@ -5,8 +5,8 @@ import { AppModule } from '../src/app.module';
 import { SupabaseService } from '../src/supabase/supabase.service';
 
 const USER_ID = '33333333-3333-4333-8333-333333333333';
-const RECORD_ID = 'record-uuid-1111';
-const REQUEST_ID = 'request-uuid-2222';
+const RECORD_ID = '44444444-4444-4444-8444-444444444444';
+const REQUEST_ID = '55555555-5555-4555-8555-555555555555';
 
 describe('Attendance & Leave Management API (e2e)', () => {
   let app: INestApplication;
@@ -220,6 +220,14 @@ describe('Attendance & Leave Management API (e2e)', () => {
         .send({ action: 'approved', reviewNote: 'Approved E2E' })
         .set('Authorization', 'Bearer fake-token')
         .expect(403);
+    });
+
+    it('POST /api/v1/leave/requests/:id/review - rejects malformed UUIDs before service access', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/leave/requests/not-a-uuid/review')
+        .send({ action: 'approved', reviewNote: 'Invalid id' })
+        .set('Authorization', 'Bearer fake-token')
+        .expect(400);
     });
   });
 });

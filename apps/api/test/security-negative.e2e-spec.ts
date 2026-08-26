@@ -132,7 +132,7 @@ describe('Comprehensive Security & Negative Authorization Matrix (e2e)', () => {
     getPeopleDirectory: jest.fn().mockResolvedValue({ items: [], total: 0 }),
     getPersonByUserId: jest.fn().mockResolvedValue({ id: EMPLOYEE_A_ID }),
     updatePersonFull: jest.fn().mockResolvedValue({ id: EMPLOYEE_A_ID }),
-    deletePerson: jest.fn().mockResolvedValue({ success: true }),
+    terminatePerson: jest.fn().mockResolvedValue({ success: true }),
   };
 
   const mockFilesService = {
@@ -260,6 +260,25 @@ describe('Comprehensive Security & Negative Authorization Matrix (e2e)', () => {
         .set(authHeader())
         .expect(200);
     });
+
+    it('allows Admin to terminate access through the safe endpoint and removes the legacy DELETE route', async () => {
+      await request(app.getHttpServer())
+        .post(`/api/v1/admin/people/${EMPLOYEE_A_ID}/terminate`)
+        .set(authHeader())
+        .send({ reason: 'Nhân sự đã nghỉ việc' })
+        .expect(201);
+
+      expect(mockPeopleService.terminatePerson).toHaveBeenCalledWith(
+        EMPLOYEE_A_ID,
+        expect.any(String),
+        'Nhân sự đã nghỉ việc',
+      );
+
+      await request(app.getHttpServer())
+        .delete(`/api/v1/admin/people/${EMPLOYEE_A_ID}`)
+        .set(authHeader())
+        .expect(404);
+    });
   });
 
   // ============================================================================
@@ -325,6 +344,14 @@ describe('Comprehensive Security & Negative Authorization Matrix (e2e)', () => {
         )
         .set(authHeader())
         .send({ action: 'approved', reviewNote: 'Auto approve' })
+        .expect(403);
+    });
+
+    it('denies Employee from terminating another account', async () => {
+      await request(app.getHttpServer())
+        .post(`/api/v1/admin/people/${ACCOUNTANT_ID}/terminate`)
+        .set(authHeader())
+        .send({ reason: 'Unauthorized attempt' })
         .expect(403);
     });
 

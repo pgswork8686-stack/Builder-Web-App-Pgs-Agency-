@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
 import { AuthGuard } from '../auth/auth.guard';
@@ -115,7 +116,7 @@ export class WorkCalendarController {
   @Patch('admin/work-calendar/events/:eventId')
   @Roles('admin')
   async updateAdminEvent(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseUUIDPipe) eventId: string,
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {
@@ -135,7 +136,7 @@ export class WorkCalendarController {
   @Delete('admin/work-calendar/events/:eventId')
   @Roles('admin')
   async deleteAdminEvent(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseUUIDPipe) eventId: string,
     @CurrentUser() user: RequestUser,
   ) {
     return this.workCalendarService.deleteEvent(eventId, user);

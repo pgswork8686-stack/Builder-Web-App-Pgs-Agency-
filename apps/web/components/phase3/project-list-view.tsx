@@ -9,6 +9,8 @@ import {
   Calendar,
   ChevronRight,
   FolderOpen,
+  Trash2,
+  AlertCircle,
 } from "lucide-react";
 import { clientsApi } from "@/lib/api/clients";
 import { peopleApi } from "@/lib/api/people";
@@ -26,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog } from "@/components/ui/dialog";
 
 type Mode = "admin" | "internal" | "client";
 
@@ -37,9 +40,11 @@ const statusConfig: Record<
   }
 > = {
   draft: { label: "Nháp", variant: "default" },
+  pending_approval: { label: "Chờ duyệt", variant: "warning" },
   active: { label: "Đang chạy", variant: "blue" },
   on_hold: { label: "Tạm dừng", variant: "warning" },
   completed: { label: "Hoàn thành", variant: "success" },
+  archived: { label: "Đã lưu trữ", variant: "default" },
   cancelled: { label: "Đã hủy", variant: "danger" },
 };
 
@@ -71,6 +76,11 @@ export function ProjectListView({ mode }: { mode: Mode }) {
   const [companies, setCompanies] = useState<any[]>([]);
   const [people, setPeople] = useState<any[]>([]);
 
+  // Delete project states
+  const [deletingProject, setDeletingProject] = useState<Project | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -100,25 +110,37 @@ export function ProjectListView({ mode }: { mode: Mode }) {
   }, [mode, page, priority, q, status]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => void load(), 0);
-    return () => window.clearTimeout(timeoutId);
+    void load();
   }, [load]);
 
   useEffect(() => {
-    if (mode !== "admin") return;
-    void Promise.all([
-      clientsApi.getClientCompanies({ page: 1, pageSize: 100 }),
-      peopleApi.getPeopleDirectory({ page: 1, pageSize: 100 }),
-    ]).then(([clientData, peopleData]) => {
-      setCompanies(clientData.items ?? []);
-      setPeople(
-        (peopleData.items ?? []).filter(
-          (person: any) =>
-            person.role !== "client" && person.accountStatus === "active",
-        ),
-      );
-    });
+    if (mode === "admin") {
+      void clientsApi
+        .getClientCompanies({ pageSize: 100 })
+        .then((res: any) => setCompanies(res?.items ?? []))
+        .catch(() => setCompanies([]));
+
+      void peopleApi
+        .getPeopleDirectory({ pageSize: 100 })
+        .then((res: any) => setPeople(res?.items ?? []))
+        .catch(() => setPeople([]));
+    }
   }, [mode]);
+
+  const handleDeleteProject = async () => {
+    if (!deletingProject) return;
+    try {
+      setDeleting(true);
+      setDeleteError(null);
+      await projectsApi.deleteProject(deletingProject.id);
+      setDeletingProject(null);
+      void load();
+    } catch (err: any) {
+      setDeleteError(err.message || "Không thể xóa dự án lúc này.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const detailBase =
     mode === "admin"
@@ -127,29 +149,27 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         ? "/app/client/projects"
         : "/app/projects";
 
-  const heading =
-    mode === "admin"
-      ? "Quản trị Dự án"
-      : mode === "client"
-        ? "Dự án Hợp tác Doanh nghiệp"
-        : "Dự án của Tôi";
-
-  const description =
-    mode === "admin"
-      ? "Theo dõi tiến độ, bàn giao sản phẩm và quản lý toàn bộ vòng đời dự án."
-      : mode === "client"
-        ? "Tra cứu tiến độ thực hiện và kết quả bàn giao của PGS Agency."
-        : "Không gian làm việc và nhiệm vụ trong các dự án bạn tham gia.";
-
   return (
     <div className="space-y-6">
-      {/* Section Header */}
+      {/* Header */}
       <SectionHeader
-        title={heading}
-        description={description}
+        title={
+          mode === "admin"
+            ? "Quản trị Dự án Khách hàng"
+            : mode === "client"
+              ? "Dự án của bạn"
+              : "Dự án tham gia"
+        }
+        description={
+          mode === "admin"
+            ? "Khởi tạo, điều phối nguồn lực và giám sát tiến độ toàn bộ dự án agency."
+            : mode === "client"
+              ? "Theo dõi tiến độ bàn giao và kết quả các dịch vụ của công ty bạn."
+              : "Danh sách các dự án bạn được phân công thực hiện nhiệm vụ."
+        }
         badge={`${result.total} Dự án`}
         action={
-          mode === "admin" && (
+          mode === "admin" ? (
             <Button
               variant="primary"
               size="sm"
@@ -158,31 +178,32 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             >
               Tạo dự án mới
             </Button>
-          )
+          ) : undefined
         }
       />
 
-      {/* Filter & Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_200px_180px_auto] gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
-        <div className="relative flex items-center">
-          <Search className="absolute left-3.5 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+      {/* Filter / Search Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <input
+            type="text"
+            placeholder="Tìm mã hoặc tên dự án..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm theo mã hoặc tên dự án..."
-            className="w-full rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] py-2.5 pl-10 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
-          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
-          <option value="">-- Tất cả trạng thái --</option>
-          {Object.entries(statusConfig).map(([key, config]) => (
+          <option value="">-- Mọi trạng thái --</option>
+          {Object.entries(statusConfig).map(([key, value]) => (
             <option key={key} value={key}>
-              {config.label}
+              {value.label}
             </option>
           ))}
         </select>
@@ -190,12 +211,12 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
-          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi mức ưu tiên --</option>
-          {Object.entries(priorityConfig).map(([key, config]) => (
+          {Object.entries(priorityConfig).map(([key, value]) => (
             <option key={key} value={key}>
-              Ưu tiên: {config.label}
+              {value.label}
             </option>
           ))}
         </select>
@@ -246,51 +267,69 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             };
 
             return (
-              <Link key={project.id} href={`${detailBase}/${project.id}`}>
-                <Card className="p-5 hover:border-[#4F75FF]/40 transition-all duration-150 group flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4 min-w-0">
-                    <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                      <BriefcaseBusiness className="w-5 h-5" />
-                    </div>
-
-                    <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono text-xs font-bold text-[#4F75FF]">
-                          {project.projectCode}
-                        </span>
-                        <Badge variant={sConf.variant} size="sm">
-                          {sConf.label}
-                        </Badge>
-                        <Badge variant={pConf.variant} size="sm">
-                          {pConf.label}
-                        </Badge>
+              <div key={project.id} className="relative group">
+                <Link href={`${detailBase}/${project.id}`}>
+                  <Card className="p-5 hover:border-[#4F75FF]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4 min-w-0 pr-12 md:pr-0">
+                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <BriefcaseBusiness className="w-5 h-5" />
                       </div>
 
-                      <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors truncate">
-                        {project.name}
-                      </h3>
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs font-bold text-[#4F75FF]">
+                            {project.projectCode}
+                          </span>
+                          <Badge variant={sConf.variant} size="sm">
+                            {sConf.label}
+                          </Badge>
+                          <Badge variant={pConf.variant} size="sm">
+                            {pConf.label}
+                          </Badge>
+                        </div>
 
-                      <p className="text-xs text-[#64748B] truncate">
-                        Khách hàng:{" "}
-                        <span className="text-[#0F172A] font-medium">
-                          {project.clientCompany?.name ?? "Chưa liên kết"}
+                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors truncate">
+                          {project.name}
+                        </h3>
+
+                        <p className="text-xs text-[#64748B] truncate">
+                          Khách hàng:{" "}
+                          <span className="text-[#0F172A] font-medium">
+                            {project.clientCompany?.name ?? "Chưa liên kết"}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#64748B] shrink-0">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        <span>
+                          {project.startDate || "—"} ➔ {project.dueDate || "—"}
                         </span>
-                      </p>
-                    </div>
-                  </div>
+                      </div>
 
-                  <div className="flex items-center justify-between md:justify-end gap-6 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#64748B] shrink-0">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span>
-                        {project.startDate || "—"} ➔ {project.dueDate || "—"}
-                      </span>
-                    </div>
+                      {mode === "admin" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeletingProject(project);
+                          }}
+                          title="Xóa dự án"
+                          className="text-rose-500 hover:bg-rose-50 hover:text-rose-700 p-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
 
-                    <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
-                  </div>
-                </Card>
-              </Link>
+                      <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
+                    </div>
+                  </Card>
+                </Link>
+              </div>
             );
           })}
         </div>
@@ -337,6 +376,49 @@ export function ProjectListView({ mode }: { mode: Mode }) {
           people={people}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        isOpen={!!deletingProject}
+        onClose={() => setDeletingProject(null)}
+        maxWidth="md"
+        title="Xác nhận lưu trữ dự án"
+        description={`Bạn có chắc chắn muốn lưu trữ dự án "${deletingProject?.name}" (${deletingProject?.projectCode})?`}
+      >
+        <div className="space-y-4 pt-2">
+          {deleteError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>{deleteError}</span>
+            </div>
+          )}
+
+          <p className="text-xs text-[#64748B] leading-relaxed">
+            Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để tra cứu và kiểm toán.
+          </p>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={deleting}
+              onClick={() => setDeletingProject(null)}
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              isLoading={deleting}
+              onClick={handleDeleteProject}
+            >
+              Lưu trữ dự án
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

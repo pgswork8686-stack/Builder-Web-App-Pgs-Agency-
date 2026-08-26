@@ -147,6 +147,7 @@ describe('AuthGuard', () => {
       avatarUrl: null,
       approvedAt: '2026-01-02',
       rejectionReason: null,
+      departmentId: null,
     });
   });
 

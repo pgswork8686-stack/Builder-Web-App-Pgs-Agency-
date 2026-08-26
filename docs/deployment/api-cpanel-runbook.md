@@ -65,9 +65,11 @@ Enter values only in **Setup Node.js App → Environment Variables** (wording ma
 APP_ENV
 PORT
 WEB_URL
+DATABASE_URL
 SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SECRET_KEY
+JWT_SECRET
 INITIAL_ADMIN_EMAIL
 THROTTLE_TTL
 THROTTLE_LIMIT
@@ -75,7 +77,7 @@ TRUST_PROXY
 CALENDARIFIC_API_KEY
 ```
 
-Production intent: `APP_ENV=production`, exact `WEB_URL=https://hub.pgsagency.vn`, hosting-assigned `PORT`, `THROTTLE_TTL=60000`, `THROTTLE_LIMIT=120`, and `TRUST_PROXY=true`; `CALENDARIFIC_API_KEY` is optional. `SUPABASE_SECRET_KEY` is a server secret: never put it in source, ZIP, `app.js`, GitHub, frontend, `NEXT_PUBLIC_*`, screenshots, or documentation.
+Production intent: `APP_ENV=production`, exact `WEB_URL=https://hub.pgsagency.vn`, hosted Supabase `DATABASE_URL`, hosting-assigned `PORT`, `THROTTLE_TTL=60000`, `THROTTLE_LIMIT=120`, and `TRUST_PROXY=true`; `CALENDARIFIC_API_KEY` is optional. `SUPABASE_SECRET_KEY` and `JWT_SECRET` are server secrets: never put them in source, ZIP, `app.js`, GitHub, frontend, `NEXT_PUBLIC_*`, screenshots, or documentation.
 
 ## G. Restart
 

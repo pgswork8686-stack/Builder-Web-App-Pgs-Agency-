@@ -69,6 +69,9 @@ export class ClientsService {
       email: c.email ?? null,
       phone: c.phone ?? null,
       website: c.website ?? null,
+      zalo: c.zalo ?? null,
+      messenger: c.messenger ?? null,
+      facebook: c.facebook ?? null,
       address: c.address ?? null,
       status: c.status,
       notes: c.notes ?? null,
@@ -143,6 +146,9 @@ export class ClientsService {
         email: dto.email?.trim() || null,
         phone: dto.phone?.trim() || null,
         website: dto.website?.trim() || null,
+        zalo: dto.zalo?.trim() || null,
+        messenger: dto.messenger?.trim() || null,
+        facebook: dto.facebook?.trim() || null,
         address: dto.address?.trim() || null,
         status: dto.status,
         notes: dto.notes?.trim() || null,
@@ -185,6 +191,11 @@ export class ClientsService {
       updatePayload.phone = dto.phone?.trim() || null;
     if (dto.website !== undefined)
       updatePayload.website = dto.website?.trim() || null;
+    if (dto.zalo !== undefined) updatePayload.zalo = dto.zalo?.trim() || null;
+    if (dto.messenger !== undefined)
+      updatePayload.messenger = dto.messenger?.trim() || null;
+    if (dto.facebook !== undefined)
+      updatePayload.facebook = dto.facebook?.trim() || null;
     if (dto.address !== undefined)
       updatePayload.address = dto.address?.trim() || null;
     if (dto.status !== undefined) updatePayload.status = dto.status;
@@ -209,6 +220,40 @@ export class ClientsService {
     }
 
     return data;
+  }
+
+  async deleteClientCompany(id: string) {
+    const existing = await this.getClientCompanyById(id);
+    if (existing.status === 'inactive') {
+      return {
+        success: true,
+        message: 'Khách hàng đã ngừng hoạt động trước đó.',
+      };
+    }
+
+    const { data, error } = await this.supabaseService
+      .getSystemClient()
+      .from('client_companies')
+      .update({ status: 'inactive' })
+      .eq('id', id)
+      .select('id,status')
+      .single();
+
+    if (error) {
+      this.logger.error(
+        `Failed to deactivate client company ${id}: ${error.message}`,
+      );
+      throw new InternalServerErrorException({
+        code: 'CLIENT_COMPANY_DEACTIVATE_FAILED',
+        message: 'Không thể ngừng hoạt động công ty khách hàng.',
+      });
+    }
+
+    return {
+      success: true,
+      data,
+      message: 'Khách hàng đã được chuyển sang ngừng hoạt động.',
+    };
   }
 
   // --- CLIENT MEMBERSHIPS CRUD (Admin & scoping) ---

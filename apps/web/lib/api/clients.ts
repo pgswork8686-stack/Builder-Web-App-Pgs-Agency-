@@ -9,6 +9,9 @@ export interface ClientCompany {
   email?: string | null;
   phone?: string | null;
   website?: string | null;
+  zalo?: string | null;
+  messenger?: string | null;
+  facebook?: string | null;
   address?: string | null;
   status: "active" | "inactive";
   isActive?: boolean;
@@ -55,6 +58,9 @@ export const clientsApi = {
     email?: string | null;
     phone?: string | null;
     website?: string | null;
+    zalo?: string | null;
+    messenger?: string | null;
+    facebook?: string | null;
     address?: string | null;
     status: "active" | "inactive";
     notes?: string | null;
@@ -73,6 +79,9 @@ export const clientsApi = {
       email?: string | null;
       phone?: string | null;
       website?: string | null;
+      zalo?: string | null;
+      messenger?: string | null;
+      facebook?: string | null;
       address?: string | null;
       status?: "active" | "inactive";
       notes?: string | null;
@@ -81,6 +90,12 @@ export const clientsApi = {
     return fetchWithAuth(`/admin/clients/${clientId}`, {
       method: "PATCH",
       body: JSON.stringify(data),
+    });
+  },
+
+  async deleteClientCompany(clientId: string) {
+    return fetchWithAuth(`/admin/clients/${clientId}`, {
+      method: "DELETE",
     });
   },
 

@@ -4,9 +4,11 @@ const safeTestConfig = {
   APP_ENV: 'test',
   PORT: '3001',
   WEB_URL: 'http://localhost:3000',
+  DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
   SUPABASE_URL: 'http://127.0.0.1:54321',
   SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key',
   SUPABASE_SECRET_KEY: 'test-secret-key',
+  JWT_SECRET: 'test-jwt-secret-with-at-least-32-characters',
   INITIAL_ADMIN_EMAIL: 'admin@test.local',
 };
 
@@ -25,6 +27,28 @@ describe('validateEnv', () => {
         SUPABASE_URL: 'https://test-project.supabase.co',
       }),
     ).toThrow('SUPABASE_URL must use a loopback URL when APP_ENV=test');
+  });
+
+  it('rejects a hosted database endpoint during test runs', () => {
+    expect(() =>
+      validateEnv({
+        ...safeTestConfig,
+        DATABASE_URL:
+          'postgresql://postgres:secret@db.project-ref.supabase.co:5432/postgres',
+      }),
+    ).toThrow('DATABASE_URL must use a loopback URL when APP_ENV=test');
+  });
+
+  it('rejects non-PostgreSQL database URLs', () => {
+    expect(() =>
+      validateEnv({ ...safeTestConfig, DATABASE_URL: 'https://example.com' }),
+    ).toThrow('DATABASE_URL must be a valid PostgreSQL URL');
+  });
+
+  it('rejects weak JWT secrets', () => {
+    expect(() =>
+      validateEnv({ ...safeTestConfig, JWT_SECRET: 'too-short' }),
+    ).toThrow('JWT_SECRET must be at least 32 characters');
   });
 
   it('rejects a non-local browser origin during test runs', () => {
