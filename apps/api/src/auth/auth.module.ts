@@ -30,4 +30,3 @@ import { ScopeGuard } from './scope.guard';
   ],
 })
 export class AuthModule {}
-

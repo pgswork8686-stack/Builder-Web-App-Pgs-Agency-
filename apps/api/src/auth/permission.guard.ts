@@ -64,11 +64,7 @@ export const ROLE_PERMISSIONS_MAP: Record<AppRole, AppPermission[]> = {
     'finance:manage',
     'services:read',
   ],
-  client: [
-    'projects:read',
-    'finance:read',
-    'services:read',
-  ],
+  client: ['projects:read', 'finance:read', 'services:read'],
 };
 
 @Injectable()
@@ -76,10 +72,9 @@ export class PermissionGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredPermissions = this.reflector.getAllAndOverride<AppPermission[]>(
-      PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<
+      AppPermission[]
+    >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;

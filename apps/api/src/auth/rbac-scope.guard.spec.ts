@@ -50,13 +50,19 @@ describe('RBAC Guards (PermissionGuard & ScopeGuard)', () => {
     });
 
     it('should throw UnauthorizedException if unauthenticated', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['projects:create']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['projects:create']);
       const context = createMockContext(undefined);
-      expect(() => permissionGuard.canActivate(context)).toThrow(UnauthorizedException);
+      expect(() => permissionGuard.canActivate(context)).toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should allow admin to perform any mapped action', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['projects:create', 'users:manage']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['projects:create', 'users:manage']);
       const context = createMockContext({
         authUserId: 'u1',
         role: 'admin',
@@ -66,17 +72,23 @@ describe('RBAC Guards (PermissionGuard & ScopeGuard)', () => {
     });
 
     it('should block employee from creating projects', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['projects:create']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['projects:create']);
       const context = createMockContext({
         authUserId: 'u2',
         role: 'employee',
         accountStatus: 'active',
       });
-      expect(() => permissionGuard.canActivate(context)).toThrow(ForbiddenException);
+      expect(() => permissionGuard.canActivate(context)).toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should allow team leader to create projects but block managing users', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['projects:create']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['projects:create']);
       const context = createMockContext({
         authUserId: 'u3',
         role: 'team_leader',
@@ -84,8 +96,12 @@ describe('RBAC Guards (PermissionGuard & ScopeGuard)', () => {
       });
       expect(permissionGuard.canActivate(context)).toBe(true);
 
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['users:manage']);
-      expect(() => permissionGuard.canActivate(context)).toThrow(ForbiddenException);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['users:manage']);
+      expect(() => permissionGuard.canActivate(context)).toThrow(
+        ForbiddenException,
+      );
     });
   });
 
