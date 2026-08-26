@@ -195,7 +195,7 @@ describe('Phase 5.5 HR Operation Validation (e2e)', () => {
       email: 'terminated@pgs.vn',
       phone: null,
       role: 'employee',
-      accountStatus: 'inactive', // Deactivated
+      accountStatus: 'rejected', // Deactivated / Rejected
       fullName: 'Terminated Employee',
       avatarUrl: null,
       approvedAt: '2026-01-01',
