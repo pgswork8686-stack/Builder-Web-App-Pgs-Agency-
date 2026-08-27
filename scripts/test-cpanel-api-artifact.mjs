@@ -171,12 +171,19 @@ try {
   const rejected = await fetch(healthUrl, {
     headers: { Origin: "https://attacker.example" },
   });
+  const rejectedBody = await rejected.json();
   if (
     rejected.status !== 403 ||
+    rejectedBody.statusCode !== 403 ||
+    rejectedBody.code !== "CORS_ORIGIN_DENIED" ||
+    typeof rejectedBody.message !== "string" ||
+    /stack|node_modules|\\\\/i.test(JSON.stringify(rejectedBody)) ||
     rejected.headers.get("access-control-allow-origin") ===
       "https://attacker.example"
   ) {
-    throw new Error("Production CORS did not reject an unrelated origin");
+    throw new Error(
+      "Production CORS did not return the expected sanitized rejection",
+    );
   }
 
   child.kill("SIGTERM");
