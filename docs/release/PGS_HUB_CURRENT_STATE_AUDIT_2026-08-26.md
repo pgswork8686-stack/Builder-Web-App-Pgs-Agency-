@@ -1,8 +1,8 @@
 # PGS HUB V1 — Current-State Audit
 
-**Audit date:** 2026-08-26 (Asia/Ho_Chi_Minh)  
-**Repository:** `pgs-hub`, branch `main`, HEAD `444d7a8ba127a806023a6568db72b2325ae60206`  
-**Production database:** Supabase project `umtgfaqjoqbsdzwpqizq`, PostgreSQL 17.6  
+**Audit date:** 2026-08-26 (Asia/Ho_Chi_Minh)
+**Repository:** `pgs-hub`, branch `main`, HEAD `444d7a8ba127a806023a6568db72b2325ae60206`
+**Production database:** Supabase project `umtgfaqjoqbsdzwpqizq`, PostgreSQL 17.6
 **Production URLs:** `https://hub.pgsagency.vn`, `https://apihub.pgsagency.vn`
 
 ## 0. Audit boundary and evidence

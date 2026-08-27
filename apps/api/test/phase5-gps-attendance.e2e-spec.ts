@@ -365,7 +365,9 @@ describe('Phase 5 GPS Attendance & HR Operations (e2e)', () => {
     };
 
     const res = await request(app.getHttpServer())
-      .get(`/api/v1/attendance/directory?departmentId=${DEPT_ID}&status=present`)
+      .get(
+        `/api/v1/attendance/directory?departmentId=${DEPT_ID}&status=present`,
+      )
       .set(authHeader())
       .expect(200);
 
@@ -396,7 +398,10 @@ describe('Phase 5 GPS Attendance & HR Operations (e2e)', () => {
       })
       .expect(201);
 
-    expect(res.body).toHaveProperty('reason', 'Quên chấm công do mất kết nối mạng internet.');
+    expect(res.body).toHaveProperty(
+      'reason',
+      'Quên chấm công do mất kết nối mạng internet.',
+    );
   });
 
   // 8. Employee views own attendance history

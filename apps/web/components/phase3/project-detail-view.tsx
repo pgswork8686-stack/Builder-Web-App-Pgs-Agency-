@@ -1294,7 +1294,8 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           )}
 
           <p className="text-xs text-[#64748B] leading-relaxed">
-            Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để tra cứu và kiểm toán.
+            Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
+            tra cứu và kiểm toán.
           </p>
 
           <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">

@@ -1,7 +1,7 @@
 # PGS HUB - PHASE 8 CUSTOMER PORTAL & MULTI-TENANT CLIENT EXPERIENCE REPORT
 
-**Date:** 2026-08-26  
-**Auditor:** PGS HUB Production Hardening Team  
+**Date:** 2026-08-26
+**Auditor:** PGS HUB Production Hardening Team
 **Scope:** Client Portal (`/app/client/*`), Strict Multi-Tenant Isolation, Deliverable Approval & Revision Workflow, Support Ticket System, Project Scoped Chat
 
 ---
@@ -10,14 +10,14 @@
 
 Phân hệ **Phase 8: Customer Portal + Multi-Tenant Client Experience** đã được thiết lập, kiểm toán bảo mật và kiểm thử tự động toàn diện qua bộ test e2e `apps/api/test/phase8-client-portal.e2e-spec.ts`:
 
-| Tiêu chí | Nội dung kiểm thử | Kết quả | Trạng thái |
-|---|---|---|:---:|
-| **1. Multi-Tenant Data Isolation** | Client A đăng nhập và chỉ thấy dự án thuộc công ty của mình (`client_company_id`). Khi cố tình gọi API dự án của Client B (`GET /api/v1/projects/client/:id`), hệ thống từ chối dứt khoát với HTTP 403 `PROJECT_CLIENT_ACCESS_DENIED`. | Cách ly tuyệt đối tại Backend API & Database RLS, không phụ thuộc vào frontend. | ✅ PASS |
-| **2. Client Deliverable Approval** | Client xem ấn phẩm nghiệm thu, thực hiện duyệt (`approved`) hoặc yêu cầu chỉnh sửa (`rejected`) kèm `decision_note` chi tiết. | Đồng bộ tức thì với `workflow_approval_requests` và kích hoạt automation event. | ✅ PASS |
-| **3. Support Ticket System** | Client gửi yêu cầu hỗ trợ (`POST /api/v1/support/tickets`) gắn với dự án và công ty. Hệ thống theo dõi trạng thái `open`, `in_progress`, `waiting_client`, `resolved`, `closed`. | Tạo và phân loại ticket thành công theo mức độ ưu tiên (`priority`). | ✅ PASS |
-| **4. Project Scoped Chat** | Client trao đổi trực tiếp với Project Manager trong phạm vi dự án (`type = 'project'`). Chặn tuyệt đối việc client tham gia room chat hoặc gửi tin nhắn vào dự án của công ty khác (HTTP 404 / 403). | Bảo mật kênh giao tiếp khách hàng. | ✅ PASS |
-| **5. Notification Delivery** | Client nhận các thông báo về ấn phẩm mới chờ duyệt, cập nhật tiến độ dự án, phản hồi ticket và tin nhắn chat từ PM. | Tích hợp qua `NotificationsService`. | ✅ PASS |
-| **6. Business Confidentiality Masking** | Ẩn toàn bộ task kỹ thuật nội bộ, chi phí nhân công, tỷ suất lợi nhuận và bình luận nội bộ trên Client Portal. | Client chỉ thấy dữ liệu nghiệm thu và tiến độ tổng quan. | ✅ PASS |
+| Tiêu chí                                | Nội dung kiểm thử                                                                                                                                                                                                                      | Kết quả                                                                         | Trạng thái |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | :--------: |
+| **1. Multi-Tenant Data Isolation**      | Client A đăng nhập và chỉ thấy dự án thuộc công ty của mình (`client_company_id`). Khi cố tình gọi API dự án của Client B (`GET /api/v1/projects/client/:id`), hệ thống từ chối dứt khoát với HTTP 403 `PROJECT_CLIENT_ACCESS_DENIED`. | Cách ly tuyệt đối tại Backend API & Database RLS, không phụ thuộc vào frontend. |  ✅ PASS   |
+| **2. Client Deliverable Approval**      | Client xem ấn phẩm nghiệm thu, thực hiện duyệt (`approved`) hoặc yêu cầu chỉnh sửa (`rejected`) kèm `decision_note` chi tiết.                                                                                                          | Đồng bộ tức thì với `workflow_approval_requests` và kích hoạt automation event. |  ✅ PASS   |
+| **3. Support Ticket System**            | Client gửi yêu cầu hỗ trợ (`POST /api/v1/support/tickets`) gắn với dự án và công ty. Hệ thống theo dõi trạng thái `open`, `in_progress`, `waiting_client`, `resolved`, `closed`.                                                       | Tạo và phân loại ticket thành công theo mức độ ưu tiên (`priority`).            |  ✅ PASS   |
+| **4. Project Scoped Chat**              | Client trao đổi trực tiếp với Project Manager trong phạm vi dự án (`type = 'project'`). Chặn tuyệt đối việc client tham gia room chat hoặc gửi tin nhắn vào dự án của công ty khác (HTTP 404 / 403).                                   | Bảo mật kênh giao tiếp khách hàng.                                              |  ✅ PASS   |
+| **5. Notification Delivery**            | Client nhận các thông báo về ấn phẩm mới chờ duyệt, cập nhật tiến độ dự án, phản hồi ticket và tin nhắn chat từ PM.                                                                                                                    | Tích hợp qua `NotificationsService`.                                            |  ✅ PASS   |
+| **6. Business Confidentiality Masking** | Ẩn toàn bộ task kỹ thuật nội bộ, chi phí nhân công, tỷ suất lợi nhuận và bình luận nội bộ trên Client Portal.                                                                                                                          | Client chỉ thấy dữ liệu nghiệm thu và tiến độ tổng quan.                        |  ✅ PASS   |
 
 ---
 

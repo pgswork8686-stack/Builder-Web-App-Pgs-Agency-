@@ -1,7 +1,7 @@
 # PGS HUB - PHASE 2.5 REAL DATA VALIDATION REPORT
 
-**Date:** 2026-08-26  
-**Auditor:** PGS HUB Production Hardening Team  
+**Date:** 2026-08-26
+**Auditor:** PGS HUB Production Hardening Team
 **Scope:** `users`, `profiles`, `roles`, `permissions`, `departments`, `employee_profiles`
 
 ---
@@ -18,6 +18,7 @@ Theo yêu cầu chuẩn bị dữ liệu trước khi chuyển giao hoàn toàn 
 ## 2. Real Data Schema & Entity Validation
 
 ### 2.1 Profiles & Roles Validation
+
 - **Bảng nguồn:** `public.profiles`
 - **Ràng buộc kiểm tra:**
   - `role`: Bắt buộc thuộc tập hợp `('admin', 'team_leader', 'employee', 'accountant', 'client')`.
@@ -27,6 +28,7 @@ Theo yêu cầu chuẩn bị dữ liệu trước khi chuyển giao hoàn toàn 
   - 100% tài khoản nội bộ (`admin`, `team_leader`, `employee`, `accountant`) phải có hồ sơ tương ứng.
 
 ### 2.2 Department & Manager Mapping Validation
+
 - **Bảng nguồn:** `public.departments` & `public.employee_profiles`
 - **9 Phòng ban chính thức (Official PGS Departments):**
   1. `PB_01` - Kinh doanh & Account (`ACCOUNT_SALES`)
@@ -48,18 +50,19 @@ Theo yêu cầu chuẩn bị dữ liệu trước khi chuyển giao hoàn toàn 
 
 Các bản ghi cần rà soát và chỉ định thủ công bởi Admin trên giao diện Quản trị tổ chức (`/app/admin/organization` & `/app/admin/people`):
 
-| Phân loại | Tiêu chí thiếu | Tác động hệ thống | Trạng thái / Hành động yêu cầu |
-|---|---|---|---|
-| **Users thiếu Role** | `profiles.role IS NULL` | Bị `RolesGuard` chặn toàn bộ truy cập | Đưa vào danh sách chờ Admin phân vai trò tại trang Quản trị tài khoản. |
-| **Team Leader thiếu Department** | `role = 'team_leader' AND department_id IS NULL` | Bị `ScopeGuard` & `ProjectsService.createProject` chặn tạo dự án | Yêu cầu gán phòng ban tại `employee_profiles`. |
-| **Employee thiếu Department** | `role = 'employee' AND department_id IS NULL` | Không lọc được báo cáo phòng ban | Gán phòng ban làm việc chính. |
-| **Department thiếu Head** | `departments.head_user_id IS NULL` | Không có người duyệt đơn nghỉ phép / ký duyệt dự án tự động | Admin chỉ định Head qua trang Departments. |
+| Phân loại                        | Tiêu chí thiếu                                   | Tác động hệ thống                                                | Trạng thái / Hành động yêu cầu                                         |
+| -------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Users thiếu Role**             | `profiles.role IS NULL`                          | Bị `RolesGuard` chặn toàn bộ truy cập                            | Đưa vào danh sách chờ Admin phân vai trò tại trang Quản trị tài khoản. |
+| **Team Leader thiếu Department** | `role = 'team_leader' AND department_id IS NULL` | Bị `ScopeGuard` & `ProjectsService.createProject` chặn tạo dự án | Yêu cầu gán phòng ban tại `employee_profiles`.                         |
+| **Employee thiếu Department**    | `role = 'employee' AND department_id IS NULL`    | Không lọc được báo cáo phòng ban                                 | Gán phòng ban làm việc chính.                                          |
+| **Department thiếu Head**        | `departments.head_user_id IS NULL`               | Không có người duyệt đơn nghỉ phép / ký duyệt dự án tự động      | Admin chỉ định Head qua trang Departments.                             |
 
 ---
 
 ## 4. Phase 3 Architecture Readiness Checklist
 
 Toàn bộ các tiêu chí nền tảng của Phase 3 đã được rà soát và xác nhận sẵn sàng:
+
 - [x] **Project thuộc Department:** Bảng `projects` có cột `department_id REFERENCES departments(id)` kèm index tối ưu truy vấn.
 - [x] **Manager có quyền tạo Project trong Department:** `ProjectsService.createProject` kiểm tra vai trò `team_leader` và tự động ràng buộc `department_id` của chính mình.
 - [x] **Employee Scope:** `getInternalProjects` giới hạn danh sách theo `project_memberships` (chỉ thấy dự án được phân công).

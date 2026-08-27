@@ -1,7 +1,7 @@
 # PGS HUB - BACKUP & DISASTER RECOVERY VALIDATION REPORT
 
-**Date:** 2026-08-26  
-**Auditor:** PGS HUB Production Infrastructure Team  
+**Date:** 2026-08-26
+**Auditor:** PGS HUB Production Infrastructure Team
 **Scope:** PostgreSQL Database Backup, File Storage Replication, Point-In-Time-Recovery (PITR) & Disaster Recovery Runbook
 
 ---
@@ -26,12 +26,12 @@ Hệ thống cơ sở dữ liệu Supabase / PostgreSQL trên Production áp d�
 
 ## 2. File Storage Buckets Backup & Replication
 
-| Bucket Name | Loại dữ liệu | Quyền truy cập | Chính sách sao lưu |
-|---|---|---|---|
-| **`documents`** | Hợp đồng, biểu mẫu, tài liệu dự án | Private (Signed URL qua Backend) | Daily Versioning & Lifecycle Rule |
-| **`deliverables`** | Ấn phẩm bàn giao, file demo, bản vẽ | Private (Client / Member token) | Multi-AZ Object Replication |
-| **`attachments`** | File đính kèm task, chat, support ticket | Private (Session scoped) | 30-day Soft-delete retention |
-| **`avatars`** | Ảnh đại diện người dùng | Public CDN cache | Cached via Cloudflare / Fastly |
+| Bucket Name        | Loại dữ liệu                             | Quyền truy cập                   | Chính sách sao lưu                |
+| ------------------ | ---------------------------------------- | -------------------------------- | --------------------------------- |
+| **`documents`**    | Hợp đồng, biểu mẫu, tài liệu dự án       | Private (Signed URL qua Backend) | Daily Versioning & Lifecycle Rule |
+| **`deliverables`** | Ấn phẩm bàn giao, file demo, bản vẽ      | Private (Client / Member token)  | Multi-AZ Object Replication       |
+| **`attachments`**  | File đính kèm task, chat, support ticket | Private (Session scoped)         | 30-day Soft-delete retention      |
+| **`avatars`**      | Ảnh đại diện người dùng                  | Public CDN cache                 | Cached via Cloudflare / Fastly    |
 
 ---
 

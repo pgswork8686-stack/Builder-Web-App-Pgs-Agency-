@@ -1,7 +1,7 @@
 # PGS HUB V1 — Phase 1 Implementation Record
 
-**Date:** 2026-08-26  
-**Baseline:** `PGS_HUB_CURRENT_STATE_AUDIT_2026-08-26.md`  
+**Date:** 2026-08-26
+**Baseline:** `PGS_HUB_CURRENT_STATE_AUDIT_2026-08-26.md`
 **Phase:** Fix Core Architecture
 
 ## Outcome

@@ -8,7 +8,6 @@ import { WorkflowRuntimeService } from '../src/workflows/workflow-runtime.servic
 
 const PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 const WORKFLOW_ID = '22222222-2222-4222-8222-222222222222';
-const STAGE_ID = '33333333-3333-4333-8333-333333333333';
 const ITEM_ID = '44444444-4444-4444-8444-444444444444';
 const APPROVAL_ID = '55555555-5555-4555-8555-555555555555';
 
@@ -28,35 +27,39 @@ describe('Phase 4.5 Approval Stress Validation (e2e)', () => {
   };
 
   const mockWorkflowRuntimeService = {
-    requestApproval: jest.fn().mockImplementation((projectId, workflowId, dto, user) => ({
-      id: APPROVAL_ID,
-      projectId,
-      projectWorkflowId: workflowId,
-      projectWorkflowStageItemId: dto.stageItemId ?? null,
-      projectWorkflowStageId: dto.stageId ?? null,
-      approvalType: dto.approvalType,
-      status: 'pending',
-      requestedByUserId: user.profileId,
-      requestNote: dto.requestNote ?? null,
-      requestedAt: new Date().toISOString(),
-    })),
-    respondApproval: jest.fn().mockImplementation((projectId, workflowId, approvalId, dto, user) => {
-      if (user.role === 'employee') {
-        throw new ForbiddenException({
-          code: 'WORKFLOW_PROJECT_MUTATION_DENIED',
-          message: 'Only the Project Manager can mutate this workflow.',
-        });
-      }
-      return {
-        id: approvalId,
+    requestApproval: jest
+      .fn()
+      .mockImplementation((projectId, workflowId, dto, user) => ({
+        id: APPROVAL_ID,
         projectId,
         projectWorkflowId: workflowId,
-        status: dto.decision,
-        approverUserId: user.profileId,
-        decisionNote: dto.decisionNote ?? null,
-        respondedAt: new Date().toISOString(),
-      };
-    }),
+        projectWorkflowStageItemId: dto.stageItemId ?? null,
+        projectWorkflowStageId: dto.stageId ?? null,
+        approvalType: dto.approvalType,
+        status: 'pending',
+        requestedByUserId: user.profileId,
+        requestNote: dto.requestNote ?? null,
+        requestedAt: new Date().toISOString(),
+      })),
+    respondApproval: jest
+      .fn()
+      .mockImplementation((projectId, workflowId, approvalId, dto, user) => {
+        if (user.role === 'employee') {
+          throw new ForbiddenException({
+            code: 'WORKFLOW_PROJECT_MUTATION_DENIED',
+            message: 'Only the Project Manager can mutate this workflow.',
+          });
+        }
+        return {
+          id: approvalId,
+          projectId,
+          projectWorkflowId: workflowId,
+          status: dto.decision,
+          approverUserId: user.profileId,
+          decisionNote: dto.decisionNote ?? null,
+          respondedAt: new Date().toISOString(),
+        };
+      }),
     listApprovals: jest.fn().mockResolvedValue([
       {
         id: APPROVAL_ID,
@@ -254,12 +257,16 @@ describe('Phase 4.5 Approval Stress Validation (e2e)', () => {
       .set(authHeader())
       .send({
         decision: 'rejected',
-        decisionNote: 'Design colors do not match brand guidelines. Please revise.',
+        decisionNote:
+          'Design colors do not match brand guidelines. Please revise.',
       })
       .expect(201);
 
     expect(res.body).toHaveProperty('status', 'rejected');
-    expect(res.body).toHaveProperty('decisionNote', 'Design colors do not match brand guidelines. Please revise.');
+    expect(res.body).toHaveProperty(
+      'decisionNote',
+      'Design colors do not match brand guidelines. Please revise.',
+    );
   });
 
   // 5. Query Approvals List

@@ -233,7 +233,10 @@ describe('Phase 5.5 HR Operation Validation (e2e)', () => {
       .expect(201);
 
     expect(res.body).toHaveProperty('adjustedByUserId', 'mgr-id');
-    expect(res.body).toHaveProperty('reason', 'Đi gặp khách hàng tại địa điểm đối tác theo lịch công tác.');
+    expect(res.body).toHaveProperty(
+      'reason',
+      'Đi gặp khách hàng tại địa điểm đối tác theo lịch công tác.',
+    );
   });
 
   // 4. Monthly Attendance Reporting: Metrics calculation
@@ -253,7 +256,9 @@ describe('Phase 5.5 HR Operation Validation (e2e)', () => {
 
     // Directory list with department filter
     const dirRes = await request(app.getHttpServer())
-      .get(`/api/v1/attendance/directory?departmentId=${DEPT_ID}&status=late&from=2026-08-01&to=2026-08-31`)
+      .get(
+        `/api/v1/attendance/directory?departmentId=${DEPT_ID}&status=late&from=2026-08-01&to=2026-08-31`,
+      )
       .set(authHeader())
       .expect(200);
 

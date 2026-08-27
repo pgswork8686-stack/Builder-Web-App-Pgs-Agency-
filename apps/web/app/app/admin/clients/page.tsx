@@ -366,7 +366,11 @@ export default function AdminClientsPage() {
                       <p className="font-bold text-[#0F172A]">{comp.name}</p>
                       {comp.website && (
                         <a
-                          href={comp.website.startsWith("http") ? comp.website : `https://${comp.website}`}
+                          href={
+                            comp.website.startsWith("http")
+                              ? comp.website
+                              : `https://${comp.website}`
+                          }
                           target="_blank"
                           rel="noreferrer"
                           className="text-[11px] text-[#64748B] hover:text-[#4F75FF] flex items-center gap-1 mt-0.5"
@@ -801,7 +805,8 @@ export default function AdminClientsPage() {
           )}
 
           <p className="text-xs text-[#64748B] leading-relaxed">
-            Hồ sơ doanh nghiệp, tài khoản liên kết và toàn bộ dự án vẫn được giữ nguyên để bảo toàn lịch sử vận hành.
+            Hồ sơ doanh nghiệp, tài khoản liên kết và toàn bộ dự án vẫn được giữ
+            nguyên để bảo toàn lịch sử vận hành.
           </p>
 
           <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">

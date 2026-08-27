@@ -18,8 +18,6 @@ const CLIENT_A_USER_ID = 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
 const CLIENT_A_COMPANY_ID = '11111111-1111-4111-8111-111111111111';
 const PROJECT_A_ID = '22222222-2222-4222-8222-222222222222';
 
-const CLIENT_B_USER_ID = 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb';
-const CLIENT_B_COMPANY_ID = '33333333-3333-4333-8333-333333333333';
 const PROJECT_B_ID = '44444444-4444-4444-8444-444444444444';
 
 const WORKFLOW_ID = '55555555-5555-4555-8555-555555555555';
@@ -45,7 +43,7 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
   };
 
   const mockProjectsService = {
-    getClientProjects: jest.fn().mockImplementation((userId, _page, _pageSize) => {
+    getClientProjects: jest.fn().mockImplementation((userId) => {
       if (userId === CLIENT_A_USER_ID) {
         return {
           items: [
@@ -84,28 +82,34 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
   };
 
   const mockWorkflowRuntimeService = {
-    respondApproval: jest.fn().mockImplementation((projectId, workflowId, approvalId, dto, user) => {
-      if (user.profileId === CLIENT_A_USER_ID && projectId === PROJECT_B_ID) {
-        throw new ForbiddenException({
-          code: 'WORKFLOW_PROJECT_ACCESS_DENIED',
-          message: 'Client from another company cannot respond to this approval.',
-        });
-      }
-      return {
-        id: approvalId,
-        projectId,
-        projectWorkflowId: workflowId,
-        status: dto.decision,
-        decisionNote: dto.decisionNote ?? null,
-        approverUserId: user.profileId,
-        respondedAt: new Date().toISOString(),
-      };
-    }),
+    respondApproval: jest
+      .fn()
+      .mockImplementation((projectId, workflowId, approvalId, dto, user) => {
+        if (user.profileId === CLIENT_A_USER_ID && projectId === PROJECT_B_ID) {
+          throw new ForbiddenException({
+            code: 'WORKFLOW_PROJECT_ACCESS_DENIED',
+            message:
+              'Client from another company cannot respond to this approval.',
+          });
+        }
+        return {
+          id: approvalId,
+          projectId,
+          projectWorkflowId: workflowId,
+          status: dto.decision,
+          decisionNote: dto.decisionNote ?? null,
+          approverUserId: user.profileId,
+          respondedAt: new Date().toISOString(),
+        };
+      }),
   };
 
   const mockSupportService = {
     createTicket: jest.fn().mockImplementation((dto, user) => {
-      if (user.profileId === CLIENT_A_USER_ID && dto.projectId === PROJECT_B_ID) {
+      if (
+        user.profileId === CLIENT_A_USER_ID &&
+        dto.projectId === PROJECT_B_ID
+      ) {
         throw new ForbiddenException({
           code: 'SUPPORT_PROJECT_ACCESS_DENIED',
           message: 'Không thể tạo ticket cho dự án ngoài phạm vi hợp đồng.',
@@ -152,7 +156,8 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
           recipientUserId: CLIENT_A_USER_ID,
           type: 'workflow.approval.requested',
           title: 'Ấn phẩm mới chờ bạn duyệt',
-          message: 'Giai đoạn 1 dự án Brand Identity Project A đã sẵn sàng nghiệm thu.',
+          message:
+            'Giai đoạn 1 dự án Brand Identity Project A đã sẵn sàng nghiệm thu.',
           entityType: 'workflow_approval_request',
           entityId: APPROVAL_ID,
           actionUrl: '/app/client/approvals',
@@ -277,7 +282,10 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
 
     expect(res.body.items).toHaveLength(1);
     expect(res.body.items[0]).toHaveProperty('id', PROJECT_A_ID);
-    expect(res.body.items[0]).toHaveProperty('clientCompanyId', CLIENT_A_COMPANY_ID);
+    expect(res.body.items[0]).toHaveProperty(
+      'clientCompanyId',
+      CLIENT_A_COMPANY_ID,
+    );
   });
 
   // 2. Client Tenancy Isolation: Client A CANNOT view Client B project
@@ -318,7 +326,10 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
       .expect(201);
 
     expect(res.body).toHaveProperty('status', 'rejected');
-    expect(res.body).toHaveProperty('decisionNote', 'Cần chỉnh sửa lại font chữ logo và tăng tương phản màu.');
+    expect(res.body).toHaveProperty(
+      'decisionNote',
+      'Cần chỉnh sửa lại font chữ logo và tăng tương phản màu.',
+    );
   });
 
   // 5. Client Support Ticket: Create & Query
@@ -354,7 +365,10 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
       .expect(200);
 
     expect(res.body.items).toHaveLength(1);
-    expect(res.body.items[0]).toHaveProperty('type', 'workflow.approval.requested');
+    expect(res.body.items[0]).toHaveProperty(
+      'type',
+      'workflow.approval.requested',
+    );
   });
 
   // 7. Client Chat: Chat within project conversation only
@@ -366,7 +380,10 @@ describe('Phase 8 Customer Portal & Multi-Tenant Isolation (e2e)', () => {
       .send({ content: 'Chào PM, bản thiết kế mới đã được duyệt!' })
       .expect(201);
 
-    expect(chatRes.body).toHaveProperty('content', 'Chào PM, bản thiết kế mới đã được duyệt!');
+    expect(chatRes.body).toHaveProperty(
+      'content',
+      'Chào PM, bản thiết kế mới đã được duyệt!',
+    );
 
     // Project B chat -> 404
     await request(app.getHttpServer())

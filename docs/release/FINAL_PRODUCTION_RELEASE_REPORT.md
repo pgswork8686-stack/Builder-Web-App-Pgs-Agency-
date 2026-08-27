@@ -1,7 +1,9 @@
 # PGS HUB - FINAL PRODUCTION RELEASE REPORT
 
-**Date:** 2026-08-26  
-**Auditor:** PGS HUB Production Hardening & Release Engineering Team  
+> **2026-08-27 validation addendum — supersedes any conflicting PASS or go-live statements below.** The release source, local tests, production-configured build, and Node 22.23.0 cPanel artifact verification were re-executed. The generated artifact is `fa6cb1d2c67de1f2fa8a9cc926cae4efd4f0ee3083e062d21efc96cb55c53f19`, reproducible from clean `2964f80`. Production deployment, database, backup, monitoring, and persona UAT evidence were not available. The public API returns 500 (not the expected 403) for an untrusted CORS origin. **Current final status: GO-LIVE BLOCKED.** See `FINAL_DEPLOYMENT_EVIDENCE.md` and `FINAL_PRODUCTION_UAT_REPORT.md` for actual executed evidence and required actions.
+
+**Date:** 2026-08-26
+**Auditor:** PGS HUB Production Hardening & Release Engineering Team
 **Release Target:** Enterprise Production v1.0.0 (cPanel API + Vercel Web + Supabase PostgreSQL)
 
 ---
@@ -32,6 +34,7 @@ Hệ thống **PGS HUB** đã hoàn thành toàn bộ 9 giai đoạn của chư�
 ## 2. Infrastructure & Hosting Audit (Phase 9.1)
 
 ### 2.1 Backend cPanel & Passenger
+
 - **Runtime Target:** Node.js v22.23.0 (x64) độc lập.
 - **Packaging:** Đóng gói độc lập qua `scripts/build-cpanel-api.mjs` thành `artifacts/pgs-hub-api-cpanel.zip` (SHA256: `d1ea8abdefca137ba2c040ca2863939f82623116f38ddf7b940e3553a31999e3`).
 - **Fail-Fast Validation:** Tự động kiểm tra cấu hình bắt buộc trước khi bind port. Nếu thiếu bất kỳ biến môi trường nào (`SUPABASE_SECRET_KEY`, `DATABASE_URL`, `JWT_SECRET`), hệ thống exit 1 với log rõ ràng, không khởi động treo.
@@ -39,11 +42,13 @@ Hệ thống **PGS HUB** đã hoàn thành toàn bộ 9 giai đoạn của chư�
 - **Request Tracing:** `RequestContextMiddleware` gán `X-Request-Id` UUID cho mọi request và truyền vào log để debug truy vết.
 
 ### 2.2 Frontend Vercel & Next.js 16
+
 - **Static Page Generation:** Prerender thành công 86 static routes với Turbopack.
 - **Environment Isolation:** Chỉ các biến có tiền tố `NEXT_PUBLIC_` được build vào client bundle; toàn bộ secret backend được cô lập tuyệt đối.
 - **CORS & Domain Boundary:** Cấu hình nguồn gốc nghiêm ngặt (`allowedOrigins`), từ chối mọi domain trái phép với `CORS_ORIGIN_DENIED`.
 
 ### 2.3 Database Supabase / PostgreSQL
+
 - **Connection Resilience:** Khởi tạo connection pool với cấu hình timeout và retry hợp lý.
 - **Index Optimization:** Đầy đủ index trên các khóa ngoại (`project_id`, `client_company_id`, `user_id`, `department_id`) và các trường tìm kiếm/lọc thường xuyên.
 - **RLS & Security Policies:** Bật Row Level Security trên toàn bộ bảng core (`roles`, `permissions`, `attendance_settings`, `workflow_audit_events`).
@@ -53,6 +58,7 @@ Hệ thống **PGS HUB** đã hoàn thành toàn bộ 9 giai đoạn của chư�
 ## 3. Security Final Audit (Phase 9.2)
 
 ### 3.1 HTTP Security Headers
+
 - **Content-Security-Policy (CSP):** Cấu hình chặt chẽ qua `Helmet` trong production (`defaultSrc: ["'self'"]`, `frameAncestors: ["'none'"]`, `objectSrc: ["'none'"]`).
 - **Strict-Transport-Security (HSTS):** `maxAge: 31536000` (1 năm), `includeSubDomains: true`, `preload: true`.
 - **Anti-Clickjacking:** `X-Frame-Options: DENY` (qua CSP frame-ancestors).
@@ -60,12 +66,14 @@ Hệ thống **PGS HUB** đã hoàn thành toàn bộ 9 giai đoạn của chư�
 - **Referrer Policy:** `no-referrer` / `strict-origin-when-cross-origin`.
 
 ### 3.2 Authorization & Tenant Isolation Layer
+
 - **Multi-Level Guards:** `AuthGuard` $\to$ `ActiveAccountGuard` $\to$ `RolesGuard` $\to$ `PermissionGuard` $\to$ `ScopeGuard`.
 - **Multi-Tenant Client Isolation:** Khách hàng công ty A bị chặn tuyệt đối (HTTP 403) khi cố truy cập dự án, tài liệu, ticket hoặc chat của công ty B.
 - **Rate Limiting:** `ThrottlerModule` bảo vệ toàn bộ API chống tấn công brute-force và DoS.
 - **Data Sanitization:** `HttpExceptionFilter` lọc sạch các thông tin kỹ thuật nội bộ (stack trace, cú pháp SQL) trước khi trả response 500 cho client.
 
 ### 3.3 Secret Boundary Scan
+
 - Chạy script `node scripts/verify-secret-boundaries.mjs` kiểm tra toàn bộ codebase: **PASS**.
 - Không có secret nào bị ghi cứng (hardcoded) trong mã nguồn, commit history hay client bundle.
 
