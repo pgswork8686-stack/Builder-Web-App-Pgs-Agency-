@@ -4,38 +4,38 @@
 
 ## 2026-08-27 continuation release matrix
 
-| Gate | Result | Evidence |
-| --- | --- | --- |
-| Git | PASS | Release branch `b9c6e06` pushed; PR #14 open. |
-| Main Sync | NOT VERIFIED | `main` remains `444d7a8`; PR is intentionally unmerged. |
-| Release | PASS | Tag dereferences to `2964f80`; source CORS contract is verified locally. |
-| API Unit | PASS | 615/615. |
-| API E2E | PASS | 138/138. |
-| Web | PASS | 80/80. |
-| Build | PASS | Local and CI build passed. |
-| Artifact | PASS | Node 22 verifier passed for `b2656a8f…10cab`. |
-| Node 22 | PASS | Exact 22.23.0 local and CI artifact job. |
-| Frontend Production | NOT VERIFIED | Production Vercel commit is unavailable. |
-| Backend Production | FAIL | Live backend remains behind verified artifact behavior. |
-| Health | PASS | Production `/api/v1/health` is 200. |
-| Auth | PASS | Production unauthenticated `/auth/me` is 401 `UNAUTHORIZED`. |
-| CORS | FAIL | Untrusted origin returns 500 instead of 403. |
-| Security Headers | PASS | CSP, HSTS, `nosniff`, and Referrer-Policy observed on production API. |
-| RBAC | PASS | Automated tests passed. |
-| Scope | PASS | Automated tests passed. |
-| Tenant | PASS | Automated tests passed. |
-| Project | PASS | Automated tests passed. |
-| Task | PASS | Automated tests passed. |
-| Kanban | PASS | Automated tests passed. |
-| Calendar | PASS | Automated tests passed. |
-| Approval | PASS | Automated tests passed. |
-| Attendance | PASS | Automated tests passed. |
-| Notifications | PASS | Automated tests passed. |
-| Client Portal | PASS | Automated tests passed. |
-| Database | NOT VERIFIED | No safe local Docker or production read-only access. |
-| Backup | NOT VERIFIED | No provider evidence access. |
-| Monitoring | NOT VERIFIED | No provider logs/monitoring access. |
-| UAT | NOT VERIFIED | No safe persona test accounts/data. |
+| Gate                | Result       | Evidence                                                                 |
+| ------------------- | ------------ | ------------------------------------------------------------------------ |
+| Git                 | PASS         | Release branch `b9c6e06` pushed; PR #14 open.                            |
+| Main Sync           | NOT VERIFIED | `main` remains `444d7a8`; PR is intentionally unmerged.                  |
+| Release             | PASS         | Tag dereferences to `2964f80`; source CORS contract is verified locally. |
+| API Unit            | PASS         | 615/615.                                                                 |
+| API E2E             | PASS         | 138/138.                                                                 |
+| Web                 | PASS         | 80/80.                                                                   |
+| Build               | PASS         | Local and CI build passed.                                               |
+| Artifact            | PASS         | Node 22 verifier passed for `b2656a8f…10cab`.                            |
+| Node 22             | PASS         | Exact 22.23.0 local and CI artifact job.                                 |
+| Frontend Production | NOT VERIFIED | Production Vercel commit is unavailable.                                 |
+| Backend Production  | FAIL         | Live backend remains behind verified artifact behavior.                  |
+| Health              | PASS         | Production `/api/v1/health` is 200.                                      |
+| Auth                | PASS         | Production unauthenticated `/auth/me` is 401 `UNAUTHORIZED`.             |
+| CORS                | FAIL         | Untrusted origin returns 500 instead of 403.                             |
+| Security Headers    | PASS         | CSP, HSTS, `nosniff`, and Referrer-Policy observed on production API.    |
+| RBAC                | PASS         | Automated tests passed.                                                  |
+| Scope               | PASS         | Automated tests passed.                                                  |
+| Tenant              | PASS         | Automated tests passed.                                                  |
+| Project             | PASS         | Automated tests passed.                                                  |
+| Task                | PASS         | Automated tests passed.                                                  |
+| Kanban              | PASS         | Automated tests passed.                                                  |
+| Calendar            | PASS         | Automated tests passed.                                                  |
+| Approval            | PASS         | Automated tests passed.                                                  |
+| Attendance          | PASS         | Automated tests passed.                                                  |
+| Notifications       | PASS         | Automated tests passed.                                                  |
+| Client Portal       | PASS         | Automated tests passed.                                                  |
+| Database            | NOT VERIFIED | No safe local Docker or production read-only access.                     |
+| Backup              | NOT VERIFIED | No provider evidence access.                                             |
+| Monitoring          | NOT VERIFIED | No provider logs/monitoring access.                                      |
+| UAT                 | NOT VERIFIED | No safe persona test accounts/data.                                      |
 
 **Date:** 2026-08-26
 **Auditor:** PGS HUB Production Hardening & Release Engineering Team
