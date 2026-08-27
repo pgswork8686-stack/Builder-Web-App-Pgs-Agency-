@@ -1,6 +1,6 @@
 # PGS HUB - FINAL PRODUCTION RELEASE REPORT
 
-> **2026-08-27 continuation addendum — supersedes any conflicting PASS or go-live statements below.** Tagged release `v1.0.0-production` dereferences to `2964f80`; the active release branch head is `b9c6e06`. Its Node 22.23.0 verified cPanel artifact is `b2656a8f24932164b59552acfc33af3ab6d9bda463909233d7de5a7587d10cab`. PR #14 passed CI and has a successful Vercel Preview, but `main` remains `444d7a8`, production Vercel SHA is not verified, and no cPanel deployment occurred. A repeat production smoke check at 2026-08-27T03:20:37Z still returned HTTP 500 (not 403) for an untrusted CORS origin. **Current final status: GO-LIVE BLOCKED.**
+> **2026-08-27 continuation addendum — supersedes any conflicting PASS or go-live statements below.** Tagged release `v1.0.0-production` dereferences to `2964f80`; the active release branch head is `b5a3f57` (runtime/artifact source `b9c6e06`). Its Node 22.23.0 verified cPanel artifact is `b2656a8f24932164b59552acfc33af3ab6d9bda463909233d7de5a7587d10cab`. PR #14 passed CI and has a successful Vercel Preview, but `main` remains `444d7a8`, production Vercel SHA is not verified, and no cPanel deployment occurred. At 2026-08-27T03:27:57Z, production health was 200 and unauthenticated auth was 401 `UNAUTHORIZED`, but an untrusted CORS origin still returned HTTP 500 (not 403). **CPANEL_DEPLOYMENT_ACCESS = BLOCKED** because no configured cPanel/FTP/SFTP/SSH access exists in this workspace. **Current final status: GO-LIVE BLOCKED.**
 
 ## 2026-08-27 continuation release matrix
 

@@ -13,6 +13,14 @@
 - PR [#14](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/pull/14) is open from the release branch to `main` (`444d7a8`). GitHub Quality gates, API production container, cPanel Node 22 artifact, and Vercel Preview checks all passed. The Vercel deployment is Preview only and protected by Vercel SSO; it is not production evidence.
 - A repeated public smoke request at 2026-08-27T03:20:37Z confirmed trusted CORS remains 200 and unauthenticated auth remains 401, but untrusted `https://evil.example.com` still receives HTTP 500. No cPanel deployment access is available in this workspace, so the verified artifact has not been uploaded or restarted.
 
+## Deployment-blocker recheck — 2026-08-27T10:27:57+07:00
+
+- Git was fetched without rewriting history. `main`/`origin/main` remains `444d7a8`, which does not contain `2964f80`; PR #14 is the normal, clean merge path and remains intentionally unmerged while the backend is stale.
+- Rollback snapshot from the public production endpoints: trusted health returned HTTP 200 with `status: ok`, `service: pgs-hub-api`, the supplied request ID, and the allowed origin; unauthenticated `/api/v1/auth/me` returned HTTP 401 with `code: UNAUTHORIZED`; untrusted `Origin: https://evil.example.com` returned HTTP 500 with `code: INTERNAL_SERVER_ERROR` and no `X-Request-Id` or reflected CORS origin. API root returned application-controlled HTTP 404. The frontend home and login both returned HTTP 200 from Vercel.
+- The observed API response headers include CSP, HSTS, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: no-referrer`. This is rollback evidence only, not release identity evidence.
+- **CPANEL_DEPLOYMENT_ACCESS = BLOCKED.** No cPanel/FTP/SFTP/SSH access variables, SSH configuration, or SSH key are configured in this workspace; no cPanel command-line tool is available. No upload, restart, log inspection, or production configuration change was attempted.
+- There is an unresolved deployment-root discrepancy: this execution brief names `/home/nhongv3g/pgs-hub-api`, while the repository cPanel runbook names `/home/<cpanel-user>/public_html/apihub`. Confirm the root shown by **Setup Node.js App** before extracting any ZIP; never deploy the artifact to both paths.
+
 ## Local release evidence
 
 | Gate                           | Actual result                                                                                                     |
