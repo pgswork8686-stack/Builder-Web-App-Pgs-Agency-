@@ -5,6 +5,14 @@
 **Branch under validation:** `codex/production-hardening-2026-08-26`
 **Deployment action performed:** none — deployment is blocked by the evidence below.
 
+## Continuation update — 2026-08-27T10:20:37+07:00
+
+- Runtime release branch head: `b9c6e060e7ca68edf77d06769b31f557aa3804f3`.
+- Production tag remains unchanged: `v1.0.0-production` dereferences to `2964f8054113ec38ee5ce4d1f978037592c56c9b`.
+- Verified current-branch cPanel artifact: `b2656a8f24932164b59552acfc33af3ab6d9bda463909233d7de5a7587d10cab` under Node.js 22.23.0. Its `DEPLOYMENT_INFO.txt` records `SOURCE_SHA=b9c6e06`.
+- PR [#14](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/pull/14) is open from the release branch to `main` (`444d7a8`). GitHub Quality gates, API production container, cPanel Node 22 artifact, and Vercel Preview checks all passed. The Vercel deployment is Preview only and protected by Vercel SSO; it is not production evidence.
+- A repeated public smoke request at 2026-08-27T03:20:37Z confirmed trusted CORS remains 200 and unauthenticated auth remains 401, but untrusted `https://evil.example.com` still receives HTTP 500. No cPanel deployment access is available in this workspace, so the verified artifact has not been uploaded or restarted.
+
 ## Local release evidence
 
 | Gate                           | Actual result                                                                                                     |
