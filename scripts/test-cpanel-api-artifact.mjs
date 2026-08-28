@@ -76,7 +76,8 @@ function expectFailFast(name, mutate) {
     APP_ENV: "production",
     PORT: "31999",
     WEB_URL: "https://hub.example.com",
-    DATABASE_URL: "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
+    DATABASE_URL:
+      "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
     SUPABASE_URL: "https://example.supabase.co",
     SUPABASE_PUBLISHABLE_KEY: "test-placeholder",
     SUPABASE_SECRET_KEY: marker,
@@ -127,7 +128,8 @@ try {
     APP_ENV: "production",
     PORT: String(port),
     WEB_URL: "https://hub.example.com",
-    DATABASE_URL: "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
+    DATABASE_URL:
+      "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
     SUPABASE_URL: "https://example.supabase.co",
     SUPABASE_PUBLISHABLE_KEY: "test-placeholder",
     SUPABASE_SECRET_KEY: "test-placeholder",
@@ -168,8 +170,22 @@ try {
     );
   }
 
+  const unauthenticatedAuth = await fetch(
+    `http://127.0.0.1:${port}/api/v1/auth/me`,
+  );
+  const unauthenticatedAuthBody = await unauthenticatedAuth.json();
+  if (
+    unauthenticatedAuth.status !== 401 ||
+    unauthenticatedAuthBody.statusCode !== 401 ||
+    unauthenticatedAuthBody.code !== "UNAUTHORIZED"
+  ) {
+    throw new Error(
+      "Packaged API unauthenticated auth smoke did not return 401 UNAUTHORIZED",
+    );
+  }
+
   const rejected = await fetch(healthUrl, {
-    headers: { Origin: "https://attacker.example" },
+    headers: { Origin: "https://evil.example.com" },
   });
   const rejectedBody = await rejected.json();
   if (
@@ -179,7 +195,7 @@ try {
     typeof rejectedBody.message !== "string" ||
     /stack|node_modules|\\\\/i.test(JSON.stringify(rejectedBody)) ||
     rejected.headers.get("access-control-allow-origin") ===
-      "https://attacker.example"
+      "https://evil.example.com"
   ) {
     throw new Error(
       "Production CORS did not return the expected sanitized rejection",
@@ -196,6 +212,7 @@ try {
   console.log("NODE_22_STARTUP=PASS");
   console.log("HEALTH=PASS");
   console.log("REQUEST_ID=PASS");
+  console.log("AUTH=PASS");
   console.log("CORS=PASS");
   console.log("SIGTERM=PASS");
 
