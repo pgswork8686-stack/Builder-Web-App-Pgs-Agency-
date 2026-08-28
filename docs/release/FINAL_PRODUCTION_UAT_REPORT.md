@@ -4,6 +4,30 @@
 **Execution timestamp:** 2026-08-27T09:39:21+07:00
 **Result:** **NOT VERIFIED — GO-LIVE BLOCKED**
 
+## Profiles permission repair update — 2026-08-28T10:27:44+07:00
+
+This update supersedes older public API health results below.
+
+| Area                                    | Result       | Evidence                                                                                                             |
+| --------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Local API unit                          | PASS         | 615/615.                                                                                                             |
+| Local API E2E                           | PASS         | 140/140, including `/auth/me` 401 without a token and 200 after AuthGuard resolves the own profile.                  |
+| Local web                               | PASS         | 80/80.                                                                                                               |
+| Static profiles migration chain         | PASS         | All 65 migrations match chronological filesystem order; profiles GRANT/RLS invariants pass.                          |
+| Local profiles GRANT+RLS runtime        | NOT VERIFIED | Docker unavailable; local PostgreSQL connection refused.                                                             |
+| Node 22.23.0 artifact                   | PASS         | Source `7b64b92`; SHA-256 `a816d820a3ec9b65877c595b83c29c0cdad652a4feca9629147d20bf103b5aca`; complete smoke passes. |
+| Production frontend public pages        | PASS         | Home and login return HTTP 200 from Vercel.                                                                          |
+| Production health                       | FAIL         | LiteSpeed HTML HTTP 503.                                                                                             |
+| Production unauthenticated auth         | FAIL         | LiteSpeed HTML HTTP 503, not 401 `UNAUTHORIZED`.                                                                     |
+| Production trusted / untrusted CORS     | FAIL         | Both return LiteSpeed HTML HTTP 503; no application CORS decision is observable.                                     |
+| Production authenticated auth           | NOT VERIFIED | Backend is unavailable and no authorized test account was supplied.                                                  |
+| Admin / Manager / Employee / Client UAT | NOT VERIFIED | No safe production test accounts or fixtures.                                                                        |
+| Database / backup / deployment identity | NOT VERIFIED | No Supabase production, cPanel, backup-provider, or Vercel deployment-metadata access.                               |
+
+Required next actions are to apply the migration through the approved production database process, preserve the current cPanel deployment, upload the verified artifact only after confirming Node 22.23.0 and the application root, restart Passenger, inspect the real `stderr.log`, and repeat health/auth/CORS/authenticated smoke tests before any persona UAT.
+
+**Final UAT status: UAT NOT VERIFIED. GO-LIVE BLOCKED.**
+
 ## Continuation update — 2026-08-27T10:20:37+07:00
 
 PR [#14](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/pull/14) passed its Quality gates, API production container, cPanel Node 22 artifact, and Vercel Preview checks. This validates the release branch (`b9c6e06`) but does not change production: `main` remains `444d7a8`, the preview is Vercel-SSO-protected, and no cPanel deployment occurred. A repeat public smoke check still observed HTTP 500 for the untrusted CORS origin, so the UAT conclusion remains blocked.

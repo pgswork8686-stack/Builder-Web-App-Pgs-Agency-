@@ -1,5 +1,38 @@
 # PGS HUB - FINAL PRODUCTION RELEASE REPORT
 
+> **2026-08-28 profiles-permission repair addendum — supersedes all conflicting PASS/go-live statements below.** Production currently returns LiteSpeed HTML HTTP 503 for health, unauthenticated auth, trusted CORS, and untrusted CORS. The minimal repair migration is `20260828021004_repair_authenticated_profiles_select.sql`; it grants only `SELECT` on `public.profiles` to `authenticated` while preserving RLS and the existing own-profile policy. Local non-database gates and the exact Node 22.23.0 artifact pass, but no cPanel or production database access exists. **Current final status: GO-LIVE BLOCKED. DATABASE NOT VERIFIED. UAT NOT VERIFIED.**
+
+## 2026-08-28 profiles repair release matrix
+
+| Gate                                         | Result       | Evidence                                                                                                                        |
+| -------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Root cause trace                             | PASS         | `AuthGuard` validates the token, then uses a user-scoped client to select `profiles`; the table GRANT gate precedes RLS.        |
+| Raw `stderr.log` file                        | NOT VERIFIED | No `stderr.log` exists in the repository/workspace; the exact error is supplied in the execution brief.                         |
+| Minimal migration                            | PASS         | `20260828021004_repair_authenticated_profiles_select.sql`; authenticated gets SELECT only; RLS and own-row policy are asserted. |
+| Adjacent browser grants                      | PASS         | No grants added for `employee_profiles`, departments, memberships, users, roles, or permissions.                                |
+| Artifact source commit                       | PASS         | `7b64b92a8eb786d9a7245e9a436ffdd8c2c53256`.                                                                                     |
+| API unit                                     | PASS         | 615/615.                                                                                                                        |
+| API E2E                                      | PASS         | 140/140, including `/auth/me` 401 without a token and 200 through the mocked AuthGuard own-profile lookup.                      |
+| Web                                          | PASS         | 80/80.                                                                                                                          |
+| Lint / typecheck / format                    | PASS         | Lint 0 errors / 282 warnings; typecheck and Prettier pass.                                                                      |
+| Secret boundary                              | PASS         | `SECRET_BOUNDARIES=PASS`.                                                                                                       |
+| Build                                        | PASS         | NestJS API and Next.js 16 production builds pass; Next.js generated 86/86 routes.                                               |
+| Static migration chain                       | PASS         | All 65 migrations match chronological filesystem order; profiles GRANT/RLS invariants pass.                                     |
+| Local database / RLS execution               | NOT VERIFIED | Docker unavailable; local PostgreSQL connection refused.                                                                        |
+| cPanel artifact                              | PASS         | Node 22.23.0 / pnpm 11.20.0 verifier; SHA-256 `a816d820a3ec9b65877c595b83c29c0cdad652a4feca9629147d20bf103b5aca`.               |
+| Artifact contents                            | PASS         | `app.js`, `package.json`, `package-lock.json`, `DEPLOYMENT_INFO.txt`, and `dist/main.js` verified.                              |
+| Artifact auth / CORS                         | PASS         | Auth 401, trusted CORS allowed, and `https://evil.example.com` rejected with 403 `CORS_ORIGIN_DENIED`.                          |
+| cPanel deployment                            | NOT VERIFIED | `CPANEL_DEPLOYMENT_ACCESS = BLOCKED`; no upload or restart performed.                                                           |
+| Production health                            | FAIL         | LiteSpeed HTML HTTP 503 at 2026-08-28T02:20:10Z.                                                                                |
+| Production unauthenticated auth              | FAIL         | LiteSpeed HTML HTTP 503, not 401, at 2026-08-28T02:20:19Z.                                                                      |
+| Production trusted CORS                      | FAIL         | LiteSpeed HTML HTTP 503; application headers unavailable.                                                                       |
+| Production untrusted CORS                    | FAIL         | LiteSpeed HTML HTTP 503, not 403 `CORS_ORIGIN_DENIED`.                                                                          |
+| Frontend public pages                        | PASS         | Home and login return Vercel HTTP 200.                                                                                          |
+| Frontend production SHA / authenticated flow | NOT VERIFIED | No Vercel deployment metadata or authorized account.                                                                            |
+| Production database / migration version      | NOT VERIFIED | No safe production DB access.                                                                                                   |
+| Backup                                       | NOT VERIFIED | No provider backup access.                                                                                                      |
+| UAT                                          | NOT VERIFIED | No authorized Admin, Manager/Team Leader, Employee, or Client test accounts/data.                                               |
+
 > **2026-08-27 continuation addendum — supersedes any conflicting PASS or go-live statements below.** Tagged release `v1.0.0-production` dereferences to `2964f80`; the active release branch head is `b5a3f57` (runtime/artifact source `b9c6e06`). Its Node 22.23.0 verified cPanel artifact is `b2656a8f24932164b59552acfc33af3ab6d9bda463909233d7de5a7587d10cab`. PR #14 passed CI and has a successful Vercel Preview, but `main` remains `444d7a8`, production Vercel SHA is not verified, and no cPanel deployment occurred. At 2026-08-27T03:27:57Z, production health was 200 and unauthenticated auth was 401 `UNAUTHORIZED`, but an untrusted CORS origin still returned HTTP 500 (not 403). **CPANEL_DEPLOYMENT_ACCESS = BLOCKED** because no configured cPanel/FTP/SFTP/SSH access exists in this workspace. **Current final status: GO-LIVE BLOCKED.**
 
 ## 2026-08-27 continuation release matrix

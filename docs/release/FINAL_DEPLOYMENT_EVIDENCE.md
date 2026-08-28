@@ -5,6 +5,23 @@
 **Branch under validation:** `codex/production-hardening-2026-08-26`
 **Deployment action performed:** none — deployment is blocked by the evidence below.
 
+## Profiles permission repair update — 2026-08-28T10:27:44+07:00
+
+This update supersedes older production-health and artifact statements below where they conflict.
+
+- **Root cause:** the supplied production log evidence reports `permission denied for table profiles`. Source tracing confirms the failing path is `HTTP → AuthGuard → getUser(token) → user-scoped profiles SELECT → PostgreSQL GRANT → profiles_select_own_policy`. The `authenticated` role must have table-level `SELECT` before RLS can evaluate the own-row policy. No local `stderr.log` file was present, so the original raw log file is **NOT VERIFIED** in this workspace.
+- **Exact repair:** added `supabase/migrations/20260828021004_repair_authenticated_profiles_select.sql`. It enables RLS defensively, grants only `SELECT` on `public.profiles` to `authenticated`, and asserts the grant, RLS state, and existing `profiles_select_own_policy`. It does not grant write privileges, grant `ALL`, disable RLS, or use `service_role` for the user-scoped lookup.
+- **Adjacent-table review:** `AuthGuard` uses the user JWT only for `profiles`. Its conditional `employee_profiles` lookup uses the existing system client. No additional browser-role table grants were added. The existing `company-documents` bucket migration remains ordered before storage policy verification; no storage change was required.
+- **Source commit:** `7b64b92a8eb786d9a7245e9a436ffdd8c2c53256` (`fix(release): repair authenticated profile lookup grant`).
+- **Local tests:** PASS — API unit 615/615, API E2E 140/140, web 80/80, validation 1/1, lint 0 errors / 282 warnings, typecheck, format, secret boundaries, API production build, and Next.js production build with 86/86 routes.
+- **Database execution:** **NOT VERIFIED** — Docker Desktop is unavailable and local PostgreSQL `127.0.0.1:54322` refuses connections. Static validation passes for all 65 migrations in exact chronological filesystem order and enforces the profiles GRANT/RLS invariants. `LOCAL_DATABASE_VERIFICATION = BLOCKED`.
+- **Artifact:** PASS under exact Node.js 22.23.0 and pnpm 11.20.0. Fresh SHA-256: `a816d820a3ec9b65877c595b83c29c0cdad652a4feca9629147d20bf103b5aca`. ZIP inspection confirms `app.js`, `package.json`, `package-lock.json`, `DEPLOYMENT_INFO.txt`, and `dist/main.js`; `DEPLOYMENT_INFO.txt` records the full source commit above. Startup, health, request ID, unauthenticated auth 401, trusted CORS, untrusted CORS 403 `CORS_ORIGIN_DENIED`, SIGTERM, seven fail-fast environment cases, and secret scan pass. The immediately previous local ZIP was preserved as `backups/pgs-hub-api-cpanel.pre-7b64b92.zip`.
+- **Deployment:** **NOT VERIFIED** — no cPanel/FTP/SFTP/SSH variables, SSH directory, or deployment client is available. `CPANEL_DEPLOYMENT_ACCESS = BLOCKED`; no upload, extraction, dependency install, Passenger restart, production database change, or frontend promotion was attempted.
+- **Production smoke at 2026-08-28T02:20:10Z–02:20:35Z:** **FAIL** — health, unauthenticated auth, trusted CORS, and untrusted CORS all return LiteSpeed HTML HTTP 503. The application does not supply health JSON, `UNAUTHORIZED`, request ID, or `CORS_ORIGIN_DENIED` because the requests do not reach NestJS. Frontend home and login remain HTTP 200 from Vercel, but production frontend SHA and authenticated behavior are **NOT VERIFIED**.
+- **Release identity, production database, backup, authenticated smoke, and persona UAT:** **NOT VERIFIED**.
+
+**Current final status: GO-LIVE BLOCKED. DATABASE NOT VERIFIED. UAT NOT VERIFIED.**
+
 ## Continuation update — 2026-08-27T10:20:37+07:00
 
 - Runtime release branch head: `b9c6e060e7ca68edf77d06769b31f557aa3804f3`.
