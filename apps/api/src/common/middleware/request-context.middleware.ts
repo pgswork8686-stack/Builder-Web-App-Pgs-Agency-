@@ -2,6 +2,7 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 import { ConfigService } from '../../config/config.service';
+import { resolveClientIp } from '../network/client-ip';
 
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9._:-]{1,128}$/;
 
@@ -23,8 +24,14 @@ export class RequestContextMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     const rawId = req.headers['x-request-id'];
     const requestId = resolveRequestId(rawId);
+    const clientIp = resolveClientIp(req, this.configService.trustProxy);
 
-    (req as any).requestId = requestId;
+    const contextualRequest = req as Request & {
+      requestId: string;
+      clientIp: string;
+    };
+    contextualRequest.requestId = requestId;
+    contextualRequest.clientIp = clientIp;
     res.setHeader('X-Request-Id', requestId);
 
     const startTime = Date.now();
@@ -43,6 +50,7 @@ export class RequestContextMiddleware implements NestMiddleware {
             service: 'pgs-hub-api',
             environment: this.configService.appEnv,
             requestId,
+            clientIp,
             method,
             path,
             statusCode,

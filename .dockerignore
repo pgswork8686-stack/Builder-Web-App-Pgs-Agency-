@@ -28,6 +28,21 @@ playwright-report
 !*.env.example
 !**/.env.example
 
+.cloudflared
+**/.cloudflared
+certs
+**/certs
+*.pem
+**/*.pem
+*.key
+**/*.key
+cloudflared-cert.pem
+**/cloudflared-cert.pem
+*.cfargotunnel.com.json
+**/*.cfargotunnel.com.json
+tunnel-credentials*.json
+**/tunnel-credentials*.json
+
 backups
 backups/
 **/backups

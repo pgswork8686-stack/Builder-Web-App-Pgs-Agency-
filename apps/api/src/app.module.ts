@@ -1,6 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import {
+  ThrottlerGuard,
+  ThrottlerModule,
+  type ThrottlerModuleOptions,
+} from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
@@ -28,6 +32,26 @@ import { WorkspaceModule } from './workspace/workspace.module';
 import { WorkCalendarModule } from './work-calendar/work-calendar.module';
 import { WorkflowModule } from './workflows/workflow.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
+import {
+  resolveClientIp,
+  type ClientIpRequest,
+} from './common/network/client-ip';
+
+export function createThrottlerOptions(
+  config: Pick<ConfigService, 'throttleTtl' | 'throttleLimit' | 'trustProxy'>,
+): ThrottlerModuleOptions {
+  return {
+    throttlers: [
+      {
+        name: 'default',
+        ttl: config.throttleTtl,
+        limit: config.throttleLimit,
+      },
+    ],
+    getTracker: (request) =>
+      resolveClientIp(request as ClientIpRequest, config.trustProxy),
+  };
+}
 
 @Module({
   imports: [
@@ -35,13 +59,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => [
-        {
-          name: 'default',
-          ttl: config.throttleTtl,
-          limit: config.throttleLimit,
-        },
-      ],
+      useFactory: createThrottlerOptions,
     }),
     HealthModule,
     SupabaseModule,
