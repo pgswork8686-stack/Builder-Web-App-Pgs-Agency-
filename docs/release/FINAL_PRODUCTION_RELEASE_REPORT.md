@@ -23,8 +23,8 @@
 | Artifact contents                            | PASS         | `app.js`, `package.json`, `package-lock.json`, `DEPLOYMENT_INFO.txt`, and `dist/main.js` verified.                              |
 | Artifact auth / CORS                         | PASS         | Auth 401, trusted CORS allowed, and `https://evil.example.com` rejected with 403 `CORS_ORIGIN_DENIED`.                          |
 | cPanel deployment                            | NOT VERIFIED | `CPANEL_DEPLOYMENT_ACCESS = BLOCKED`; no upload or restart performed.                                                           |
-| Production health                            | FAIL         | LiteSpeed HTML HTTP 503 at 2026-08-28T02:20:10Z.                                                                                |
-| Production unauthenticated auth              | FAIL         | LiteSpeed HTML HTTP 503, not 401, at 2026-08-28T02:20:19Z.                                                                      |
+| Production health                            | FAIL         | LiteSpeed HTML HTTP 503 at 2026-08-28T03:29:35Z.                                                                                |
+| Production unauthenticated auth              | FAIL         | LiteSpeed HTML HTTP 503, not 401, at 2026-08-28T03:29:40Z.                                                                      |
 | Production trusted CORS                      | FAIL         | LiteSpeed HTML HTTP 503; application headers unavailable.                                                                       |
 | Production untrusted CORS                    | FAIL         | LiteSpeed HTML HTTP 503, not 403 `CORS_ORIGIN_DENIED`.                                                                          |
 | Frontend public pages                        | PASS         | Home and login return Vercel HTTP 200.                                                                                          |
