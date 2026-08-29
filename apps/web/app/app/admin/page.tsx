@@ -208,20 +208,20 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Block 2: Total Progress */}
-        <div className="rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 flex flex-col justify-between shadow-xs">
+        <div className="rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-2xl bg-[#5D87FF] text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-[#E7AE18] text-[#161827] flex items-center justify-center shadow-xs font-bold">
               <FolderKanban className="w-5 h-5" />
             </div>
-            <Badge variant="blue" size="sm">
+            <Badge variant="brand" size="sm">
               Vận hành
             </Badge>
           </div>
           <div className="mt-4">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            <h3 className="text-base font-extrabold text-[#161827] tracking-tight">
               Tiến độ tổng: {stats.projectCount} Dự án
             </h3>
-            <p className="text-xs text-[#5D87FF] mt-1 font-medium">
+            <p className="text-xs text-[#9A7000] mt-1 font-medium">
               Theo dõi phân bổ nguồn lực & bàn giao đúng hạn
             </p>
           </div>
@@ -252,13 +252,13 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {/* 1. Dự án */}
         <Link href="/app/admin/projects">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#FFF8E5] text-[#9A7000] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
+              <p className="text-lg font-black text-[#161827] tracking-tight">
                 {stats.projectCount}
               </p>
             </div>
@@ -267,8 +267,8 @@ export default function AdminDashboardPage() {
 
         {/* 2. Công việc (theo dõi trong chi tiết từng dự án) */}
         <Link href="/app/admin/tasks">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#FFC400] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#FFF8E5] text-[#E7AE18] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <ListTodo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -284,15 +284,15 @@ export default function AdminDashboardPage() {
 
         {/* 3. Khách hàng */}
         <Link href="/app/admin/clients">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#13DEB9] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <Briefcase className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">
                 Khách hàng
               </p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
+              <p className="text-lg font-black text-[#161827] tracking-tight">
                 {stats.clientCount}
               </p>
             </div>
@@ -301,13 +301,13 @@ export default function AdminDashboardPage() {
 
         {/* 4. Nhân sự */}
         <Link href="/app/admin/people">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <Users className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-[#7C879D] font-medium">Nhân sự</p>
-              <p className="text-lg font-black text-[#24304A] tracking-tight">
+              <p className="text-lg font-black text-[#161827] tracking-tight">
                 {stats.peopleCount}
               </p>
             </div>
@@ -316,8 +316,8 @@ export default function AdminDashboardPage() {
 
         {/* 5. Tài liệu */}
         <Link href="/app/admin/documents">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all flex items-center gap-3 group col-span-2 sm:col-span-1">
-            <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#FA896B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group col-span-2 sm:col-span-1">
+            <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#FA896B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <FolderOpen className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -335,12 +335,12 @@ export default function AdminDashboardPage() {
         {/* Left 7 cols: Tiến độ dự án */}
         <div className="md:col-span-7 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
+            <h3 className="text-base font-extrabold text-[#161827] tracking-tight">
               Tiến độ dự án
             </h3>
             <Link
               href="/app/admin/projects"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#161827] hover:text-[#E7AE18] transition-colors flex items-center gap-1"
             >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>

@@ -8,18 +8,27 @@
     --pgs-card-border: #edf2f7;
     --pgs-border-subtle: #f1f5f9;
 
-    --pgs-primary: #4f75ff;
-    --pgs-primary-hover: #3d62ee;
-    --pgs-primary-light: #eef2ff;
+    /* PGS Brand Identity - Navy & Gold */
+    --pgs-navy: #161827;
+    --pgs-navy-soft: #222638;
+    --pgs-navy-dark: #0f121f;
 
-    --pgs-gold: #ffb800;
-    --pgs-gold-light: #fef9c3;
+    --pgs-primary: #e7ae18;
+    --pgs-primary-hover: #cc9410;
+    --pgs-primary-light: #fff8e5;
 
-    --pgs-text: #0f172a;
+    --pgs-gold: #e7ae18;
+    --pgs-gold-hover: #cc9410;
+    --pgs-gold-light: #fff8e5;
+    --pgs-gold-muted: #d49b0e;
+
+    /* Typography colors */
+    --pgs-text: #161827;
     --pgs-text-secondary: #334155;
     --pgs-muted: #64748b;
     --pgs-subtle: #94a3b8;
 
+    /* Semantic Status Colors (Preserved) */
     --pgs-success: #00d09c;
     --pgs-success-light: #e6fbf5;
 
