@@ -38,7 +38,12 @@ export function TaskViewTabs({
 
   const resolvedLinks = links || defaultLinks[role];
 
-  const tabs: { key: TaskView; label: string; href: string; icon: LucideIcon }[] = [
+  const tabs: {
+    key: TaskView;
+    label: string;
+    href: string;
+    icon: LucideIcon;
+  }[] = [
     {
       key: "list",
       label: "Danh sách",
@@ -81,7 +86,9 @@ export function TaskViewTabs({
           >
             <Icon
               className={`w-4 h-4 shrink-0 transition-colors ${
-                isActive ? "text-[#161827]" : "text-[#7C879D] group-hover:text-[#161827]"
+                isActive
+                  ? "text-[#161827]"
+                  : "text-[#7C879D] group-hover:text-[#161827]"
               }`}
             />
             <span>{tab.label}</span>
