@@ -80,12 +80,12 @@ export default function AccountantDashboardPage() {
       {/* Main Hero: Doanh thu tháng + 2 Mini KPI Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Banner: Doanh thu tháng */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-6 rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#24304A] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Doanh thu YTD: {formatVND(summary?.total_revenue_ytd || 0)}
             </h2>
-            <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
               Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang
               thực thi.
             </p>

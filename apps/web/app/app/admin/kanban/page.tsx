@@ -1,27 +1,17 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { Kanban as KanbanIcon, Plus, FolderKanban } from "lucide-react";
-import { SectionHeader } from "@/components/dashboard/section-header";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
+import { TaskModuleHeader } from "@/components/tasks/task-module-header";
 
 export default function AdminKanbanPage() {
   return (
     <div className="space-y-6">
-      <SectionHeader
+      <TaskModuleHeader
+        role="admin"
+        activeView="kanban"
         title="Bảng Kanban Tổng hợp (Master Board)"
         description="Theo dõi luồng xử lý công việc trực quan theo các cột trạng thái dự án."
-        badge="Kanban View"
-        action={
-          <Link href="/app/admin/tasks">
-            <Button variant="secondary" size="sm">
-              Xem dạng danh sách
-            </Button>
-          </Link>
-        }
+        badge="Kanban"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 min-h-[450px]">
@@ -36,7 +26,7 @@ export default function AdminKanbanPage() {
             className="p-4 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] flex flex-col space-y-3"
           >
             <div className="flex items-center justify-between pb-2 border-b border-[#EDF2F7]">
-              <span className="text-xs font-bold text-[#24304A]">{col}</span>
+              <span className="text-xs font-bold text-[#161827]">{col}</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#7C879D] border border-[#EDF2F7]">
                 0
               </span>

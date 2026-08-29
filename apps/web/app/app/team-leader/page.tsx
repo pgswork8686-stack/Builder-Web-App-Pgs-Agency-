@@ -120,12 +120,12 @@ export default function TeamLeaderDashboardPage() {
       {/* Main Banner + 2 KPI Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Banner: X dự án đang được quản lý */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-6 rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#24304A] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               {stats.projectCount} dự án đang được quản lý
             </h2>
-            <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
               Kiểm soát tiến độ bàn giao và các nội dung đang chờ phê duyệt hôm
               nay.
             </p>
@@ -196,24 +196,24 @@ export default function TeamLeaderDashboardPage() {
       {/* 5 Pastel KPI Counters Row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Link href="/app/team-leader/projects">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#5D87FF]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#9A7000]">
                 DA
               </span>
             </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
+            <p className="text-2xl font-black text-[#161827] mt-2">
               {stats.projectCount}
             </p>
           </Card>
         </Link>
 
         <Link href="/app/team-leader/tasks">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
+          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#7C879D]">Task mở</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF9C3] text-[#FFC400]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#E7AE18]">
                 CV
               </span>
             </div>

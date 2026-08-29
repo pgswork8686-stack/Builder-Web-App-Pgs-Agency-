@@ -50,16 +50,42 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     router.push("/auth/login");
   };
 
-  // Center title resolution matching Figma
+  // Center title resolution matching module boundaries
   const getCenterTitle = () => {
+    // Dashboards
     if (pathname === "/app/admin") return "Admin Dashboard";
     if (pathname === "/app/team-leader") return "Manager Dashboard";
     if (pathname === "/app/employee") return "Employee Dashboard";
     if (pathname === "/app/accountant") return "Accounting Dashboard";
     if (pathname === "/app/client") return "Client Dashboard";
+
+    // Task & Work Modules (Admin, Team Leader, Employee)
+    if (
+      pathname.startsWith("/app/admin/tasks") ||
+      pathname.startsWith("/app/admin/kanban") ||
+      pathname.startsWith("/app/admin/calendar")
+    ) {
+      return "Công việc";
+    }
+    if (
+      pathname.startsWith("/app/team-leader/tasks") ||
+      pathname.startsWith("/app/team-leader/kanban") ||
+      pathname.startsWith("/app/team-leader/calendar")
+    ) {
+      return "Công việc";
+    }
+    if (pathname.startsWith("/app/employee/tasks")) return "Công việc";
+
+    // Specific Calendars
+    if (pathname.startsWith("/app/employee/calendar"))
+      return "Lịch Làm việc Cá nhân";
+    if (pathname.startsWith("/app/admin/settings/work-calendar"))
+      return "Lịch Làm việc Hệ thống";
+    if (pathname.startsWith("/app/client/meetings"))
+      return "Lịch Họp Khách hàng";
+
+    // Other Modules
     if (pathname.includes("/projects")) return "Quản lý Dự án";
-    if (pathname.includes("/tasks") || pathname.includes("/kanban"))
-      return "Công việc & Kanban";
     if (pathname.includes("/attendance")) return "Quản lý Chấm công";
     if (pathname.includes("/leave")) return "Quản lý Nghỉ phép";
     if (pathname.includes("/finance")) return "Quản lý Tài chính";
@@ -69,13 +95,17 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
       pathname.includes("/organization") ||
       pathname.includes("/departments") ||
       pathname.includes("/teams")
-    )
+    ) {
       return "Quản lý Nhân sự & Cơ cấu";
+    }
     if (pathname.includes("/documents")) return "Thư viện Tài liệu PGS";
     if (pathname.includes("/reports")) return "Báo cáo Tổng hợp";
     if (pathname.includes("/chat")) return "Tin nhắn Nội bộ";
     if (pathname.includes("/notifications")) return "Trung tâm Thông báo";
     if (pathname.includes("/settings")) return "Cài đặt Hệ thống";
+    if (pathname.includes("/approvals")) return "Phê duyệt & Nghiệm thu";
+    if (pathname.includes("/support")) return "Yêu cầu Hỗ trợ";
+
     return "PGS Hub Workspace";
   };
 
@@ -92,7 +122,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         <button
           type="button"
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-2 rounded-xl text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="lg:hidden p-2 rounded-xl text-[#7C879D] hover:text-[#161827] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           aria-label="Mở menu điều hướng"
         >
           <Menu className="w-5 h-5" />
@@ -101,7 +131,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
       {/* Center: Current Dashboard / Page Name */}
       <div className="flex items-center justify-center">
-        <span className="font-bold text-sm text-[#24304A] tracking-tight">
+        <span className="font-bold text-sm text-[#161827] tracking-tight">
           {getCenterTitle()}
         </span>
       </div>
@@ -111,7 +141,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         {/* Quick Chat Link */}
         <Link
           href="/app/chat"
-          className="relative p-2 rounded-xl text-[#7C879D] hover:text-[#5D87FF] hover:bg-[#EEF2FF] transition-all cursor-pointer"
+          className="relative p-2 rounded-xl text-[#7C879D] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
           title="Tin nhắn nội bộ"
           aria-label="Tin nhắn nội bộ"
         >
@@ -126,13 +156,13 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#F6F8FC] border border-transparent hover:border-[#EDF2F7] transition-all cursor-pointer select-none"
+            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#F8FAFC] border border-transparent hover:border-[#EDF2F7] transition-all cursor-pointer select-none"
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
             <Avatar name={displayName} size="sm" />
             <div className="hidden xl:flex flex-col text-left">
-              <span className="text-xs font-bold text-[#24304A] tracking-tight truncate max-w-[130px]">
+              <span className="text-xs font-bold text-[#161827] tracking-tight truncate max-w-[130px]">
                 {displayName}
               </span>
               <span className="text-[10px] text-[#7C879D] font-medium truncate max-w-[130px]">
@@ -146,13 +176,13 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#EDF2F7] p-2 text-[#24304A] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#EDF2F7] p-2 text-[#161827] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="p-3 border-b border-[#EDF2F7]">
-                <p className="text-xs font-bold text-[#24304A] tracking-tight truncate">
+                <p className="text-xs font-bold text-[#161827] tracking-tight truncate">
                   {displayName}
                 </p>
                 <div className="mt-1.5 flex items-center gap-1.5">
-                  <Badge variant="blue" size="sm">
+                  <Badge variant="brand" size="sm">
                     {account.role
                       ? account.role.toUpperCase()
                       : "CHƯA PHÂN QUYỀN"}
@@ -164,7 +194,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <Link
                   href="/app/profile"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#24304A] hover:bg-[#F6F8FC] transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
                 >
                   <User className="w-4 h-4 text-[#7C879D]" />
                   <span>Hồ sơ cá nhân</span>
@@ -174,9 +204,9 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                   <Link
                     href="/app/admin"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#24304A] hover:bg-[#F6F8FC] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
                   >
-                    <Shield className="w-4 h-4 text-[#5D87FF]" />
+                    <Shield className="w-4 h-4 text-[#E7AE18]" />
                     <span>Bảng điều khiển Admin</span>
                   </Link>
                 )}
@@ -184,7 +214,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <Link
                   href="/auth/update-password"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#24304A] hover:bg-[#F6F8FC] transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
                 >
                   <ExternalLink className="w-4 h-4 text-[#7C879D]" />
                   <span>Đổi mật khẩu</span>
@@ -195,7 +225,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#FA896B] hover:bg-rose-50 transition-colors cursor-pointer font-medium"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#FF785A] hover:bg-rose-50 transition-colors cursor-pointer font-medium"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Đăng xuất</span>
