@@ -10,6 +10,7 @@
 ## 1. MỤC TIÊU TRIỂN KHAI
 
 Đợt frontend refinement có kiểm soát đã hoàn thành trọn vẹn 2 mục tiêu cốt lõi theo đúng yêu cầu:
+
 1. **Fix triệt để navigation "Công việc / Kanban / Lịch":**
    - Chuyển đổi kiến trúc từ Sidebar phân mảnh sang mô hình chuẩn: **Sidebar đại diện cho Module**, **Content Tabs đại diện cho View**.
    - Thống nhất các view List, Kanban, Calendar vào chung module **"Công việc"** ở Sidebar Admin (`10`) và Team Leader (`04`).
@@ -32,6 +33,7 @@
 ## 2. CHI TIẾT CÁC THAY ĐỔI THEO TỪNG COMPONENT
 
 ### A. Navigation & Routing Architecture
+
 - **`apps/web/components/app-shell/navigation-utils.ts`:**
   - Cung cấp helper dùng chung `isNavItemActive(pathname, item)`.
   - Hỗ trợ so khớp đa đường dẫn `activePaths?: string[]`, nhận diện chính xác khi người dùng ở `/app/admin/tasks`, `/app/admin/kanban` hay `/app/admin/calendar`.
@@ -48,6 +50,7 @@
   - Tinh chỉnh hàm `getCenterTitle()`: hiển thị đúng `"Công việc"` cho toàn bộ sub-routes task của Admin và Team Leader mà không làm ảnh hưởng đến các calendar chuyên biệt khác.
 
 ### B. Bộ Nhận Diện PGS Agency (Navy + Gold)
+
 - **Tài nguyên Logo (`apps/web/public/brand/`):**
   - `pgs-agency-logo-original.jpg`: Lưu trữ bản gốc.
   - `pgs-agency-logo.png`: Bản crop tỷ lệ chuẩn với nền sạch.
@@ -72,27 +75,30 @@
 
 ## 3. DANH SÁCH COMMITS
 
-| Commit Hash | Loại commit | Nội dung tóm tắt |
-|:---|:---|:---|
-| `6083808` | `fix(web-nav)` | Thống nhất navigation module công việc và tab chế độ xem, re-index sidebar liên tục |
-| `d0347fb` | `feat(brand)` | Đồng bộ nhận diện hình ảnh PGS Agency sang Navy (#161827) và Gold (#E7AE18) |
+| Commit Hash | Loại commit    | Nội dung tóm tắt                                                                    |
+| :---------- | :------------- | :---------------------------------------------------------------------------------- |
+| `6083808`   | `fix(web-nav)` | Thống nhất navigation module công việc và tab chế độ xem, re-index sidebar liên tục |
+| `d0347fb`   | `feat(brand)`  | Đồng bộ nhận diện hình ảnh PGS Agency sang Navy (#161827) và Gold (#E7AE18)         |
 
 ---
 
 ## 4. KẾT QUẢ KIỂM THỬ VÀ BUILD TỰ ĐỘNG
 
 ### 1. Web Unit & Component Tests (Vitest)
+
 ```
 Test Files  16 passed (16)
 Tests       92 passed (92)
 Snapshots   0 total
 Duration    3.59s
 ```
+
 - ✅ `navigation-utils.test.ts`: 9 tests passed (xác minh logic active exact, subpaths, grouped paths, role numbering).
 - ✅ `task-view-tabs.test.tsx`: 3 tests passed (xác minh hiển thị và routing tab Danh sách, Kanban, Lịch).
 - ✅ Tất cả 14 test suites cũ của web: 80 tests passed không gặp bất kỳ lỗi hồi quy nào.
 
 ### 2. Monorepo Typecheck (`pnpm -r typecheck`)
+
 - ✅ `packages/api-client`: Done
 - ✅ `packages/config`: Done
 - ✅ `packages/types`: Done
@@ -102,14 +108,17 @@ Duration    3.59s
 - ✅ `apps/api`: Done (0 type errors)
 
 ### 3. Monorepo Lint (`pnpm run lint`)
+
 - ✅ `apps/web`: 0 errors
 - ✅ `apps/api`: 0 errors
 
 ### 4. Production Build (`pnpm run build`)
+
 - ✅ `apps/api`: Nest production build thành công.
 - ✅ `apps/web`: Next.js 16.3.0 (Turbopack) build tối ưu hóa toàn bộ **86/86 static & dynamic pages** thành công.
 
 ### 5. Backend Automated Test Integrity
+
 - ✅ `apps/api` Unit Test: **67/67 test suites (615/615 tests) PASSED**.
 - ✅ `apps/api` E2E Test: **16/16 test suites (140/140 tests) PASSED**.
 

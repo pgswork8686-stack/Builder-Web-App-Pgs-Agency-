@@ -38,12 +38,16 @@ describe("Navigation Utils - isNavItemActive", () => {
 
   it("activates Admin 'Công việc' item for /app/admin/kanban and subpaths", () => {
     expect(isNavItemActive("/app/admin/kanban", adminWorkItem)).toBe(true);
-    expect(isNavItemActive("/app/admin/kanban/board-1", adminWorkItem)).toBe(true);
+    expect(isNavItemActive("/app/admin/kanban/board-1", adminWorkItem)).toBe(
+      true,
+    );
   });
 
   it("activates Admin 'Công việc' item for /app/admin/calendar and subpaths", () => {
     expect(isNavItemActive("/app/admin/calendar", adminWorkItem)).toBe(true);
-    expect(isNavItemActive("/app/admin/calendar/month", adminWorkItem)).toBe(true);
+    expect(isNavItemActive("/app/admin/calendar/month", adminWorkItem)).toBe(
+      true,
+    );
   });
 
   it("does not activate Admin 'Công việc' item for other routes", () => {
@@ -58,8 +62,12 @@ describe("Navigation Utils - isNavItemActive", () => {
   });
 
   it("activates employee calendar independently", () => {
-    expect(isNavItemActive("/app/employee/calendar", employeeCalendarItem)).toBe(true);
-    expect(isNavItemActive("/app/employee/tasks", employeeCalendarItem)).toBe(false);
+    expect(
+      isNavItemActive("/app/employee/calendar", employeeCalendarItem),
+    ).toBe(true);
+    expect(isNavItemActive("/app/employee/tasks", employeeCalendarItem)).toBe(
+      false,
+    );
   });
 });
 
@@ -79,9 +87,13 @@ describe("Role Navigation Structure & Indexing", () => {
     ]);
 
     // Verify no separate Kanban or Calendar items in Admin sidebar
-    const kanbanItem = allItems.find((i) => i.title === "Kanban" && i.href === "/app/admin/kanban");
+    const kanbanItem = allItems.find(
+      (i) => i.title === "Kanban" && i.href === "/app/admin/kanban",
+    );
     expect(kanbanItem).toBeUndefined();
-    const calendarItem = allItems.find((i) => i.title === "Lịch" && i.href === "/app/admin/calendar");
+    const calendarItem = allItems.find(
+      (i) => i.title === "Lịch" && i.href === "/app/admin/calendar",
+    );
     expect(calendarItem).toBeUndefined();
 
     // Verify numbering is continuous 01 to 19

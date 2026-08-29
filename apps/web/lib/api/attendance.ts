@@ -85,7 +85,62 @@ export interface AttendanceQuery {
   pageSize?: number;
 }
 
+/** Policy requirements returned by GET /attendance/policy for staff UI. */
+export interface AttendancePolicy {
+  timezone: string;
+  workdayStartTime: string | null;
+  workdayEndTime: string | null;
+  lateGraceMinutes: number | null;
+  earlyLeaveGraceMinutes: number | null;
+  locationRequired: boolean;
+  photoRequired: boolean;
+}
+
+export function getAttendanceErrorMessage(error: any): string {
+  const code = error?.code || error?.data?.code;
+  switch (code) {
+    case "ATTENDANCE_LOCATION_REQUIRED":
+      return "Tọa độ GPS là bắt buộc theo chính sách chấm công. Vui lòng bật vị trí trình duyệt.";
+    case "ATTENDANCE_PHOTO_REQUIRED":
+      return "Ảnh bằng chứng khuôn mặt là bắt buộc theo chính sách. Vui lòng chụp hoặc chọn ảnh.";
+    case "OUTSIDE_ALLOWED_LOCATION":
+      return "Vị trí của bạn nằm ngoài bán kính cho phép chấm công của văn phòng.";
+    case "ATTENDANCE_ALREADY_CHECKED_IN":
+      return "Bạn đã thực hiện vào ca (check-in) cho ngày hôm nay rồi.";
+    case "ATTENDANCE_NOT_CHECKED_IN":
+      return "Bạn chưa thực hiện vào ca cho ngày hôm nay.";
+    case "ATTENDANCE_ALREADY_CHECKED_OUT":
+      return "Bạn đã hoàn tất tan ca (check-out) cho ngày hôm nay rồi.";
+    case "ATTENDANCE_INVALID_TIME_RANGE":
+      return "Thời gian tan ca phải sau thời gian vào ca.";
+    case "ATTENDANCE_PHOTO_SESSION_INVALID":
+      return "Phiên chụp ảnh không hợp lệ. Vui lòng chọn lại ảnh.";
+    case "ATTENDANCE_PHOTO_SESSION_EXPIRED":
+      return "Phiên chụp ảnh đã hết hạn (quá 15 phút). Vui lòng chụp lại ảnh mới.";
+    case "ATTENDANCE_PHOTO_SESSION_REUSED":
+      return "Phiên ảnh đã được sử dụng trước đó. Vui lòng chọn ảnh mới.";
+    case "ATTENDANCE_PHOTO_NOT_FOUND":
+      return "Không tìm thấy tệp ảnh tải lên trong bộ nhớ. Vui lòng thử lại.";
+    case "ATTENDANCE_PHOTO_TOO_LARGE":
+      return "Ảnh tải lên vượt quá dung lượng cho phép (tối đa 5 MB).";
+    case "ATTENDANCE_PHOTO_INVALID_MIME":
+      return "Định dạng ảnh không hợp lệ (hệ thống chỉ chấp nhận JPEG, PNG, WEBP).";
+    case "ATTENDANCE_SETTINGS_NOT_CONFIGURED":
+      return "Hệ thống chưa có cấu hình chấm công hợp lệ từ quản trị viên.";
+    case "ATTENDANCE_SETTINGS_INVALID":
+      return "Cấu hình chấm công hệ thống không hợp lệ.";
+    case "ATTENDANCE_WRITE_FAILED":
+      return "Không thể ghi nhận dữ liệu chấm công. Vui lòng thử lại sau giây lát.";
+    default:
+      return error?.message || "Thao tác chấm công thất bại. Vui lòng thử lại.";
+  }
+}
+
 export const attendanceApi = {
+  getPolicy: (): Promise<AttendancePolicy> => {
+    return request("/attendance/policy");
+  },
+
   getSettings: (): Promise<AttendanceSettings> => {
     return request("/attendance/settings");
   },

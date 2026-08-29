@@ -125,4 +125,32 @@ describe("Phase 5 Attendance API client — Fix Round 3 contract", () => {
     expect(body).not.toHaveProperty("photoPath");
     expect(body).toHaveProperty("photoUploadSessionId", "session-xyz");
   });
+
+  it("T7: getPolicy fetches policy requirements from GET /attendance/policy", () => {
+    attendanceApi.getPolicy();
+    expect(requestMock).toHaveBeenCalledWith("/attendance/policy");
+  });
+
+  it("T8: checkIn and checkOut send accuracyMeters when provided", () => {
+    attendanceApi.checkIn({
+      latitude: 20.984,
+      longitude: 105.77,
+      accuracyMeters: 15.5,
+    });
+    const checkInBody = JSON.parse(
+      (requestMock.mock.calls[0][1] as any).body as string,
+    );
+    expect(checkInBody).toHaveProperty("accuracyMeters", 15.5);
+
+    requestMock.mockReset();
+    attendanceApi.checkOut({
+      latitude: 20.984,
+      longitude: 105.77,
+      accuracyMeters: 8.2,
+    });
+    const checkOutBody = JSON.parse(
+      (requestMock.mock.calls[0][1] as any).body as string,
+    );
+    expect(checkOutBody).toHaveProperty("accuracyMeters", 8.2);
+  });
 });

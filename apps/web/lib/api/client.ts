@@ -12,6 +12,8 @@ export async function getAccessToken(): Promise<string | null> {
 }
 
 export class ApiError extends Error {
+  public code?: string;
+
   constructor(
     public status: number,
     public message: string,
@@ -19,6 +21,7 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = "ApiError";
+    this.code = data?.code;
   }
 }
 
