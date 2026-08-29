@@ -49,6 +49,8 @@ export class ProjectsService {
       priority: row.priority,
       projectManagerUserId: row.project_manager_user_id ?? null,
       projectManager: row.project_manager ?? null,
+      departmentId: row.department_id ?? null,
+      department: row.department ?? null,
       startDate: row.start_date ?? null,
       dueDate: row.due_date ?? null,
       completedAt: row.completed_at ?? null,
@@ -63,7 +65,7 @@ export class ProjectsService {
     const { data, error } = await this.client
       .from('projects')
       .select(
-        '*, client_company:client_companies(id,code,name,status), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url)',
+        '*, client_company:client_companies(id,code,name,status), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url), department:departments(id,code,name)',
       )
       .eq('id', projectId)
       .maybeSingle();
@@ -243,7 +245,7 @@ export class ProjectsService {
     let query = this.client
       .from('projects')
       .select(
-        '*, client_company:client_companies(id,code,name,status), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url)',
+        '*, client_company:client_companies(id,code,name,status), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url), department:departments(id,code,name)',
         { count: 'exact' },
       );
 
@@ -258,6 +260,9 @@ export class ProjectsService {
     if (filters.priority) query = query.eq('priority', filters.priority);
     if (filters.projectManagerUserId) {
       query = query.eq('project_manager_user_id', filters.projectManagerUserId);
+    }
+    if (filters.departmentId) {
+      query = query.eq('department_id', filters.departmentId);
     }
 
     const { data, count, error } = await query
@@ -286,7 +291,29 @@ export class ProjectsService {
     return this.mapProject(await this.getProjectRow(projectId));
   }
 
-  async createProject(dto: CreateProjectDto, actorUserId: string) {
+  async createProject(
+    dto: CreateProjectDto,
+    actorUserId: string,
+    actorRole: AppRole | null = 'admin',
+    actorDepartmentId?: string | null,
+  ) {
+    if (actorRole === 'team_leader' && !actorDepartmentId) {
+      throw new ForbiddenException({
+        code: 'DEPARTMENT_SCOPE_REQUIRED',
+        message: 'Trưởng phòng phải được gán phòng ban trước khi tạo dự án.',
+      });
+    }
+    if (
+      actorRole === 'team_leader' &&
+      dto.departmentId &&
+      dto.departmentId !== actorDepartmentId
+    ) {
+      throw new ForbiddenException({
+        code: 'DEPARTMENT_SCOPE_DENIED',
+        message: 'Không thể tạo dự án cho phòng ban khác.',
+      });
+    }
+
     await this.requireClientCompany(dto.clientCompanyId);
     if (dto.projectManagerUserId) {
       await this.validateProjectManager(dto.projectManagerUserId);
@@ -320,6 +347,10 @@ export class ProjectsService {
       status: dto.status,
       priority: dto.priority,
       project_manager_user_id: dto.projectManagerUserId ?? null,
+      department_id:
+        actorRole === 'team_leader'
+          ? actorDepartmentId
+          : (dto.departmentId ?? null),
       start_date: dto.startDate ?? null,
       due_date: dto.dueDate ?? null,
       created_by: actorUserId,
@@ -388,6 +419,8 @@ export class ProjectsService {
     if (dto.priority !== undefined) payload.priority = dto.priority;
     if (dto.projectManagerUserId !== undefined)
       payload.project_manager_user_id = dto.projectManagerUserId;
+    if (dto.departmentId !== undefined)
+      payload.department_id = dto.departmentId;
     if (dto.startDate !== undefined) payload.start_date = dto.startDate;
     if (dto.dueDate !== undefined) payload.due_date = dto.dueDate;
 
@@ -416,6 +449,38 @@ export class ProjectsService {
       );
     }
     return this.mapProject(data);
+  }
+
+  async deleteProject(projectId: string, actorUserId?: string) {
+    const existing = await this.getProjectRow(projectId);
+
+    if (existing.status === 'archived') {
+      return { success: true, message: 'Dự án đã được lưu trữ trước đó.' };
+    }
+
+    const { data, error } = await this.client
+      .from('projects')
+      .update({
+        status: 'archived',
+        updated_by: actorUserId ?? null,
+      })
+      .eq('id', projectId)
+      .select('id,status')
+      .single();
+
+    if (error) {
+      this.databaseFailure(
+        'PROJECT_ARCHIVE_FAILED',
+        'Không thể lưu trữ dự án lúc này.',
+        error,
+      );
+    }
+
+    return {
+      success: true,
+      data,
+      message: 'Dự án đã được lưu trữ an toàn.',
+    };
   }
 
   async getMemberships(projectId: string) {
@@ -1034,15 +1099,19 @@ export class ProjectsService {
     page = 1,
     pageSize = 20,
     role?: AppRole,
+    departmentId?: string | null,
   ) {
     if (role === 'admin') {
       return this.getAdminProjects({ page, pageSize });
+    }
+    if (role === 'team_leader' && departmentId) {
+      return this.getAdminProjects({ page, pageSize, departmentId });
     }
     const offset = (page - 1) * pageSize;
     const { data, count, error } = await this.client
       .from('project_memberships')
       .select(
-        'project:projects(*, client_company:client_companies(id,code,name), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email))',
+        'project:projects(*, client_company:client_companies(id,code,name), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email), department:departments(id,code,name))',
         { count: 'exact' },
       )
       .eq('user_id', userId)
@@ -1073,9 +1142,18 @@ export class ProjectsService {
     userId: string,
     projectId: string,
     role?: AppRole,
+    departmentId?: string | null,
   ) {
     let currentRole = 'project_manager';
-    if (role !== 'admin') {
+    if (role === 'team_leader' && departmentId) {
+      const scopedProject = await this.getProjectRow(projectId);
+      if (scopedProject.department_id !== departmentId) {
+        throw new ForbiddenException({
+          code: 'DEPARTMENT_SCOPE_DENIED',
+          message: 'Bạn không có quyền truy cập dữ liệu phòng ban khác.',
+        });
+      }
+    } else if (role !== 'admin') {
       const { data: membership, error: membershipError } = await this.client
         .from('project_memberships')
         .select('id,project_role')
@@ -1100,7 +1178,7 @@ export class ProjectsService {
     const { data, error } = await this.client
       .from('projects')
       .select(
-        '*, client_company:client_companies(id,code,name), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url), project_memberships(id,user_id,project_role,profile:profiles!project_memberships_user_id_fkey(id,full_name,email,avatar_url)), project_services(id,status,notes,started_at,ended_at,service:services(id,code,name,description,active))',
+        '*, client_company:client_companies(id,code,name), project_manager:profiles!projects_project_manager_user_id_fkey(id,full_name,email,avatar_url), department:departments(id,code,name), project_memberships(id,user_id,project_role,profile:profiles!project_memberships_user_id_fkey(id,full_name,email,avatar_url)), project_services(id,status,notes,started_at,ended_at,service:services(id,code,name,description,active))',
       )
       .eq('id', projectId)
       .maybeSingle();

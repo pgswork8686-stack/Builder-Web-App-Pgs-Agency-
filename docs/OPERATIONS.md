@@ -12,7 +12,7 @@
 
 ### API cannot start
 
-- Check `APP_ENV`, `PORT`, `WEB_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, and `INITIAL_ADMIN_EMAIL`.
+- Check `APP_ENV`, `PORT`, `WEB_URL`, `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `JWT_SECRET`, and `INITIAL_ADMIN_EMAIL`.
 - Confirm no secret is accidentally configured on the web service.
 - Inspect API service logs in Coolify or the host process manager.
 

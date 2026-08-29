@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   BadRequestException,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
@@ -115,7 +116,7 @@ export class AttendanceController {
 
   @Post('records/:id/adjust')
   async adjustRecord(
-    @Param('id') recordId: string,
+    @Param('id', ParseUUIDPipe) recordId: string,
     @Body() body: unknown,
     @CurrentUser() user: RequestUser,
   ) {

@@ -1,5 +1,11 @@
 import { spawn, spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +24,21 @@ const runtimeRoot = join(temporaryRoot, "app");
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 const nodeCommand = process.execPath;
 let output = "";
+
+function copyDirectory(sourceDirectory, targetDirectory) {
+  mkdirSync(targetDirectory, { recursive: true });
+  for (const entry of readdirSync(sourceDirectory, { withFileTypes: true })) {
+    const sourcePath = join(sourceDirectory, entry.name);
+    const targetPath = join(targetDirectory, entry.name);
+    if (entry.isDirectory()) {
+      copyDirectory(sourcePath, targetPath);
+    } else if (entry.isFile()) {
+      copyFileSync(sourcePath, targetPath);
+    } else {
+      throw new Error(`Unsupported artifact entry: ${sourcePath}`);
+    }
+  }
+}
 
 function appendOutput(chunk) {
   output = `${output}${chunk}`.slice(-200000);
@@ -55,9 +76,12 @@ function expectFailFast(name, mutate) {
     APP_ENV: "production",
     PORT: "31999",
     WEB_URL: "https://hub.example.com",
+    DATABASE_URL:
+      "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
     SUPABASE_URL: "https://example.supabase.co",
     SUPABASE_PUBLISHABLE_KEY: "test-placeholder",
     SUPABASE_SECRET_KEY: marker,
+    JWT_SECRET: "test-jwt-secret-with-at-least-32-characters",
     INITIAL_ADMIN_EMAIL: "admin@example.com",
     THROTTLE_TTL: "60000",
     THROTTLE_LIMIT: "120",
@@ -81,11 +105,18 @@ function expectFailFast(name, mutate) {
 }
 
 try {
-  cpSync(source, runtimeRoot, { recursive: true });
+  // Node 22 fs.cpSync can terminate the Windows process when the source path
+  // contains non-ASCII segments. Copy entries explicitly so the same artifact
+  // verification works from Unicode workspaces and Linux CI.
+  copyDirectory(source, runtimeRoot);
   const install = spawnSync(
     npmCommand,
     ["ci", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"],
-    { cwd: runtimeRoot, encoding: "utf8" },
+    {
+      cwd: runtimeRoot,
+      encoding: "utf8",
+      shell: process.platform === "win32",
+    },
   );
   if (install.status !== 0) {
     throw new Error(`npm ci failed: ${install.stderr || install.stdout}`);
@@ -97,9 +128,12 @@ try {
     APP_ENV: "production",
     PORT: String(port),
     WEB_URL: "https://hub.example.com",
+    DATABASE_URL:
+      "postgresql://postgres:postgres@db.example.supabase.co:5432/postgres",
     SUPABASE_URL: "https://example.supabase.co",
     SUPABASE_PUBLISHABLE_KEY: "test-placeholder",
     SUPABASE_SECRET_KEY: "test-placeholder",
+    JWT_SECRET: "test-jwt-secret-with-at-least-32-characters",
     INITIAL_ADMIN_EMAIL: "admin@example.com",
     THROTTLE_TTL: "60000",
     THROTTLE_LIMIT: "120",
@@ -136,14 +170,36 @@ try {
     );
   }
 
-  const rejected = await fetch(healthUrl, {
-    headers: { Origin: "https://attacker.example" },
-  });
+  const unauthenticatedAuth = await fetch(
+    `http://127.0.0.1:${port}/api/v1/auth/me`,
+  );
+  const unauthenticatedAuthBody = await unauthenticatedAuth.json();
   if (
-    rejected.headers.get("access-control-allow-origin") ===
-    "https://attacker.example"
+    unauthenticatedAuth.status !== 401 ||
+    unauthenticatedAuthBody.statusCode !== 401 ||
+    unauthenticatedAuthBody.code !== "UNAUTHORIZED"
   ) {
-    throw new Error("Production CORS accepted an unrelated origin");
+    throw new Error(
+      "Packaged API unauthenticated auth smoke did not return 401 UNAUTHORIZED",
+    );
+  }
+
+  const rejected = await fetch(healthUrl, {
+    headers: { Origin: "https://evil.example.com" },
+  });
+  const rejectedBody = await rejected.json();
+  if (
+    rejected.status !== 403 ||
+    rejectedBody.statusCode !== 403 ||
+    rejectedBody.code !== "CORS_ORIGIN_DENIED" ||
+    typeof rejectedBody.message !== "string" ||
+    /stack|node_modules|\\\\/i.test(JSON.stringify(rejectedBody)) ||
+    rejected.headers.get("access-control-allow-origin") ===
+      "https://evil.example.com"
+  ) {
+    throw new Error(
+      "Production CORS did not return the expected sanitized rejection",
+    );
   }
 
   child.kill("SIGTERM");
@@ -156,11 +212,18 @@ try {
   console.log("NODE_22_STARTUP=PASS");
   console.log("HEALTH=PASS");
   console.log("REQUEST_ID=PASS");
+  console.log("AUTH=PASS");
   console.log("CORS=PASS");
   console.log("SIGTERM=PASS");
 
   expectFailFast("MISSING_SUPABASE_SECRET_KEY", (env) => {
     delete env.SUPABASE_SECRET_KEY;
+  });
+  expectFailFast("MISSING_DATABASE_URL", (env) => {
+    delete env.DATABASE_URL;
+  });
+  expectFailFast("MISSING_JWT_SECRET", (env) => {
+    delete env.JWT_SECRET;
   });
   expectFailFast("INVALID_WEB_URL", (env) => {
     env.WEB_URL = "not-a-url";

@@ -33,7 +33,7 @@ describe('Phase 3 DTO validation', () => {
     });
 
     it.each([
-      ['invalid status', { status: 'archived' }],
+      ['invalid status', { status: 'deleted' }],
       ['invalid priority', { priority: 'critical' }],
       ['invalid client UUID', { clientCompanyId: 'not-a-uuid' }],
       ['impossible calendar date', { startDate: '2026-02-31' }],

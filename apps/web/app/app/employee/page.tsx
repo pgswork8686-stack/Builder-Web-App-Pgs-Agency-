@@ -133,12 +133,12 @@ export default function EmployeeDashboardPage() {
       {/* Main Hero + 2 Mini KPI Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Banner: Bạn có X công việc hôm nay */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#EEF2FF] border border-[#E0EAFF] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-6 rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#24304A] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Bạn có {taskCount} công việc hôm nay
             </h2>
-            <p className="text-xs sm:text-sm text-[#5D87FF] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
               Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng
               thái trên bảng Kanban.
             </p>

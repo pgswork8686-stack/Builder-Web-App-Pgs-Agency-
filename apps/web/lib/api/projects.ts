@@ -1,7 +1,13 @@
 import { request } from "./client";
 
 export type ProjectStatus =
-  "draft" | "active" | "on_hold" | "completed" | "cancelled";
+  | "draft"
+  | "pending_approval"
+  | "active"
+  | "on_hold"
+  | "completed"
+  | "archived"
+  | "cancelled";
 export type ProjectPriority = "low" | "medium" | "high" | "urgent";
 export type ProjectMemberRole =
   "project_manager" | "member" | "client_contact" | "viewer";
@@ -65,6 +71,8 @@ export interface Project {
   priority: ProjectPriority;
   projectManagerUserId?: string | null;
   projectManager?: { id: string; full_name?: string; email?: string } | null;
+  departmentId?: string | null;
+  department?: { id: string; code: string; name: string } | null;
   startDate?: string | null;
   dueDate?: string | null;
   completedAt?: string | null;
@@ -99,6 +107,7 @@ export const projectsApi = {
       status?: ProjectStatus;
       priority?: ProjectPriority;
       projectManagerUserId?: string;
+      departmentId?: string;
       page?: number;
       pageSize?: number;
     } = {},
@@ -120,6 +129,7 @@ export const projectsApi = {
     status?: ProjectStatus;
     priority?: ProjectPriority;
     projectManagerUserId?: string | null;
+    departmentId?: string | null;
     startDate?: string | null;
     dueDate?: string | null;
   }) {
@@ -134,6 +144,15 @@ export const projectsApi = {
       method: "PATCH",
       body: JSON.stringify(data),
     });
+  },
+
+  deleteProject(projectId: string) {
+    return request<{ success: boolean; message: string }>(
+      `/admin/projects/${projectId}`,
+      {
+        method: "DELETE",
+      },
+    );
   },
 
   getMembers(projectId: string) {

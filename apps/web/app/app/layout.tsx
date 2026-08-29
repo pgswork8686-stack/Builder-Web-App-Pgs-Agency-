@@ -128,9 +128,9 @@ export default function ProtectedAppLayout({
 
   if (checking || !account) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] text-[#0F172A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-[#161827]">
         <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-center shadow-lg">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4F75FF]" />
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#E7AE18]" />
           <p className="mt-4 text-xs font-medium text-[#64748B]">
             Đang kiểm tra quyền truy cập...
           </p>
@@ -143,7 +143,7 @@ export default function ProtectedAppLayout({
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
-                  className="px-3 py-1.5 text-xs font-medium text-white bg-[#4F75FF] hover:bg-[#3d62ee] rounded-lg transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-bold text-[#161827] bg-[#E7AE18] hover:bg-[#CC9410] rounded-xl transition-colors cursor-pointer shadow-xs"
                 >
                   Thử lại
                 </button>
@@ -154,7 +154,7 @@ export default function ProtectedAppLayout({
                     await supabase.auth.signOut();
                     router.replace("/auth/login");
                   }}
-                  className="px-3 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#161827] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
                 >
                   Đăng xuất
                 </button>
@@ -168,10 +168,10 @@ export default function ProtectedAppLayout({
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] p-6 text-[#0F172A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-6 text-[#161827]">
         <div className="max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-500" />
-          <h1 className="mt-4 text-base font-extrabold text-[#0F172A]">
+          <h1 className="mt-4 text-base font-extrabold text-[#161827]">
             Không có quyền truy cập
           </h1>
           <p className="mt-2 text-xs text-[#64748B]">

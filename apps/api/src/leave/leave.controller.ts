@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   BadRequestException,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { ActiveAccountGuard } from '../auth/active-account.guard';
@@ -72,7 +73,7 @@ export class LeaveController {
 
   @Post('requests/:id/review')
   async reviewRequest(
-    @Param('id') requestId: string,
+    @Param('id', ParseUUIDPipe) requestId: string,
     @Body() body: unknown,
     @CurrentUser() user: any,
   ) {
@@ -87,7 +88,7 @@ export class LeaveController {
 
   @Post('requests/:id/cancel')
   async cancelRequest(
-    @Param('id') requestId: string,
+    @Param('id', ParseUUIDPipe) requestId: string,
     @CurrentUser() user: any,
   ) {
     return this.leaveService.cancelRequest(requestId, user);
@@ -95,7 +96,7 @@ export class LeaveController {
 
   @Post('balances/:id/adjust')
   async adjustBalance(
-    @Param('id') balanceId: string,
+    @Param('id', ParseUUIDPipe) balanceId: string,
     @Body() body: unknown,
     @CurrentUser() user: any,
   ) {

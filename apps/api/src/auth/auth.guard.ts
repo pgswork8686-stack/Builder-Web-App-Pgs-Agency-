@@ -93,6 +93,25 @@ export class AuthGuard implements CanActivate {
       throw new ForbiddenException('ACCOUNT_STATE_INVALID');
     }
 
+    let departmentId: string | null = null;
+    if (profile.role === 'team_leader') {
+      const { data: employment, error: employmentError } = await client
+        .from('employee_profiles')
+        .select('department_id')
+        .eq('user_id', profile.id)
+        .maybeSingle();
+      if (employmentError) {
+        this.logger.error(
+          `Department scope lookup error: ${employmentError.message}`,
+        );
+        throw new InternalServerErrorException({
+          code: 'DEPARTMENT_SCOPE_LOOKUP_FAILED',
+          message: 'Không thể kiểm tra phạm vi phòng ban lúc này.',
+        });
+      }
+      departmentId = employment?.department_id ?? null;
+    }
+
     const requestUser: RequestUser = {
       authUserId: user.id,
       profileId: profile.id,
@@ -104,6 +123,7 @@ export class AuthGuard implements CanActivate {
       avatarUrl: profile.avatar_url ?? null,
       approvedAt: profile.approved_at ?? null,
       rejectionReason: profile.rejection_reason ?? null,
+      departmentId,
     };
 
     request.user = requestUser;

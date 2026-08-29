@@ -49,7 +49,7 @@ export function WorkspaceHeader({
     <header className="space-y-4 pb-4 border-b border-[#EDF2F7]">
       <Link
         href={base}
-        className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition-colors"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#161827] transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Tổng quan dự án</span>
@@ -58,11 +58,11 @@ export function WorkspaceHeader({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#4F75FF] bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#E0EAFF]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A7000] bg-[#FFF8E5] px-2.5 py-0.5 rounded-full border border-[#FDE68A]">
               {projectCode ?? "PROJECT"}
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-black text-[#0F172A] tracking-tight sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-black text-[#161827] tracking-tight sm:text-3xl">
             {projectName ?? "Không gian thực thi dự án"}
           </h1>
         </div>
@@ -80,10 +80,10 @@ export function WorkspaceHeader({
             <Link
               key={key}
               href={href}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-150 ${
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-150 select-none ${
                 isActive
-                  ? "bg-[#4F75FF] text-white shadow-xs"
-                  : "bg-white text-[#64748B] hover:text-[#0F172A] border border-[#E2E8F0] hover:bg-[#F8FAFC]"
+                  ? "bg-[#E7AE18] text-[#161827] shadow-xs"
+                  : "bg-white text-[#64748B] hover:text-[#161827] border border-[#E2E8F0] hover:bg-[#FFF8E5]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />

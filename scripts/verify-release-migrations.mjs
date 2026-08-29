@@ -61,6 +61,16 @@ const BUSINESS_RULES_MIGRATIONS = [
   "20260821102000_payroll_attendance_and_compliance.sql",
 ];
 
+const PRODUCTION_HARDENING_MIGRATIONS = [
+  "20260824090000_add_client_social_links.sql",
+  "20260826024721_production_audit_hardening.sql",
+  "20260826032457_phase1_safe_account_lifecycle.sql",
+];
+
+const PROFILES_PERMISSION_REPAIR_MIGRATIONS = [
+  "20260828021004_repair_authenticated_profiles_select.sql",
+];
+
 const RELEASE_TABLES = [
   // Workflow
   "workflow_templates",
@@ -108,18 +118,21 @@ const RELEASE_FIXTURE_AUTH_EMAILS = [
   "client.test@example.com",
 ];
 const RELEASE_FIXTURE_AUTH_IDS = [ADMIN_ID];
+const STATIC_ONLY = process.argv.includes("--static");
 
 assertNoHostedSupabaseEnvironment(process.env);
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
-if (!DATABASE_URL) {
+if (!DATABASE_URL && !STATIC_ONLY) {
   throw new Error(
     `DATABASE_URL is required. This destructive verifier only accepts the local Supabase PostgreSQL tuple (loopback host, port 54322, database postgres) with ${DISPOSABLE_DATABASE_CONFIRMATION_ENV}=${DISPOSABLE_DATABASE_CONFIRMATION_VALUE}.`,
   );
 }
 
-assertConfirmedLocalSupabaseMigrationDatabaseUrl(DATABASE_URL);
+if (DATABASE_URL) {
+  assertConfirmedLocalSupabaseMigrationDatabaseUrl(DATABASE_URL);
+}
 
 function phase(message) {
   process.stdout.write(`\n=== ${message} ===\n`);
@@ -156,6 +169,8 @@ async function loadManifest() {
     ...STORAGE_BUCKET_MIGRATIONS,
     ...PAYROLL_HARDENING_MIGRATIONS,
     ...BUSINESS_RULES_MIGRATIONS,
+    ...PRODUCTION_HARDENING_MIGRATIONS,
+    ...PROFILES_PERMISSION_REPAIR_MIGRATIONS,
   ];
 
   assert(
@@ -169,8 +184,13 @@ async function loadManifest() {
   );
   assert.equal(
     manifest.length,
-    61,
-    "Release manifest must contain the 61 accepted local migrations",
+    65,
+    "Release manifest must contain the 65 accepted local migrations",
+  );
+  assert.deepEqual(
+    manifest,
+    allFiles,
+    "Release manifest must match every migration in chronological filesystem order",
   );
   for (const file of manifest) {
     assert(
@@ -178,6 +198,44 @@ async function loadManifest() {
       `Required release migration missing: ${file}`,
     );
   }
+
+  const profilePolicySql = await readFile(
+    join(
+      MIGRATIONS_DIR,
+      "20260813070000_phase8_lockdown_security_definer_helpers.sql",
+    ),
+    "utf8",
+  );
+  assert.match(
+    profilePolicySql,
+    /CREATE POLICY "profiles_select_own_policy"[\s\S]*?ON public\.profiles[\s\S]*?FOR SELECT[\s\S]*?TO authenticated[\s\S]*?USING \(\(SELECT auth\.uid\(\)\) = id\);/iu,
+    "profiles_select_own_policy must remain an authenticated own-row SELECT policy",
+  );
+
+  const profileRepairSql = await readFile(
+    join(MIGRATIONS_DIR, PROFILES_PERMISSION_REPAIR_MIGRATIONS[0]),
+    "utf8",
+  );
+  assert.match(
+    profileRepairSql,
+    /ALTER TABLE public\.profiles ENABLE ROW LEVEL SECURITY;/iu,
+    "Profiles repair must preserve RLS",
+  );
+  assert.match(
+    profileRepairSql,
+    /GRANT SELECT ON TABLE public\.profiles TO authenticated;/iu,
+    "Profiles repair must grant authenticated SELECT",
+  );
+  assert.match(
+    profileRepairSql,
+    /has_table_privilege\([\s\S]*?'authenticated'[\s\S]*?'public\.profiles'[\s\S]*?'SELECT'[\s\S]*?\)/iu,
+    "Profiles repair must assert the authenticated SELECT privilege",
+  );
+  assert.doesNotMatch(
+    profileRepairSql,
+    /DISABLE ROW LEVEL SECURITY|GRANT\s+(?:ALL|INSERT|UPDATE|DELETE|TRUNCATE|REFERENCES|TRIGGER)[\s\S]*?TO\s+authenticated|service_role/iu,
+    "Profiles repair must not weaken RLS or expand authenticated privileges",
+  );
 
   for (const file of manifest) {
     process.stdout.write(`${file}\n`);
@@ -464,7 +522,10 @@ async function assertReleaseSchema(client) {
       has_table_privilege('anon', 'public.profiles', 'SELECT') AS anon_can_select_profiles,
       has_table_privilege('authenticated', 'public.profiles', 'INSERT') AS authenticated_can_insert_profiles,
       has_table_privilege('authenticated', 'public.profiles', 'UPDATE') AS authenticated_can_update_profiles,
-      has_table_privilege('authenticated', 'public.profiles', 'DELETE') AS authenticated_can_delete_profiles
+      has_table_privilege('authenticated', 'public.profiles', 'DELETE') AS authenticated_can_delete_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'TRUNCATE') AS authenticated_can_truncate_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'REFERENCES') AS authenticated_can_reference_profiles,
+      has_table_privilege('authenticated', 'public.profiles', 'TRIGGER') AS authenticated_can_trigger_profiles
   `);
   assert.equal(
     profileLookupPrivileges.rows[0].authenticated_can_select_profiles,
@@ -481,12 +542,21 @@ async function assertReleaseSchema(client) {
         profileLookupPrivileges.rows[0].authenticated_can_update_profiles,
       authenticatedCanDeleteProfiles:
         profileLookupPrivileges.rows[0].authenticated_can_delete_profiles,
+      authenticatedCanTruncateProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_truncate_profiles,
+      authenticatedCanReferenceProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_reference_profiles,
+      authenticatedCanTriggerProfiles:
+        profileLookupPrivileges.rows[0].authenticated_can_trigger_profiles,
     },
     {
       anonCanSelectProfiles: false,
       authenticatedCanInsertProfiles: false,
       authenticatedCanUpdateProfiles: false,
       authenticatedCanDeleteProfiles: false,
+      authenticatedCanTruncateProfiles: false,
+      authenticatedCanReferenceProfiles: false,
+      authenticatedCanTriggerProfiles: false,
     },
     "Profile browser grant must stay read-only for authenticated users and closed to anon",
   );
@@ -772,6 +842,78 @@ async function assertRoleIsolation(client) {
       await client.query("RESET ROLE");
     }
   }
+}
+
+async function assertProfileRlsIsolation(client, seed) {
+  phase("Assert profiles GRANT and RLS together");
+
+  const profileSecurity = await client.query(`
+    SELECT
+      table_class.relrowsecurity AS rls_enabled,
+      EXISTS (
+        SELECT 1
+        FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = 'profiles'
+          AND policyname = 'profiles_select_own_policy'
+          AND cmd = 'SELECT'
+          AND 'authenticated' = ANY (roles)
+      ) AS own_select_policy_exists
+    FROM pg_class AS table_class
+    JOIN pg_namespace AS table_schema
+      ON table_schema.oid = table_class.relnamespace
+    WHERE table_schema.nspname = 'public'
+      AND table_class.relname = 'profiles'
+  `);
+  assert.deepEqual(
+    profileSecurity.rows,
+    [{ rls_enabled: true, own_select_policy_exists: true }],
+    "profiles must retain RLS and the authenticated own-row SELECT policy",
+  );
+
+  await client.query("BEGIN");
+  try {
+    await client.query("SET LOCAL ROLE authenticated");
+    await client.query(
+      `SELECT
+         set_config('request.jwt.claim.sub', $1, true),
+         set_config('request.jwt.claim.role', 'authenticated', true)`,
+      [seed.employeeId],
+    );
+
+    const visibleProfiles = await client.query(
+      "SELECT id FROM public.profiles ORDER BY id",
+    );
+    assert.deepEqual(
+      visibleProfiles.rows,
+      [{ id: seed.employeeId }],
+      "User A must be able to read only profile A",
+    );
+
+    const otherProfile = await client.query(
+      "SELECT id FROM public.profiles WHERE id = $1",
+      [seed.clientUserId],
+    );
+    assert.equal(otherProfile.rowCount, 0, "User A must not read profile B");
+  } finally {
+    await client.query("ROLLBACK");
+  }
+
+  await client.query("BEGIN");
+  try {
+    await client.query("SET LOCAL ROLE anon");
+    await expectDatabaseError(
+      () => client.query("SELECT id FROM public.profiles LIMIT 1"),
+      ["42501", "permission denied"],
+      "Anonymous profiles SELECT",
+    );
+  } finally {
+    await client.query("ROLLBACK");
+  }
+
+  process.stdout.write(
+    "PASS: authenticated own profile allowed; cross-user and anonymous profile reads denied.\n",
+  );
 }
 
 async function seedDisposableData(client) {
@@ -1174,12 +1316,21 @@ async function main() {
     phase("Build explicit release manifest and verify Phase10 exclusion");
     const manifest = await loadManifest();
 
+    if (STATIC_ONLY) {
+      phase("Static Release Migration Validation Passed");
+      process.stdout.write(
+        `PASS: ${manifest.length} migrations match chronological filesystem order; profiles SELECT and RLS repair invariants verified.\n`,
+      );
+      return;
+    }
+
     client = await createClient();
     await bootstrapSupabaseSurface(client);
     await applyMigrations(client, manifest);
     await assertReleaseSchema(client);
     await assertRoleIsolation(client);
     const seed = await seedDisposableData(client);
+    await assertProfileRlsIsolation(client, seed);
     await runReleaseSmoke(client, seed);
 
     phase("Full Release Migration Preflight Passed");

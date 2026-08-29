@@ -147,6 +147,7 @@ describe('AuthGuard', () => {
       avatarUrl: null,
       approvedAt: '2026-01-02',
       rejectionReason: null,
+      departmentId: null,
     });
   });
 
@@ -205,7 +206,7 @@ describe('AuthGuard', () => {
     );
   });
 
-  it('should throw sanitized InternalServerErrorException if database query fails', async () => {
+  it('should sanitize a profiles permission error instead of exposing database details', async () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const mockUser = { id: 'user-123', email: 'test@example.com' };
 
@@ -216,7 +217,7 @@ describe('AuthGuard', () => {
 
     const maybeSingleMock = jest.fn().mockResolvedValue({
       data: null,
-      error: new Error('relation "profiles" does not exist'),
+      error: new Error('permission denied for table profiles'),
     });
     const eqMock = jest.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
     const selectMock = jest.fn().mockReturnValue({ eq: eqMock });
@@ -235,7 +236,7 @@ describe('AuthGuard', () => {
         code: 'PROFILE_LOOKUP_FAILED',
         message: 'Không thể kiểm tra thông tin tài khoản lúc này.',
       });
-      expect(err.message).not.toContain('relation "profiles" does not exist');
+      expect(err.message).not.toContain('permission denied for table profiles');
     }
   });
 });

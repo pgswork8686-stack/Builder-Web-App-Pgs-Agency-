@@ -28,6 +28,7 @@ import {
   UpdateProjectServiceSchema,
 } from './dto/project.dto';
 import type { AppRole } from '../auth/auth.types';
+import type { RequestUser } from '../auth/auth.types';
 import { ProjectsService } from './projects.service';
 
 const ScopedListQuerySchema = z.object({
@@ -56,14 +57,16 @@ export class ProjectsController {
   }
 
   @Post('admin/projects')
-  @Roles('admin')
-  async createProject(
-    @Body() body: unknown,
-    @CurrentUser('profileId') actorUserId: string,
-  ) {
+  @Roles('admin', 'team_leader')
+  async createProject(@Body() body: unknown, @CurrentUser() user: RequestUser) {
     const parsed = CreateProjectSchema.safeParse(body);
     if (!parsed.success) invalidRequest(parsed.error);
-    return this.projectsService.createProject(parsed.data, actorUserId);
+    return this.projectsService.createProject(
+      parsed.data,
+      user.profileId,
+      user.role,
+      user.departmentId,
+    );
   }
 
   @Get('admin/projects/:projectId')
@@ -86,6 +89,15 @@ export class ProjectsController {
       parsed.data,
       actorUserId,
     );
+  }
+
+  @Delete('admin/projects/:projectId')
+  @Roles('admin')
+  async deleteProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') actorUserId: string,
+  ) {
+    return this.projectsService.deleteProject(projectId, actorUserId);
   }
 
   @Get('admin/projects/:projectId/members')
@@ -265,6 +277,7 @@ export class ProjectsController {
   async getInternalProjects(
     @CurrentUser('profileId') userId: string,
     @CurrentUser('role') role: AppRole,
+    @CurrentUser('departmentId') departmentId: string | null,
     @Query() rawQuery: Record<string, string>,
   ) {
     const parsed = ScopedListQuerySchema.safeParse(rawQuery);
@@ -274,6 +287,7 @@ export class ProjectsController {
       parsed.data.page,
       parsed.data.pageSize,
       role,
+      departmentId,
     );
   }
 
@@ -282,9 +296,15 @@ export class ProjectsController {
   async getInternalProject(
     @CurrentUser('profileId') userId: string,
     @CurrentUser('role') role: AppRole,
+    @CurrentUser('departmentId') departmentId: string | null,
     @Param('projectId', ParseUUIDPipe) projectId: string,
   ) {
-    return this.projectsService.getInternalProjectById(userId, projectId, role);
+    return this.projectsService.getInternalProjectById(
+      userId,
+      projectId,
+      role,
+      departmentId,
+    );
   }
 
   @Get('client/me/projects')

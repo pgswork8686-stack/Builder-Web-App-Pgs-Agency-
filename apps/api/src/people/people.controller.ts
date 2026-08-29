@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -23,6 +22,7 @@ import {
   UpdatePersonFullSchema,
   AssignUserProjectsSchema,
   UpdateOwnProfileSchema,
+  TerminatePersonSchema,
 } from './dto/employment.dto';
 import { PeopleService } from './people.service';
 
@@ -196,13 +196,24 @@ export class PeopleController {
     );
   }
 
-  @Delete('admin/people/:userId')
+  @Post('admin/people/:userId/terminate')
   @Roles('admin')
-  async deletePerson(
+  async terminatePerson(
     @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() body: unknown,
     @CurrentUser('authUserId') adminUserId: string,
   ) {
-    return this.peopleService.deletePerson(userId, adminUserId);
+    const result = TerminatePersonSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(
+        result.error.errors.map((error) => error.message).join(', '),
+      );
+    }
+    return this.peopleService.terminatePerson(
+      userId,
+      adminUserId,
+      result.data.reason,
+    );
   }
 
   @Get('admin/people/:userId/projects')

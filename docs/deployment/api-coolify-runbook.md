@@ -51,9 +51,11 @@ Configure these names in the Coolify API application. Obtain values through the 
 APP_ENV
 PORT
 WEB_URL
+DATABASE_URL
 SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SECRET_KEY     SECRET
+JWT_SECRET              SECRET
 INITIAL_ADMIN_EMAIL
 THROTTLE_TTL
 THROTTLE_LIMIT
@@ -61,7 +63,7 @@ TRUST_PROXY
 CALENDARIFIC_API_KEY   OPTIONAL
 ```
 
-Required deployment settings include `APP_ENV=production`, `PORT=3001`, and `TRUST_PROXY=true`. `WEB_URL` must be the exact HTTPS web origin with no path. Production startup fails if required values are absent or invalid. Do not use local `.env` files in production.
+Required deployment settings include `APP_ENV=production`, `PORT=3001`, `DATABASE_URL`, `JWT_SECRET`, and `TRUST_PROXY=true`. `WEB_URL` must be the exact HTTPS web origin with no path. Production startup fails if required values are absent or invalid. Do not use local `.env` files in production.
 
 ## E. HTTPS
 

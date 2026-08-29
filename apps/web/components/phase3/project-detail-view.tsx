@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   CalendarDays,
@@ -88,6 +88,7 @@ const taskStatuses: TaskStatus[] = [
 ];
 
 export function ProjectDetailView({ mode }: { mode: Mode }) {
+  const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [members, setMembers] = useState<any[]>([]);
@@ -101,9 +102,12 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  // Lifecycle Modals
+  // Lifecycle & Delete Modals
   const [completeOpen, setCompleteOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [deleteProjectOpen, setDeleteProjectOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Add Member / Service / Task Dialogs
   const [addMemberOpen, setAddMemberOpen] = useState(false);
@@ -253,6 +257,21 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       setError(
         caught instanceof Error ? caught.message : "Không thể gỡ thành viên.",
       );
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (!project) return;
+    try {
+      setDeleting(true);
+      setDeleteError(null);
+      await projectsApi.deleteProject(project.id);
+      setDeleteProjectOpen(false);
+      router.push("/app/admin/projects");
+    } catch (err: any) {
+      setDeleteError(err.message || "Không thể xóa dự án lúc này.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -450,6 +469,17 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 leftIcon={<Archive className="w-4 h-4" />}
               >
                 Lưu trữ
+              </Button>
+            )}
+
+            {mode === "admin" && (
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setDeleteProjectOpen(true)}
+                leftIcon={<Trash2 className="w-4 h-4" />}
+              >
+                Xóa dự án
               </Button>
             )}
           </div>
@@ -1246,6 +1276,50 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         onCloseArchive={() => setArchiveOpen(false)}
         onUpdated={(updated) => setProject(updated)}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        isOpen={deleteProjectOpen}
+        onClose={() => setDeleteProjectOpen(false)}
+        maxWidth="md"
+        title="Xác nhận lưu trữ dự án"
+        description={`Bạn có chắc chắn muốn lưu trữ dự án "${project?.name}" (${project?.projectCode})?`}
+      >
+        <div className="space-y-4 pt-2">
+          {deleteError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>{deleteError}</span>
+            </div>
+          )}
+
+          <p className="text-xs text-[#64748B] leading-relaxed">
+            Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
+            tra cứu và kiểm toán.
+          </p>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={deleting}
+              onClick={() => setDeleteProjectOpen(false)}
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              isLoading={deleting}
+              onClick={handleDeleteProject}
+            >
+              Lưu trữ dự án
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

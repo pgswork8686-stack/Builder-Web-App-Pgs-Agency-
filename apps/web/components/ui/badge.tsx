@@ -3,6 +3,7 @@ import React from "react";
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?:
     | "default"
+    | "brand"
     | "blue"
     | "gold"
     | "success"
@@ -28,8 +29,10 @@ export function Badge({
 
   const variantStyles = {
     default: "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]",
+    brand:
+      "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold shadow-2xs",
     blue: "bg-[#EEF2FF] text-[#4F75FF] border border-[#E0EAFF] font-semibold",
-    gold: "bg-[#FEF9C3] text-[#A16207] border border-[#FEF08A] font-semibold",
+    gold: "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold",
     success:
       "bg-[#E6FBF5] text-[#00B788] border border-[#A7F3D0] font-semibold",
     warning:

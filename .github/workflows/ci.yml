@@ -26,9 +26,11 @@ jobs:
       APP_ENV: test
       PORT: "3001"
       WEB_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
       SUPABASE_URL: http://127.0.0.1:54321
       SUPABASE_PUBLISHABLE_KEY: test-publishable-key
       SUPABASE_SECRET_KEY: test-secret-key
+      JWT_SECRET: test-jwt-secret-with-at-least-32-characters
       INITIAL_ADMIN_EMAIL: admin@example.com
       THROTTLE_TTL: "60000"
       THROTTLE_LIMIT: "120"
@@ -100,9 +102,11 @@ jobs:
             --env APP_ENV=production \
             --env PORT=3001 \
             --env WEB_URL=https://app.example.com \
+            --env DATABASE_URL=postgresql://postgres:postgres@db.example.supabase.co:5432/postgres \
             --env SUPABASE_URL=https://example.supabase.co \
             --env SUPABASE_PUBLISHABLE_KEY=test-placeholder \
             --env SUPABASE_SECRET_KEY=test-placeholder \
+            --env JWT_SECRET=test-jwt-secret-with-at-least-32-characters \
             --env INITIAL_ADMIN_EMAIL=admin@example.com \
             --env THROTTLE_TTL=60000 \
             --env THROTTLE_LIMIT=120 \
@@ -137,9 +141,11 @@ jobs:
             --env APP_ENV=production
             --env PORT=3001
             --env WEB_URL=https://app.example.com
+            --env DATABASE_URL=postgresql://postgres:postgres@db.example.supabase.co:5432/postgres
             --env SUPABASE_URL=https://example.supabase.co
             --env SUPABASE_PUBLISHABLE_KEY=test-placeholder
             --env SUPABASE_SECRET_KEY="$secret_marker"
+            --env JWT_SECRET=test-jwt-secret-with-at-least-32-characters
             --env INITIAL_ADMIN_EMAIL=admin@example.com
             --env THROTTLE_TTL=60000
             --env THROTTLE_LIMIT=120
@@ -163,6 +169,7 @@ jobs:
             --env APP_ENV=production \
             --env PORT=3001 \
             --env WEB_URL=https://app.example.com \
+            --env DATABASE_URL=postgresql://postgres:postgres@db.example.supabase.co:5432/postgres \
             --env SUPABASE_URL=https://example.supabase.co \
             --env SUPABASE_PUBLISHABLE_KEY=test-placeholder \
             --env INITIAL_ADMIN_EMAIL=admin@example.com \
@@ -175,6 +182,8 @@ jobs:
           fi
 
           expect_failure invalid-web-url --env WEB_URL=not-a-url
+          expect_failure invalid-database-url --env DATABASE_URL=https://example.com
+          expect_failure invalid-jwt-secret --env JWT_SECRET=too-short
           expect_failure invalid-admin-email --env INITIAL_ADMIN_EMAIL=not-an-email
           expect_failure invalid-port --env PORT=70000
           expect_failure invalid-throttle-limit --env THROTTLE_LIMIT=0
@@ -189,9 +198,11 @@ jobs:
       APP_ENV: test
       PORT: "3001"
       WEB_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
       SUPABASE_URL: http://127.0.0.1:54321
       SUPABASE_PUBLISHABLE_KEY: test-publishable-key
       SUPABASE_SECRET_KEY: test-secret-key
+      JWT_SECRET: test-jwt-secret-with-at-least-32-characters
       INITIAL_ADMIN_EMAIL: admin@example.com
       THROTTLE_TTL: "60000"
       THROTTLE_LIMIT: "120"

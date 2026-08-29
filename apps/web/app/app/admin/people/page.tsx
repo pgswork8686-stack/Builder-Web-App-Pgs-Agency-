@@ -259,23 +259,23 @@ export default function AdminPeopleDirectoryPage() {
     }
   };
 
-  // Delete / Permanently Remove Person
+  // Terminate access while retaining business and audit history.
   const handleConfirmDelete = async () => {
     if (!deletingPerson) return;
     try {
       setSubmitting(true);
       setError(null);
 
-      await peopleApi.deletePerson(deletingPerson.id);
+      await peopleApi.terminatePerson(deletingPerson.id);
 
       setSuccessMsg(
-        `Đã xóa vĩnh viễn tài khoản ${deletingPerson.fullName || deletingPerson.email} khỏi hệ thống thành công!`,
+        `Đã chấm dứt quyền truy cập của ${deletingPerson.fullName || deletingPerson.email}; dữ liệu lịch sử được giữ nguyên.`,
       );
       setTimeout(() => setSuccessMsg(null), 4000);
       setDeletingPerson(null);
       fetchDirectory();
     } catch (err: any) {
-      setError(err.message || "Không thể xóa tài khoản nhân sự");
+      setError(err.message || "Không thể chấm dứt quyền truy cập tài khoản");
     } finally {
       setSubmitting(false);
     }
@@ -1003,13 +1003,13 @@ export default function AdminPeopleDirectoryPage() {
         </div>
       </Dialog>
 
-      {/* MODAL 3: XÁC NHẬN XÓA VĨNH VIỄN NHÂN SỰ */}
+      {/* MODAL 3: XÁC NHẬN CHẤM DỨT QUYỀN TRUY CẬP */}
       <DeleteConfirmDialog
         isOpen={Boolean(deletingPerson)}
         onClose={() => !submitting && setDeletingPerson(null)}
         onConfirm={handleConfirmDelete}
-        title="Xóa vĩnh viễn tài khoản nhân sự"
-        description={`Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản của "${deletingPerson?.fullName || deletingPerson?.email}"? Tài khoản và toàn bộ dữ liệu hồ sơ liên quan sẽ bị xóa hoàn toàn khỏi cơ sở dữ liệu và không thể khôi phục.`}
+        title="Chấm dứt quyền truy cập tài khoản"
+        description={`Tài khoản của "${deletingPerson?.fullName || deletingPerson?.email}" sẽ không thể đăng nhập hoặc thao tác. Hồ sơ và toàn bộ dữ liệu lịch sử, tài chính, chấm công, công việc và kiểm toán vẫn được giữ nguyên.`}
         isLoading={submitting}
       />
     </div>

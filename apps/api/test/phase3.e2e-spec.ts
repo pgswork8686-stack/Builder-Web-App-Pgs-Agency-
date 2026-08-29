@@ -167,11 +167,13 @@ describe('Phase 3 API (e2e)', () => {
         priority: 'medium',
       }),
       expect.any(String),
+      'admin',
+      null,
     );
   });
 
   it.each([
-    ['invalid status', { status: 'archived' }],
+    ['invalid status', { status: 'deleted' }],
     ['invalid priority', { priority: 'critical' }],
     ['invalid date range', { startDate: '2026-08-12', dueDate: '2026-08-11' }],
   ])('project create rejects %s', async (_label, override) => {

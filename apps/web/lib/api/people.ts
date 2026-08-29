@@ -114,9 +114,10 @@ export const peopleApi = {
     });
   },
 
-  async deletePerson(userId: string) {
-    return fetchWithAuth(`/admin/people/${userId}`, {
-      method: "DELETE",
+  async terminatePerson(userId: string, reason?: string) {
+    return fetchWithAuth(`/admin/people/${userId}/terminate`, {
+      method: "POST",
+      body: JSON.stringify(reason ? { reason } : {}),
     });
   },
 

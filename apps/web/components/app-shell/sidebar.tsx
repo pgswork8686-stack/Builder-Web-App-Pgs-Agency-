@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   ChevronLeft,
@@ -9,7 +10,6 @@ import {
   HelpCircle,
   UserCheck,
   Clock,
-  ExternalLink,
 } from "lucide-react";
 import {
   getNavigationForRole,
@@ -17,6 +17,7 @@ import {
   ROLE_LABELS,
   type NavItem,
 } from "./role-navigation";
+import { isNavItemActive } from "./navigation-utils";
 import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 import { Avatar } from "@/components/ui/avatar";
 
@@ -46,33 +47,35 @@ export function Sidebar({
     user?.email?.split("@")[0] ||
     roleLabel.split("(")[0].trim();
 
-  const isItemActive = (item: NavItem) => {
-    if (item.exact) return pathname === item.href;
-    return pathname === item.href || pathname.startsWith(`${item.href}/`);
-  };
-
   // Determine support destination
   const supportHref =
     account.role === "client" ? "/app/client/support" : "/app/notifications";
 
   return (
     <aside
-      className={`hidden lg:flex flex-col h-full border-r border-[#EDF2F7] bg-white transition-all duration-300 z-20 select-none shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.02)] ${
-        collapsed ? "w-20" : "w-[250px]"
+      className={`hidden lg:flex flex-col h-full border-r border-[#222638] bg-[#161827] text-white transition-all duration-300 z-20 select-none shrink-0 shadow-lg ${
+        collapsed ? "w-20" : "w-[252px]"
       }`}
     >
-      {/* Brand Header - Fixed Top (78px height in Figma) */}
-      <div className="h-[78px] flex items-center justify-between px-4 border-b border-[#EDF2F7] shrink-0">
+      {/* Brand Header - Fixed Top (78px height) with Real PGS Agency Logo */}
+      <div className="h-[78px] flex items-center justify-between px-3.5 border-b border-[#222638] shrink-0 bg-[#161827]">
         <Link href="/app" className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-[#5D87FF] text-white font-black flex items-center justify-center text-sm shadow-xs shrink-0">
-            P
+          <div className="relative w-9 h-9 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-white/10">
+            <Image
+              src="/brand/pgs-agency-logo-transparent.png"
+              alt="PGS Agency"
+              width={36}
+              height={36}
+              className="object-contain w-full h-full"
+              priority
+            />
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="font-black text-sm tracking-tight text-[#24304A]">
+              <span className="font-black text-sm tracking-tight text-white leading-tight">
                 PGS Hub
               </span>
-              <span className="text-[10px] font-semibold text-[#7C879D] tracking-tight">
+              <span className="text-[10px] font-semibold text-[#94A3B8] tracking-tight truncate">
                 {subtitle}
               </span>
             </div>
@@ -83,7 +86,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
         >
@@ -96,22 +99,22 @@ export function Sidebar({
       </div>
 
       {/* Navigation Links - Scrollable Center Area */}
-      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3 scrollbar-none">
+      <div className="flex-1 overflow-y-auto py-3 px-2.5 space-y-3 scrollbar-none">
         {/* Dedicated Highlight Action if Admin */}
         {!collapsed && account.role === "admin" && (
           <Link
             href="/app/admin/accounts/pending"
-            className="flex items-center justify-between p-2.5 rounded-xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] hover:bg-[#E0EAFF] transition-all group"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-[#E7AE18]/10 border border-[#E7AE18]/25 text-[#F3BA2F] hover:bg-[#E7AE18]/20 transition-all group"
           >
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-[#5D87FF] text-white flex items-center justify-center">
+              <div className="w-6 h-6 rounded-lg bg-[#E7AE18] text-[#161827] flex items-center justify-center font-bold">
                 <UserCheck className="w-3.5 h-3.5" />
               </div>
-              <span className="text-xs font-bold text-[#24304A] group-hover:text-[#5D87FF]">
+              <span className="text-xs font-bold text-white group-hover:text-[#F3BA2F] transition-colors">
                 Yêu cầu tài khoản
               </span>
             </div>
-            <span className="w-2 h-2 rounded-full bg-[#5D87FF] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#E7AE18] animate-pulse" />
           </Link>
         )}
 
@@ -119,17 +122,17 @@ export function Sidebar({
         {!collapsed && account.role === "employee" && (
           <Link
             href="/app/attendance"
-            className="flex items-center justify-between p-2.5 rounded-xl bg-[#FEF9C3] border border-[#FFC400]/40 text-[#92400E] hover:bg-[#FEF08A] transition-all group"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-[#FEF9C3]/10 border border-[#FFC400]/30 text-[#FDE047] hover:bg-[#FEF9C3]/20 transition-all group"
           >
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-[#FFC400] text-white flex items-center justify-center">
-                <Clock className="w-3.5 h-3.5 text-white" />
+              <div className="w-6 h-6 rounded-lg bg-[#FFC400] text-[#161827] flex items-center justify-center font-bold">
+                <Clock className="w-3.5 h-3.5" />
               </div>
-              <span className="text-xs font-bold text-[#92400E]">
+              <span className="text-xs font-bold text-white">
                 Chấm công bắt buộc
               </span>
             </div>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FFC400] text-white">
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
               GPS
             </span>
           </Link>
@@ -138,12 +141,12 @@ export function Sidebar({
         {navGroups.map((group, groupIdx) => (
           <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#7C879D]">
+              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
                 {group.groupTitle}
               </div>
             )}
             {group.items.map((item, itemIdx) => {
-              const active = isItemActive(item);
+              const active = isNavItemActive(pathname, item);
               const Icon = item.icon;
               const itemNum =
                 item.index || (itemIdx + 1).toString().padStart(2, "0");
@@ -153,16 +156,16 @@ export function Sidebar({
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.title : undefined}
-                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150 group relative ${
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150 group relative select-none ${
                     active
-                      ? "bg-[#EEF2FF] text-[#5D87FF] font-bold shadow-2xs"
-                      : "text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC]"
-                  } ${collapsed ? "justify-center px-0 py-2" : ""}`}
+                      ? "bg-[#E7AE18]/15 text-[#F3BA2F] font-bold shadow-2xs border-l-2 border-[#E7AE18]"
+                      : "text-[#94A3B8] hover:text-white hover:bg-white/5"
+                  } ${collapsed ? "justify-center px-0 py-2 border-l-0" : ""}`}
                 >
                   {!collapsed && (
                     <span
                       className={`text-[10px] font-mono font-medium ${
-                        active ? "text-[#5D87FF]" : "text-[#7C879D]"
+                        active ? "text-[#E7AE18]" : "text-[#64748B]"
                       }`}
                     >
                       {itemNum}
@@ -172,15 +175,15 @@ export function Sidebar({
                   <Icon
                     className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
                       active
-                        ? "text-[#5D87FF]"
-                        : "text-[#7C879D] group-hover:text-[#24304A]"
+                        ? "text-[#E7AE18]"
+                        : "text-[#94A3B8] group-hover:text-white"
                     }`}
                   />
                   {!collapsed && (
                     <span className="truncate flex-1">{item.title}</span>
                   )}
                   {!collapsed && item.badge && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-[#5D87FF]/10 text-[#5D87FF] text-[9px] font-bold">
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#E7AE18]/20 text-[#F3BA2F] text-[9px] font-bold">
                       {item.badge}
                     </span>
                   )}
@@ -193,20 +196,20 @@ export function Sidebar({
 
       {/* Footer / Support & User Card - Fixed to Bottom (mt-auto) */}
       {!collapsed ? (
-        <div className="mt-auto p-3 border-t border-[#EDF2F7] space-y-2 shrink-0 bg-white">
-          <div className="p-2.5 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-1.5">
-            <div className="flex items-center gap-1.5 text-[#5D87FF] text-xs font-bold">
+        <div className="mt-auto p-3 border-t border-[#222638] space-y-2 shrink-0 bg-[#161827]">
+          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[#E7AE18] text-xs font-bold">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Cần hỗ trợ?</span>
             </div>
-            <p className="text-[10px] text-[#7C879D] leading-tight">
+            <p className="text-[10px] text-[#94A3B8] leading-tight">
               {account.role === "client"
                 ? "Gửi yêu cầu hỗ trợ và ticket tới bộ phận CSKH."
                 : "Xem hướng dẫn và trung tâm trợ giúp hệ thống."}
             </p>
             <Link
               href={supportHref}
-              className="w-full py-1 px-2 rounded-lg bg-[#5D87FF] hover:bg-[#4F75FF] text-white text-[10px] font-bold transition-colors block text-center"
+              className="w-full py-1.5 px-2 rounded-lg bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] text-[10px] font-black transition-colors block text-center shadow-xs"
             >
               {account.role === "client"
                 ? "Mở trung tâm hỗ trợ"
@@ -217,14 +220,14 @@ export function Sidebar({
           {/* Authenticated User Preview Card */}
           <Link
             href="/app/profile"
-            className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
+            className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-white/5 transition-colors group"
           >
             <Avatar name={displayName} size="sm" />
             <div className="flex flex-col min-w-0 flex-1">
-              <p className="text-xs font-bold text-[#24304A] truncate group-hover:text-[#5D87FF]">
+              <p className="text-xs font-bold text-white truncate group-hover:text-[#F3BA2F] transition-colors">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#7C879D] truncate">{roleLabel}</p>
+              <p className="text-[10px] text-[#94A3B8] truncate">{roleLabel}</p>
             </div>
           </Link>
         </div>

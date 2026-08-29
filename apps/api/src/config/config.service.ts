@@ -17,6 +17,10 @@ export class ConfigService {
     return this.nestConfigService.getOrThrow<string>('WEB_URL');
   }
 
+  get databaseUrl(): string {
+    return this.nestConfigService.getOrThrow<string>('DATABASE_URL');
+  }
+
   get supabaseUrl(): string {
     return this.nestConfigService.getOrThrow<string>('SUPABASE_URL');
   }
@@ -29,6 +33,10 @@ export class ConfigService {
 
   get supabaseSecretKey(): string {
     return this.nestConfigService.getOrThrow<string>('SUPABASE_SECRET_KEY');
+  }
+
+  get jwtSecret(): string {
+    return this.nestConfigService.getOrThrow<string>('JWT_SECRET');
   }
 
   get initialAdminEmail(): string {

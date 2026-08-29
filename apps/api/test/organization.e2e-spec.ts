@@ -194,6 +194,10 @@ describe('Organization & Client API (e2e)', () => {
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({
+            data: { department_id: 'department-1' },
+            error: null,
+          }),
           in: jest.fn().mockResolvedValue({
             data: [
               {
@@ -233,6 +237,16 @@ describe('Organization & Client API (e2e)', () => {
             }),
           };
         }
+        if (table === 'employee_profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { department_id: 'department-1' },
+              error: null,
+            }),
+          };
+        }
         return {};
       });
       await request(app.getHttpServer())
@@ -256,6 +270,16 @@ describe('Organization & Client API (e2e)', () => {
             }),
           };
         }
+        if (table === 'employee_profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { department_id: 'department-1' },
+              error: null,
+            }),
+          };
+        }
         return {};
       });
       await request(app.getHttpServer())
@@ -275,6 +299,16 @@ describe('Organization & Client API (e2e)', () => {
             eq: jest.fn().mockReturnThis(),
             maybeSingle: jest.fn().mockResolvedValue({
               data: { id: 'user-id', role: r, account_status: 'active' },
+              error: null,
+            }),
+          };
+        }
+        if (table === 'employee_profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { department_id: 'department-1' },
               error: null,
             }),
           };

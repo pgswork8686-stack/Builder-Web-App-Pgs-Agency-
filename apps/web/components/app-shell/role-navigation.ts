@@ -36,6 +36,7 @@ export interface NavItem {
   icon: LucideIcon;
   badge?: string;
   exact?: boolean;
+  activePaths?: string[];
 }
 
 export interface NavGroup {
@@ -137,21 +138,14 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               title: "Công việc",
               href: "/app/admin/tasks",
               icon: ListTodo,
+              activePaths: [
+                "/app/admin/tasks",
+                "/app/admin/kanban",
+                "/app/admin/calendar",
+              ],
             },
             {
               index: "11",
-              title: "Kanban",
-              href: "/app/admin/kanban",
-              icon: Kanban,
-            },
-            {
-              index: "12",
-              title: "Lịch",
-              href: "/app/admin/calendar",
-              icon: Calendar,
-            },
-            {
-              index: "13",
               title: "Tài liệu PGS",
               href: "/app/admin/documents",
               icon: FolderOpen,
@@ -162,13 +156,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "NHÂN SỰ & CHẤM CÔNG",
           items: [
             {
-              index: "14",
+              index: "12",
               title: "Chấm công",
               href: "/app/admin/attendance",
               icon: Clock,
             },
             {
-              index: "15",
+              index: "13",
               title: "Nghỉ phép",
               href: "/app/admin/leave",
               icon: CalendarDays,
@@ -179,13 +173,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "TÀI CHÍNH",
           items: [
             {
-              index: "16",
+              index: "14",
               title: "Finance",
               href: "/app/admin/finance",
               icon: CreditCard,
             },
             {
-              index: "17",
+              index: "15",
               title: "Báo cáo",
               href: "/app/admin/reports",
               icon: FileSpreadsheet,
@@ -196,13 +190,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "GIAO TIẾP",
           items: [
             {
-              index: "18",
+              index: "16",
               title: "Tin nhắn (Chat)",
               href: "/app/chat",
               icon: MessageSquare,
             },
             {
-              index: "19",
+              index: "17",
               title: "Thông báo",
               href: "/app/notifications",
               icon: Bell,
@@ -213,13 +207,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "HỆ THỐNG",
           items: [
             {
-              index: "20",
+              index: "18",
               title: "Tự động hóa",
               href: "/app/admin/automation",
               icon: Cpu,
             },
             {
-              index: "21",
+              index: "19",
               title: "Cài đặt",
               href: "/app/admin/settings",
               icon: Settings,
@@ -258,51 +252,44 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               title: "Công việc",
               href: "/app/team-leader/tasks",
               icon: ListTodo,
+              activePaths: [
+                "/app/team-leader/tasks",
+                "/app/team-leader/kanban",
+                "/app/team-leader/calendar",
+              ],
             },
             {
               index: "05",
-              title: "Kanban",
-              href: "/app/team-leader/kanban",
-              icon: Kanban,
-            },
-            {
-              index: "06",
-              title: "Lịch",
-              href: "/app/team-leader/calendar",
-              icon: Calendar,
-            },
-            {
-              index: "07",
               title: "Đội nhóm",
               href: "/app/team-leader/teams",
               icon: Layers,
             },
             {
-              index: "08",
+              index: "06",
               title: "Đơn cần duyệt",
               href: "/app/team-leader/approvals",
               icon: UserCheck,
             },
             {
-              index: "09",
+              index: "07",
               title: "Tài liệu PGS",
               href: "/app/team-leader/documents",
               icon: FolderOpen,
             },
             {
-              index: "10",
+              index: "08",
               title: "Báo cáo",
               href: "/app/team-leader/reports",
               icon: FileSpreadsheet,
             },
             {
-              index: "11",
+              index: "09",
               title: "Chấm công",
               href: "/app/attendance",
               icon: Clock,
             },
             {
-              index: "12",
+              index: "10",
               title: "Nghỉ phép",
               href: "/app/leave",
               icon: CalendarDays,
@@ -313,13 +300,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "GIAO TIẾP",
           items: [
             {
-              index: "13",
+              index: "11",
               title: "Tin nhắn (Chat)",
               href: "/app/chat",
               icon: MessageSquare,
             },
             {
-              index: "14",
+              index: "12",
               title: "Thông báo",
               href: "/app/notifications",
               icon: Bell,
