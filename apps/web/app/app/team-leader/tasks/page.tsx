@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { ListTodo, Search, Filter } from "lucide-react";
-import { SectionHeader } from "@/components/dashboard/section-header";
+import { ListTodo, Search } from "lucide-react";
+import { TaskModuleHeader } from "@/components/tasks/task-module-header";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TeamLeaderTasksPage() {
@@ -13,18 +11,27 @@ export default function TeamLeaderTasksPage() {
 
   return (
     <div className="space-y-6">
-      <SectionHeader
+      <TaskModuleHeader
+        role="team_leader"
+        activeView="list"
         title="Danh sách Công việc của Nhóm (Team Tasks)"
         description="Theo dõi toàn bộ các đầu việc được giao cho thành viên trong team."
-        badge="Công việc"
-        action={
-          <Link href="/app/team-leader/kanban">
-            <Button variant="secondary" size="sm">
-              Mở bảng Kanban
-            </Button>
-          </Link>
-        }
+        badge="Danh sách"
       />
+
+      {/* Filter Bar */}
+      <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="w-4 h-4 text-[#7C879D] absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm công việc theo tên, người phụ trách..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] focus:outline-none focus:border-[#E7AE18]"
+          />
+        </div>
+      </div>
 
       <Card className="p-10 text-center">
         <EmptyState

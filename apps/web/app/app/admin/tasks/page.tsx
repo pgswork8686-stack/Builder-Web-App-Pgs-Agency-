@@ -1,19 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import {
-  ListTodo,
-  Plus,
-  Filter,
-  Search,
-  CheckCircle2,
-  Clock,
-} from "lucide-react";
-import { SectionHeader } from "@/components/dashboard/section-header";
+import { ListTodo, Search } from "lucide-react";
+import { TaskModuleHeader } from "@/components/tasks/task-module-header";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AdminTasksPage() {
@@ -22,19 +12,12 @@ export default function AdminTasksPage() {
 
   return (
     <div className="space-y-6">
-      <SectionHeader
+      <TaskModuleHeader
+        role="admin"
+        activeView="list"
         title="Danh sách Công việc (Tasks Master)"
         description="Quản lý và điều phối tất cả các đầu việc trong toàn bộ các dự án của agency."
-        badge="Tổng công việc"
-        action={
-          <div className="flex items-center gap-2">
-            <Link href="/app/admin/kanban">
-              <Button variant="secondary" size="sm">
-                Mở bảng Kanban
-              </Button>
-            </Link>
-          </div>
-        }
+        badge="Danh sách"
       />
 
       {/* Filter Bar */}
@@ -47,7 +30,7 @@ export default function AdminTasksPage() {
               placeholder="Tìm kiếm công việc, người thực hiện..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] focus:outline-none focus:border-[#5D87FF]"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] focus:outline-none focus:border-[#E7AE18]"
             />
           </div>
         </div>
@@ -56,7 +39,7 @@ export default function AdminTasksPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] focus:outline-none"
+            className="text-xs px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#161827] focus:outline-none focus:border-[#E7AE18]"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="todo">Cần làm</option>
