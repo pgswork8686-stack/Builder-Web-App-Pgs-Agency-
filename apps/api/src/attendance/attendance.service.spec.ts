@@ -39,6 +39,7 @@ function queryResult(
   for (const method of [
     'select',
     'eq',
+    'is',
     'in',
     'gte',
     'lte',

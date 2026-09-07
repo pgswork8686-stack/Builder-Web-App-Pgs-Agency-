@@ -8,24 +8,32 @@ import {
   RefreshCw,
   CheckCircle2,
   Clock,
+  AlertCircle,
 } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { fetchMyPayslips, Payslip } from "@/lib/api/payroll";
 
 export default function EmployeePayrollPage() {
   const [payslips, setPayslips] = useState<Payslip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await fetchMyPayslips();
       setPayslips(data || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load my payslips", err);
+      setError(
+        err?.message ||
+          "Không thể tải danh sách phiếu lương. Vui lòng kiểm tra kết nối mạng hoặc thử lại.",
+      );
     } finally {
       setLoading(false);
     }
@@ -48,6 +56,22 @@ export default function EmployeePayrollPage() {
           <div className="p-12 text-center text-[#7C879D]">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
             Đang tải phiếu lương cá nhân...
+          </div>
+        ) : error ? (
+          <div className="p-10 text-center space-y-4">
+            <EmptyState
+              icon={<AlertCircle className="w-10 h-10 text-rose-500" />}
+              title="Không thể tải dữ liệu phiếu lương"
+              description={error}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadData}
+              className="mx-auto"
+            >
+              Thử lại
+            </Button>
           </div>
         ) : payslips.length === 0 ? (
           <div className="p-10 text-center">

@@ -12,6 +12,7 @@ import {
   Send,
   RefreshCw,
   CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card } from "@/components/ui/card";
@@ -62,6 +63,10 @@ export default function ClientSupportPage() {
   // Reply message
   const [replyContent, setReplyContent] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const loadData = async () => {
     try {
@@ -85,6 +90,7 @@ export default function ClientSupportPage() {
 
     try {
       setSubmitting(true);
+      setFeedback(null);
       const newTicket = await createSupportTicket({
         title: title.trim(),
         description: description.trim(),
@@ -93,10 +99,20 @@ export default function ClientSupportPage() {
       });
       setTitle("");
       setDescription("");
+      setFeedback({
+        type: "success",
+        message:
+          "Tạo yêu cầu hỗ trợ thành công. Đội ngũ PGS sẽ phản hồi sớm nhất.",
+      });
       loadData();
       setSelectedTicket(newTicket);
     } catch (err: any) {
-      alert(err?.message || "Không thể gửi yêu cầu hỗ trợ.");
+      setFeedback({
+        type: "error",
+        message:
+          err?.message ||
+          "Không thể gửi yêu cầu hỗ trợ. Vui lòng kiểm tra lại.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -104,10 +120,14 @@ export default function ClientSupportPage() {
 
   const handleSelectTicket = async (id: string) => {
     try {
+      setFeedback(null);
       const ticket = await fetchSupportTicketById(id);
       setSelectedTicket(ticket);
     } catch (err: any) {
-      alert(err?.message || "Không thể tải chi tiết yêu cầu.");
+      setFeedback({
+        type: "error",
+        message: err?.message || "Không thể tải chi tiết yêu cầu hỗ trợ.",
+      });
     }
   };
 
@@ -117,13 +137,17 @@ export default function ClientSupportPage() {
 
     try {
       setSendingReply(true);
+      setFeedback(null);
       await sendTicketMessage(selectedTicket.id, {
         content: replyContent.trim(),
       });
       setReplyContent("");
       handleSelectTicket(selectedTicket.id);
     } catch (err: any) {
-      alert(err?.message || "Không thể gửi tin nhắn phản hồi.");
+      setFeedback({
+        type: "error",
+        message: err?.message || "Không thể gửi tin nhắn phản hồi.",
+      });
     } finally {
       setSendingReply(false);
     }
@@ -136,6 +160,32 @@ export default function ClientSupportPage() {
         description="Gửi yêu cầu hỗ trợ, theo dõi tiến độ giải quyết và trao đổi trực tiếp với Quản lý dự án PGS Agency."
         badge="Help Desk 24/7"
       />
+
+      {feedback && (
+        <div
+          className={`p-4 rounded-xl text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in duration-150 ${
+            feedback.type === "success"
+              ? "bg-emerald-50 border border-emerald-200 text-emerald-700"
+              : "bg-rose-50 border border-rose-200 text-rose-700"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {feedback.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            className="text-xs hover:underline opacity-80"
+          >
+            Đóng
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Left Column: Submit Ticket or Ticket Details */}

@@ -588,6 +588,33 @@ export class PayrollService {
       reviewsByUserId.set(String(r.user_id), r);
     }
 
+    // 6.b. Query approved leave requests in this payroll period
+    const { data: approvedLeaves, error: leaveError } = await this.client
+      .from('leave_requests')
+      .select(
+        'id, user_id, start_date, end_date, total_days, leave_type_id, leave_types(code, is_paid)',
+      )
+      .eq('status', 'approved')
+      .lte('start_date', endDate)
+      .gte('end_date', startDate);
+
+    if (leaveError) {
+      this.handleDbError(
+        leaveError,
+        'Không thể tải dữ liệu đơn nghỉ phép để tính lương.',
+        'PAYROLL_LEAVE_LOOKUP_FAILED',
+      );
+    }
+
+    const leavesByUserId = new Map<string, any[]>();
+    for (const l of approvedLeaves || []) {
+      const uid = String(l.user_id);
+      if (!leavesByUserId.has(uid)) {
+        leavesByUserId.set(uid, []);
+      }
+      leavesByUserId.get(uid)!.push(l);
+    }
+
     // 7. Calculate every payslip before creating persistent payroll data.
     const payslipDrafts: any[] = [];
     let totalGross = 0;
@@ -650,10 +677,36 @@ export class PayrollService {
         }
       }
 
+      // Calculate approved paid & unpaid leave days that fall on eligible work dates
+      let paidLeaveDays = 0;
+      let unpaidLeaveDays = 0;
+      const empLeaves = leavesByUserId.get(String(emp.user_id)) || [];
+
+      for (const leave of empLeaves) {
+        const isPaid =
+          leave.leave_types?.is_paid !== false &&
+          leave.leave_types?.code !== 'unpaid';
+        for (const workDate of eligibleWorkDatesSet) {
+          if (
+            workDate >= leave.start_date &&
+            workDate <= leave.end_date &&
+            !workedDates.has(workDate)
+          ) {
+            if (isPaid) {
+              paidLeaveDays += 1;
+            } else {
+              unpaidLeaveDays += 1;
+            }
+          }
+        }
+      }
+
       const actualWorkedDays = workedDates.size;
+      const totalCompensatedDays = actualWorkedDays + paidLeaveDays;
       const absenceDays = Math.max(
         0,
-        eligibleCompanyWorkDays.length - actualWorkedDays,
+        eligibleCompanyWorkDays.length -
+          (actualWorkedDays + paidLeaveDays + unpaidLeaveDays),
       );
 
       // Calculate attendance penalties
@@ -676,9 +729,9 @@ export class PayrollService {
         disciplineEligible,
       });
 
-      // Salary formula
+      // Salary formula: compensated work days include actual worked days + approved paid leaves
       const dailyRate = baseSalary / companyStandardDays;
-      const earnedBase = Math.round(dailyRate * actualWorkedDays);
+      const earnedBase = Math.round(dailyRate * totalCompensatedDays);
       const overtimePay = 0;
       const otherBonus = 0;
       const otherDeductions = 0;
@@ -703,8 +756,8 @@ export class PayrollService {
         employee_profile_id: emp.user_id,
         standard_working_days: companyStandardDays,
         actual_worked_days: actualWorkedDays,
-        paid_leave_days: 0,
-        unpaid_leave_days: 0,
+        paid_leave_days: paidLeaveDays,
+        unpaid_leave_days: unpaidLeaveDays,
         base_salary: baseSalary,
         allowances,
         overtime_pay: overtimePay,
