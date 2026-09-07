@@ -29,6 +29,10 @@ export default function EmployeeTasksPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -80,13 +84,23 @@ export default function EmployeeTasksPage() {
     newStatus: TaskStatus,
   ) => {
     setUpdatingTaskId(taskId);
+    setFeedback(null);
     try {
       await tasksApi.update(projectId, taskId, { status: newStatus });
       setTasks((prev) =>
         prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
       );
-    } catch {
-      // Ignore or feedback
+      setFeedback({
+        type: "success",
+        message: "Cập nhật trạng thái nhiệm vụ thành công.",
+      });
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message:
+          err?.message ||
+          "Không thể cập nhật trạng thái nhiệm vụ. Vui lòng thử lại.",
+      });
     } finally {
       setUpdatingTaskId(null);
     }
@@ -104,6 +118,32 @@ export default function EmployeeTasksPage() {
         description="Danh sách các công việc cá nhân được phân công thực hiện theo từng dự án."
         badge={`${tasks.length} Nhiệm vụ`}
       />
+
+      {feedback && (
+        <div
+          className={`p-4 rounded-xl text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in duration-150 ${
+            feedback.type === "success"
+              ? "bg-emerald-50 border border-emerald-200 text-emerald-700"
+              : "bg-rose-50 border border-rose-200 text-rose-700"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {feedback.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            className="text-xs hover:underline opacity-80"
+          >
+            Đóng
+          </button>
+        </div>
+      )}
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap items-center gap-2">

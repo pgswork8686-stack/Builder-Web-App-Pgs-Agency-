@@ -641,12 +641,6 @@ export class FinanceService {
       this.handleDbError(error);
     }
 
-    if (status === 'issued') {
-      await this.notifyFinanceEvent('invoice.issued', data, user);
-    } else if (status === 'overdue') {
-      await this.notifyFinanceEvent('invoice.overdue', data, user);
-    }
-
     return data;
   }
 

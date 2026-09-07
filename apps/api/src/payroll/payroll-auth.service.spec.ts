@@ -393,6 +393,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         error: null,
       });
       const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const leaveRequests = mockQueryChain({ data: [], error: null });
       const createRunConflict = mockQueryChain({
         data: null,
         error: {
@@ -407,6 +408,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         .mockReturnValueOnce(activeEmployees)
         .mockReturnValueOnce(compHistory)
         .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(leaveRequests)
         .mockReturnValueOnce(
           mockQueryChain({
             data: mockWorkingDays.map((d) => ({
@@ -469,6 +471,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         ],
         error: null,
       });
+      const leaveRequests = mockQueryChain({ data: [], error: null });
       const createRun = mockQueryChain({
         data: { id: RUN_ID },
         error: null,
@@ -499,6 +502,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         .mockReturnValueOnce(activeEmployees)
         .mockReturnValueOnce(compHistory)
         .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(leaveRequests)
         .mockReturnValueOnce(attendances)
         .mockReturnValueOnce(createRun)
         .mockReturnValueOnce(insertPayslips)
@@ -573,6 +577,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         error: null,
       });
       const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const leaveRequests = mockQueryChain({ data: [], error: null });
       const createRun = mockQueryChain({ data: { id: RUN_ID }, error: null });
 
       // Working days from Aug 15 to Aug 31 are days 15..23 (9 days)
@@ -604,6 +609,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         .mockReturnValueOnce(activeEmployees)
         .mockReturnValueOnce(compHistory)
         .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(leaveRequests)
         .mockReturnValueOnce(attendances)
         .mockReturnValueOnce(createRun)
         .mockReturnValueOnce(insertPayslips)
@@ -709,6 +715,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         error: null,
       });
       const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const leaveRequests = mockQueryChain({ data: [], error: null });
       const firstAttendance = mockQueryChain({
         data: mockWorkingDays.map((d) => ({
           id: `att-1-${d.work_date}`,
@@ -730,6 +737,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         .mockReturnValueOnce(activeEmployees)
         .mockReturnValueOnce(compHistory)
         .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(leaveRequests)
         .mockReturnValueOnce(firstAttendance)
         .mockReturnValueOnce(failedSecondAttendance);
 
@@ -769,6 +777,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         error: null,
       });
       const monthlyReviews = mockQueryChain({ data: [], error: null });
+      const leaveRequests = mockQueryChain({ data: [], error: null });
       const attendances = mockQueryChain({
         data: mockWorkingDays.map((d, index) => ({
           id: `att-${index}`,
@@ -793,6 +802,7 @@ describe('PayrollService — Authorization & Integrity Suite', () => {
         .mockReturnValueOnce(activeEmployees)
         .mockReturnValueOnce(compHistory)
         .mockReturnValueOnce(monthlyReviews)
+        .mockReturnValueOnce(leaveRequests)
         .mockReturnValueOnce(attendances)
         .mockReturnValueOnce(createRun)
         .mockReturnValueOnce(insertPayslips)

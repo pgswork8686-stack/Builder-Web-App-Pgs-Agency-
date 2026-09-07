@@ -793,8 +793,8 @@ export class AttendanceService {
       this.getAttendanceTimezone(settings),
     );
 
-    // Query current day check-in record first (pre-check for Nest validation)
-    const { data: record, error: findError } = await this.client
+    // Query active check-in record: check today first, then look for active overnight check-in from yesterday
+    const { data: todayRecord, error: findError } = await this.client
       .from('attendance_records')
       .select('*')
       .eq('user_id', user.profileId)
@@ -806,6 +806,29 @@ export class AttendanceService {
         code: 'ATTENDANCE_WRITE_FAILED',
         message: 'Không thể kiểm tra thông tin check-in hiện tại.',
       });
+    }
+
+    let record = todayRecord;
+
+    // If no record found today, check if there is an open check-in record without checkout (e.g. overnight shift started yesterday)
+    if (!record) {
+      const yesterday = new Date(checkOutTime.getTime() - 24 * 60 * 60 * 1000);
+      const yesterdayStr = this.getVietnamDate(
+        yesterday,
+        this.getAttendanceTimezone(settings),
+      );
+
+      const { data: overnightRecord, error: overnightError } = await this.client
+        .from('attendance_records')
+        .select('*')
+        .eq('user_id', user.profileId)
+        .eq('attendance_date', yesterdayStr)
+        .is('check_out_at', null)
+        .maybeSingle();
+
+      if (!overnightError && overnightRecord) {
+        record = overnightRecord;
+      }
     }
 
     if (!record) {
@@ -844,12 +867,14 @@ export class AttendanceService {
       this.calculateAttendanceMetrics(checkInTime, checkOutTime, settings);
 
     let checkOutRecord: any = null;
+    const targetAttendanceDate = record.attendance_date || todayStr;
+
     // Call atomic checkout RPC — p_photo_path removed; DB derives path from session
     const { data, error } = await this.client.rpc(
       'phase5_check_out_attendance',
       {
         p_user_id: user.profileId,
-        p_attendance_date: todayStr,
+        p_attendance_date: targetAttendanceDate,
         p_checkout_time: checkOutTime.toISOString(),
         p_latitude: dto.latitude ?? null,
         p_longitude: dto.longitude ?? null,
@@ -924,6 +949,7 @@ export class AttendanceService {
           updated_by: user.authUserId || user.profileId,
         })
         .eq('id', record.id)
+        .is('check_out_at', null)
         .select(
           'id, user_id, attendance_date, check_in_at, check_out_at, status, work_minutes',
         )
