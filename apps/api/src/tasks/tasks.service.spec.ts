@@ -80,6 +80,119 @@ describe('TasksService', () => {
     );
   });
 
+  describe('getAggregateTasks', () => {
+    function aggregateQuery(result: Record<string, unknown>) {
+      const query: Record<string, any> = {};
+      for (const method of [
+        'select',
+        'eq',
+        'in',
+        'ilike',
+        'gte',
+        'lte',
+        'order',
+      ]) {
+        query[method] = jest.fn(() => query);
+      }
+      query.range = jest.fn().mockResolvedValue({ error: null, ...result });
+      return query;
+    }
+    const base = {
+      page: 1,
+      pageSize: 20,
+      includeCounts: false,
+    } as const;
+
+    it('rejects clients', async () => {
+      await expect(
+        service.getAggregateTasks({ ...base }, user('client')),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(client.from).not.toHaveBeenCalled();
+    });
+
+    it('scopes non-admin users to their project memberships', async () => {
+      const memberships = queryResult({}, 'eq' as any);
+      memberships.eq = jest.fn().mockResolvedValue({
+        data: [{ project_id: PROJECT_ID, project_role: 'member' }],
+        error: null,
+      });
+      const tasks = aggregateQuery({
+        data: [
+          taskRow({ assignee_user_id: USER_ID, project: { id: PROJECT_ID } }),
+          taskRow({ id: 'other', assignee_user_id: ASSIGNEE_ID }),
+        ],
+        count: 2,
+      });
+      client.from.mockReturnValueOnce(memberships).mockReturnValueOnce(tasks);
+
+      const result = await service.getAggregateTasks(
+        { ...base },
+        user('employee'),
+      );
+
+      expect(tasks.in).toHaveBeenCalledWith('project_id', [PROJECT_ID]);
+      expect(result.total).toBe(2);
+      expect(result.items.map((i: any) => i.canUpdateStatus)).toEqual([
+        true,
+        false,
+      ]);
+    });
+
+    it('returns an empty page without querying tasks when user has no projects', async () => {
+      const memberships = queryResult({}, 'eq' as any);
+      memberships.eq = jest.fn().mockResolvedValue({ data: [], error: null });
+      client.from.mockReturnValueOnce(memberships);
+
+      const result = await service.getAggregateTasks(
+        { ...base, includeCounts: true },
+        user('team_leader'),
+      );
+
+      expect(result.items).toEqual([]);
+      expect(result.statusCounts).toMatchObject({ todo: 0, done: 0 });
+      expect(client.from).toHaveBeenCalledTimes(1);
+    });
+
+    it('forbids filtering by a project the user is not a member of', async () => {
+      const memberships = queryResult({}, 'eq' as any);
+      memberships.eq = jest.fn().mockResolvedValue({
+        data: [{ project_id: PROJECT_ID, project_role: 'member' }],
+        error: null,
+      });
+      client.from.mockReturnValueOnce(memberships);
+
+      await expect(
+        service.getAggregateTasks(
+          { ...base, projectId: OTHER_PROJECT_ID },
+          user('employee'),
+        ),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('lets admin see all projects and applies filters', async () => {
+      const tasks = aggregateQuery({ data: [taskRow()], count: 1 });
+      client.from.mockReturnValueOnce(tasks);
+
+      const result = await service.getAggregateTasks(
+        {
+          ...base,
+          q: 'seo',
+          status: 'review',
+          dueFrom: '2026-09-01',
+          dueTo: '2026-09-30',
+        },
+        user('admin'),
+      );
+
+      expect(tasks.in).not.toHaveBeenCalled();
+      expect(tasks.ilike).toHaveBeenCalledWith('title', '%seo%');
+      expect(tasks.eq).toHaveBeenCalledWith('status', 'review');
+      expect(tasks.gte).toHaveBeenCalledWith('due_date', '2026-09-01');
+      expect(tasks.lte).toHaveBeenCalledWith('due_date', '2026-09-30');
+      expect(result.items[0].canUpdateStatus).toBe(true);
+    });
+  });
+
   it('creates a task for an admin', async () => {
     client.from
       .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))

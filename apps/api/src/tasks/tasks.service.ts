@@ -11,7 +11,12 @@ import { RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
+import {
+  AggregateTaskListQuery,
+  CreateTaskDto,
+  TaskListQuery,
+  UpdateTaskDto,
+} from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 export interface CreatedTaskRow extends Record<string, unknown> {
@@ -455,6 +460,143 @@ export class TasksService {
       total,
       totalPages: Math.ceil(total / filters.pageSize),
     };
+  }
+
+  /**
+   * Cross-project task listing used by the Tasks / Kanban / Calendar
+   * aggregate views. Scope: admin sees every project; other internal roles
+   * see only projects they are a member of (same rule as the per-project
+   * endpoints). Clients never see internal tasks.
+   */
+  async getAggregateTasks(filters: AggregateTaskListQuery, user: RequestUser) {
+    if (user.role === 'client') {
+      throw new ForbiddenException({
+        code: 'TASK_ACCESS_DENIED',
+        message: 'Khách hàng không có quyền truy cập công việc nội bộ.',
+      });
+    }
+
+    const projectRoles = new Map<string, string>();
+    let scopedProjectIds: string[] | null = null;
+    if (user.role !== 'admin') {
+      const { data, error } = await this.client
+        .from('project_memberships')
+        .select('project_id,project_role')
+        .eq('user_id', user.profileId);
+      if (error) {
+        this.databaseFailure(
+          'PROJECT_ACCESS_LOOKUP_FAILED',
+          'Không thể kiểm tra quyền truy cập dự án.',
+          error,
+        );
+      }
+      for (const row of data ?? []) {
+        projectRoles.set(row.project_id as string, row.project_role as string);
+      }
+      scopedProjectIds = [...projectRoles.keys()];
+      if (filters.projectId && !projectRoles.has(filters.projectId)) {
+        throw new ForbiddenException({
+          code: 'PROJECT_ACCESS_DENIED',
+          message: 'Bạn không phải thành viên của dự án.',
+        });
+      }
+      if (scopedProjectIds.length === 0) {
+        return {
+          items: [],
+          page: filters.page,
+          pageSize: filters.pageSize,
+          total: 0,
+          totalPages: 0,
+          ...(filters.includeCounts
+            ? { statusCounts: this.emptyStatusCounts() }
+            : {}),
+        };
+      }
+    }
+
+    const applyFilters = (query: any, includeStatus: boolean) => {
+      if (scopedProjectIds) query = query.in('project_id', scopedProjectIds);
+      if (filters.projectId) query = query.eq('project_id', filters.projectId);
+      if (filters.q) query = query.ilike('title', `%${filters.q.trim()}%`);
+      if (includeStatus && filters.status)
+        query = query.eq('status', filters.status);
+      if (filters.priority) query = query.eq('priority', filters.priority);
+      if (filters.assigneeUserId)
+        query = query.eq('assignee_user_id', filters.assigneeUserId);
+      if (filters.dueFrom) query = query.gte('due_date', filters.dueFrom);
+      if (filters.dueTo) query = query.lte('due_date', filters.dueTo);
+      return query;
+    };
+
+    const offset = (filters.page - 1) * filters.pageSize;
+    const { data, count, error } = await applyFilters(
+      this.client
+        .from('tasks')
+        .select(
+          '*, assignee:profiles!tasks_assignee_user_id_fkey(id,full_name,email,avatar_url), project:projects!tasks_project_id_fkey(id,name,project_code,project_manager_user_id)',
+          { count: 'exact' },
+        ),
+      true,
+    )
+      .order('due_date', { ascending: true, nullsFirst: false })
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: false })
+      .range(offset, offset + filters.pageSize - 1);
+    if (error) {
+      this.databaseFailure(
+        'TASKS_LOOKUP_FAILED',
+        'Không thể truy vấn danh sách công việc.',
+        error,
+      );
+    }
+
+    let statusCounts: Record<string, number> | undefined;
+    if (filters.includeCounts) {
+      statusCounts = this.emptyStatusCounts();
+      for (const status of Object.keys(statusCounts)) {
+        const { count: statusCount, error: countError } = await applyFilters(
+          this.client
+            .from('tasks')
+            .select('id', { count: 'exact', head: true }),
+          false,
+        ).eq('status', status);
+        if (countError) {
+          this.databaseFailure(
+            'TASKS_LOOKUP_FAILED',
+            'Không thể truy vấn danh sách công việc.',
+            countError,
+          );
+        }
+        statusCounts[status] = statusCount ?? 0;
+      }
+    }
+
+    const total = count ?? 0;
+    return {
+      items: (data ?? []).map((task: Record<string, any>) => {
+        const isManager =
+          user.role === 'admin' ||
+          projectRoles.get(task.project_id) === 'project_manager' ||
+          task.project?.project_manager_user_id === user.profileId;
+        const isViewer = projectRoles.get(task.project_id) === 'viewer';
+        return {
+          ...task,
+          canUpdateStatus:
+            user.role === 'admin' ||
+            (!isViewer &&
+              (isManager || task.assignee_user_id === user.profileId)),
+        };
+      }),
+      page: filters.page,
+      pageSize: filters.pageSize,
+      total,
+      totalPages: Math.ceil(total / filters.pageSize),
+      ...(statusCounts ? { statusCounts } : {}),
+    };
+  }
+
+  private emptyStatusCounts(): Record<string, number> {
+    return { todo: 0, in_progress: 0, review: 0, done: 0, cancelled: 0 };
   }
 
   async getTask(projectId: string, taskId: string, user: RequestUser) {

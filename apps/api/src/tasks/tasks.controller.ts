@@ -17,11 +17,34 @@ import type { RequestUser } from '../auth/auth.types';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import {
+  AggregateTaskListQuerySchema,
   CreateTaskSchema,
   TaskListQuerySchema,
   UpdateTaskSchema,
 } from './dto/task.dto';
 import { TasksService } from './tasks.service';
+
+@Controller('tasks')
+@Roles('admin', 'team_leader', 'employee', 'accountant')
+@UseGuards(AuthGuard, ActiveAccountGuard, RolesGuard)
+export class AggregateTasksController {
+  constructor(private readonly tasksService: TasksService) {}
+
+  @Get()
+  async getAggregateTasks(
+    @Query() rawQuery: Record<string, string>,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const parsed = AggregateTaskListQuerySchema.safeParse(rawQuery);
+    if (!parsed.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_FAILED',
+        message: parsed.error.errors.map((item) => item.message).join(', '),
+      });
+    }
+    return this.tasksService.getAggregateTasks(parsed.data, user);
+  }
+}
 
 @Controller('projects/:projectId/tasks')
 @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
