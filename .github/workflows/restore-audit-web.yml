@@ -35,6 +35,8 @@ jobs:
                   if info.is_dir():
                       continue
                   p = info.filename.replace('\\', '/')
+                  if p.startswith('web/'):
+                      p = 'apps/' + p
                   path = Path(p)
                   if not p.startswith('apps/web/') or '..' in path.parts or path.is_absolute() or not p.endswith(('.ts', '.tsx')):
                       raise SystemExit('Unexpected entry in audit frontend archive: '+p)
