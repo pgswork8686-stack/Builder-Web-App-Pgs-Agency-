@@ -100,6 +100,7 @@ describe('TasksService', () => {
     const base = {
       page: 1,
       pageSize: 20,
+      openOnly: false,
       includeCounts: false,
     } as const;
 
