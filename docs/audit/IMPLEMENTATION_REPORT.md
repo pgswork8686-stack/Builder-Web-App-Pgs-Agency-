@@ -37,3 +37,6 @@ Branch `audit/system-remediation`, based on baseline import of upstream `a07b74e
 ## Not implemented (see `FUNCTIONAL_GAPS.md`)
 
 Leave KPIs (FG-3), other dashboards (FG-4), calendar leave/milestones, controller/e2e tests for `/tasks`, RLS and five-role runtime tests, E2E workflow, responsive/a11y browser audit, ops documentation rewrite.
+## GitHub delivery update — 2026-10-16
+
+The previously misplaced root-level audit files were integrated into their monorepo locations. The archived frontend changes from `web.zip` were extracted into `apps/web/`, formatted using the repository's pinned toolchain, and the temporary archive/restore workflow were removed. This supersedes the local-only Git delivery note in the historical audit report. End-to-end browser and database-backed verification remain NOT VERIFIED until CI and isolated staging checks finish.
