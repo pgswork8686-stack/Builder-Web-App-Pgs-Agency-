@@ -44,6 +44,7 @@ export interface AggregateTaskFilters {
   projectId?: string;
   dueFrom?: string;
   dueTo?: string;
+  openOnly?: boolean;
   includeCounts?: boolean;
   page?: number;
   pageSize?: number;

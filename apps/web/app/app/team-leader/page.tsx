@@ -48,7 +48,7 @@ export default function TeamLeaderDashboardPage() {
             projectsApi.getInternalProjects(1, 6),
             attendanceApi.getSummary(),
             leaveApi.getDirectory({ status: "pending" }),
-            organizationApi.getTeams(),
+            organizationApi.getMyTeams(),
           ]);
 
         if (meRes.status === "fulfilled") setUser(meRes.value.user);

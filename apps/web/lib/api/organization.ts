@@ -28,6 +28,17 @@ export interface Department {
   updated_at?: string;
 }
 
+export interface MyTeam {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  departmentId: string | null;
+  departmentName: string | null;
+  memberCount: number;
+}
+
 export interface Team {
   id: string;
   departmentId?: string;
@@ -104,6 +115,9 @@ export const organizationApi = {
     if (filters?.q) params.append("q", filters.q);
 
     return fetchWithAuth<Team[]>(`/admin/teams?${params.toString()}`);
+  },
+  async getMyTeams() {
+    return fetchWithAuth<MyTeam[]>("/teams/mine");
   },
   async getTeamById(id: string) {
     return fetchWithAuth<Team>(`/admin/teams/${id}`);

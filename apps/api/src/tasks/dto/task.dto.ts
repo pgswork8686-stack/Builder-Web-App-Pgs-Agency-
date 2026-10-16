@@ -93,6 +93,10 @@ export const AggregateTaskListQuerySchema = z
     projectId: z.string().uuid().optional(),
     dueFrom: DateSchema.optional(),
     dueTo: DateSchema.optional(),
+    openOnly: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
     includeCounts: z
       .enum(['true', 'false'])
       .default('false')

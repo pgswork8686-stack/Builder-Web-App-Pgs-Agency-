@@ -15,7 +15,7 @@ export default function TeamLeaderTeamsPage() {
   useEffect(() => {
     async function loadTeams() {
       try {
-        const res = await organizationApi.getTeams();
+        const res = await organizationApi.getMyTeams();
         setTeams((res as any) || []);
       } catch {
         // Safe load

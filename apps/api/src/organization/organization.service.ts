@@ -264,6 +264,60 @@ export class OrganizationService {
     return data || [];
   }
 
+  /** Only teams led by the authenticated Team Leader. */
+  async getMyLedTeams(leaderUserId: string) {
+    const client = this.supabaseService.getSystemClient();
+    const { data: teams, error } = await client
+      .from('teams')
+      .select(
+        'id, code, name, description, is_active, department_id, department:departments(name)',
+      )
+      .eq('leader_user_id', leaderUserId)
+      .order('code', { ascending: true });
+
+    if (error) {
+      this.logger.error(`Failed to get led teams: ${error.message}`);
+      throw new InternalServerErrorException({
+        code: 'TEAMS_LOOKUP_FAILED',
+        message: 'Không thể truy vấn danh sách đội nhóm.',
+      });
+    }
+    const rows = teams ?? [];
+    const counts = new Map<string, number>();
+    if (rows.length > 0) {
+      const { data: members, error: memberError } = await client
+        .from('employee_profiles')
+        .select('team_id')
+        .in('team_id', rows.map((team) => team.id));
+      if (memberError) {
+        this.logger.error(`Failed to count team members: ${memberError.message}`);
+        throw new InternalServerErrorException({
+          code: 'TEAMS_LOOKUP_FAILED',
+          message: 'Không thể truy vấn danh sách đội nhóm.',
+        });
+      }
+      for (const member of members ?? []) {
+        const teamId = member.team_id as string;
+        counts.set(teamId, (counts.get(teamId) ?? 0) + 1);
+      }
+    }
+    return rows.map((team: any) => {
+      const department = Array.isArray(team.department)
+        ? team.department[0]
+        : team.department;
+      return {
+        id: team.id as string,
+        code: team.code as string,
+        name: team.name as string,
+        description: (team.description ?? null) as string | null,
+        isActive: team.is_active as boolean,
+        departmentId: (team.department_id ?? null) as string | null,
+        departmentName: (department?.name ?? null) as string | null,
+        memberCount: counts.get(team.id) ?? 0,
+      };
+    });
+  }
+
   async getTeamById(id: string) {
     const client = this.supabaseService.getSystemClient();
     const { data, error } = await client

@@ -520,6 +520,8 @@ export class TasksService {
       if (filters.q) query = query.ilike('title', `%${filters.q.trim()}%`);
       if (includeStatus && filters.status)
         query = query.eq('status', filters.status);
+      else if (includeStatus && filters.openOnly)
+        query = query.in('status', ['todo', 'in_progress', 'review']);
       if (filters.priority) query = query.eq('priority', filters.priority);
       if (filters.assigneeUserId)
         query = query.eq('assignee_user_id', filters.assigneeUserId);
