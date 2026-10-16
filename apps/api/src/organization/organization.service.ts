@@ -288,9 +288,14 @@ export class OrganizationService {
       const { data: members, error: memberError } = await client
         .from('employee_profiles')
         .select('team_id')
-        .in('team_id', rows.map((team) => team.id));
+        .in(
+          'team_id',
+          rows.map((team) => team.id),
+        );
       if (memberError) {
-        this.logger.error(`Failed to count team members: ${memberError.message}`);
+        this.logger.error(
+          `Failed to count team members: ${memberError.message}`,
+        );
         throw new InternalServerErrorException({
           code: 'TEAMS_LOOKUP_FAILED',
           message: 'Không thể truy vấn danh sách đội nhóm.',
