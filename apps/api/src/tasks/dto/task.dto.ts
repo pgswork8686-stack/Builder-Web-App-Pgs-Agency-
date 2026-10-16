@@ -84,7 +84,6 @@ export const TaskListQuerySchema = z.object({
 
 export type TaskListQuery = z.infer<typeof TaskListQuerySchema>;
 
-
 export const AggregateTaskListQuerySchema = z
   .object({
     q: z.string().trim().max(100).optional(),

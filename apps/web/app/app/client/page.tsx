@@ -22,6 +22,10 @@ import {
 import { getMe, type UserPayload } from "@/lib/api/auth";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { financeApi } from "@/lib/api/finance";
+import {
+  computeOutstandingByCurrency,
+  computeProjectCompletion,
+} from "@/lib/client-dashboard-kpis";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +37,8 @@ export default function ClientDashboardPage() {
   const [contracts, setContracts] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [projectsFailed, setProjectsFailed] = useState(false);
+  const [invoicesFailed, setInvoicesFailed] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -47,10 +53,12 @@ export default function ClientDashboardPage() {
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
         if (projRes.status === "fulfilled")
           setProjects(projRes.value.items || []);
+        else setProjectsFailed(true);
         if (contRes.status === "fulfilled")
           setContracts(contRes.value?.items || []);
         if (invRes.status === "fulfilled")
           setInvoices(invRes.value?.items || []);
+        else setInvoicesFailed(true);
       } catch {
         // Safe load
       } finally {
@@ -62,6 +70,10 @@ export default function ClientDashboardPage() {
 
   const companyName = user?.fullName || "Quý Khách hàng";
   const activeProjectsCount = projects.length;
+  const completion = computeProjectCompletion(projects);
+  const outstandingEntries = Object.entries(
+    computeOutstandingByCurrency(invoices),
+  );
 
   return (
     <div className="space-y-6">
@@ -131,12 +143,18 @@ export default function ClientDashboardPage() {
               Tiến độ tổng
             </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
-              {activeProjectsCount > 0 ? "100%" : "—"}
+              {loading
+                ? "…"
+                : projectsFailed
+                  ? "—"
+                  : `${completion.completed}/${completion.total}`}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#7C879D] flex items-center gap-1 mt-4">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Đúng tiến độ cam kết
+            {projectsFailed
+              ? "Không tải được dữ liệu dự án"
+              : "Dự án đã hoàn tất / tổng số dự án"}
           </span>
         </div>
 
@@ -146,10 +164,38 @@ export default function ClientDashboardPage() {
             <span className="text-xs font-bold text-[#7C879D]">
               Công nợ còn lại
             </span>
-            <div className="text-2xl font-black text-[#24304A] mt-2">0 ₫</div>
+            <div className="text-2xl font-black text-[#24304A] mt-2">
+              {loading
+                ? "…"
+                : invoicesFailed
+                  ? "—"
+                  : outstandingEntries.length === 0
+                    ? "0 ₫"
+                    : outstandingEntries
+                        .map(([currency, value]) =>
+                          new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency,
+                            maximumFractionDigits: 0,
+                          }).format(value),
+                        )
+                        .join(" + ")}
+            </div>
           </div>
-          <span className="text-xs font-bold text-[#13DEB9] mt-4">
-            Đã hoàn thành nghĩa vụ
+          <span
+            className={`text-xs font-bold mt-4 ${
+              invoicesFailed
+                ? "text-[#7C879D]"
+                : outstandingEntries.length === 0
+                  ? "text-[#13DEB9]"
+                  : "text-[#B45309]"
+            }`}
+          >
+            {invoicesFailed
+              ? "Không tải được dữ liệu hóa đơn"
+              : outstandingEntries.length === 0
+                ? "Không có hóa đơn nào còn nợ"
+                : "Tổng hóa đơn đã phát hành chưa thanh toán"}
           </span>
         </div>
       </div>

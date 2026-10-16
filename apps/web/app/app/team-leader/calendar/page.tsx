@@ -2,7 +2,7 @@
 
 import React from "react";
 import { TaskModuleHeader } from "@/components/tasks/task-module-header";
-import { MonthCalendar } from "@/components/ui/month-calendar";
+import { AggregateCalendar } from "@/components/tasks/aggregate-calendar";
 
 export default function TeamLeaderCalendarPage() {
   return (
@@ -11,10 +11,10 @@ export default function TeamLeaderCalendarPage() {
         role="team_leader"
         activeView="calendar"
         title="Lịch Công tác & Deadline (Team Calendar)"
-        description="Lịch làm việc của đội nhóm, các mốc giao nộp sản phẩm và lịch họp dự án."
+        description="Deadline công việc trong các dự án bạn tham gia và lịch nghỉ lễ của công ty."
         badge="Lịch nhóm"
       />
-      <MonthCalendar />
+      <AggregateCalendar />
     </div>
   );
 }
