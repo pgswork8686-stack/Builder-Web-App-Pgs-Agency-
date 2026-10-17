@@ -347,7 +347,7 @@ export default function EmployeeAttendancePage() {
             </div>
             <div className="flex justify-between py-1.5">
               <span>Bán kính GPS hợp lệ:</span>
-              <span className="font-bold text-[#00B788]">≤ 100 mét</span>
+              <span className="font-bold text-[#047857]">≤ 100 mét</span>
             </div>
           </div>
         </Card>

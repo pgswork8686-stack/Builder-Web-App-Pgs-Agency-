@@ -250,6 +250,7 @@ export default function ClientSupportPage() {
                       Danh mục
                     </label>
                     <select
+                      aria-label="Danh mục"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
@@ -266,6 +267,7 @@ export default function ClientSupportPage() {
                       Mức độ ưu tiên
                     </label>
                     <select
+                      aria-label="Mức độ ưu tiên"
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"

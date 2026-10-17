@@ -74,8 +74,8 @@ export function StatCard({
     },
     rose: {
       bg: "bg-[#FEE2E2] border-[#FECACA] shadow-xs",
-      iconBg: "bg-white text-[#DC2626] shadow-xs",
-      titleColor: "text-[#DC2626]",
+      iconBg: "bg-white text-[#B91C1C] shadow-xs",
+      titleColor: "text-[#B91C1C]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#FECACA]",
     },
@@ -159,11 +159,11 @@ export function StatCard({
                 </span>
               )}
               {trend.label && (
-                <span className="text-[#94A3B8] truncate">{trend.label}</span>
+                <span className="text-[#5B6B82] truncate">{trend.label}</span>
               )}
             </div>
           ) : (
-            <span className="text-[#5B6B82] text-[11px] font-medium truncate">
+            <span className="text-[#4B5A70] text-[11px] font-medium truncate">
               {subtitle}
             </span>
           )}

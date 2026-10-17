@@ -213,7 +213,7 @@ export default function TeamLeaderDashboardPage() {
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#5F6E85]">Task mở</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#E7AE18]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#7A5700]">
                 CV
               </span>
             </div>
@@ -245,7 +245,7 @@ export default function TeamLeaderDashboardPage() {
               <span className="text-xs font-bold text-[#5F6E85]">
                 Thành viên
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#A855F7]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#7E22CE]">
                 TV
               </span>
             </div>
@@ -259,7 +259,7 @@ export default function TeamLeaderDashboardPage() {
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#5F6E85]">Deadline</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#C2410C]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#9A3412]">
                 DL
               </span>
             </div>

@@ -251,7 +251,7 @@ export default function UserProfilePage() {
                 type="button"
                 onClick={handleOpenEdit}
                 title="Thay đổi ảnh đại diện"
-                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#4F75FF] text-white hover:bg-[#3D61E6] shadow-md transition-colors"
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#3F63D6] text-white hover:bg-[#3D61E6] shadow-md transition-colors"
               >
                 <Camera className="w-3.5 h-3.5" />
               </button>

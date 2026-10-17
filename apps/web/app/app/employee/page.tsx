@@ -186,7 +186,7 @@ export default function EmployeeDashboardPage() {
               {leaveDaysRemaining.toString().padStart(2, "0")}
             </div>
           </div>
-          <span className="text-xs font-bold text-[#FFC400] mt-4">
+          <span className="text-xs font-bold text-[#854D0E] mt-4">
             Ngày phép năm 2026
           </span>
         </div>

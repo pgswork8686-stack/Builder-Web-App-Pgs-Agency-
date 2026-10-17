@@ -268,7 +268,7 @@ export default function AdminDashboardPage() {
         {/* 2. Công việc (theo dõi trong chi tiết từng dự án) */}
         <Link href="/app/admin/tasks">
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#FFF8E5] text-[#E7AE18] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
+            <div className="w-10 h-10 rounded-xl bg-[#FFF8E5] text-[#7A5700] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <ListTodo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -302,7 +302,7 @@ export default function AdminDashboardPage() {
         {/* 4. Nhân sự */}
         <Link href="/app/admin/people">
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
+            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] text-[#7E22CE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <Users className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -317,7 +317,7 @@ export default function AdminDashboardPage() {
         {/* 5. Tài liệu */}
         <Link href="/app/admin/documents">
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all flex items-center gap-3 group col-span-2 sm:col-span-1">
-            <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#C2410C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
+            <div className="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#9A3412] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform font-bold">
               <FolderOpen className="w-5 h-5" />
             </div>
             <div className="min-w-0">

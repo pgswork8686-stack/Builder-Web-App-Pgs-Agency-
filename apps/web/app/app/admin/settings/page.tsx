@@ -212,7 +212,7 @@ export default function AdminSettingsPage() {
           <Card className="p-6 space-y-4 border border-[#4F75FF]/30 bg-[#EEF2FF]/40 shadow-xs md:col-span-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#4F75FF] text-white flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-[#3F63D6] text-white flex items-center justify-center font-bold">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
@@ -456,7 +456,7 @@ export default function AdminSettingsPage() {
           {/* Security & Rate Limiting */}
           <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#00B788] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#047857] flex items-center justify-center">
                 <Shield className="w-5 h-5" />
               </div>
               <div>

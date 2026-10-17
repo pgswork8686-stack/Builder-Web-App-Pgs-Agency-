@@ -683,7 +683,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-[#5B6B82]">Ngày nghiệm thu:</span>
-                <span className="text-[#00B788] font-semibold">
+                <span className="text-[#047857] font-semibold">
                   {project.completedAt || "Chưa nghiệm thu"}
                 </span>
               </div>
