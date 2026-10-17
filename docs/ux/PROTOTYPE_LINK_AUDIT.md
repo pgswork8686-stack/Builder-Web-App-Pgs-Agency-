@@ -12,15 +12,15 @@
 
 Thêm 7 section `X-FLOW-01..07` ở cuối page 09 (bản sao frame 1440 + hotspot ON_CLICK → NAVIGATE, kiểu giống FLOW-xx). FLOW cũ không bị sửa. Tổng reaction page 09: 50 → 87. Mỗi flow có starting point đặt tên; frame cuối trỏ về FLOW HUB.
 
-| Flow | Bước | Hotspot khớp nút theo chữ | Hotspot đặt tạm (FALLBACK) |
-|---|---|---|---|
-| X-FLOW-01 Admin tạo dự án → TL | 6 | 6 | 0 (nhưng B1 khớp mục sidebar, cần duyệt) |
-| X-FLOW-02 TL giao task → Employee | 5 | 4 | 1 (B3 Kanban → Chi tiết task) |
-| X-FLOW-03 Employee thực hiện → gửi duyệt | 4 | 3 | 1 (B3 → Đơn cần duyệt) |
-| X-FLOW-04 TL kiểm duyệt | 4 | 3 | 1 (B2 → Chi tiết task) |
-| X-FLOW-05 Client nghiệm thu | 5 | 5 | 0 |
-| X-FLOW-06 Accountant tài chính | 8 | 8 | 0 |
-| X-FLOW-07 Admin hoàn thành | 5 | 4 | 1 (B4 → Tệp dự án) |
+| Flow                                     | Bước | Hotspot khớp nút theo chữ | Hotspot đặt tạm (FALLBACK)               |
+| ---------------------------------------- | ---- | ------------------------- | ---------------------------------------- |
+| X-FLOW-01 Admin tạo dự án → TL           | 6    | 6                         | 0 (nhưng B1 khớp mục sidebar, cần duyệt) |
+| X-FLOW-02 TL giao task → Employee        | 5    | 4                         | 1 (B3 Kanban → Chi tiết task)            |
+| X-FLOW-03 Employee thực hiện → gửi duyệt | 4    | 3                         | 1 (B3 → Đơn cần duyệt)                   |
+| X-FLOW-04 TL kiểm duyệt                  | 4    | 3                         | 1 (B2 → Chi tiết task)                   |
+| X-FLOW-05 Client nghiệm thu              | 5    | 5                         | 0                                        |
+| X-FLOW-06 Accountant tài chính           | 8    | 8                         | 0                                        |
+| X-FLOW-07 Admin hoàn thành               | 5    | 4                         | 1 (B4 → Tệp dự án)                       |
 
 Giới hạn: hotspot được đặt lên chữ có từ khóa gần nhất, **chưa được nhà thiết kế duyệt vị trí**; 4 hotspot FALLBACK nằm ở vị trí tạm và cần kéo sang đúng nút. Bản sao chưa có trạng thái Submit/Reject/modal: các luồng này chỉ điều hướng giữa màn hình, chưa mô phỏng Từ chối → quay lại Employee. Chưa phủ tablet/mobile.
 

@@ -2,19 +2,19 @@
 
 Trạng thái: Figma = có frame/prototype; Code = route + API tồn tại trong source; E2E = có bài kiểm tra liên vai trò kiểm DB. Cột Code chỉ dựa trên đọc source, chưa chạy.
 
-| Luồng | Figma | Code (route / API) | E2E liên vai trò | Ghi chú |
-|---|---|---|---|---|
-| 01 Khởi tạo dự án (Admin) | FLOW-07 (Dự án → Chi tiết → Kanban), sơ đồ "02 Vòng đời dự án" | `/app/admin/projects`, `/clients`, `/services`, `/workflows`; module `projects`, `clients`, `services`, `workflows` | CHƯA CÓ | Chưa thấy frame tạo khách hàng → chọn workflow → chỉ định TL trong prototype |
-| 02 Phân công (TL) | FLOW-10 | `/app/team-leader/*`, `/app/projects/[id]/board`; module `tasks` | CHƯA CÓ | |
-| 03 Thực hiện (Employee) | FLOW-04 | `/app/employee/tasks`, `/app/projects/[id]/tasks/[taskId]`, `/files` | CHƯA CÓ | |
-| 04 Duyệt nội bộ (TL) | FLOW-06 (đơn cần duyệt) | `/app/team-leader/approvals`; workflow stage approval | CHƯA CÓ | Figma mới là duyệt đơn; duyệt sản phẩm task cần xác nhận |
-| 05 Nghiệm thu (Client) | FLOW-03 | `/app/client/projects/[id]`, `/approvals`, `/documents`, `/meetings` | CHƯA CÓ | P0 403 đã sửa phía web (commit này), chưa chạy E2E |
-| 06 Tài chính (Accountant) | FLOW-05, FLOW-09 | `/app/accountant/finance/*`, `/payroll`; module `finance`, `payroll` | CHƯA CÓ | Cần kiểm chống ghi nhận thanh toán trùng |
-| 07 Hoàn thành dự án (Admin) | KHÔNG CÓ flow riêng | dialog Nghiệm thu / Lưu trữ trong project detail, `/app/admin/projects/completed` | CHƯA CÓ | Thiếu thiết kế prototype |
-| Xác thực, duyệt tài khoản, quên mật khẩu | FLOW-01, 02, 12 | `/auth/*`, `/app/admin/accounts/pending` | CHƯA CÓ | |
-| Nghỉ phép, chấm công | FLOW-08 | `/app/leave`, `/app/attendance`, `/app/admin/leave` | CHƯA CÓ | |
-| Hỗ trợ khách hàng | FLOW-11 | `/app/client/support`; module `support` | CHƯA CÓ | |
-| Chat, thông báo, tài liệu | chỉ sơ đồ page 15 | `/app/chat`, `/app/notifications`, `*/documents` | CHƯA CÓ | Chưa có prototype |
+| Luồng                                    | Figma                                                          | Code (route / API)                                                                                                  | E2E liên vai trò | Ghi chú                                                                      |
+| ---------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------- |
+| 01 Khởi tạo dự án (Admin)                | FLOW-07 (Dự án → Chi tiết → Kanban), sơ đồ "02 Vòng đời dự án" | `/app/admin/projects`, `/clients`, `/services`, `/workflows`; module `projects`, `clients`, `services`, `workflows` | CHƯA CÓ          | Chưa thấy frame tạo khách hàng → chọn workflow → chỉ định TL trong prototype |
+| 02 Phân công (TL)                        | FLOW-10                                                        | `/app/team-leader/*`, `/app/projects/[id]/board`; module `tasks`                                                    | CHƯA CÓ          |                                                                              |
+| 03 Thực hiện (Employee)                  | FLOW-04                                                        | `/app/employee/tasks`, `/app/projects/[id]/tasks/[taskId]`, `/files`                                                | CHƯA CÓ          |                                                                              |
+| 04 Duyệt nội bộ (TL)                     | FLOW-06 (đơn cần duyệt)                                        | `/app/team-leader/approvals`; workflow stage approval                                                               | CHƯA CÓ          | Figma mới là duyệt đơn; duyệt sản phẩm task cần xác nhận                     |
+| 05 Nghiệm thu (Client)                   | FLOW-03                                                        | `/app/client/projects/[id]`, `/approvals`, `/documents`, `/meetings`                                                | CHƯA CÓ          | P0 403 đã sửa phía web (commit này), chưa chạy E2E                           |
+| 06 Tài chính (Accountant)                | FLOW-05, FLOW-09                                               | `/app/accountant/finance/*`, `/payroll`; module `finance`, `payroll`                                                | CHƯA CÓ          | Cần kiểm chống ghi nhận thanh toán trùng                                     |
+| 07 Hoàn thành dự án (Admin)              | KHÔNG CÓ flow riêng                                            | dialog Nghiệm thu / Lưu trữ trong project detail, `/app/admin/projects/completed`                                   | CHƯA CÓ          | Thiếu thiết kế prototype                                                     |
+| Xác thực, duyệt tài khoản, quên mật khẩu | FLOW-01, 02, 12                                                | `/auth/*`, `/app/admin/accounts/pending`                                                                            | CHƯA CÓ          |                                                                              |
+| Nghỉ phép, chấm công                     | FLOW-08                                                        | `/app/leave`, `/app/attendance`, `/app/admin/leave`                                                                 | CHƯA CÓ          |                                                                              |
+| Hỗ trợ khách hàng                        | FLOW-11                                                        | `/app/client/support`; module `support`                                                                             | CHƯA CÓ          |                                                                              |
+| Chat, thông báo, tài liệu                | chỉ sơ đồ page 15                                              | `/app/chat`, `/app/notifications`, `*/documents`                                                                    | CHƯA CÓ          | Chưa có prototype                                                            |
 
 Cập nhật: prototype Figma đã có X-FLOW-01..07 (xem PROTOTYPE_LINK_AUDIT.md), cột Figma của luồng 01–07 giờ là `X-FLOW-0N`, chỉ đường thành công.
 

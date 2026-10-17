@@ -153,6 +153,18 @@ async function runAxe(page) {
       id: v.id,
       impact: v.impact,
       nodes: v.nodes.length,
+      // First offenders only, so the evidence JSON stays small but actionable.
+      samples: v.nodes.slice(0, 8).map((n) => {
+        const data = (n.any[0] && n.any[0].data) || {};
+        return {
+          target: n.target.join(" "),
+          fg: data.fgColor,
+          bg: data.bgColor,
+          ratio: data.contrastRatio,
+          expected: data.expectedContrastRatio,
+          text: (n.html || "").slice(0, 120),
+        };
+      }),
     }));
   });
 }
