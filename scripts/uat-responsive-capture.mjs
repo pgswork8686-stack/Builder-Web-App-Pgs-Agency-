@@ -220,6 +220,21 @@ try {
           if (facts.overflowX > 1)
             entry.problems.push(`horizontal overflow ${facts.overflowX}px`);
           entry.axe = await runAxe(page);
+          // Accessibility gate: serious/critical axe violations fail the page.
+          // Set UAT_AXE_GATE=off only for local triage, never in CI.
+          if (process.env.UAT_AXE_GATE !== "off") {
+            if (entry.axe === null) {
+              entry.problems.push("axe-core not loaded (gate cannot run)");
+            } else {
+              const blocking = entry.axe.filter((v) =>
+                ["serious", "critical"].includes(v.impact),
+              );
+              if (blocking.length)
+                entry.problems.push(
+                  `axe: ${blocking.map((v) => `${v.id}(${v.nodes})`).join(", ")}`,
+                );
+            }
+          }
           entry.consoleErrors = consoleErrors;
           entry.failedRequests = failedRequests;
           if (consoleErrors.length)

@@ -196,6 +196,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </div>
 
         <select
+          aria-label="Lọc theo trạng thái dự án"
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
           className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
@@ -209,6 +210,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </select>
 
         <select
+          aria-label="Lọc theo độ ưu tiên dự án"
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
           className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"

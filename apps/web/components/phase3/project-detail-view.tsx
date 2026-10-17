@@ -173,12 +173,10 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           ),
         );
       } else if (mode === "client") {
-        const [projectData, taskData] = await Promise.all([
-          projectsApi.getClientProject(projectId),
-          tasksApi.list(projectId, { page: 1, pageSize: 100 }),
-        ]);
-        setProject(projectData);
-        setTasks(taskData.items);
+        // Clients never see internal tasks (API returns 403), so only the
+        // client-scoped project payload is requested here.
+        setProject(await projectsApi.getClientProject(projectId));
+        setTasks([]);
       } else {
         const [projectData, memberData, serviceData, taskData, peopleData] =
           await Promise.all([
@@ -380,12 +378,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         },
       );
     }
-    list.push({
-      value: "tasks",
-      label: "Công việc",
-      icon: ListTodo,
-      count: tasks.length,
-    });
+    if (mode !== "client") {
+      list.push({
+        value: "tasks",
+        label: "Công việc",
+        icon: ListTodo,
+        count: tasks.length,
+      });
+    }
     return list;
   }, [mode, members.length, projectServices.length, tasks.length]);
 
@@ -494,18 +494,22 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Tiến độ công việc"
-          value={`${taskProgress}%`}
-          subtitle={`${completedTasks}/${tasks.length} tasks hoàn thành`}
-          icon={<ListTodo className="w-5 h-5" />}
-        />
-        <StatCard
-          title="Đội ngũ nhân sự"
-          value={`${members.length} thành viên`}
-          subtitle={`PM: ${project.projectManager?.full_name || project.projectManager?.email || "Chưa gán"}`}
-          icon={<Users className="w-5 h-5" />}
-        />
+        {mode !== "client" && (
+          <>
+            <StatCard
+              title="Tiến độ công việc"
+              value={`${taskProgress}%`}
+              subtitle={`${completedTasks}/${tasks.length} tasks hoàn thành`}
+              icon={<ListTodo className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Đội ngũ nhân sự"
+              value={`${members.length} thành viên`}
+              subtitle={`PM: ${project.projectManager?.full_name || project.projectManager?.email || "Chưa gán"}`}
+              icon={<Users className="w-5 h-5" />}
+            />
+          </>
+        )}
         <StatCard
           title="Thời hạn bàn giao"
           value={project.dueDate || "Chưa đặt"}
