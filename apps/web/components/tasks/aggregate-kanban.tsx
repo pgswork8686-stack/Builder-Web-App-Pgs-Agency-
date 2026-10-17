@@ -92,7 +92,7 @@ export function AggregateKanban() {
 
   if (loading && tasks.length === 0) {
     return (
-      <Card className="p-10 flex items-center justify-center gap-2 text-sm text-[#7C879D]">
+      <Card className="p-10 flex items-center justify-center gap-2 text-sm text-[#5F6E85]">
         <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
         Đang tải bảng Kanban...
       </Card>
@@ -127,7 +127,7 @@ export function AggregateKanban() {
         </div>
       )}
       {truncated && (
-        <p className="text-xs text-[#7C879D]">
+        <p className="text-xs text-[#5F6E85]">
           Đang hiển thị {LOAD_LIMIT} công việc gần hạn nhất; số đếm từng cột là
           tổng thực tế.
         </p>
@@ -152,13 +152,13 @@ export function AggregateKanban() {
                 <h2 className="text-xs font-bold text-[#161827]">
                   {TASK_STATUS_LABEL[column]}
                 </h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#7C879D] border border-[#EDF2F7]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#5F6E85] border border-[#EDF2F7]">
                   {counts ? counts[column] : items.length}
                 </span>
               </div>
               {items.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center p-4 border border-dashed border-[#EDF2F7] rounded-xl text-center">
-                  <span className="text-xs text-[#7C879D]">Trống</span>
+                  <span className="text-xs text-[#5F6E85]">Trống</span>
                 </div>
               ) : (
                 items.map((task) => {
@@ -181,7 +181,7 @@ export function AggregateKanban() {
                       >
                         {task.title}
                       </Link>
-                      <p className="text-[11px] text-[#7C879D]">
+                      <p className="text-[11px] text-[#5F6E85]">
                         {task.project?.name ?? "—"} ·{" "}
                         {task.assignee?.full_name ?? "Chưa giao"}
                       </p>
@@ -194,7 +194,7 @@ export function AggregateKanban() {
                         </Badge>
                         {task.due_date && (
                           <span
-                            className={`text-[10px] font-semibold ${overdue ? "text-rose-600" : "text-[#7C879D]"}`}
+                            className={`text-[10px] font-semibold ${overdue ? "text-rose-600" : "text-[#5F6E85]"}`}
                           >
                             {task.due_date}
                             {overdue ? " · quá hạn" : ""}

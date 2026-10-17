@@ -540,7 +540,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
                     Kanban Board
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Kéo thả & phân bổ task thời gian thực
                   </p>
                 </div>
@@ -560,7 +560,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
                     Lịch biểu dự án
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Theo dõi timeline và deadline công việc
                   </p>
                 </div>
@@ -580,7 +580,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
                     Tệp tin & Tài liệu
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Kho lưu trữ và tài liệu bàn giao
                   </p>
                 </div>
@@ -601,13 +601,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer ${
                 isActive
                   ? "border-[#4F75FF] text-[#4F75FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{label}</span>
               {typeof count === "number" && (
-                <span className="px-1.5 py-0.2 rounded-full bg-[#F1F5F9] text-[10px] text-[#64748B]">
+                <span className="px-1.5 py-0.2 rounded-full bg-[#F1F5F9] text-[10px] text-[#5B6B82]">
                   {count}
                 </span>
               )}
@@ -630,7 +630,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
               {mode === "admin" && (
                 <div className="pt-4 border-t border-[#EDF2F7] space-y-3">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
                     Chuyển nhanh trạng thái
                   </label>
                   <Select
@@ -658,13 +658,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Công ty khách hàng:</span>
+                <span className="text-[#5B6B82]">Công ty khách hàng:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.clientCompany?.name || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Project Manager:</span>
+                <span className="text-[#5B6B82]">Project Manager:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.projectManager?.full_name ||
                     project.projectManager?.email ||
@@ -672,17 +672,17 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Ngày khởi động:</span>
+                <span className="text-[#5B6B82]">Ngày khởi động:</span>
                 <span className="text-[#0F172A]">
                   {project.startDate || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Hạn chót bàn giao:</span>
+                <span className="text-[#5B6B82]">Hạn chót bàn giao:</span>
                 <span className="text-[#0F172A]">{project.dueDate || "—"}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-[#64748B]">Ngày nghiệm thu:</span>
+                <span className="text-[#5B6B82]">Ngày nghiệm thu:</span>
                 <span className="text-[#00B788] font-semibold">
                   {project.completedAt || "Chưa nghiệm thu"}
                 </span>
@@ -730,7 +730,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-[#64748B] py-8"
+                      className="text-center text-[#5B6B82] py-8"
                     >
                       Chưa có thành viên nào được gán vào dự án.
                     </TableCell>
@@ -741,7 +741,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                       <TableCell className="font-bold text-[#0F172A]">
                         {m.profile?.full_name || m.profile?.email}
                       </TableCell>
-                      <TableCell className="text-[#64748B]">
+                      <TableCell className="text-[#5B6B82]">
                         {m.profile?.email}
                       </TableCell>
                       <TableCell>
@@ -804,7 +804,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-[#64748B] py-8"
+                      className="text-center text-[#5B6B82] py-8"
                     >
                       Chưa có dịch vụ nào được gán cho dự án này.
                     </TableCell>
@@ -823,7 +823,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                           {s.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {s.notes || "—"}
                       </TableCell>
                     </TableRow>
@@ -865,7 +865,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     taskView === value
                       ? "bg-white text-[#4F75FF] shadow-sm border border-[#EDF2F7]"
-                      : "text-[#64748B] hover:text-[#0F172A]"
+                      : "text-[#5B6B82] hover:text-[#0F172A]"
                   }`}
                 >
                   {label}
@@ -903,7 +903,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="text-center text-[#64748B] py-8"
+                        className="text-center text-[#5B6B82] py-8"
                       >
                         Chưa có công việc nào trong dự án này.
                       </TableCell>
@@ -919,7 +919,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                             {t.title}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-xs text-[#64748B]">
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {t.assignee?.full_name ||
                             t.assignee?.email ||
                             "Chưa gán"}
@@ -944,7 +944,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                             {t.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-xs text-[#64748B]">
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {t.due_date || "—"}
                         </TableCell>
                       </TableRow>
@@ -1197,7 +1197,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     <p className="font-bold text-[#0F172A] truncate">
                       {taskForm.file.name}
                     </p>
-                    <p className="text-[11px] text-[#64748B]">
+                    <p className="text-[11px] text-[#5B6B82]">
                       {(taskForm.file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -1205,7 +1205,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 <button
                   type="button"
                   onClick={() => setTaskForm({ ...taskForm, file: null })}
-                  className="p-1 rounded-lg text-[#64748B] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="p-1 rounded-lg text-[#5B6B82] hover:text-rose-600 hover:bg-rose-50 transition-colors"
                 >
                   <CloseIcon className="w-4 h-4" />
                 </button>
@@ -1235,7 +1235,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           {/* Progress if uploading */}
           {creatingTask && uploadProgress > 0 && uploadProgress < 100 && (
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-[#64748B]">
+              <div className="flex justify-between text-[11px] text-[#5B6B82]">
                 <span>Đang tải tệp lên...</span>
                 <span>{uploadProgress}%</span>
               </div>
@@ -1297,7 +1297,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#5B6B82] leading-relaxed">
             Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
             tra cứu và kiểm toán.
           </p>

@@ -28,11 +28,11 @@ export function Badge({
   };
 
   const variantStyles = {
-    default: "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]",
+    default: "bg-[#F1F5F9] text-[#526077] border border-[#E2E8F0]",
     brand:
-      "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold shadow-2xs",
-    blue: "bg-[#EEF2FF] text-[#4F75FF] border border-[#E0EAFF] font-semibold",
-    gold: "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold",
+      "bg-[#FFF8E5] text-[#7A5700] border border-[#FDE68A] font-bold shadow-2xs",
+    blue: "bg-[#EEF2FF] text-[#3453D1] border border-[#E0EAFF] font-semibold",
+    gold: "bg-[#FFF8E5] text-[#7A5700] border border-[#FDE68A] font-bold",
     success:
       "bg-[#E6FBF5] text-[#00B788] border border-[#A7F3D0] font-semibold",
     warning:

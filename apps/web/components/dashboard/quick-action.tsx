@@ -54,7 +54,7 @@ export function QuickActionGrid({
                 <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
                   {item.title}
                 </h4>
-                <p className="mt-1 text-xs text-[#64748B] leading-relaxed">
+                <p className="mt-1 text-xs text-[#5B6B82] leading-relaxed">
                   {item.description}
                 </p>
               </div>

@@ -255,7 +255,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
         <h2 className="text-base font-bold text-[#0F172A]">
           Không tìm thấy hóa đơn
         </h2>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-[#5B6B82]">
           Hóa đơn không tồn tại hoặc bạn không có quyền truy cập.
         </p>
         <Link href={`${roleBasePath}/finance/invoices`}>
@@ -377,7 +377,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
           <Card className="p-6 space-y-6">
             <div className="flex justify-between items-start gap-4">
               <div>
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider">
                   Mã số hóa đơn
                 </span>
                 <h2 className="text-xl font-extrabold text-[#0F172A] mt-1 font-mono">
@@ -386,7 +386,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               </div>
 
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Tổng số tiền
                 </span>
                 <span className="text-2xl font-black text-[#4F75FF] mt-1 block">
@@ -397,7 +397,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-b border-[#EDF2F7] py-6">
               <div>
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Khách hàng
                 </span>
                 <span className="text-sm font-semibold text-[#0F172A] mt-1 block">
@@ -405,7 +405,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Hợp đồng liên quan
                 </span>
                 <span className="text-sm font-semibold text-[#0F172A] mt-1 block">
@@ -427,7 +427,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               <div className="flex items-start gap-3">
                 <Calendar className="w-5 h-5 text-[#4F75FF] shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                  <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                     Ngày phát hành
                   </span>
                   <span className="text-sm text-[#0F172A] font-mono font-medium mt-0.5 block">
@@ -439,7 +439,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               <div className="flex items-start gap-3">
                 <Calendar className="w-5 h-5 text-[#4F75FF] shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                  <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                     Hạn thanh toán
                   </span>
                   <span className="text-sm text-[#0F172A] font-mono font-medium mt-0.5 block">
@@ -449,7 +449,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               </div>
 
               <div>
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Dư nợ còn lại
                 </span>
                 <span className="text-sm font-bold text-[#0F172A] block mt-0.5">
@@ -460,10 +460,10 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
             {invoice.notes && (
               <div className="border-t border-[#EDF2F7] pt-6 space-y-2">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Ghi chú
                 </span>
-                <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
+                <p className="text-xs text-[#5B6B82] leading-relaxed whitespace-pre-line bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
                   {invoice.notes}
                 </p>
               </div>
@@ -500,7 +500,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                         </Badge>
                       </div>
                       {pay.paymentReference && (
-                        <div className="text-[#64748B] text-[11px]">
+                        <div className="text-[#5B6B82] text-[11px]">
                           Mã tham chiếu:{" "}
                           <span className="font-mono text-[#0F172A]">
                             {pay.paymentReference}
@@ -508,7 +508,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                         </div>
                       )}
                       {pay.notes && (
-                        <p className="text-[#64748B] text-[11px] leading-relaxed">
+                        <p className="text-[#5B6B82] text-[11px] leading-relaxed">
                           {pay.notes}
                         </p>
                       )}
@@ -573,7 +573,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
         >
           <form onSubmit={handleRecordPayment} className="space-y-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold uppercase text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase text-[#5B6B82] mb-1">
                 Số tiền thanh toán *
               </label>
               <div className="relative">
@@ -592,7 +592,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase text-[#5B6B82] mb-1">
                 Ngày & Giờ giao dịch *
               </label>
               <input
@@ -605,7 +605,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase text-[#5B6B82] mb-1">
                 Phương thức thanh toán
               </label>
               <select
@@ -622,7 +622,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase text-[#5B6B82] mb-1">
                 Mã tham chiếu giao dịch
               </label>
               <input
@@ -635,7 +635,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase text-[#5B6B82] mb-1">
                 Ghi chú thanh toán
               </label>
               <textarea

@@ -499,7 +499,7 @@ export default function AdminPeopleDirectoryPage() {
                           <p className="font-bold text-[#0F172A]">
                             {person.fullName || "Chưa cập nhật"}
                           </p>
-                          <p className="text-xs text-[#64748B]">
+                          <p className="text-xs text-[#5B6B82]">
                             {person.email}
                           </p>
                         </div>
@@ -529,7 +529,7 @@ export default function AdminPeopleDirectoryPage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#5B6B82]">
                       <p className="text-[#0F172A] font-medium">
                         {ep?.departmentName || "Chưa gán PB"}
                       </p>
@@ -621,7 +621,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
           <span>
             Trang {page} / {totalPages} ({total} nhân sự)
           </span>
@@ -761,7 +761,7 @@ export default function AdminPeopleDirectoryPage() {
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
                     Mã nhân viên (Employee Code)
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
-                      <span className="text-[10px] text-[#7C879D] font-normal ml-1">
+                      <span className="text-[10px] text-[#5F6E85] font-normal ml-1">
                         (Mã định danh bất biến)
                       </span>
                     )}
@@ -776,7 +776,7 @@ export default function AdminPeopleDirectoryPage() {
                     placeholder="VD: NV-001"
                     className={`w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] text-xs font-mono font-bold outline-none ${
                       editingPerson?.employeeProfile?.employeeCode
-                        ? "bg-[#EDF2F7] text-[#64748B] cursor-not-allowed"
+                        ? "bg-[#EDF2F7] text-[#5B6B82] cursor-not-allowed"
                         : "bg-white text-[#5D87FF] focus:border-[#5D87FF]"
                     }`}
                   />
@@ -903,7 +903,7 @@ export default function AdminPeopleDirectoryPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#7C879D] shrink-0">
+              <span className="text-xs text-[#5F6E85] shrink-0">
                 Vai trò trong dự án:
               </span>
               <select
@@ -920,7 +920,7 @@ export default function AdminPeopleDirectoryPage() {
 
           <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#EDF2F7] divide-y divide-[#EDF2F7] p-1">
             {filteredProjects.length === 0 ? (
-              <p className="p-6 text-center text-xs text-[#7C879D]">
+              <p className="p-6 text-center text-xs text-[#5F6E85]">
                 Không có dự án nào khớp với tìm kiếm.
               </p>
             ) : (
@@ -951,7 +951,7 @@ export default function AdminPeopleDirectoryPage() {
                             {p.name}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#7C879D] truncate">
+                        <p className="text-[11px] text-[#5F6E85] truncate">
                           Khách hàng:{" "}
                           {p.clientCompany?.name || "Doanh nghiệp đối tác"}
                         </p>

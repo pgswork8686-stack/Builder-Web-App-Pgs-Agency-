@@ -254,14 +254,14 @@ export default function AdminDocumentsPage() {
                       <div>
                         <p className="font-bold text-[#0F172A]">{doc.title}</p>
                         {doc.description && (
-                          <p className="text-[11px] text-[#64748B] line-clamp-1">
+                          <p className="text-[11px] text-[#5B6B82] line-clamp-1">
                             {doc.description}
                           </p>
                         )}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs text-[#64748B] font-medium">
+                  <TableCell className="text-xs text-[#5B6B82] font-medium">
                     {CATEGORY_MAP[doc.category] || doc.category}
                   </TableCell>
                   <TableCell>
@@ -272,10 +272,10 @@ export default function AdminDocumentsPage() {
                       {ACCESS_MAP[doc.access_level]?.label || doc.access_level}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs font-mono text-[#64748B]">
+                  <TableCell className="text-xs font-mono text-[#5B6B82]">
                     {Math.round(doc.size_bytes / 1024)} KB
                   </TableCell>
-                  <TableCell className="text-xs text-[#64748B]">
+                  <TableCell className="text-xs text-[#5B6B82]">
                     {doc.uploaded_by?.full_name || "Quản trị viên"}
                   </TableCell>
                   <TableCell className="text-right space-x-1.5">
@@ -367,7 +367,7 @@ export default function AdminDocumentsPage() {
               type="file"
               required
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-[#64748B] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
+              className="w-full text-xs text-[#5B6B82] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
             />
           </div>
 

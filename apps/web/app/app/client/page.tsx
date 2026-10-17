@@ -83,7 +83,7 @@ export default function ClientDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Chào {companyName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Cổng thông tin khách hàng, theo dõi tiến độ thực hiện và bàn giao
             sản phẩm từ PGS Agency.
           </p>
@@ -139,7 +139,7 @@ export default function ClientDashboardPage() {
         {/* Tiến độ tổng */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Tiến độ tổng
             </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
@@ -150,7 +150,7 @@ export default function ClientDashboardPage() {
                   : `${completion.completed}/${completion.total}`}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#7C879D] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#5F6E85] flex items-center gap-1 mt-4">
             <ShieldCheck className="w-3.5 h-3.5" />
             {projectsFailed
               ? "Không tải được dữ liệu dự án"
@@ -161,7 +161,7 @@ export default function ClientDashboardPage() {
         {/* Công nợ còn lại */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Công nợ còn lại
             </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
@@ -185,7 +185,7 @@ export default function ClientDashboardPage() {
           <span
             className={`text-xs font-bold mt-4 ${
               invoicesFailed
-                ? "text-[#7C879D]"
+                ? "text-[#5F6E85]"
                 : outstandingEntries.length === 0
                   ? "text-[#13DEB9]"
                   : "text-[#B45309]"
@@ -204,7 +204,7 @@ export default function ClientDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Link href="/app/client/projects">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
+            <span className="text-xs font-bold text-[#5F6E85]">Dự án</span>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {activeProjectsCount}
             </p>
@@ -213,8 +213,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/approvals">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Chờ duyệt</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo dự án
             </p>
           </Card>
@@ -222,8 +222,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/documents">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Tài liệu</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Tài liệu</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo dự án
             </p>
           </Card>
@@ -231,8 +231,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/meetings">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Cuộc họp</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Cuộc họp</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo lịch
             </p>
           </Card>
@@ -240,8 +240,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/support">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
-            <span className="text-xs font-bold text-[#7C879D]">Hỗ trợ</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Hỗ trợ</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Chat nội bộ
             </p>
           </Card>
@@ -266,7 +266,7 @@ export default function ClientDashboardPage() {
           {projects.length === 0 ? (
             <Card className="p-6 text-center">
               <EmptyState
-                icon={<FolderKanban className="w-8 h-8 text-[#7C879D]" />}
+                icon={<FolderKanban className="w-8 h-8 text-[#5F6E85]" />}
                 title="Chưa có dự án hợp tác"
                 description="Các dự án triển khai giữa doanh nghiệp và PGS Agency sẽ hiển thị tại đây."
               />
@@ -306,7 +306,7 @@ export default function ClientDashboardPage() {
           </div>
 
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Hiện tại không có ấn phẩm hoặc tài liệu nào đang chờ quý khách
               nghiệm thu.
             </p>
@@ -321,7 +321,7 @@ export default function ClientDashboardPage() {
             Tài liệu bàn giao
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Chưa có tài liệu đính kèm nào được tải lên.
             </p>
           </Card>

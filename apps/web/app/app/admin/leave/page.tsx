@@ -184,7 +184,7 @@ export default function AdminLeavePage() {
       <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-[#4F75FF]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#5B6B82]">
             Lọc danh sách
           </span>
         </div>
@@ -206,7 +206,7 @@ export default function AdminLeavePage() {
               className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === item.id
                   ? "bg-[#4F75FF] text-white shadow-xs"
-                  : "bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
+                  : "bg-[#F8FAFC] text-[#5B6B82] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
               }`}
             >
               {item.label}
@@ -224,7 +224,7 @@ export default function AdminLeavePage() {
               <h3 className="text-base font-extrabold text-[#0F172A]">
                 Đơn cần duyệt ({total})
               </h3>
-              <span className="text-xs text-[#64748B]">
+              <span className="text-xs text-[#5B6B82]">
                 Trang {page} / {totalPages || 1}
               </span>
             </div>
@@ -263,11 +263,11 @@ export default function AdminLeavePage() {
                           <div className="font-bold text-[#0F172A]">
                             {req.employee?.fullName || "Chưa cập nhật"}
                           </div>
-                          <div className="text-[11px] text-[#64748B]">
+                          <div className="text-[11px] text-[#5B6B82]">
                             {req.employee?.email}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs text-[#64748B]">
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {req.leave_type?.name || "Phép năm"}
                         </TableCell>
                         <TableCell className="text-xs text-[#0F172A]">
@@ -320,7 +320,7 @@ export default function AdminLeavePage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+              <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
                 <span>Tổng số {total} đơn</span>
                 <div className="flex gap-2">
                   <Button
@@ -362,7 +362,7 @@ export default function AdminLeavePage() {
                   <Skeleton className="h-14 w-full" />
                 </div>
               ) : calendarEvents.length === 0 ? (
-                <p className="text-center py-6 text-xs text-[#64748B]">
+                <p className="text-center py-6 text-xs text-[#5B6B82]">
                   Không có ai nghỉ phép trong tháng này.
                 </p>
               ) : (
@@ -374,7 +374,7 @@ export default function AdminLeavePage() {
                     <div className="font-bold text-[#0F172A]">
                       {evt.fullName}
                     </div>
-                    <div className="text-[11px] text-[#64748B]">
+                    <div className="text-[11px] text-[#5B6B82]">
                       {evt.leaveType}
                     </div>
                     <div className="text-[11px] text-[#4F75FF] font-semibold">
@@ -400,19 +400,19 @@ export default function AdminLeavePage() {
           <div className="space-y-4 pt-2">
             <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-2">
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Thời gian:</span>
+                <span className="text-[#5B6B82]">Thời gian:</span>
                 <span className="font-bold text-[#0F172A]">
                   {selectedRequest.start_date} ➔ {selectedRequest.end_date}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Tổng ngày:</span>
+                <span className="text-[#5B6B82]">Tổng ngày:</span>
                 <span className="font-bold text-[#4F75FF]">
                   {Number(selectedRequest.total_days).toFixed(1)} ngày
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Lý do:</span>
+                <span className="text-[#5B6B82]">Lý do:</span>
                 <span className="text-[#0F172A]">
                   {selectedRequest.reason || "Không ghi chú"}
                 </span>
@@ -427,7 +427,7 @@ export default function AdminLeavePage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
                 Ý kiến phản hồi / Nhận xét của người duyệt
               </label>
               <textarea

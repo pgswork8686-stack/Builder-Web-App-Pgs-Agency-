@@ -123,7 +123,7 @@ export default function SignUpPage() {
             <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
               Tạo tài khoản
             </h2>
-            <p className="mt-1 text-xs text-[#64748B]">
+            <p className="mt-1 text-xs text-[#5B6B82]">
               Đăng ký tài khoản thành viên hệ thống PGS Hub
             </p>
           </div>
@@ -185,7 +185,7 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSignUp} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Họ và tên
               </label>
               <div className="relative">
@@ -202,7 +202,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Email doanh nghiệp
               </label>
               <div className="relative">
@@ -219,7 +219,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Mật khẩu
               </label>
               <div className="relative">
@@ -236,7 +236,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Xác nhận mật khẩu
               </label>
               <div className="relative">
@@ -266,7 +266,7 @@ export default function SignUpPage() {
           </form>
 
           {/* Footer Login Prompt */}
-          <div className="text-center text-xs text-[#64748B]">
+          <div className="text-center text-xs text-[#5B6B82]">
             Đã có tài khoản?{" "}
             <Link
               href="/auth/login"

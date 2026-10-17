@@ -42,7 +42,7 @@ export default function AccountPendingPage() {
           </h2>
         </div>
 
-        <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
+        <p className="text-xs text-[#5B6B82] leading-relaxed bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
           Tài khoản của bạn đã được khởi tạo thành công và đang chờ Quản trị
           viên (Admin) phê duyệt và phân quyền truy cập. Vui lòng thử lại sau
           hoặc liên hệ bộ phận quản lý.

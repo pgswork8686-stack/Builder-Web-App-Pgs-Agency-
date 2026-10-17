@@ -86,7 +86,7 @@ export default function AdminOrganizationDashboard() {
                     <h3 className="font-extrabold text-base text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+                    <p className="text-xs text-[#5B6B82] mt-1 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>

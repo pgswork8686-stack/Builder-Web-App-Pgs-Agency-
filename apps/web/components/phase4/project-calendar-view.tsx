@@ -149,19 +149,19 @@ function ProjectCalendarContent({
         {/* Legend and Toggles */}
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#4F75FF]" /> Công
               việc
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Ngày
               làm việc
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-300" /> Ngày
               nghỉ
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Ngày lễ
             </span>
           </div>
@@ -207,7 +207,7 @@ function ProjectCalendarContent({
           type="button"
           onClick={() => changeMonth(-1)}
           aria-label="Tháng trước"
-          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#5B6B82] hover:text-[#0F172A] transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -218,7 +218,7 @@ function ProjectCalendarContent({
           type="button"
           onClick={() => changeMonth(1)}
           aria-label="Tháng sau"
-          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#5B6B82] hover:text-[#0F172A] transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -230,7 +230,7 @@ function ProjectCalendarContent({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#5B6B82]">
           Đang tải lịch công việc…
         </div>
       ) : (
@@ -239,7 +239,7 @@ function ProjectCalendarContent({
             {weekdayLabels.map((label) => (
               <div
                 key={label}
-                className="p-3 text-center text-xs font-bold text-[#64748B]"
+                className="p-3 text-center text-xs font-bold text-[#5B6B82]"
               >
                 {label}
               </div>

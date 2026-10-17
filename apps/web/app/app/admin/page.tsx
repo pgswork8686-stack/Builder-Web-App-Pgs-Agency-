@@ -134,13 +134,13 @@ export default function AdminDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Chào buổi sáng, {userName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Đây là tình hình vận hành của PGS Agency hôm nay.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+          <span className="text-xs font-bold text-[#5F6E85] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
             Hôm nay
           </span>
           <Link href="/app/admin/accounts/pending">
@@ -257,7 +257,7 @@ export default function AdminDashboardPage() {
               <FolderKanban className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Dự án</p>
+              <p className="text-[11px] text-[#5F6E85] font-medium">Dự án</p>
               <p className="text-lg font-black text-[#161827] tracking-tight">
                 {stats.projectCount}
               </p>
@@ -272,10 +272,10 @@ export default function AdminDashboardPage() {
               <ListTodo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">
+              <p className="text-[11px] text-[#5F6E85] font-medium">
                 Công việc
               </p>
-              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+              <p className="text-xs font-semibold text-[#5F6E85] mt-1">
                 Theo dự án
               </p>
             </div>
@@ -289,7 +289,7 @@ export default function AdminDashboardPage() {
               <Briefcase className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">
+              <p className="text-[11px] text-[#5F6E85] font-medium">
                 Khách hàng
               </p>
               <p className="text-lg font-black text-[#161827] tracking-tight">
@@ -306,7 +306,7 @@ export default function AdminDashboardPage() {
               <Users className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Nhân sự</p>
+              <p className="text-[11px] text-[#5F6E85] font-medium">Nhân sự</p>
               <p className="text-lg font-black text-[#161827] tracking-tight">
                 {stats.peopleCount}
               </p>
@@ -321,8 +321,8 @@ export default function AdminDashboardPage() {
               <FolderOpen className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[#7C879D] font-medium">Tài liệu</p>
-              <p className="text-xs font-semibold text-[#7C879D] mt-1">
+              <p className="text-[11px] text-[#5F6E85] font-medium">Tài liệu</p>
+              <p className="text-xs font-semibold text-[#5F6E85] mt-1">
                 Theo dự án
               </p>
             </div>
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
           {projects.length === 0 ? (
             <Card className="p-6 text-center">
               <EmptyState
-                icon={<FolderKanban className="w-8 h-8 text-[#7C879D]" />}
+                icon={<FolderKanban className="w-8 h-8 text-[#5F6E85]" />}
                 title="Chưa có dự án nào"
                 description="Tạo dự án mới để theo dõi tiến độ công việc và phân bổ nhân sự."
                 actionLabel="Tạo dự án mới"
@@ -372,7 +372,7 @@ export default function AdminDashboardPage() {
                         {p.name}
                       </h4>
                     </div>
-                    <p className="text-[11px] text-[#7C879D] mt-0.5 truncate">
+                    <p className="text-[11px] text-[#5F6E85] mt-0.5 truncate">
                       Khách hàng: {p.clientCompany?.name || "Chưa liên kết"}
                     </p>
                   </div>
@@ -418,7 +418,7 @@ export default function AdminDashboardPage() {
                   <h5 className="text-xs font-bold text-[#24304A]">
                     Tài khoản chờ duyệt
                   </h5>
-                  <p className="text-[11px] text-[#7C879D]">
+                  <p className="text-[11px] text-[#5F6E85]">
                     {pendingUsers.length} tài khoản mới đăng ký
                   </p>
                 </div>
@@ -438,12 +438,12 @@ export default function AdminDashboardPage() {
                   <h5 className="text-xs font-bold text-[#24304A]">
                     Đơn nghỉ phép
                   </h5>
-                  <p className="text-[11px] text-[#7C879D]">
+                  <p className="text-[11px] text-[#5F6E85]">
                     Kiểm tra và phê duyệt nghỉ phép
                   </p>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-[#7C879D]" />
+              <ChevronRight className="w-4 h-4 text-[#5F6E85]" />
             </Link>
           </Card>
         </div>
@@ -456,7 +456,7 @@ export default function AdminDashboardPage() {
             Dự án cần chú ý
           </h3>
           <Card className="p-5 text-center">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Chưa có dự án nào rơi vào tình trạng quá hạn hoặc cảnh báo rủi ro.
             </p>
           </Card>
@@ -467,7 +467,7 @@ export default function AdminDashboardPage() {
             Hoạt động gần đây
           </h3>
           <Card className="p-5 text-center">
-            <p className="text-xs text-[#7C879D]">Chưa có hoạt động gần đây</p>
+            <p className="text-xs text-[#5F6E85]">Chưa có hoạt động gần đây</p>
           </Card>
         </div>
       </div>
@@ -479,7 +479,7 @@ export default function AdminDashboardPage() {
             <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight">
               Duyệt tài khoản và phân quyền mới
             </h3>
-            <p className="text-xs text-[#7C879D] mt-0.5">
+            <p className="text-xs text-[#5F6E85] mt-0.5">
               Danh sách người dùng mới đăng ký chờ xét duyệt vai trò và bộ phận
               làm việc.
             </p>
@@ -521,7 +521,7 @@ export default function AdminDashboardPage() {
                           <p className="text-xs font-bold text-[#24304A]">
                             {u.fullName || "Chưa đặt tên"}
                           </p>
-                          <p className="text-[11px] text-[#7C879D]">
+                          <p className="text-[11px] text-[#5F6E85]">
                             {u.email}
                           </p>
                         </div>
@@ -532,7 +532,7 @@ export default function AdminDashboardPage() {
                         {u.role ? u.role.toUpperCase() : "CHỜ PHÂN VAI TRÒ"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-[#7C879D]">
+                    <TableCell className="text-xs text-[#5F6E85]">
                       Toàn hệ thống
                     </TableCell>
                     <TableCell>

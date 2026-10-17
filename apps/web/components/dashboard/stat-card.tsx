@@ -33,7 +33,7 @@ export function StatCard({
     default: {
       bg: "bg-white border-[#EDF2F7] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
       iconBg: "bg-[#EEF2FF] text-[#4F75FF] border-[#E0EAFF]",
-      titleColor: "text-[#64748B]",
+      titleColor: "text-[#5B6B82]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#EDF2F7]",
     },
@@ -153,7 +153,7 @@ export function StatCard({
                   {trend.value}
                 </span>
               ) : (
-                <span className="flex items-center text-[#64748B] font-semibold gap-0.5 shrink-0">
+                <span className="flex items-center text-[#5B6B82] font-semibold gap-0.5 shrink-0">
                   <Minus className="w-3.5 h-3.5" />
                   {trend.value}
                 </span>
@@ -163,7 +163,7 @@ export function StatCard({
               )}
             </div>
           ) : (
-            <span className="text-[#64748B] text-[11px] font-medium truncate">
+            <span className="text-[#5B6B82] text-[11px] font-medium truncate">
               {subtitle}
             </span>
           )}

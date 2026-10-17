@@ -264,7 +264,7 @@ export default function EmployeeAttendancePage() {
               <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
                 Điểm danh ca làm việc
               </h3>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-[#5B6B82]">
                 Văn phòng:{" "}
                 <span className="font-medium text-[#0F172A]">
                   Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
@@ -288,7 +288,7 @@ export default function EmployeeAttendancePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
               Ghi chú chấm công (Tùy chọn)
             </label>
             <input
@@ -332,7 +332,7 @@ export default function EmployeeAttendancePage() {
           <h4 className="text-sm font-bold uppercase tracking-wider text-[#4F75FF]">
             Quy định ca làm việc
           </h4>
-          <div className="space-y-3 text-xs text-[#64748B]">
+          <div className="space-y-3 text-xs text-[#5B6B82]">
             <div className="flex justify-between py-1.5 border-b border-[#EDF2F7]">
               <span>Ca sáng:</span>
               <span className="font-bold text-[#0F172A]">08:30 — 12:00</span>
@@ -405,10 +405,10 @@ export default function EmployeeAttendancePage() {
                       <TableCell className="font-bold text-[#0F172A]">
                         {rec.attendance_date}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {checkInTime}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {checkOutTime}
                       </TableCell>
                       <TableCell className="text-xs font-mono font-bold text-[#4F75FF]">
@@ -430,7 +430,7 @@ export default function EmployeeAttendancePage() {
                           {rec.status ? rec.status.toUpperCase() : "—"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {rec.check_in_note || rec.check_out_note || "—"}
                       </TableCell>
                     </TableRow>

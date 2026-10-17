@@ -19,7 +19,7 @@ export default function AccountantCashflowPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-6 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Tổng thu tháng 8/2026
             </span>
             <TrendingUp className="w-4 h-4 text-[#13DEB9]" />
@@ -29,7 +29,7 @@ export default function AccountantCashflowPage() {
 
         <Card className="p-6 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Tổng chi tháng 8/2026
             </span>
             <TrendingDown className="w-4 h-4 text-[#FA896B]" />
@@ -40,7 +40,7 @@ export default function AccountantCashflowPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<CreditCard className="w-10 h-10 text-[#7C879D]" />}
+          icon={<CreditCard className="w-10 h-10 text-[#5F6E85]" />}
           title="Chưa có dữ liệu biến động thu chi"
           description="Dữ liệu dòng tiền sẽ được cập nhật tự động khi phát sinh các giao dịch thu hoặc chi."
         />

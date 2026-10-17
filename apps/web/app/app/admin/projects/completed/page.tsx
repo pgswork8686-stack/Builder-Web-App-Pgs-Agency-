@@ -72,7 +72,7 @@ export default function AdminCompletedProjectsPage() {
                 </Badge>
               </div>
               <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>
-              <p className="text-xs text-[#7C879D]">
+              <p className="text-xs text-[#5F6E85]">
                 Khách hàng: {p.clientCompany?.name || "—"}
               </p>
             </Card>

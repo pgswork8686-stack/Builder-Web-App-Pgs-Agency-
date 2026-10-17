@@ -199,7 +199,7 @@ export default function AdminSettingsPage() {
       />
 
       {loading ? (
-        <div className="p-12 text-center text-[#7C879D]">
+        <div className="p-12 text-center text-[#5F6E85]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
           Đang tải thông số cấu hình...
         </div>
@@ -219,7 +219,7 @@ export default function AdminSettingsPage() {
                   <h4 className="text-sm font-bold text-[#0F172A]">
                     Lịch Làm Việc Công Ty & Đồng Bộ Ngày Lễ
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Cấu hình thứ 7 cách tuần, ngày lễ quốc gia, ngày làm bù và
                     ngoại lệ lịch áp dụng toàn hệ thống.
                   </p>
@@ -244,7 +244,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Thông tin Tổ chức
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Tên và thông tin nhận diện doanh nghiệp
                 </p>
               </div>
@@ -312,7 +312,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Quy chuẩn Chấm công & Ca làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Cấu hình bán kính định vị GPS và khung giờ chuẩn
                 </p>
               </div>
@@ -463,7 +463,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Bảo mật & Phiên làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Chính sách hết hạn phiên và giới hạn yêu cầu (Throttling)
                 </p>
               </div>

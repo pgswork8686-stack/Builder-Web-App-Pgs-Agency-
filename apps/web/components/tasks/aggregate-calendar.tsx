@@ -116,7 +116,7 @@ export function AggregateCalendar({
         </div>
       )}
       {truncated && (
-        <p className="text-xs text-[#7C879D]">
+        <p className="text-xs text-[#5F6E85]">
           Tháng này có nhiều hơn {PAGE_SIZE * MAX_PAGES} công việc; chỉ hiển thị
           một phần. Dùng danh sách để lọc chi tiết.
         </p>

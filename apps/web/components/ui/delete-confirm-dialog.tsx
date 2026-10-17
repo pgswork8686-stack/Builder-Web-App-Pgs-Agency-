@@ -33,7 +33,7 @@ export function DeleteConfirmDialog({
           <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
             {title}
           </h3>
-          <p className="text-xs text-[#64748B] leading-relaxed max-w-xs mx-auto">
+          <p className="text-xs text-[#5B6B82] leading-relaxed max-w-xs mx-auto">
             {description}
           </p>
           {itemName && (

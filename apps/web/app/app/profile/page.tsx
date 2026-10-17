@@ -222,7 +222,7 @@ export default function UserProfilePage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
           <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#5B6B82]">
             Đang tải thông tin hồ sơ của bạn...
           </span>
         </div>
@@ -260,12 +260,12 @@ export default function UserProfilePage() {
               <h3 className="text-base font-extrabold text-[#0F172A]">
                 {userProfile.user.fullName || "Chưa cập nhật tên"}
               </h3>
-              <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
+              <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
                 <Mail className="w-3 h-3 text-[#94A3B8]" />
                 {userProfile.user.email}
               </p>
               {userProfile.user.phone && (
-                <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-1">
+                <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-1">
                   <Phone className="w-3 h-3 text-[#94A3B8]" />
                   {userProfile.user.phone}
                 </p>
@@ -284,7 +284,7 @@ export default function UserProfilePage() {
 
             <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-[#64748B] flex items-center gap-1.5">
+                <span className="text-[#5B6B82] flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5 text-[#94A3B8]" />
                   Vai trò
                 </span>
@@ -293,7 +293,7 @@ export default function UserProfilePage() {
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#64748B] flex items-center gap-1.5">
+                <span className="text-[#5B6B82] flex items-center gap-1.5">
                   <CheckCircle className="w-3.5 h-3.5 text-[#94A3B8]" />
                   Tài khoản
                 </span>
@@ -303,7 +303,7 @@ export default function UserProfilePage() {
               </div>
               {userProfile.account.approvedAt && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748B] flex items-center gap-1.5">
+                  <span className="text-[#5B6B82] flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                     Kích hoạt ngày
                   </span>
@@ -351,7 +351,7 @@ export default function UserProfilePage() {
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 text-xs text-[#64748B] mt-1 font-mono">
+                          <div className="flex items-center gap-3 text-xs text-[#5B6B82] mt-1 font-mono">
                             <span>Mã: {comp.code}</span>
                             {comp.title && (
                               <span className="text-[#0F172A] font-sans font-medium">
@@ -388,7 +388,7 @@ export default function UserProfilePage() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Mã nhân sự
                       </span>
                       <span className="text-sm font-bold font-mono text-[#4F75FF]">
@@ -397,7 +397,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Chức danh công việc
                       </span>
                       <span className="text-sm font-bold text-[#0F172A]">
@@ -406,34 +406,34 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Phòng ban trực thuộc
                       </span>
                       <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
-                        <Building2 className="w-3.5 h-3.5 text-[#64748B]" />
+                        <Building2 className="w-3.5 h-3.5 text-[#5B6B82]" />
                         {orgContext.department?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Đội nhóm trực thuộc
                       </span>
                       <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
-                        <Users2 className="w-3.5 h-3.5 text-[#64748B]" />
+                        <Users2 className="w-3.5 h-3.5 text-[#5B6B82]" />
                         {orgContext.team?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Người quản lý trực tiếp
                       </span>
                       <span className="text-xs text-[#0F172A]">
                         {orgContext.manager?.fullName ? (
                           <span className="font-semibold">
                             {orgContext.manager.fullName}{" "}
-                            <span className="font-mono text-[11px] text-[#64748B]">
+                            <span className="font-mono text-[11px] text-[#5B6B82]">
                               ({orgContext.manager.email})
                             </span>
                           </span>
@@ -444,7 +444,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Trạng thái làm việc
                       </span>
                       <Badge
@@ -525,7 +525,7 @@ export default function UserProfilePage() {
                   <label className="block text-xs font-bold text-[#0F172A]">
                     Ảnh đại diện
                   </label>
-                  <p className="text-[11px] text-[#64748B]">
+                  <p className="text-[11px] text-[#5B6B82]">
                     Tải trực tiếp ảnh từ máy tính hoặc dán URL ảnh có sẵn.
                   </p>
                 </div>
@@ -557,7 +557,7 @@ export default function UserProfilePage() {
             </div>
 
             <div className="pt-2 border-t border-[#EDF2F7]">
-              <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
+              <label className="block text-[11px] font-semibold text-[#5B6B82] mb-1">
                 Hoặc dán đường dẫn ảnh (URL):
               </label>
               <input
@@ -570,7 +570,7 @@ export default function UserProfilePage() {
                 disabled={editAvatarUrl.startsWith("data:")}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3.5 py-1.5 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all disabled:bg-slate-100 disabled:text-[#64748B]"
+                className="w-full px-3.5 py-1.5 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all disabled:bg-slate-100 disabled:text-[#5B6B82]"
               />
             </div>
           </div>

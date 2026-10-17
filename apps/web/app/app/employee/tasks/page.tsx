@@ -113,7 +113,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "all"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#EDF2F7] text-[#5F6E85] hover:bg-[#F6F8FC]"
           }`}
         >
           Tất cả ({tasks.length})
@@ -124,7 +124,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "in_progress"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#EDF2F7] text-[#5F6E85] hover:bg-[#F6F8FC]"
           }`}
         >
           Đang làm
@@ -135,7 +135,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "todo"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#EDF2F7] text-[#5F6E85] hover:bg-[#F6F8FC]"
           }`}
         >
           Cần làm
@@ -146,7 +146,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "done"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#EDF2F7] text-[#5F6E85] hover:bg-[#F6F8FC]"
           }`}
         >
           Hoàn thành
@@ -156,14 +156,14 @@ export default function EmployeeTasksPage() {
       {loading ? (
         <Card className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#5D87FF] mx-auto" />
-          <p className="mt-3 text-xs text-[#7C879D]">
+          <p className="mt-3 text-xs text-[#5F6E85]">
             Đang tải danh sách nhiệm vụ...
           </p>
         </Card>
       ) : filteredTasks.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<ListTodo className="w-10 h-10 text-[#7C879D]" />}
+            icon={<ListTodo className="w-10 h-10 text-[#5F6E85]" />}
             title="Không có nhiệm vụ nào"
             description="Bạn đã hoàn thành tất cả công việc hoặc chưa có task được giao."
           />
@@ -199,7 +199,7 @@ export default function EmployeeTasksPage() {
                     {t.title}
                   </h4>
                   {t.description && (
-                    <p className="text-xs text-[#7C879D] line-clamp-2">
+                    <p className="text-xs text-[#5F6E85] line-clamp-2">
                       {t.description}
                     </p>
                   )}

@@ -91,7 +91,7 @@ export function MonthCalendar({
           {monthLabel}
           {loading && (
             <span
-              className="ml-2 text-xs font-medium text-[#7C879D]"
+              className="ml-2 text-xs font-medium text-[#5F6E85]"
               role="status"
             >
               Đang tải...
@@ -117,7 +117,7 @@ export function MonthCalendar({
               className={`text-xs font-bold ${
                 highlightSunday && d === "CN"
                   ? "text-rose-400"
-                  : "text-[#7C879D]"
+                  : "text-[#5F6E85]"
               }`}
             >
               {d}
@@ -184,7 +184,7 @@ export function MonthCalendar({
                   );
                 })}
                 {(items?.[iso(day)]?.length ?? 0) > 3 && (
-                  <span className="text-[9px] text-[#7C879D]">
+                  <span className="text-[9px] text-[#5F6E85]">
                     +{(items?.[iso(day)]?.length ?? 0) - 3} nữa
                   </span>
                 )}

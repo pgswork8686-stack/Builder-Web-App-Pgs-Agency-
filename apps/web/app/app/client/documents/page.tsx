@@ -17,7 +17,7 @@ export default function ClientDocumentsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<FolderOpen className="w-10 h-10 text-[#7C879D]" />}
+          icon={<FolderOpen className="w-10 h-10 text-[#5F6E85]" />}
           title="Chưa có tài liệu bàn giao nào"
           description="Tất cả các tài liệu chính thức sẽ được cập nhật sau khi nghiệm thu từng giai đoạn."
         />

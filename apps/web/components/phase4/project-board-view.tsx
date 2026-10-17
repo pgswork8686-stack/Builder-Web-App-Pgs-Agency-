@@ -323,14 +323,14 @@ function ProjectBoardContent({
         </div>
       )}
       {!board?.canReorder && board && (
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-[#5B6B82]">
           Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
           chỉ dành cho Admin và quản lý dự án.
         </p>
       )}
 
       {loading && !board ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#5B6B82]">
           Đang tải Kanban…
         </div>
       ) : (
@@ -518,7 +518,7 @@ function BoardCard({
           >
             {task.title}
           </Link>
-          <p className="mt-1 truncate text-xs text-[#64748B]">
+          <p className="mt-1 truncate text-xs text-[#5B6B82]">
             {task.assignee?.full_name || task.assignee?.email || "Chưa giao"}
           </p>
         </div>

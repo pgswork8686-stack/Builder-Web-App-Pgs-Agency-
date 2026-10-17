@@ -89,7 +89,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-black text-[#0F172A] tracking-tight">
               Đăng nhập PGS Hub
             </h2>
-            <p className="mt-1.5 text-xs text-[#64748B]">
+            <p className="mt-1.5 text-xs text-[#5B6B82]">
               Sử dụng tài khoản đã được Admin kích hoạt.
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function LoginPage() {
           </button>
 
           {/* Footer Register Prompt */}
-          <div className="pt-2 text-center text-xs text-[#64748B]">
+          <div className="pt-2 text-center text-xs text-[#5B6B82]">
             Chưa có tài khoản?{" "}
             <Link
               href="/auth/sign-up"

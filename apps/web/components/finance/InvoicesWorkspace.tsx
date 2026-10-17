@@ -482,7 +482,7 @@ export default function InvoicesWorkspace({
           <h3 className="text-base font-extrabold text-[#0F172A]">
             Danh sách hóa đơn ({total})
           </h3>
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#5B6B82]">
             Trang {page} / {totalPages || 1}
           </span>
         </div>
@@ -496,7 +496,7 @@ export default function InvoicesWorkspace({
         ) : error ? (
           <div className="text-center p-8 space-y-3">
             <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-            <p className="text-xs text-[#64748B]">{error}</p>
+            <p className="text-xs text-[#5B6B82]">{error}</p>
             <Button variant="secondary" size="sm" onClick={loadInvoices}>
               Thử lại
             </Button>
@@ -534,13 +534,13 @@ export default function InvoicesWorkspace({
                     <TableCell className="font-bold text-[#0F172A]">
                       {inv.client_company?.name || "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B] max-w-[180px] truncate">
+                    <TableCell className="text-xs text-[#5B6B82] max-w-[180px] truncate">
                       {inv.project?.name || "—"}
                     </TableCell>
                     <TableCell className="font-extrabold text-[#0F172A] text-xs">
                       {formatCurrency(inv.amount, inv.currency_code)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[#64748B]">
+                    <TableCell className="font-mono text-xs text-[#5B6B82]">
                       {inv.due_date}
                     </TableCell>
                     <TableCell>
@@ -577,7 +577,7 @@ export default function InvoicesWorkspace({
                             size="sm"
                             onClick={() => openEditModal(inv)}
                             title="Sửa hóa đơn"
-                            className="text-[#64748B] hover:text-[#0F172A]"
+                            className="text-[#5B6B82] hover:text-[#0F172A]"
                           >
                             <Edit2 className="w-4 h-4" />
                           </Button>
@@ -604,7 +604,7 @@ export default function InvoicesWorkspace({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
             <span>
               Hiển thị{" "}
               <span className="font-bold text-[#0F172A]">
@@ -666,7 +666,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Số hóa đơn *
                 </label>
                 <input
@@ -683,7 +683,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Khách hàng (Công ty) *
                 </label>
                 <select
@@ -711,7 +711,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Hợp đồng liên kết
                 </label>
                 <select
@@ -732,7 +732,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Dự án liên kết
                 </label>
                 <select
@@ -755,7 +755,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Ngày phát hành *
                 </label>
                 <input
@@ -771,7 +771,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Hạn thanh toán *
                 </label>
                 <input
@@ -789,7 +789,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Tổng số tiền *
                 </label>
                 <input
@@ -805,7 +805,7 @@ export default function InvoicesWorkspace({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Loại tiền *
                 </label>
                 <select
@@ -825,7 +825,7 @@ export default function InvoicesWorkspace({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Ghi chú hóa đơn
               </label>
               <textarea
@@ -847,7 +847,7 @@ export default function InvoicesWorkspace({
               />
               <label
                 htmlFor="formClientVisible"
-                className="text-xs text-[#64748B] cursor-pointer select-none"
+                className="text-xs text-[#5B6B82] cursor-pointer select-none"
               >
                 Cho phép khách hàng nhìn thấy hóa đơn này trên cổng thông tin
               </label>

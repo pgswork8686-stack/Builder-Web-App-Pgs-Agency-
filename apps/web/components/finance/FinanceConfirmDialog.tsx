@@ -41,7 +41,7 @@ export function FinanceConfirmDialog({
               <HelpCircle className="w-5 h-5" />
             )}
           </div>
-          <p className="text-xs text-[#64748B] leading-relaxed mt-1">
+          <p className="text-xs text-[#5B6B82] leading-relaxed mt-1">
             {message}
           </p>
         </div>

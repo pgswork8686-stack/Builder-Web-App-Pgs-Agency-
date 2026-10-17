@@ -45,14 +45,14 @@ export default function EmployeePayrollPage() {
 
       <Card className="overflow-hidden border border-[#EAEFF4] dark:border-[#334155]">
         {loading ? (
-          <div className="p-12 text-center text-[#7C879D]">
+          <div className="p-12 text-center text-[#5F6E85]">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
             Đang tải phiếu lương cá nhân...
           </div>
         ) : payslips.length === 0 ? (
           <div className="p-10 text-center">
             <EmptyState
-              icon={<FileText className="w-10 h-10 text-[#7C879D]" />}
+              icon={<FileText className="w-10 h-10 text-[#5F6E85]" />}
               title="Chưa có phiếu lương nào được phát hành"
               description="Phiếu lương tháng sẽ hiển thị sau khi bộ phận Kế toán chốt kỳ thanh toán lương."
             />
@@ -60,7 +60,7 @@ export default function EmployeePayrollPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã phiếu</th>
                   <th className="px-4 py-3">Kỳ lương</th>
@@ -88,13 +88,13 @@ export default function EmployeePayrollPage() {
                     <td className="px-4 py-3 text-center text-[#2A3547] dark:text-white font-medium">
                       {ps.actual_worked_days} / {ps.standard_working_days}
                     </td>
-                    <td className="px-4 py-3 text-right text-[#7C879D]">
+                    <td className="px-4 py-3 text-right text-[#5F6E85]">
                       {new Intl.NumberFormat("vi-VN").format(
                         Number(ps.base_salary),
                       )}{" "}
                       đ
                     </td>
-                    <td className="px-4 py-3 text-right text-[#7C879D]">
+                    <td className="px-4 py-3 text-right text-[#5F6E85]">
                       {new Intl.NumberFormat("vi-VN").format(
                         Number(ps.allowances) +
                           Number(ps.bonus) +

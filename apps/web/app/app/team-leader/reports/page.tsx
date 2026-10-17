@@ -36,25 +36,25 @@ export default function TeamLeaderReportsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="p-5 space-y-2">
-          <span className="text-xs font-bold text-[#7C879D]">
+          <span className="text-xs font-bold text-[#5F6E85]">
             Hiệu suất Công việc
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
             Tỷ lệ hoàn thành Tasks
           </h4>
-          <p className="text-xs text-[#7C879D]">
+          <p className="text-xs text-[#5F6E85]">
             Thống kê các đầu việc đúng hạn và các task bị trễ hạn.
           </p>
         </Card>
 
         <Card className="p-5 space-y-2">
-          <span className="text-xs font-bold text-[#7C879D]">
+          <span className="text-xs font-bold text-[#5F6E85]">
             Chấm công Đội ngũ
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
             Chuyên cần Thành viên
           </h4>
-          <p className="text-xs text-[#7C879D]">
+          <p className="text-xs text-[#5F6E85]">
             Theo dõi giờ vào ca, ngày nghỉ phép của thành viên trong nhóm.
           </p>
         </Card>

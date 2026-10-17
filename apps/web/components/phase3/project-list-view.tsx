@@ -294,7 +294,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           {project.name}
                         </h3>
 
-                        <p className="text-xs text-[#64748B] truncate">
+                        <p className="text-xs text-[#5B6B82] truncate">
                           Khách hàng:{" "}
                           <span className="text-[#0F172A] font-medium">
                             {project.clientCompany?.name ?? "Chưa liên kết"}
@@ -303,7 +303,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#64748B] shrink-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#5B6B82] shrink-0">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span>
@@ -339,7 +339,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
       {/* Pagination Footer */}
       {result.totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
           <span>
             Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
             dự án)
@@ -395,7 +395,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#5B6B82] leading-relaxed">
             Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
             tra cứu và kiểm toán.
           </p>

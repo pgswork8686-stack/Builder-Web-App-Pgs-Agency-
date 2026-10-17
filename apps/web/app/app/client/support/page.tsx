@@ -189,7 +189,7 @@ export default function ClientSupportPage() {
                   >
                     <div className="flex items-center justify-between mb-1 font-semibold text-[11px]">
                       <span>{msg.sender?.full_name || "Thành viên"}</span>
-                      <span className="text-[#7C879D] font-normal">
+                      <span className="text-[#5F6E85] font-normal">
                         {new Date(msg.created_at).toLocaleTimeString("vi-VN", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -231,7 +231,7 @@ export default function ClientSupportPage() {
 
               <form onSubmit={handleCreateTicket} className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#7C879D] block mb-1">
+                  <label className="text-xs font-semibold text-[#5F6E85] block mb-1">
                     Tiêu đề yêu cầu *
                   </label>
                   <input
@@ -246,7 +246,7 @@ export default function ClientSupportPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#7C879D] block mb-1">
+                    <label className="text-xs font-semibold text-[#5F6E85] block mb-1">
                       Danh mục
                     </label>
                     <select
@@ -262,7 +262,7 @@ export default function ClientSupportPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#7C879D] block mb-1">
+                    <label className="text-xs font-semibold text-[#5F6E85] block mb-1">
                       Mức độ ưu tiên
                     </label>
                     <select
@@ -279,7 +279,7 @@ export default function ClientSupportPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#7C879D] block mb-1">
+                  <label className="text-xs font-semibold text-[#5F6E85] block mb-1">
                     Mô tả chi tiết *
                   </label>
                   <textarea
@@ -310,7 +310,7 @@ export default function ClientSupportPage() {
         <div className="md:col-span-5 space-y-6">
           <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155]">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-[#7C879D] uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#5F6E85] uppercase tracking-wider">
                 Yêu cầu đã gửi của bạn
               </h4>
               <Button
@@ -324,9 +324,9 @@ export default function ClientSupportPage() {
             </div>
 
             {loading ? (
-              <p className="text-xs text-[#7C879D]">Đang tải...</p>
+              <p className="text-xs text-[#5F6E85]">Đang tải...</p>
             ) : tickets.length === 0 ? (
-              <p className="text-xs text-[#7C879D]">
+              <p className="text-xs text-[#5F6E85]">
                 Chưa có yêu cầu hỗ trợ nào.
               </p>
             ) : (
@@ -357,7 +357,7 @@ export default function ClientSupportPage() {
                     <p className="text-xs font-semibold text-[#2A3547] dark:text-white truncate">
                       {t.title}
                     </p>
-                    <p className="text-[11px] text-[#7C879D] mt-1">
+                    <p className="text-[11px] text-[#5F6E85] mt-1">
                       {new Date(t.created_at).toLocaleDateString("vi-VN")}
                     </p>
                   </div>
@@ -368,7 +368,7 @@ export default function ClientSupportPage() {
 
           {/* Contact Box */}
           <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#F8FAFC] dark:bg-[#0F172A]">
-            <h4 className="text-xs font-bold text-[#7C879D] uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#5F6E85] uppercase tracking-wider">
               Kênh liên hệ khẩn cấp
             </h4>
             <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">

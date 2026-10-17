@@ -25,7 +25,7 @@ export default function Home() {
           <h1 className="text-3xl font-extrabold tracking-tight text-[#161827]">
             PGS HUB
           </h1>
-          <p className="text-sm text-[#64748B] mt-1 font-medium">
+          <p className="text-sm text-[#5B6B82] mt-1 font-medium">
             Hệ thống quản trị vận hành PGS Agency Enterprise
           </p>
         </div>

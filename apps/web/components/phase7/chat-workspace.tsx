@@ -560,7 +560,7 @@ export function ChatWorkspace() {
                 <h2 className="font-bold text-[#0F172A] text-sm">
                   Cuộc trò chuyện
                 </h2>
-                <p className="mt-0.5 text-[11px] text-[#64748B]">
+                <p className="mt-0.5 text-[11px] text-[#5B6B82]">
                   {conversations.length} cuộc hội thoại
                 </p>
               </div>
@@ -587,7 +587,7 @@ export function ChatWorkspace() {
               />
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-[#64748B]">
+            <div className="flex items-center gap-2 text-xs text-[#5B6B82]">
               {connectionState === "denied" ? (
                 <WifiOff className="h-3.5 w-3.5 text-red-500" />
               ) : (
@@ -604,7 +604,7 @@ export function ChatWorkspace() {
 
             <div className="max-h-[26rem] space-y-2 overflow-y-auto pt-1">
               {loadingList ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#64748B]">
+                <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#5B6B82]">
                   <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                   Đang tải...
                 </div>
@@ -631,7 +631,7 @@ export function ChatWorkspace() {
                         <div className="truncate text-xs font-bold text-[#0F172A]">
                           {conversationTitle(conversation)}
                         </div>
-                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#64748B] flex items-center gap-1.5">
+                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#5B6B82] flex items-center gap-1.5">
                           {conversation.type === "project" ? (
                             <span className="text-[#4F75FF] font-semibold">
                               ● Project
@@ -679,7 +679,7 @@ export function ChatWorkspace() {
                 Xem danh sách
               </Button>
             </div>
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-[#5B6B82]">
               Chọn nhanh nhân sự nội bộ hoặc khách hàng để nhắn tin:
             </p>
             <div className="space-y-2 pt-1">
@@ -738,7 +738,7 @@ export function ChatWorkspace() {
                 Xem dự án
               </Button>
             </div>
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-[#5B6B82]">
               Chọn nhanh phòng chat theo dự án đang tham gia:
             </p>
             <div className="space-y-2 pt-1">
@@ -788,7 +788,7 @@ export function ChatWorkspace() {
                     ? conversationTitle(selected)
                     : "Chưa chọn cuộc trò chuyện"}
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   {selected
                     ? `${selected.type === "project" ? "Phòng chat dự án" : "Trò chuyện cá nhân"}`
                     : "Chọn một cuộc trò chuyện từ danh sách hoặc bấm 'Cuộc trò chuyện mới'."}
@@ -836,7 +836,7 @@ export function ChatWorkspace() {
               <div className="flex flex-col h-full items-center justify-center text-center text-xs text-[#94A3B8] py-20 space-y-3">
                 <MessageCircle className="w-12 h-12 text-[#CBD5E1]" />
                 <div>
-                  <p className="font-bold text-[#64748B] text-sm mb-1">
+                  <p className="font-bold text-[#5B6B82] text-sm mb-1">
                     Bắt đầu cuộc trò chuyện
                   </p>
                   <p>
@@ -855,7 +855,7 @@ export function ChatWorkspace() {
                 </Button>
               </div>
             ) : loadingMessages && messages.length === 0 ? (
-              <div className="flex h-full items-center justify-center gap-2 text-xs text-[#64748B]">
+              <div className="flex h-full items-center justify-center gap-2 text-xs text-[#5B6B82]">
                 <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                 Đang tải lịch sử chat...
               </div>
@@ -985,7 +985,7 @@ export function ChatWorkspace() {
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "direct"
                   ? "border-[#4F75FF] text-[#4F75FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
               <Users className="w-4 h-4" />
@@ -997,7 +997,7 @@ export function ChatWorkspace() {
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "project"
                   ? "border-[#4F75FF] text-[#4F75FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -1037,7 +1037,7 @@ export function ChatWorkspace() {
               {/* User List */}
               <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
                 {loadingContacts ? (
-                  <div className="py-10 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+                  <div className="py-10 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
                     Đang tải danh bạ...
                   </div>
@@ -1069,7 +1069,7 @@ export function ChatWorkspace() {
                               </span>
                             )}
                           </div>
-                          <div className="text-[11px] text-[#64748B] font-mono truncate">
+                          <div className="text-[11px] text-[#5B6B82] font-mono truncate">
                             {contact.email}
                           </div>
                         </div>
@@ -1140,7 +1140,7 @@ export function ChatWorkspace() {
                                 </span>
                               </div>
                               {proj.clientCompany?.name && (
-                                <div className="text-[11px] text-[#64748B] flex items-center gap-1 mt-0.5">
+                                <div className="text-[11px] text-[#5B6B82] flex items-center gap-1 mt-0.5">
                                   <Building className="w-3 h-3 text-[#94A3B8]" />
                                   Khách hàng: {proj.clientCompany.name}
                                 </div>
@@ -1190,13 +1190,13 @@ export function ChatWorkspace() {
                               <span className="text-[11px] font-bold text-[#0F172A] uppercase tracking-wide">
                                 Chọn người để Chat riêng (1-on-1):
                               </span>
-                              <span className="text-[10px] text-[#64748B]">
+                              <span className="text-[10px] text-[#5B6B82]">
                                 {members.length} thành viên / khách hàng
                               </span>
                             </div>
 
                             {isLoadingThis ? (
-                              <div className="py-4 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+                              <div className="py-4 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
                                 Đang tải danh sách thành viên...
                               </div>
@@ -1243,7 +1243,7 @@ export function ChatWorkspace() {
                                               profile?.email ||
                                               "Chưa đặt tên"}
                                           </div>
-                                          <div className="text-[10px] text-[#64748B] truncate font-medium">
+                                          <div className="text-[10px] text-[#5B6B82] truncate font-medium">
                                             {roleName}
                                           </div>
                                         </div>
@@ -1298,7 +1298,7 @@ export function ChatWorkspace() {
         <div className="space-y-4 pt-2">
           {selected?.projectId &&
           loadingMembersForProject === selected.projectId ? (
-            <div className="py-10 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
+            <div className="py-10 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
               Đang tải danh sách...
             </div>
@@ -1353,7 +1353,7 @@ export function ChatWorkspace() {
                             {roleName}
                           </span>
                         </div>
-                        <div className="text-[11px] text-[#64748B] font-mono truncate">
+                        <div className="text-[11px] text-[#5B6B82] font-mono truncate">
                           {profile?.email}
                         </div>
                       </div>

@@ -34,7 +34,7 @@ export default function EmployeeReportsPage() {
             rows={3}
             disabled
             placeholder="Liệt kê các đầu việc hoặc task bạn đã xử lý xong..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#7C879D] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#5F6E85] cursor-not-allowed"
           />
         </div>
 
@@ -46,7 +46,7 @@ export default function EmployeeReportsPage() {
             rows={2}
             disabled
             placeholder="Các vấn đề phát sinh cần cấp trên hoặc đồng đội hỗ trợ..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#7C879D] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#5F6E85] cursor-not-allowed"
           />
         </div>
 
@@ -58,7 +58,7 @@ export default function EmployeeReportsPage() {
             rows={2}
             disabled
             placeholder="Các đầu việc dự kiến hoàn thành vào ngày mai..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#7C879D] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#5F6E85] cursor-not-allowed"
           />
         </div>
 

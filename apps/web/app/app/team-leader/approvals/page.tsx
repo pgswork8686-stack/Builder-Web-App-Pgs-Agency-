@@ -120,7 +120,7 @@ export default function TeamLeaderApprovalsPage() {
       {loading ? (
         <Card className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#5D87FF] mx-auto" />
-          <p className="mt-3 text-xs text-[#7C879D]">
+          <p className="mt-3 text-xs text-[#5F6E85]">
             Đang tải danh sách đơn chờ duyệt...
           </p>
         </Card>
@@ -157,7 +157,7 @@ export default function TeamLeaderApprovalsPage() {
                         <div className="font-bold text-xs text-[#24304A]">
                           {req.employee?.fullName || "Nhân viên"}
                         </div>
-                        <div className="text-[11px] text-[#7C879D]">
+                        <div className="text-[11px] text-[#5F6E85]">
                           {req.employee?.email}
                         </div>
                       </TableCell>
@@ -178,7 +178,7 @@ export default function TeamLeaderApprovalsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <p className="text-xs text-[#7C879D] max-w-xs truncate">
+                        <p className="text-xs text-[#5F6E85] max-w-xs truncate">
                           {req.reason || "—"}
                         </p>
                       </TableCell>

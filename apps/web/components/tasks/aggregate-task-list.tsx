@@ -78,7 +78,7 @@ export function AggregateTaskList() {
       <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] flex flex-wrap items-center gap-3 shadow-xs">
         <div className="relative flex-1 min-w-[240px]">
           <Search
-            className="w-4 h-4 text-[#7C879D] absolute left-3 top-1/2 -translate-y-1/2"
+            className="w-4 h-4 text-[#5F6E85] absolute left-3 top-1/2 -translate-y-1/2"
             aria-hidden="true"
           />
           <input
@@ -137,14 +137,14 @@ export function AggregateTaskList() {
           </Button>
         </Card>
       ) : loading && !data ? (
-        <Card className="p-10 flex items-center justify-center gap-2 text-sm text-[#7C879D]">
+        <Card className="p-10 flex items-center justify-center gap-2 text-sm text-[#5F6E85]">
           <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           Đang tải công việc...
         </Card>
       ) : !data || data.items.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<ListTodo className="w-10 h-10 text-[#7C879D]" />}
+            icon={<ListTodo className="w-10 h-10 text-[#5F6E85]" />}
             title={
               hasFilters
                 ? "Không có công việc phù hợp bộ lọc"
@@ -162,7 +162,7 @@ export function AggregateTaskList() {
           <div className="overflow-x-auto" aria-busy={loading}>
             <table className="w-full text-left text-xs">
               <caption className="sr-only">Danh sách công việc</caption>
-              <thead className="bg-[#F6F8FC] text-[#7C879D]">
+              <thead className="bg-[#F6F8FC] text-[#5F6E85]">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-bold">
                     Công việc
@@ -230,7 +230,7 @@ export function AggregateTaskList() {
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between gap-3 border-t border-[#EDF2F7] px-4 py-3 text-xs text-[#7C879D]">
+          <div className="flex items-center justify-between gap-3 border-t border-[#EDF2F7] px-4 py-3 text-xs text-[#5F6E85]">
             <span>
               {data.total} công việc · Trang {data.page}/
               {Math.max(data.totalPages, 1)}

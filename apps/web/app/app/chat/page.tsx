@@ -5,7 +5,7 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-xs text-[#64748B]">Đang tải chat...</div>
+        <div className="p-8 text-xs text-[#5B6B82]">Đang tải chat...</div>
       }
     >
       <ChatWorkspace />

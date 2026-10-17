@@ -95,14 +95,14 @@ export default function TeamLeaderDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Chào {userName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Theo dõi tiến độ dự án, đội nhóm và các nội dung đang chờ duyệt hôm
             nay.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+          <span className="text-xs font-bold text-[#5F6E85] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
             Tuần này
           </span>
           <Link href="/app/team-leader/projects">
@@ -142,7 +142,7 @@ export default function TeamLeaderDashboardPage() {
                 className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-2xs ${
                   checkedInToday
                     ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
-                    : "bg-white border-[#EDF2F7] text-[#7C879D]"
+                    : "bg-white border-[#EDF2F7] text-[#5F6E85]"
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default function TeamLeaderDashboardPage() {
         {/* Team Performance Metric */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Hiệu suất nhóm
             </span>
             <div className="flex items-baseline justify-between mt-2">
@@ -178,7 +178,7 @@ export default function TeamLeaderDashboardPage() {
         {/* Overdue Tasks Metric */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Task quá hạn
             </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
@@ -198,7 +198,7 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/projects">
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
+              <span className="text-xs font-bold text-[#5F6E85]">Dự án</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#9A7000]">
                 DA
               </span>
@@ -212,12 +212,12 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/tasks">
           <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Task mở</span>
+              <span className="text-xs font-bold text-[#5F6E85]">Task mở</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#E7AE18]">
                 CV
               </span>
             </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo dự án
             </p>
           </Card>
@@ -226,7 +226,7 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/approvals">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">
+              <span className="text-xs font-bold text-[#5F6E85]">
                 Chờ duyệt
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#13DEB9]">
@@ -242,7 +242,7 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/teams">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">
+              <span className="text-xs font-bold text-[#5F6E85]">
                 Thành viên
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#A855F7]">
@@ -258,12 +258,12 @@ export default function TeamLeaderDashboardPage() {
         <Link href="/app/team-leader/calendar">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Deadline</span>
+              <span className="text-xs font-bold text-[#5F6E85]">Deadline</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#FA896B]">
                 DL
               </span>
             </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo lịch
             </p>
           </Card>
@@ -288,7 +288,7 @@ export default function TeamLeaderDashboardPage() {
           {projects.length === 0 ? (
             <Card className="p-6 text-center">
               <EmptyState
-                icon={<ListTodo className="w-8 h-8 text-[#7C879D]" />}
+                icon={<ListTodo className="w-8 h-8 text-[#5F6E85]" />}
                 title="Chưa có dự án nào được giao"
                 description="Các dự án phụ trách sẽ hiển thị tại đây khi được phân công."
               />
@@ -344,7 +344,7 @@ export default function TeamLeaderDashboardPage() {
                 </Link>
               </div>
             ) : (
-              <p className="text-xs text-[#7C879D]">
+              <p className="text-xs text-[#5F6E85]">
                 Hiện tại không có đề xuất duyệt nào cần xử lý.
               </p>
             )}
@@ -359,7 +359,7 @@ export default function TeamLeaderDashboardPage() {
             Dự án cần chú ý
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Tất cả các dự án đang trong tiến độ kế hoạch.
             </p>
           </Card>
@@ -370,7 +370,7 @@ export default function TeamLeaderDashboardPage() {
             Deadline gần nhất
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Không có deadline gấp trong 24 giờ tới.
             </p>
           </Card>

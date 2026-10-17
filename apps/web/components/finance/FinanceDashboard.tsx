@@ -102,7 +102,7 @@ export default function FinanceDashboard({
     return (
       <div className="p-8 text-center rounded-2xl bg-white border border-[#EDF2F7] shadow-xs space-y-3">
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-        <p className="text-xs text-[#64748B]">{error}</p>
+        <p className="text-xs text-[#5B6B82]">{error}</p>
         <Button variant="secondary" size="sm" onClick={loadData}>
           Thử lại
         </Button>
@@ -242,7 +242,7 @@ export default function FinanceDashboard({
         </div>
 
         {auditLogs.length === 0 ? (
-          <p className="text-center py-6 text-xs text-[#64748B]">
+          <p className="text-center py-6 text-xs text-[#5B6B82]">
             Chưa có nhật ký hoạt động nào được ghi nhận.
           </p>
         ) : (
@@ -261,13 +261,13 @@ export default function FinanceDashboard({
                       {getActionLabel(log.action)}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#64748B]">
+                  <div className="text-[11px] text-[#5B6B82]">
                     Entity ID:{" "}
                     <span className="font-mono text-[#0F172A]">
                       {log.entity_id}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#64748B]">
+                  <div className="text-[11px] text-[#5B6B82]">
                     Thực hiện bởi:{" "}
                     <span className="font-bold text-[#0F172A]">
                       {log.actor?.full_name || log.actor?.email || "System"}
