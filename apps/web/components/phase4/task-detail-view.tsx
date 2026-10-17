@@ -164,7 +164,7 @@ function TaskDetailContent({
             <section className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#4F75FF]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#3453D1]">
                     Thông tin công việc
                   </p>
                   <h2 className="mt-2 text-2xl font-black text-[#0F172A]">
@@ -187,7 +187,7 @@ function TaskDetailContent({
                     ))}
                   </select>
                 ) : (
-                  <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-bold text-[#4F75FF]">
+                  <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-bold text-[#3453D1]">
                     {task.status}
                   </span>
                 )}

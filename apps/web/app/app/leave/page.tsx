@@ -211,7 +211,7 @@ export default function EmployeeLeavePage() {
           </div>
         ) : requests.length === 0 ? (
           <EmptyState
-            icon={<Plane className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Plane className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có đơn xin nghỉ phép nào"
             description="Bạn chưa gửi đơn xin nghỉ phép nào trong năm nay."
             actionLabel="Tạo đơn đầu tiên"
@@ -241,7 +241,7 @@ export default function EmployeeLeavePage() {
                       {r.start_date} ➔ {r.end_date}
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                       {r.total_days} ngày
                     </TableCell>
 

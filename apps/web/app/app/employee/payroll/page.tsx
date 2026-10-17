@@ -77,7 +77,7 @@ export default function EmployeePayrollPage() {
                     key={ps.id}
                     className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#3453D1]">
                       {ps.payslip_code || "PL"}
                     </td>
                     <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
@@ -102,7 +102,7 @@ export default function EmployeePayrollPage() {
                       )}{" "}
                       đ
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-[#13DEB9]">
+                    <td className="px-4 py-3 text-right font-bold text-[#0A7F6B]">
                       {new Intl.NumberFormat("vi-VN").format(
                         Number(ps.net_salary),
                       )}{" "}

@@ -425,7 +425,7 @@ function BoardColumn({
       <div className="mb-3 flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2">
           <h2 className="font-bold text-[#0F172A] text-sm">{label}</h2>
-          <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
+          <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#3453D1] shadow-xs">
             {tasks.length}
           </span>
         </div>
@@ -433,7 +433,7 @@ function BoardColumn({
           <button
             type="button"
             onClick={onCreate}
-            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-[11px] font-bold text-[#4F75FF] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-[11px] font-bold text-[#3453D1] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
           >
             <Plus className="h-3 w-3" />
             Tạo
@@ -514,7 +514,7 @@ function BoardCard({
         <div className="min-w-0 flex-1">
           <Link
             href={href}
-            className="font-bold text-sm text-[#0F172A] hover:text-[#4F75FF] transition-colors"
+            className="font-bold text-sm text-[#0F172A] hover:text-[#3453D1] transition-colors"
           >
             {task.title}
           </Link>
@@ -524,7 +524,7 @@ function BoardCard({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
+        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#3453D1]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
         <span className="text-[#94A3B8] text-[11px] font-mono">

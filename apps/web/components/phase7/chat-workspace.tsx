@@ -568,7 +568,7 @@ export function ChatWorkspace() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setNewChatModalOpen(true)}
-                className="text-[#4F75FF] hover:bg-[#EEF2FF] p-1.5 h-8 rounded-lg"
+                className="text-[#3453D1] hover:bg-[#EEF2FF] p-1.5 h-8 rounded-lg"
                 title="Bắt đầu cuộc trò chuyện mới"
               >
                 <Plus className="h-4 w-4" />
@@ -605,7 +605,7 @@ export function ChatWorkspace() {
             <div className="max-h-[26rem] space-y-2 overflow-y-auto pt-1">
               {loadingList ? (
                 <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#5B6B82]">
-                  <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+                  <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
                   Đang tải...
                 </div>
               ) : filteredConversations.length === 0 ? (
@@ -633,7 +633,7 @@ export function ChatWorkspace() {
                         </div>
                         <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[#5B6B82] flex items-center gap-1.5">
                           {conversation.type === "project" ? (
-                            <span className="text-[#4F75FF] font-semibold">
+                            <span className="text-[#3453D1] font-semibold">
                               ● Project
                             </span>
                           ) : (
@@ -662,7 +662,7 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-[#4F75FF]" />
+                <UserPlus className="h-4 w-4 text-[#3453D1]" />
                 <h2 className="font-bold text-[#0F172A] text-sm">
                   Mở Direct Chat
                 </h2>
@@ -674,7 +674,7 @@ export function ChatWorkspace() {
                   setModalTab("direct");
                   setNewChatModalOpen(true);
                 }}
-                className="text-xs text-[#4F75FF] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+                className="text-xs text-[#3453D1] hover:bg-[#EEF2FF] px-2 py-1 h-7"
               >
                 Xem danh sách
               </Button>
@@ -721,7 +721,7 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-[#4F75FF]" />
+                <FolderOpen className="h-4 w-4 text-[#3453D1]" />
                 <h2 className="font-bold text-[#0F172A] text-sm">
                   Mở Project Chat
                 </h2>
@@ -733,7 +733,7 @@ export function ChatWorkspace() {
                   setModalTab("project");
                   setNewChatModalOpen(true);
                 }}
-                className="text-xs text-[#4F75FF] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+                className="text-xs text-[#3453D1] hover:bg-[#EEF2FF] px-2 py-1 h-7"
               >
                 Xem dự án
               </Button>
@@ -779,7 +779,7 @@ export function ChatWorkspace() {
         <Card className="flex min-h-[44rem] flex-col p-0 overflow-hidden">
           <div className="flex items-center justify-between gap-4 border-b border-[#EDF2F7] p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
@@ -801,14 +801,14 @@ export function ChatWorkspace() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-[#CBD5E1] text-[#0F172A] hover:border-[#4F75FF] hover:text-[#4F75FF] text-xs font-semibold"
+                    className="border-[#CBD5E1] text-[#0F172A] hover:border-[#4F75FF] hover:text-[#3453D1] text-xs font-semibold"
                     onClick={async () => {
                       if (selected.projectId) {
                         await loadProjectMembers(selected.projectId);
                       }
                       setViewingProjectMembersModal(true);
                     }}
-                    leftIcon={<Users className="w-3.5 h-3.5 text-[#4F75FF]" />}
+                    leftIcon={<Users className="w-3.5 h-3.5 text-[#3453D1]" />}
                   >
                     Thành viên & Khách hàng
                   </Button>
@@ -856,7 +856,7 @@ export function ChatWorkspace() {
               </div>
             ) : loadingMessages && messages.length === 0 ? (
               <div className="flex h-full items-center justify-center gap-2 text-xs text-[#5B6B82]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
                 Đang tải lịch sử chat...
               </div>
             ) : (
@@ -984,7 +984,7 @@ export function ChatWorkspace() {
               onClick={() => setModalTab("direct")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "direct"
-                  ? "border-[#4F75FF] text-[#4F75FF]"
+                  ? "border-[#4F75FF] text-[#3453D1]"
                   : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
@@ -996,7 +996,7 @@ export function ChatWorkspace() {
               onClick={() => setModalTab("project")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "project"
-                  ? "border-[#4F75FF] text-[#4F75FF]"
+                  ? "border-[#4F75FF] text-[#3453D1]"
                   : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
@@ -1038,7 +1038,7 @@ export function ChatWorkspace() {
               <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
                 {loadingContacts ? (
                   <div className="py-10 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#3453D1]" />
                     Đang tải danh bạ...
                   </div>
                 ) : filteredContacts.length === 0 ? (
@@ -1060,7 +1060,7 @@ export function ChatWorkspace() {
                         />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
+                            <span className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#3453D1]">
                               {contact.fullName || contact.email}
                             </span>
                             {contact.employmentProfile?.jobTitle && (
@@ -1127,7 +1127,7 @@ export function ChatWorkspace() {
                         {/* Project Header Bar */}
                         <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8FAFC]/50">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center shrink-0">
                               <FolderOpen className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
@@ -1135,7 +1135,7 @@ export function ChatWorkspace() {
                                 <span className="text-xs font-bold text-[#0F172A] truncate">
                                   {proj.name}
                                 </span>
-                                <span className="text-[10px] font-mono font-bold text-[#4F75FF] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
+                                <span className="text-[10px] font-mono font-bold text-[#3453D1] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
                                   {proj.projectCode}
                                 </span>
                               </div>
@@ -1153,7 +1153,7 @@ export function ChatWorkspace() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 text-xs font-semibold border-[#CBD5E1] hover:border-[#4F75FF] hover:text-[#4F75FF]"
+                              className="h-8 text-xs font-semibold border-[#CBD5E1] hover:border-[#4F75FF] hover:text-[#3453D1]"
                               onClick={() => {
                                 if (isExpanded) {
                                   setExpandedProjectId(null);
@@ -1197,7 +1197,7 @@ export function ChatWorkspace() {
 
                             {isLoadingThis ? (
                               <div className="py-4 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+                                <Loader2 className="w-4 h-4 animate-spin text-[#3453D1]" />
                                 Đang tải danh sách thành viên...
                               </div>
                             ) : members.length === 0 ? (
@@ -1238,7 +1238,7 @@ export function ChatWorkspace() {
                                           size="sm"
                                         />
                                         <div className="min-w-0">
-                                          <div className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#4F75FF]">
+                                          <div className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#3453D1]">
                                             {profile?.full_name ||
                                               profile?.email ||
                                               "Chưa đặt tên"}
@@ -1299,7 +1299,7 @@ export function ChatWorkspace() {
           {selected?.projectId &&
           loadingMembersForProject === selected.projectId ? (
             <div className="py-10 text-center text-xs text-[#5B6B82] flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#4F75FF]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#3453D1]" />
               Đang tải danh sách...
             </div>
           ) : selected?.projectId &&

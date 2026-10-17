@@ -74,7 +74,7 @@ export default function UpdatePasswordPage() {
           <div>
             <Link
               href="/auth/login"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-[#5B6B82] hover:text-[#4F75FF] mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#5B6B82] hover:text-[#3453D1] mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Quay lại đăng nhập</span>

@@ -54,7 +54,7 @@ export default function AdminCompletedProjectsPage() {
       {projects.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<CheckCircle2 className="w-10 h-10 text-[#13DEB9]" />}
+            icon={<CheckCircle2 className="w-10 h-10 text-[#0A7F6B]" />}
             title="Chưa có dự án nào hoàn thành"
             description="Khi một dự án chuyển sang trạng thái Nghiệm thu / Hoàn tất, dự án sẽ được lưu trữ tại đây."
           />
@@ -64,7 +64,7 @@ export default function AdminCompletedProjectsPage() {
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                <span className="font-mono text-xs font-bold text-[#3453D1]">
                   {p.projectCode}
                 </span>
                 <Badge variant="success" size="sm">

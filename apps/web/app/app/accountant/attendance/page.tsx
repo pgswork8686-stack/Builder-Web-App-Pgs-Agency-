@@ -313,7 +313,7 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("company")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "company"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
+                  ? "bg-white text-[#3453D1] shadow-xs"
                   : "text-[#5F6E85] hover:text-[#24304A]"
               }`}
             >
@@ -323,7 +323,7 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("personal")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "personal"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
+                  ? "bg-white text-[#3453D1] shadow-xs"
                   : "text-[#5F6E85] hover:text-[#24304A]"
               }`}
             >
@@ -442,7 +442,7 @@ export default function AccountantAttendancePage() {
             </div>
           ) : records.length === 0 ? (
             <EmptyState
-              icon={<Clock className="w-8 h-8 text-[#5D87FF]" />}
+              icon={<Clock className="w-8 h-8 text-[#3453D1]" />}
               title="Không có dữ liệu chấm công"
               description="Không tìm thấy bản ghi chấm công nào phù hợp với bộ lọc đã chọn."
             />
@@ -471,7 +471,7 @@ export default function AccountantAttendancePage() {
                       <TableRow key={r.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#5D87FF] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
+                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3453D1] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
                               {(emp?.full_name || emp?.work_email || "U")
                                 .charAt(0)
                                 .toUpperCase()}
@@ -493,7 +493,7 @@ export default function AccountantAttendancePage() {
 
                         <TableCell className="text-xs">
                           {r.check_in_at ? (
-                            <span className="font-mono font-bold text-[#13DEB9]">
+                            <span className="font-mono font-bold text-[#0A7F6B]">
                               {new Date(r.check_in_at).toLocaleTimeString(
                                 "vi-VN",
                                 { hour: "2-digit", minute: "2-digit" },
@@ -511,7 +511,7 @@ export default function AccountantAttendancePage() {
 
                         <TableCell className="text-xs">
                           {r.check_out_at ? (
-                            <span className="font-mono font-bold text-[#5D87FF]">
+                            <span className="font-mono font-bold text-[#3453D1]">
                               {new Date(r.check_out_at).toLocaleTimeString(
                                 "vi-VN",
                                 { hour: "2-digit", minute: "2-digit" },
@@ -650,7 +650,7 @@ export default function AccountantAttendancePage() {
                   <MapPin
                     className={`w-4 h-4 ${
                       geoCoords
-                        ? "text-[#13DEB9]"
+                        ? "text-[#0A7F6B]"
                         : "text-amber-500 animate-pulse"
                     }`}
                   />

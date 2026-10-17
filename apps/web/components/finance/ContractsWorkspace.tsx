@@ -436,7 +436,7 @@ export default function ContractsWorkspace({
           </div>
         ) : contracts.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
             title="Không tìm thấy hợp đồng"
             description="Chưa có hợp đồng nào phù hợp với bộ lọc tìm kiếm."
             actionLabel="Tạo hợp đồng mới"
@@ -461,7 +461,7 @@ export default function ContractsWorkspace({
               <TableBody>
                 {contracts.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {c.contract_number}
                     </TableCell>
                     <TableCell className="font-bold text-[#0F172A]">
@@ -517,7 +517,7 @@ export default function ContractsWorkspace({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                            className="text-[#3453D1] hover:bg-[#EEF2FF]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>

@@ -68,7 +68,7 @@ export default function AccountRejectedPage() {
             href="mailto:admin@pgsagency.com"
             className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white border border-[#CBD5E1] text-[#0F172A] font-bold text-xs hover:bg-[#F8FAFC] transition-colors"
           >
-            <Mail className="w-4 h-4 text-[#4F75FF]" />
+            <Mail className="w-4 h-4 text-[#3453D1]" />
             <span>Liên hệ Quản trị viên</span>
           </a>
 

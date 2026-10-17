@@ -42,7 +42,7 @@ export function StateBanner({
     },
     error: {
       bg: "bg-rose-950/40 border-rose-500/30 text-rose-200",
-      icon: <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />,
+      icon: <AlertCircle className="w-5 h-5 text-rose-700 shrink-0" />,
       titleColor: "text-rose-300",
     },
   };

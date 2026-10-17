@@ -144,7 +144,7 @@ export default function ClientSupportPage() {
             <Card className="p-6 space-y-4 border border-[#EAEFF4] dark:border-[#334155]">
               <div className="flex items-center justify-between pb-3 border-b border-[#EAEFF4] dark:border-[#334155]">
                 <div>
-                  <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <span className="font-mono text-xs font-bold text-[#3453D1]">
                     {selectedTicket.ticket_code || "YC"}
                   </span>
                   <h3 className="text-base font-bold text-[#2A3547] dark:text-white mt-0.5">
@@ -342,7 +342,7 @@ export default function ClientSupportPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                      <span className="font-mono text-xs font-bold text-[#3453D1]">
                         {t.ticket_code || "YC"}
                       </span>
                       <Badge
@@ -372,13 +372,13 @@ export default function ClientSupportPage() {
               Kênh liên hệ khẩn cấp
             </h4>
             <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">
-              <Phone className="w-4 h-4 text-[#5D87FF]" />
+              <Phone className="w-4 h-4 text-[#3453D1]" />
               <span>
                 Hotline CSKH: <strong>1900 8686</strong>
               </span>
             </div>
             <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">
-              <Mail className="w-4 h-4 text-[#13DEB9]" />
+              <Mail className="w-4 h-4 text-[#0A7F6B]" />
               <span>
                 Email: <strong>contact@pgsagency.vn</strong>
               </span>

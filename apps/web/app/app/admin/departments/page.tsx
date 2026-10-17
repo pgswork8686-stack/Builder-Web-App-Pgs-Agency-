@@ -233,14 +233,14 @@ export default function AdminDepartmentsPage() {
       <Card className="p-0 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
             <span className="text-xs text-[#5B6B82]">
               Đang tải danh sách phòng ban...
             </span>
           </div>
         ) : departments.length === 0 ? (
           <EmptyState
-            icon={<Building2 className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Building2 className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có phòng ban nào"
             description="Bắt đầu tạo sơ đồ cơ cấu công ty bằng cách thêm phòng ban đầu tiên."
             actionLabel="Thêm phòng ban"
@@ -267,7 +267,7 @@ export default function AdminDepartmentsPage() {
               <TableBody>
                 {departments.map((dept) => (
                   <TableRow key={dept.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {dept.departmentCode}
                     </TableCell>
                     <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
@@ -279,7 +279,7 @@ export default function AdminDepartmentsPage() {
                     <TableCell>
                       {dept.head ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] flex items-center justify-center font-bold text-xs">
+                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#3453D1] flex items-center justify-center font-bold text-xs">
                             {dept.head.fullName.charAt(0)}
                           </div>
                           <div>

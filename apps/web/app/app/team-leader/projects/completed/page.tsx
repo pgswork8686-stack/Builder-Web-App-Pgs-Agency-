@@ -49,7 +49,7 @@ export default function TeamLeaderCompletedProjectsPage() {
       {projects.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<CheckCircle2 className="w-10 h-10 text-[#13DEB9]" />}
+            icon={<CheckCircle2 className="w-10 h-10 text-[#0A7F6B]" />}
             title="Chưa có dự án nào hoàn thành"
             description="Khi dự án hoàn tất tất cả hạng mục và nghiệm thu, dự án sẽ hiển thị tại đây."
           />
@@ -58,7 +58,7 @@ export default function TeamLeaderCompletedProjectsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-2">
-              <span className="font-mono text-xs font-bold text-[#5D87FF]">
+              <span className="font-mono text-xs font-bold text-[#3453D1]">
                 {p.projectCode}
               </span>
               <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>

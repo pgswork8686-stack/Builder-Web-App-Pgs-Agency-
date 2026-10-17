@@ -116,7 +116,7 @@ export function MonthCalendar({
               key={d}
               className={`text-xs font-bold ${
                 highlightSunday && d === "CN"
-                  ? "text-rose-400"
+                  ? "text-rose-700"
                   : "text-[#5F6E85]"
               }`}
             >
@@ -149,16 +149,16 @@ export function MonthCalendar({
                 <span
                   className={`text-xs font-bold ${
                     todayCell
-                      ? "text-[#5D87FF]"
+                      ? "text-[#3453D1]"
                       : highlightSunday && isSunday
-                        ? "text-rose-400"
+                        ? "text-rose-700"
                         : "text-[#24304A]"
                   }`}
                 >
                   {day}
                 </span>
                 {todayCell && (
-                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#5D87FF] text-white w-fit truncate">
+                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#3F63D6] text-white w-fit truncate">
                     Hôm nay
                   </span>
                 )}

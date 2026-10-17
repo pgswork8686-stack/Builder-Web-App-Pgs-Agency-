@@ -47,7 +47,7 @@ export default function TeamLeaderTeamsPage() {
           {teams.map((t) => (
             <Card key={t.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                <span className="font-mono text-xs font-bold text-[#3453D1]">
                   {t.code}
                 </span>
                 <Badge variant={t.isActive ? "success" : "default"} size="sm">

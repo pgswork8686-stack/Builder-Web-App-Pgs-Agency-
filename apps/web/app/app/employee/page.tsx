@@ -138,7 +138,7 @@ export default function EmployeeDashboardPage() {
             <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Bạn có {taskCount} công việc hôm nay
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng
               thái trên bảng Kanban.
             </p>
@@ -170,7 +170,7 @@ export default function EmployeeDashboardPage() {
               {checkedInTime || "Chưa check-in"}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#0A7F6B] flex items-center gap-1 mt-4">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {checkedInTime ? "Đúng giờ" : "Vui lòng chấm công trước 08:30"}
           </span>
@@ -233,7 +233,7 @@ export default function EmployeeDashboardPage() {
             </h3>
             <Link
               href="/app/employee/tasks"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#3453D1] hover:underline flex items-center gap-1"
             >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -287,7 +287,7 @@ export default function EmployeeDashboardPage() {
               href="/app/employee/tasks"
               className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:bg-[#E0EAFF] transition-all text-center block"
             >
-              <span className="text-xs font-bold text-[#5D87FF]">
+              <span className="text-xs font-bold text-[#3453D1]">
                 Cập nhật tiến độ
               </span>
             </Link>

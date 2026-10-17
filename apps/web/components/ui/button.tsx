@@ -50,7 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-white text-[#161827] border border-[#E2E8F0] hover:bg-[#FFF8E5] hover:border-[#E7AE18] active:scale-[0.98]",
       gold: "bg-[#E7AE18] text-[#161827] hover:bg-[#CC9410] shadow-xs active:scale-[0.98]",
       "gold-outline":
-        "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] hover:bg-[#FEF08A] active:scale-[0.98]",
+        "bg-[#FFF8E5] text-[#7A5700] border border-[#FDE68A] hover:bg-[#FEF08A] active:scale-[0.98]",
       ghost:
         "bg-transparent text-[#5B6B82] hover:text-[#161827] hover:bg-[#F1F5F9] active:scale-[0.98]",
       danger:

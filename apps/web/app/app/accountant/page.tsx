@@ -85,7 +85,7 @@ export default function AccountantDashboardPage() {
             <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Doanh thu YTD: {formatVND(summary?.total_revenue_ytd || 0)}
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang
               thực thi.
             </p>
@@ -119,7 +119,7 @@ export default function AccountantDashboardPage() {
               {formatVND(summary?.total_revenue_ytd || 0)}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#0A7F6B] flex items-center gap-1 mt-4">
             <TrendingUp className="w-3.5 h-3.5" />
             Cân đối thu chi
           </span>
@@ -135,7 +135,7 @@ export default function AccountantDashboardPage() {
               {formatVND(summary?.total_outstanding_ar || 0)}
             </div>
           </div>
-          <span className="text-xs font-bold text-[#FA896B] mt-4">
+          <span className="text-xs font-bold text-[#C2410C] mt-4">
             {summary?.total_outstanding_ar
               ? "Cần đôn đốc thanh toán"
               : "Không có nợ xấu"}
@@ -166,7 +166,7 @@ export default function AccountantDashboardPage() {
 
         <Card className="p-4">
           <span className="text-xs font-bold text-[#5F6E85]">Quá hạn</span>
-          <p className="text-lg font-black text-[#FA896B] mt-2 truncate">
+          <p className="text-lg font-black text-[#C2410C] mt-2 truncate">
             {formatVND(summary?.total_overdue_ar || 0)}
           </p>
         </Card>
@@ -244,7 +244,7 @@ export default function AccountantDashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#5D87FF]" />
+              <Clock className="w-5 h-5 text-[#3453D1]" />
               Chấm công & Quản lý ngày công toàn công ty
             </h3>
             <p className="text-xs text-[#5F6E85]">

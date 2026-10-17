@@ -216,8 +216,8 @@ export default function AdminPersonDetailPage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
-          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-          <span className="text-xs text-[#64748B]">
+          <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
+          <span className="text-xs text-[#5B6B82]">
             Đang tải dữ liệu hồ sơ nhân sự...
           </span>
         </div>
@@ -236,7 +236,7 @@ export default function AdminPersonDetailPage() {
           {/* Left Column: Account Profile Meta */}
           <div className="space-y-6">
             <Card className="p-6 text-center space-y-4">
-              <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] mx-auto flex items-center justify-center text-[#4F75FF] font-bold overflow-hidden shadow-xs">
+              <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] mx-auto flex items-center justify-center text-[#3453D1] font-bold overflow-hidden shadow-xs">
                 {person.avatarUrl ? (
                   <img
                     src={person.avatarUrl}
@@ -244,14 +244,14 @@ export default function AdminPersonDetailPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User2 className="w-8 h-8 text-[#4F75FF]" />
+                  <User2 className="w-8 h-8 text-[#3453D1]" />
                 )}
               </div>
               <div>
                 <h3 className="text-base font-extrabold text-[#0F172A]">
                   {person.fullName || "Chưa cập nhật tên"}
                 </h3>
-                <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
+                <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
                   <Mail className="w-3 h-3 text-[#94A3B8]" />
                   {person.email}
                 </p>
@@ -259,13 +259,13 @@ export default function AdminPersonDetailPage() {
 
               <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748B]">Vai trò hệ thống</span>
+                  <span className="text-[#5B6B82]">Vai trò hệ thống</span>
                   <Badge variant="blue" size="sm">
                     {person.role ? person.role.toUpperCase() : "CHƯA GÁN"}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748B]">Trạng thái tài khoản</span>
+                  <span className="text-[#5B6B82]">Trạng thái tài khoản</span>
                   <Badge
                     variant={
                       person.accountStatus === "active"
@@ -295,7 +295,7 @@ export default function AdminPersonDetailPage() {
                 <h3 className="text-sm font-bold text-[#0F172A]">
                   Tài khoản Khách hàng
                 </h3>
-                <p className="text-xs text-[#64748B] max-w-md mx-auto leading-relaxed">
+                <p className="text-xs text-[#5B6B82] max-w-md mx-auto leading-relaxed">
                   Tài khoản vai trò **client** không có hồ sơ nhân sự nội bộ
                   trực thuộc công ty. Vui lòng quản lý liên kết khách hàng trong
                   danh mục **Khách hàng**.
@@ -304,7 +304,7 @@ export default function AdminPersonDetailPage() {
             ) : (
               <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
-                  <ShieldCheck className="w-5 h-5 text-[#4F75FF]" />
+                  <ShieldCheck className="w-5 h-5 text-[#3453D1]" />
                   <h2 className="font-extrabold text-sm text-[#0F172A]">
                     {person.employeeProfile
                       ? "Thông Tin Hồ Sơ Nhân Sự"
@@ -329,7 +329,7 @@ export default function AdminPersonDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Mã nhân sự (Không được đổi)
                       </label>
                       <input
@@ -343,7 +343,7 @@ export default function AdminPersonDetailPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Chức danh (Job Title)
                       </label>
                       <input
@@ -358,7 +358,7 @@ export default function AdminPersonDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Phòng ban trực thuộc
                       </label>
                       <select
@@ -379,7 +379,7 @@ export default function AdminPersonDetailPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Đội nhóm trực thuộc
                       </label>
                       <select
@@ -398,7 +398,7 @@ export default function AdminPersonDetailPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                    <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                       Người quản lý trực tiếp (Reports To)
                     </label>
                     <select
@@ -417,7 +417,7 @@ export default function AdminPersonDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Trạng thái làm việc
                       </label>
                       <select
@@ -437,7 +437,7 @@ export default function AdminPersonDetailPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Ngày vào làm
                       </label>
                       <input
@@ -449,7 +449,7 @@ export default function AdminPersonDetailPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                      <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                         Ngày nghỉ việc
                       </label>
                       <input

@@ -83,7 +83,7 @@ export default function ClientContractsPage() {
         </div>
       ) : contracts.length === 0 ? (
         <EmptyState
-          icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
           title="Chưa có hợp đồng nào"
           description="Không có hợp đồng nào được công khai cho tài khoản của bạn."
         />
@@ -124,7 +124,7 @@ export default function ClientContractsPage() {
                   </div>
 
                   <div className="text-xs text-[#5B6B82] flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#4F75FF]" />
+                    <Calendar className="w-3.5 h-3.5 text-[#3453D1]" />
                     <span>
                       Hiệu lực:{" "}
                       <span className="font-mono text-[#0F172A] font-semibold">
@@ -140,7 +140,7 @@ export default function ClientContractsPage() {
                     <span className="text-[10px] font-bold text-[#5B6B82] uppercase block">
                       Giá trị hợp đồng
                     </span>
-                    <span className="text-lg font-black text-[#4F75FF] block mt-0.5">
+                    <span className="text-lg font-black text-[#3453D1] block mt-0.5">
                       {formatCurrency(c.contract_value, c.currency_code)}
                     </span>
                   </div>

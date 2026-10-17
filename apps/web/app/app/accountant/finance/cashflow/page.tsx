@@ -22,7 +22,7 @@ export default function AccountantCashflowPage() {
             <span className="text-xs font-bold text-[#5F6E85]">
               Tổng thu tháng 8/2026
             </span>
-            <TrendingUp className="w-4 h-4 text-[#13DEB9]" />
+            <TrendingUp className="w-4 h-4 text-[#0A7F6B]" />
           </div>
           <p className="text-2xl font-black text-[#24304A]">0 ₫</p>
         </Card>
@@ -32,7 +32,7 @@ export default function AccountantCashflowPage() {
             <span className="text-xs font-bold text-[#5F6E85]">
               Tổng chi tháng 8/2026
             </span>
-            <TrendingDown className="w-4 h-4 text-[#FA896B]" />
+            <TrendingDown className="w-4 h-4 text-[#C2410C]" />
           </div>
           <p className="text-2xl font-black text-[#24304A]">0 ₫</p>
         </Card>

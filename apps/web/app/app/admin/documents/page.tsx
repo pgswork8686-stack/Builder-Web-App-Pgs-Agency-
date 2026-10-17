@@ -213,7 +213,7 @@ export default function AdminDocumentsPage() {
       {/* Documents Grid / Table */}
       {loading ? (
         <div className="p-12 text-center text-[#94A3B8] bg-white rounded-2xl border border-[#EDF2F7]">
-          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4F75FF]" />
+          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#3453D1]" />
           Đang tải danh sách tài liệu...
         </div>
       ) : documents.length === 0 ? (
@@ -243,12 +243,12 @@ export default function AdminDocumentsPage() {
             <TableBody>
               {documents.map((doc) => (
                 <TableRow key={doc.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                  <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                     {doc.document_code || "TL"}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F75FF] shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#3453D1] shrink-0">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div>
@@ -367,7 +367,7 @@ export default function AdminDocumentsPage() {
               type="file"
               required
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-[#5B6B82] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
+              className="w-full text-xs text-[#5B6B82] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#3453D1] hover:file:bg-[#E0E7FF] cursor-pointer"
             />
           </div>
 

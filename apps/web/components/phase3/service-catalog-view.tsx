@@ -459,7 +459,7 @@ export function ServiceCatalogView() {
           onClick={() => setActiveTab("services")}
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "services"
-              ? "border-[#4F75FF] text-[#4F75FF]"
+              ? "border-[#4F75FF] text-[#3453D1]"
               : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
           }`}
         >
@@ -470,7 +470,7 @@ export function ServiceCatalogView() {
           onClick={() => setActiveTab("categories")}
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "categories"
-              ? "border-[#4F75FF] text-[#4F75FF]"
+              ? "border-[#4F75FF] text-[#3453D1]"
               : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
           }`}
         >
@@ -542,7 +542,7 @@ export function ServiceCatalogView() {
               </div>
             ) : services.length === 0 ? (
               <EmptyState
-                icon={<Wrench className="w-8 h-8 text-[#4F75FF]" />}
+                icon={<Wrench className="w-8 h-8 text-[#3453D1]" />}
                 title="Chưa có dịch vụ nào"
                 description="Thêm dịch vụ đầu tiên để bắt đầu triển khai cho các dự án."
                 actionLabel="Thêm dịch vụ"
@@ -571,7 +571,7 @@ export function ServiceCatalogView() {
                   <TableBody>
                     {services.map((svc) => (
                       <TableRow key={svc.id}>
-                        <TableCell className="font-mono font-bold text-[#4F75FF]">
+                        <TableCell className="font-mono font-bold text-[#3453D1]">
                           {svc.service_code || svc.serviceCode || svc.code}
                         </TableCell>
                         <TableCell>
@@ -695,7 +695,7 @@ export function ServiceCatalogView() {
               <TableBody>
                 {categories.map((cat) => (
                   <TableRow key={cat.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {cat.serviceCategoryCode}
                     </TableCell>
                     <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
@@ -1072,7 +1072,7 @@ export function ServiceCatalogView() {
 
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="w-4 h-4 text-[#4F75FF]" />
+                  <Building2 className="w-4 h-4 text-[#3453D1]" />
                   <span className="text-xs font-bold text-[#0F172A]">
                     Phòng ban phối hợp
                   </span>
@@ -1124,7 +1124,7 @@ export function ServiceCatalogView() {
                             }}
                             className="w-4 h-4 accent-[#4F75FF]"
                           />
-                          <span className="font-mono text-[#4F75FF]">
+                          <span className="font-mono text-[#3453D1]">
                             {department.departmentCode}
                           </span>
                           <span>{department.name}</span>
@@ -1136,7 +1136,7 @@ export function ServiceCatalogView() {
 
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <UsersRound className="w-4 h-4 text-[#4F75FF]" />
+                  <UsersRound className="w-4 h-4 text-[#3453D1]" />
                   <span className="text-xs font-bold text-[#0F172A]">
                     Team phối hợp
                   </span>
@@ -1199,7 +1199,7 @@ export function ServiceCatalogView() {
                               }}
                               className="w-4 h-4 accent-[#4F75FF]"
                             />
-                            <span className="font-mono text-[#4F75FF]">
+                            <span className="font-mono text-[#3453D1]">
                               {team.teamCode || team.team_code || team.code}
                             </span>
                             <span>{team.name}</span>
@@ -1375,7 +1375,7 @@ export function ServiceCatalogView() {
                     className="p-3 bg-white rounded-xl border border-[#E2E8F0] flex items-center justify-between hover:border-[#CBD5E1] transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
+                      <span className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#3453D1] font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <div>
@@ -1383,7 +1383,7 @@ export function ServiceCatalogView() {
                           <span className="font-bold text-xs text-[#0F172A]">
                             {item.name}
                           </span>
-                          <span className="font-mono text-[10px] text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">
+                          <span className="font-mono text-[10px] text-[#3453D1] bg-blue-50 px-1.5 py-0.5 rounded">
                             {item.delivery_item_code}
                           </span>
                           <Badge

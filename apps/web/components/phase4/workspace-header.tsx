@@ -58,7 +58,7 @@ export function WorkspaceHeader({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A7000] bg-[#FFF8E5] px-2.5 py-0.5 rounded-full border border-[#FDE68A]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#7A5700] bg-[#FFF8E5] px-2.5 py-0.5 rounded-full border border-[#FDE68A]">
               {projectCode ?? "PROJECT"}
             </span>
           </div>

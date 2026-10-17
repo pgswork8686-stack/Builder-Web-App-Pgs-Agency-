@@ -270,7 +270,7 @@ export default function SignUpPage() {
             Đã có tài khoản?{" "}
             <Link
               href="/auth/login"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3453D1] font-bold hover:underline"
             >
               Đăng nhập ngay
             </Link>

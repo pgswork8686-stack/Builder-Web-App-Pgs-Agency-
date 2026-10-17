@@ -352,7 +352,7 @@ export default function AdminAttendancePage() {
           </div>
         ) : records.length === 0 ? (
           <EmptyState
-            icon={<Clock className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Clock className="w-8 h-8 text-[#3453D1]" />}
             title="Không tìm thấy bản ghi chấm công"
             description="Chưa có dữ liệu chấm công nào khớp với bộ lọc tìm kiếm."
           />
@@ -392,7 +392,7 @@ export default function AdminAttendancePage() {
                     <TableCell className="text-xs text-[#5B6B82]">
                       {formatVietnamTime(rec.check_out_at)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                       {rec.work_minutes
                         ? `${(rec.work_minutes / 60).toFixed(1)}h`
                         : "—"}
@@ -418,7 +418,7 @@ export default function AdminAttendancePage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenAdjust(rec)}
-                        className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                        className="text-[#3453D1] hover:bg-[#EEF2FF]"
                       >
                         Hiệu chỉnh
                       </Button>

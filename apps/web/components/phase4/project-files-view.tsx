@@ -238,7 +238,7 @@ export function FileManager({
                 >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
-                      <FileText className="h-4 w-4 text-[#4F75FF]" />
+                      <FileText className="h-4 w-4 text-[#3453D1]" />
                       {file.originalName}
                     </span>
                     <p className="mt-0.5 text-[11px] text-[#94A3B8]">

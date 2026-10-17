@@ -78,7 +78,7 @@ export default function AdminReportsPage() {
           Bộ lọc khoảng thời gian
         </h4>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#EEF2FF] text-[#5D87FF] border border-[#5D87FF]/20">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#EEF2FF] text-[#3453D1] border border-[#5D87FF]/20">
             Tháng hiện tại
           </span>
           <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#5F6E85] border border-[#EDF2F7] opacity-60 cursor-not-allowed">

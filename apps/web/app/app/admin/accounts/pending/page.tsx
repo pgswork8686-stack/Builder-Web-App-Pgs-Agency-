@@ -175,7 +175,7 @@ export default function AdminPendingAccountsPage() {
           {notification.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
           )}
           <span>{notification.message}</span>
         </div>

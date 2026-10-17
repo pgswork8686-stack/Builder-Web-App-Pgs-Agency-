@@ -29,7 +29,7 @@ export default function AccountPendingPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-[#0F172A] p-6 relative">
       <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#EDF2F7]">
         {/* Status Icon Header */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#854D0E] shadow-xs">
           <Clock className="w-8 h-8 animate-pulse" />
         </div>
 
@@ -75,7 +75,7 @@ export default function AccountPendingPage() {
         </div>
 
         <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-center gap-2 text-xs text-[#94A3B8]">
-          <ShieldAlert className="w-3.5 h-3.5 text-[#4F75FF]" />
+          <ShieldAlert className="w-3.5 h-3.5 text-[#3453D1]" />
           <span>PGS Agency Enterprise Operating System</span>
         </div>
       </Card>

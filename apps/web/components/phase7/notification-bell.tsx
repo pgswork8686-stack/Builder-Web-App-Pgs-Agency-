@@ -173,7 +173,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#5B6B82] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#F8FAFC] shadow-2xs"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#5B6B82] transition hover:border-[#4F75FF]/30 hover:text-[#3453D1] hover:bg-[#F8FAFC] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#3453D1] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -236,7 +236,7 @@ export function NotificationBell() {
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#5B6B82]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
@@ -293,7 +293,7 @@ export function NotificationBell() {
 
           <Link
             href="/app/notifications"
-            className="block border-t border-[#EDF2F7] bg-[#F8FAFC] px-4 py-2.5 text-center text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+            className="block border-t border-[#EDF2F7] bg-[#F8FAFC] px-4 py-2.5 text-center text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
           >
             Xem trung tâm thông báo
           </Link>

@@ -243,7 +243,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin" />
       </div>
     );
   }
@@ -389,7 +389,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                   Tổng số tiền
                 </span>
-                <span className="text-2xl font-black text-[#4F75FF] mt-1 block">
+                <span className="text-2xl font-black text-[#3453D1] mt-1 block">
                   {formatCurrency(invoice.amount, invoice.currency_code)}
                 </span>
               </div>
@@ -412,7 +412,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                   {invoice.contract_id ? (
                     <Link
                       href={`${roleBasePath}/finance/contracts/${invoice.contract_id}`}
-                      className="text-[#4F75FF] hover:underline font-mono"
+                      className="text-[#3453D1] hover:underline font-mono"
                     >
                       {invoice.contract?.contract_number || "Xem chi tiết"}
                     </Link>
@@ -425,7 +425,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-[#4F75FF] shrink-0 mt-0.5" />
+                <Calendar className="w-5 h-5 text-[#3453D1] shrink-0 mt-0.5" />
                 <div>
                   <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                     Ngày phát hành
@@ -437,7 +437,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               </div>
 
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-[#4F75FF] shrink-0 mt-0.5" />
+                <Calendar className="w-5 h-5 text-[#3453D1] shrink-0 mt-0.5" />
                 <div>
                   <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block">
                     Hạn thanh toán
@@ -474,7 +474,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
               <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                <CreditCard className="w-4.5 h-4.5 text-[#4F75FF]" />
+                <CreditCard className="w-4.5 h-4.5 text-[#3453D1]" />
                 Lịch sử thanh toán ({payments.length})
               </h3>
             </div>

@@ -174,7 +174,7 @@ function ProjectCalendarContent({
                 type="checkbox"
                 checked={showTasks}
                 onChange={(e) => setShowTasks(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                className="rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
               />
               <span>Công việc</span>
             </label>
@@ -183,7 +183,7 @@ function ProjectCalendarContent({
                 type="checkbox"
                 checked={showWorkSchedule}
                 onChange={(e) => setShowWorkSchedule(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                className="rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
               />
               <span>Lịch làm việc</span>
             </label>
@@ -321,7 +321,7 @@ function ProjectCalendarContent({
                             key={task.taskId}
                             href={`${base}/${projectId}/tasks/${task.taskId}`}
                             onClick={(event) => event.stopPropagation()}
-                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
+                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#3453D1] hover:border-[#4F75FF] transition-colors"
                             title={task.title}
                           >
                             <div className="flex items-center justify-between gap-1">

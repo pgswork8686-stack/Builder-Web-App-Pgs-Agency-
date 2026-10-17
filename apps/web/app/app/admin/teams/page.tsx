@@ -307,14 +307,14 @@ export default function AdminTeamsPage() {
       <Card className="p-0 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
             <span className="text-xs text-[#5B6B82]">
               Đang tải danh sách đội nhóm...
             </span>
           </div>
         ) : filteredTeams.length === 0 ? (
           <EmptyState
-            icon={<Users2 className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Users2 className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có đội nhóm nào"
             description="Bắt đầu tạo cơ cấu làm việc bằng cách thêm đội nhóm đầu tiên."
             actionLabel="Thêm đội nhóm"
@@ -345,7 +345,7 @@ export default function AdminTeamsPage() {
                   );
                   return (
                     <TableRow key={team.id}>
-                      <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      <TableCell className="font-mono font-bold text-[#3453D1]">
                         {team.code}
                       </TableCell>
                       <TableCell>

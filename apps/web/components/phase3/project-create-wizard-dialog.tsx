@@ -155,7 +155,7 @@ export function ProjectCreateWizardDialog({
       maxWidth="xl"
       title={
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center">
             <FolderPlus className="w-5 h-5" />
           </div>
           <span>Tạo dự án mới (Project Wizard)</span>
@@ -168,7 +168,7 @@ export function ProjectCreateWizardDialog({
         <div className="grid grid-cols-3 gap-2 border-b border-[#EDF2F7] pb-4">
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 1 ? "text-[#5D87FF]" : "text-[#5F6E85]"
+              step >= 1 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
@@ -176,7 +176,7 @@ export function ProjectCreateWizardDialog({
                 step > 1
                   ? "bg-[#13DEB9] text-white"
                   : step === 1
-                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
+                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
                     : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
@@ -187,7 +187,7 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 2 ? "text-[#5D87FF]" : "text-[#5F6E85]"
+              step >= 2 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
@@ -195,7 +195,7 @@ export function ProjectCreateWizardDialog({
                 step > 2
                   ? "bg-[#13DEB9] text-white"
                   : step === 2
-                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
+                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
                     : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
@@ -206,13 +206,13 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step === 3 ? "text-[#5D87FF]" : "text-[#5F6E85]"
+              step === 3 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                 step === 3
-                  ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
+                  ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
                   : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
@@ -378,7 +378,7 @@ export function ProjectCreateWizardDialog({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-[#5F6E85]">Mã dự án:</span>{" "}
-                  <span className="font-mono font-bold text-[#5D87FF]">
+                  <span className="font-mono font-bold text-[#3453D1]">
                     {form.projectCode}
                   </span>
                 </div>
@@ -432,7 +432,7 @@ export function ProjectCreateWizardDialog({
               )}
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#3453D1] text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>
                 Sau khi kích hoạt, bạn có thể tạo công việc (Tasks), phân công

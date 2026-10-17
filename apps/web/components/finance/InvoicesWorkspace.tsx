@@ -503,7 +503,7 @@ export default function InvoicesWorkspace({
           </div>
         ) : invoices.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
             title="Không tìm thấy hóa đơn"
             description="Chưa có hóa đơn nào phù hợp với bộ lọc tìm kiếm."
             actionLabel="Tạo hóa đơn mới"
@@ -528,7 +528,7 @@ export default function InvoicesWorkspace({
               <TableBody>
                 {invoices.map((inv) => (
                   <TableRow key={inv.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {inv.invoice_number}
                     </TableCell>
                     <TableCell className="font-bold text-[#0F172A]">
@@ -588,7 +588,7 @@ export default function InvoicesWorkspace({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                            className="text-[#3453D1] hover:bg-[#EEF2FF]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>

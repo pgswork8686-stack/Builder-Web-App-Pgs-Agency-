@@ -32,7 +32,7 @@ export function FinanceConfirmDialog({
             className={`p-2.5 rounded-xl ${
               isDanger
                 ? "bg-rose-50 text-rose-600 border border-rose-100"
-                : "bg-[#EEF2FF] text-[#4F75FF] border border-[#E0E7FF]"
+                : "bg-[#EEF2FF] text-[#3453D1] border border-[#E0E7FF]"
             } shrink-0`}
           >
             {isDanger ? (

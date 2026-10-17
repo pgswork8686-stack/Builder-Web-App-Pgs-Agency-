@@ -263,7 +263,7 @@ export default function AdminWorkCalendarPage() {
           {/* Card 1: Quy tắc chung */}
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-3 border-b border-[#EDF2F7] pb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center font-bold">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <div>
@@ -560,7 +560,7 @@ export default function AdminWorkCalendarPage() {
                       <span
                         className={`text-[11px] font-semibold ${
                           ev.source_type === "manual"
-                            ? "text-[#4F75FF]"
+                            ? "text-[#3453D1]"
                             : ev.source_type === "api"
                               ? "text-amber-600"
                               : "text-[#5B6B82]"
@@ -574,7 +574,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => openEditEventModal(ev)}
-                          className="p-1.5 text-[#5B6B82] hover:text-[#4F75FF] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#5B6B82] hover:text-[#3453D1] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
                           title="Sửa ngoại lệ"
                         >
                           <Edit2 className="w-3.5 h-3.5" />

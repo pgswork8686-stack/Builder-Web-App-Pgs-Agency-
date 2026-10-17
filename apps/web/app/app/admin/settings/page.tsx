@@ -237,7 +237,7 @@ export default function AdminSettingsPage() {
           {/* Company Info */}
           <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center">
                 <Globe className="w-5 h-5" />
               </div>
               <div>
@@ -436,7 +436,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={locationRequired}
                     onChange={(e) => setLocationRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
                   />
                   Bắt buộc GPS khi chấm công
                 </label>
@@ -445,7 +445,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={photoRequired}
                     onChange={(e) => setPhotoRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
                   />
                   Bắt buộc ảnh bằng chứng khi chấm công
                 </label>

@@ -17,7 +17,7 @@ export default function ClientApprovalsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<UserCheck className="w-10 h-10 text-[#13DEB9]" />}
+          icon={<UserCheck className="w-10 h-10 text-[#0A7F6B]" />}
           title="Không có sản phẩm nào đang chờ duyệt"
           description="Khi agency gửi bản thiết kế hoặc sản phẩm bàn giao, thông báo sẽ hiển thị tại đây."
         />

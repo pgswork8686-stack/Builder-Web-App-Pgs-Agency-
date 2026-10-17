@@ -89,7 +89,7 @@ export default function ClientInvoicesPage() {
           </div>
         ) : invoices.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có hóa đơn nào"
             description="Không có hóa đơn công khai nào được ghi nhận cho tài khoản của bạn."
           />
@@ -110,7 +110,7 @@ export default function ClientInvoicesPage() {
                 <TableBody>
                   {invoices.map((i) => (
                     <TableRow key={i.id}>
-                      <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      <TableCell className="font-mono font-bold text-[#3453D1]">
                         {i.invoice_number}
                       </TableCell>
                       <TableCell className="font-mono text-xs text-[#5B6B82]">

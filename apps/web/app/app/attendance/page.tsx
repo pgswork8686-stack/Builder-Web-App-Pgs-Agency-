@@ -329,7 +329,7 @@ export default function EmployeeAttendancePage() {
 
         {/* Shift Policy Card */}
         <Card className="p-6 space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-[#4F75FF]">
+          <h4 className="text-sm font-bold uppercase tracking-wider text-[#3453D1]">
             Quy định ca làm việc
           </h4>
           <div className="space-y-3 text-xs text-[#5B6B82]">
@@ -367,7 +367,7 @@ export default function EmployeeAttendancePage() {
           </div>
         ) : history.length === 0 ? (
           <EmptyState
-            icon={<History className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<History className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có dữ liệu chấm công"
             description="Lịch sử chấm công của bạn trong tháng này sẽ xuất hiện tại đây sau khi check-in."
           />
@@ -411,7 +411,7 @@ export default function EmployeeAttendancePage() {
                       <TableCell className="text-xs text-[#5B6B82]">
                         {checkOutTime}
                       </TableCell>
-                      <TableCell className="text-xs font-mono font-bold text-[#4F75FF]">
+                      <TableCell className="text-xs font-mono font-bold text-[#3453D1]">
                         {rec.work_minutes
                           ? `${(rec.work_minutes / 60).toFixed(1)}h`
                           : "—"}

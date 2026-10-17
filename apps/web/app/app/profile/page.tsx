@@ -221,7 +221,7 @@ export default function UserProfilePage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
-          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
           <span className="text-xs text-[#5B6B82]">
             Đang tải thông tin hồ sơ của bạn...
           </span>
@@ -322,7 +322,7 @@ export default function UserProfilePage() {
             {orgContext?.type === "client" ? (
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
-                  <Briefcase className="w-5 h-5 text-[#CA8A04]" />
+                  <Briefcase className="w-5 h-5 text-[#854D0E]" />
                   <h2 className="text-sm font-extrabold text-[#0F172A]">
                     Liên Kết Doanh Nghiệp Khách Hàng
                   </h2>
@@ -374,7 +374,7 @@ export default function UserProfilePage() {
             ) : (
               <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
-                  <Award className="w-5 h-5 text-[#4F75FF]" />
+                  <Award className="w-5 h-5 text-[#3453D1]" />
                   <h2 className="text-sm font-extrabold text-[#0F172A]">
                     Thông Tin Hồ Sơ Nhân Sự
                   </h2>
@@ -391,7 +391,7 @@ export default function UserProfilePage() {
                       <span className="text-[10px] font-bold text-[#5B6B82] uppercase tracking-wider block mb-1">
                         Mã nhân sự
                       </span>
-                      <span className="text-sm font-bold font-mono text-[#4F75FF]">
+                      <span className="text-sm font-bold font-mono text-[#3453D1]">
                         {orgContext.employee.employeeCode}
                       </span>
                     </div>

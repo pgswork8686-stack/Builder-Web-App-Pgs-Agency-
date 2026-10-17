@@ -112,7 +112,7 @@ export default function ClientDashboardPage() {
                 ? `Dự án đang triển khai (${activeProjectsCount})`
                 : "Chưa có dự án nào đang triển khai"}
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Theo dõi các mốc hoàn thành, kiểm duyệt tài liệu nghiệm thu và hóa
               đơn thanh toán trực tiếp.
             </p>
@@ -187,7 +187,7 @@ export default function ClientDashboardPage() {
               invoicesFailed
                 ? "text-[#5F6E85]"
                 : outstandingEntries.length === 0
-                  ? "text-[#13DEB9]"
+                  ? "text-[#0A7F6B]"
                   : "text-[#B45309]"
             }`}
           >
@@ -257,7 +257,7 @@ export default function ClientDashboardPage() {
             </h3>
             <Link
               href="/app/client/projects"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#3453D1] hover:underline flex items-center gap-1"
             >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -279,7 +279,7 @@ export default function ClientDashboardPage() {
                   className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
                 >
                   <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                    <span className="font-mono text-xs font-bold text-[#3453D1]">
                       {p.projectCode}
                     </span>
                     <h4 className="text-xs font-bold text-[#24304A]">
@@ -336,7 +336,7 @@ export default function ClientDashboardPage() {
               href="/app/client/invoices"
               className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-center block"
             >
-              <span className="text-xs font-bold text-[#5D87FF]">
+              <span className="text-xs font-bold text-[#3453D1]">
                 Tra cứu hóa đơn
               </span>
             </Link>

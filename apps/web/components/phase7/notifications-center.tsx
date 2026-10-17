@@ -253,7 +253,7 @@ export function NotificationsCenter() {
         <Card className="p-6 space-y-4">
           <div className="flex flex-col gap-3 border-b border-[#EDF2F7] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
@@ -288,12 +288,12 @@ export function NotificationsCenter() {
 
           {loading ? (
             <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#5B6B82]">
-              <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+              <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
               Đang tải thông báo...
             </div>
           ) : items.length === 0 ? (
             <EmptyState
-              icon={<Bell className="w-8 h-8 text-[#4F75FF]" />}
+              icon={<Bell className="w-8 h-8 text-[#3453D1]" />}
               title="Không có thông báo phù hợp"
               description="Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại đây."
             />
@@ -354,7 +354,7 @@ export function NotificationsCenter() {
                             size="sm"
                             disabled={saving === item.id}
                             onClick={() => void markRead(item)}
-                            className="text-[#4F75FF]"
+                            className="text-[#3453D1]"
                           >
                             {saving === item.id ? "Đang lưu..." : "Đã đọc"}
                           </Button>
@@ -402,7 +402,7 @@ export function NotificationsCenter() {
                   <h3 className="font-bold text-xs text-[#0F172A]">
                     Thông báo toàn thể nhân viên
                   </h3>
-                  <p className="text-[10px] text-[#4F75FF] font-semibold">
+                  <p className="text-[10px] text-[#3453D1] font-semibold">
                     Quyền hạn: Admin
                   </p>
                 </div>
@@ -425,7 +425,7 @@ export function NotificationsCenter() {
 
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <Settings className="h-5 w-5" />
               </div>
               <div>
@@ -492,13 +492,13 @@ export function NotificationsCenter() {
             <div className="grid gap-2">
               <Link
                 href="/app/chat"
-                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
               >
                 Mở chat nội bộ / project
               </Link>
               <Link
                 href="/app/projects"
-                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
               >
                 Xem workspace dự án
               </Link>
@@ -513,7 +513,7 @@ export function NotificationsCenter() {
         onClose={() => !broadcasting && setIsBroadcastOpen(false)}
         title={
           <div className="flex items-center gap-2.5 text-lg font-black text-[#0F172A]">
-            <Megaphone className="w-5 h-5 text-[#4F75FF]" />
+            <Megaphone className="w-5 h-5 text-[#3453D1]" />
             Gửi thông báo đến toàn thể nhân viên
           </div>
         }
