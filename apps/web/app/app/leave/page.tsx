@@ -211,7 +211,7 @@ export default function EmployeeLeavePage() {
           </div>
         ) : requests.length === 0 ? (
           <EmptyState
-            icon={<Plane className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Plane className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có đơn xin nghỉ phép nào"
             description="Bạn chưa gửi đơn xin nghỉ phép nào trong năm nay."
             actionLabel="Tạo đơn đầu tiên"
@@ -237,15 +237,15 @@ export default function EmployeeLeavePage() {
                       {r.leave_type?.name || "Nghỉ phép"}
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#5B6B82]">
                       {r.start_date} ➔ {r.end_date}
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                       {r.total_days} ngày
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B] max-w-xs truncate">
+                    <TableCell className="text-xs text-[#5B6B82] max-w-xs truncate">
                       {r.reason || "—"}
                     </TableCell>
 
@@ -264,7 +264,7 @@ export default function EmployeeLeavePage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#5B6B82]">
                       {new Date(r.created_at).toLocaleDateString("vi-VN")}
                     </TableCell>
                   </TableRow>
@@ -276,7 +276,7 @@ export default function EmployeeLeavePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#E2E8F0] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#E2E8F0] text-xs text-[#5B6B82]">
             <span>
               Trang {page} / {totalPages}
             </span>
@@ -343,7 +343,7 @@ export default function EmployeeLeavePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
               Lý do xin nghỉ *
             </label>
             <textarea

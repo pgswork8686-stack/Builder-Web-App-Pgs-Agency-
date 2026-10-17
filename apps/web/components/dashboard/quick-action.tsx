@@ -40,27 +40,27 @@ export function QuickActionGrid({
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center group-hover:scale-105 transition-transform">
                   {item.icon}
                 </div>
                 {item.badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F75FF] text-[10px] font-bold border border-[#E0EAFF]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#3453D1] text-[10px] font-bold border border-[#E0EAFF]">
                     {item.badge}
                   </span>
                 )}
               </div>
 
               <div>
-                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#3453D1] transition-colors">
                   {item.title}
                 </h4>
-                <p className="mt-1 text-xs text-[#64748B] leading-relaxed">
+                <p className="mt-1 text-xs text-[#5B6B82] leading-relaxed">
                   {item.description}
                 </p>
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#4F75FF] opacity-90 group-hover:opacity-100 transition-opacity">
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#3453D1] opacity-90 group-hover:opacity-100 transition-opacity">
               <span>Truy cập</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>

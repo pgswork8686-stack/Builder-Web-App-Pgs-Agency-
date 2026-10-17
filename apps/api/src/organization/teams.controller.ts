@@ -18,6 +18,18 @@ import { RolesGuard } from '../auth/roles.guard';
 import { CreateTeamSchema, UpdateTeamSchema } from './dto/team.dto';
 import { OrganizationService } from './organization.service';
 
+@Controller('teams')
+@UseGuards(AuthGuard, ActiveAccountGuard, RolesGuard)
+@Roles('team_leader')
+export class MyTeamsController {
+  constructor(private readonly organizationService: OrganizationService) {}
+
+  @Get('mine')
+  async getMyTeams(@CurrentUser('profileId') profileId: string) {
+    return this.organizationService.getMyLedTeams(profileId);
+  }
+}
+
 @Controller('admin/teams')
 @UseGuards(AuthGuard, ActiveAccountGuard, RolesGuard)
 @Roles('admin')

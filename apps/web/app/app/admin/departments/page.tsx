@@ -233,14 +233,14 @@ export default function AdminDepartmentsPage() {
       <Card className="p-0 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-            <span className="text-xs text-[#64748B]">
+            <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
+            <span className="text-xs text-[#5B6B82]">
               Đang tải danh sách phòng ban...
             </span>
           </div>
         ) : departments.length === 0 ? (
           <EmptyState
-            icon={<Building2 className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Building2 className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có phòng ban nào"
             description="Bắt đầu tạo sơ đồ cơ cấu công ty bằng cách thêm phòng ban đầu tiên."
             actionLabel="Thêm phòng ban"
@@ -267,7 +267,7 @@ export default function AdminDepartmentsPage() {
               <TableBody>
                 {departments.map((dept) => (
                   <TableRow key={dept.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {dept.departmentCode}
                     </TableCell>
                     <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
@@ -279,14 +279,14 @@ export default function AdminDepartmentsPage() {
                     <TableCell>
                       {dept.head ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] flex items-center justify-center font-bold text-xs">
+                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#3453D1] flex items-center justify-center font-bold text-xs">
                             {dept.head.fullName.charAt(0)}
                           </div>
                           <div>
                             <div className="font-semibold text-xs text-[#0F172A]">
                               {dept.head.fullName}
                             </div>
-                            <div className="text-[10px] text-[#64748B] font-mono">
+                            <div className="text-[10px] text-[#5B6B82] font-mono">
                               {dept.headUserCode ||
                                 dept.head.employeeCode ||
                                 dept.head.email}
@@ -299,7 +299,7 @@ export default function AdminDepartmentsPage() {
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B] max-w-xs truncate">
+                    <TableCell className="text-xs text-[#5B6B82] max-w-xs truncate">
                       {dept.description || "—"}
                     </TableCell>
                     <TableCell>
@@ -351,7 +351,7 @@ export default function AdminDepartmentsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mã phòng ban *
               </label>
               <input
@@ -365,7 +365,7 @@ export default function AdminDepartmentsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Tên phòng ban *
               </label>
               <input
@@ -379,7 +379,7 @@ export default function AdminDepartmentsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Trưởng phòng (Tùy chọn)
               </label>
               <select
@@ -397,7 +397,7 @@ export default function AdminDepartmentsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mô tả chức năng
               </label>
               <textarea
@@ -450,19 +450,19 @@ export default function AdminDepartmentsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mã phòng ban (Cố định)
               </label>
               <input
                 type="text"
                 disabled
                 value={`${editingDept.departmentCode} (${editingDept.code})`}
-                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#5B6B82] cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Tên phòng ban *
               </label>
               <input
@@ -477,7 +477,7 @@ export default function AdminDepartmentsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Bổ nhiệm Trưởng phòng
               </label>
               <select
@@ -495,7 +495,7 @@ export default function AdminDepartmentsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mô tả chức năng
               </label>
               <textarea

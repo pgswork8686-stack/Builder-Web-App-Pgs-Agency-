@@ -56,13 +56,13 @@ export default function AccountantDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Tổng quan tài chính (Accounting Dashboard)
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Theo dõi doanh thu, công nợ, hóa đơn, chi phí và bảng lương.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+          <span className="text-xs font-bold text-[#5F6E85] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
             Tháng 8/2026
           </span>
           <Link href="/app/accountant/finance/invoices">
@@ -85,7 +85,7 @@ export default function AccountantDashboardPage() {
             <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Doanh thu YTD: {formatVND(summary?.total_revenue_ytd || 0)}
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Tổng giá trị hóa đơn đã thanh toán từ các hợp đồng dịch vụ đang
               thực thi.
             </p>
@@ -112,14 +112,14 @@ export default function AccountantDashboardPage() {
         {/* Dòng tiền ròng */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Dòng tiền ròng
             </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
               {formatVND(summary?.total_revenue_ytd || 0)}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#0A7F6B] flex items-center gap-1 mt-4">
             <TrendingUp className="w-3.5 h-3.5" />
             Cân đối thu chi
           </span>
@@ -128,14 +128,14 @@ export default function AccountantDashboardPage() {
         {/* Quá hạn */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Công nợ quá hạn
             </span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
               {formatVND(summary?.total_outstanding_ar || 0)}
             </div>
           </div>
-          <span className="text-xs font-bold text-[#FA896B] mt-4">
+          <span className="text-xs font-bold text-[#C2410C] mt-4">
             {summary?.total_outstanding_ar
               ? "Cần đôn đốc thanh toán"
               : "Không có nợ xấu"}
@@ -146,33 +146,33 @@ export default function AccountantDashboardPage() {
       {/* 5-Metric Row: Doanh thu, Phải thu, Phải trả, Quá hạn, Lương */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Doanh thu</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Doanh thu</span>
           <p className="text-lg font-black text-[#24304A] mt-2 truncate">
             {formatVND(summary?.total_revenue_ytd || 0)}
           </p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Phải thu</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Phải thu</span>
           <p className="text-lg font-black text-[#24304A] mt-2 truncate">
             {formatVND(summary?.total_outstanding_ar || 0)}
           </p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Phải trả</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Phải trả</span>
           <p className="text-lg font-black text-[#24304A] mt-2 truncate">0 ₫</p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Quá hạn</span>
-          <p className="text-lg font-black text-[#FA896B] mt-2 truncate">
+          <span className="text-xs font-bold text-[#5F6E85]">Quá hạn</span>
+          <p className="text-lg font-black text-[#C2410C] mt-2 truncate">
             {formatVND(summary?.total_overdue_ar || 0)}
           </p>
         </Card>
 
         <Card className="p-4 col-span-2 sm:col-span-1">
-          <span className="text-xs font-bold text-[#7C879D]">Lương</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Lương</span>
           <p className="text-lg font-black text-[#24304A] mt-2 truncate">0 ₫</p>
         </Card>
       </div>
@@ -184,12 +184,12 @@ export default function AccountantDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Thu và chi theo tuần
             </h3>
-            <span className="text-xs text-[#7C879D]">Dữ liệu tự động</span>
+            <span className="text-xs text-[#5F6E85]">Dữ liệu tự động</span>
           </div>
 
           <Card className="p-6 text-center">
             <EmptyState
-              icon={<TrendingUp className="w-8 h-8 text-[#7C879D]" />}
+              icon={<TrendingUp className="w-8 h-8 text-[#5F6E85]" />}
               title="Chưa có dữ liệu biến động thu chi"
               description="Biểu đồ dòng tiền sẽ được cập nhật khi các giao dịch phát sinh."
             />
@@ -207,7 +207,7 @@ export default function AccountantDashboardPage() {
           </div>
 
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Không có khoản thanh toán nào sắp đến hạn trong tuần này.
             </p>
           </Card>
@@ -221,7 +221,7 @@ export default function AccountantDashboardPage() {
             Giao dịch gần đây
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Chưa có giao dịch thanh toán mới trong hệ thống.
             </p>
           </Card>
@@ -232,7 +232,7 @@ export default function AccountantDashboardPage() {
             Chi phí dự án
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Chưa có phiếu đề nghị chi phí dự án nào được gửi.
             </p>
           </Card>
@@ -244,10 +244,10 @@ export default function AccountantDashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#5D87FF]" />
+              <Clock className="w-5 h-5 text-[#3453D1]" />
               Chấm công & Quản lý ngày công toàn công ty
             </h3>
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Điểm danh ca làm việc cá nhân và đối soát dữ liệu chấm công GPS
               của toàn bộ nhân sự phục vụ tính lương.
             </p>

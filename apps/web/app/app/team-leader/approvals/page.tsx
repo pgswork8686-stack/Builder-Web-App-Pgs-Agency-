@@ -104,7 +104,7 @@ export default function TeamLeaderApprovalsPage() {
         <div
           className={`p-4 rounded-2xl border flex items-center gap-3 text-xs font-semibold ${
             feedback.type === "success"
-              ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
+              ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#0A7F6B]"
               : "bg-red-50 border-red-200 text-red-600"
           }`}
         >
@@ -119,15 +119,15 @@ export default function TeamLeaderApprovalsPage() {
 
       {loading ? (
         <Card className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#5D87FF] mx-auto" />
-          <p className="mt-3 text-xs text-[#7C879D]">
+          <Loader2 className="w-8 h-8 animate-spin text-[#3453D1] mx-auto" />
+          <p className="mt-3 text-xs text-[#5F6E85]">
             Đang tải danh sách đơn chờ duyệt...
           </p>
         </Card>
       ) : requests.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<UserCheck className="w-10 h-10 text-[#13DEB9]" />}
+            icon={<UserCheck className="w-10 h-10 text-[#0A7F6B]" />}
             title="Không có đơn nào đang chờ duyệt"
             description="Tất cả các yêu cầu từ thành viên trong nhóm đã được xử lý xong."
           />
@@ -157,7 +157,7 @@ export default function TeamLeaderApprovalsPage() {
                         <div className="font-bold text-xs text-[#24304A]">
                           {req.employee?.fullName || "Nhân viên"}
                         </div>
-                        <div className="text-[11px] text-[#7C879D]">
+                        <div className="text-[11px] text-[#5F6E85]">
                           {req.employee?.email}
                         </div>
                       </TableCell>
@@ -178,7 +178,7 @@ export default function TeamLeaderApprovalsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <p className="text-xs text-[#7C879D] max-w-xs truncate">
+                        <p className="text-xs text-[#5F6E85] max-w-xs truncate">
                           {req.reason || "—"}
                         </p>
                       </TableCell>

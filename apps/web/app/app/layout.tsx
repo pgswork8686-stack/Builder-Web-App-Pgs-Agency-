@@ -131,7 +131,7 @@ export default function ProtectedAppLayout({
       <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-[#161827]">
         <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-center shadow-lg">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#E7AE18]" />
-          <p className="mt-4 text-xs font-medium text-[#64748B]">
+          <p className="mt-4 text-xs font-medium text-[#5B6B82]">
             Đang kiểm tra quyền truy cập...
           </p>
           {error ? (
@@ -154,7 +154,7 @@ export default function ProtectedAppLayout({
                     await supabase.auth.signOut();
                     router.replace("/auth/login");
                   }}
-                  className="px-3.5 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#161827] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-medium text-[#5B6B82] hover:text-[#161827] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
                 >
                   Đăng xuất
                 </button>
@@ -174,7 +174,7 @@ export default function ProtectedAppLayout({
           <h1 className="mt-4 text-base font-extrabold text-[#161827]">
             Không có quyền truy cập
           </h1>
-          <p className="mt-2 text-xs text-[#64748B]">
+          <p className="mt-2 text-xs text-[#5B6B82]">
             Bạn đang được chuyển về workspace đúng vai trò.
           </p>
         </div>

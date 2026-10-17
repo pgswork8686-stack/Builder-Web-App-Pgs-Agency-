@@ -446,7 +446,7 @@ export default function AdminPeopleDirectoryPage() {
         </div>
       ) : people.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<Users className="w-8 h-8 text-[#3453D1]" />}
           title="Không tìm thấy nhân sự"
           description="Không có hồ sơ nào phù hợp với các tiêu chí tìm kiếm hiện tại."
         />
@@ -499,14 +499,14 @@ export default function AdminPeopleDirectoryPage() {
                           <p className="font-bold text-[#0F172A]">
                             {person.fullName || "Chưa cập nhật"}
                           </p>
-                          <p className="text-xs text-[#64748B]">
+                          <p className="text-xs text-[#5B6B82]">
                             {person.email}
                           </p>
                         </div>
                       </div>
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                       {ep?.employeeCode || "—"}
                     </TableCell>
 
@@ -529,12 +529,12 @@ export default function AdminPeopleDirectoryPage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#5B6B82]">
                       <p className="text-[#0F172A] font-medium">
                         {ep?.departmentName || "Chưa gán PB"}
                       </p>
                       {ep?.teamName && (
-                        <p className="text-[11px] text-[#4F75FF]">
+                        <p className="text-[11px] text-[#3453D1]">
                           Team: {ep.teamName}
                         </p>
                       )}
@@ -542,7 +542,7 @@ export default function AdminPeopleDirectoryPage() {
 
                     <TableCell className="text-xs">
                       {ep?.jobTitle ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#4F75FF] font-bold text-xs">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#3453D1] font-bold text-xs">
                           {ep.jobTitle}
                         </span>
                       ) : (
@@ -577,7 +577,7 @@ export default function AdminPeopleDirectoryPage() {
                           size="sm"
                           onClick={() => handleOpenEdit(person)}
                           leftIcon={
-                            <Edit2 className="w-3.5 h-3.5 text-[#5D87FF]" />
+                            <Edit2 className="w-3.5 h-3.5 text-[#3453D1]" />
                           }
                           title="Chỉnh sửa thông tin & phân quyền"
                         >
@@ -591,7 +591,7 @@ export default function AdminPeopleDirectoryPage() {
                             size="sm"
                             onClick={() => handleOpenAssignProjects(person)}
                             leftIcon={
-                              <FolderKanban className="w-3.5 h-3.5 text-[#5D87FF]" />
+                              <FolderKanban className="w-3.5 h-3.5 text-[#3453D1]" />
                             }
                             title="Phân bổ dự án cho nhân sự"
                           >
@@ -621,7 +621,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
           <span>
             Trang {page} / {totalPages} ({total} nhân sự)
           </span>
@@ -752,7 +752,7 @@ export default function AdminPeopleDirectoryPage() {
           {editRole !== "client" && (
             <div className="p-4 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-4">
               <h4 className="text-xs font-extrabold text-[#24304A] uppercase tracking-wider flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-[#5D87FF]" />
+                <Briefcase className="w-4 h-4 text-[#3453D1]" />
                 Thông tin hồ sơ nhân sự doanh nghiệp
               </h4>
 
@@ -761,7 +761,7 @@ export default function AdminPeopleDirectoryPage() {
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
                     Mã nhân viên (Employee Code)
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
-                      <span className="text-[10px] text-[#7C879D] font-normal ml-1">
+                      <span className="text-[10px] text-[#5F6E85] font-normal ml-1">
                         (Mã định danh bất biến)
                       </span>
                     )}
@@ -776,8 +776,8 @@ export default function AdminPeopleDirectoryPage() {
                     placeholder="VD: NV-001"
                     className={`w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] text-xs font-mono font-bold outline-none ${
                       editingPerson?.employeeProfile?.employeeCode
-                        ? "bg-[#EDF2F7] text-[#64748B] cursor-not-allowed"
-                        : "bg-white text-[#5D87FF] focus:border-[#5D87FF]"
+                        ? "bg-[#EDF2F7] text-[#5B6B82] cursor-not-allowed"
+                        : "bg-white text-[#3453D1] focus:border-[#5D87FF]"
                     }`}
                   />
                 </div>
@@ -903,7 +903,7 @@ export default function AdminPeopleDirectoryPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#7C879D] shrink-0">
+              <span className="text-xs text-[#5F6E85] shrink-0">
                 Vai trò trong dự án:
               </span>
               <select
@@ -920,7 +920,7 @@ export default function AdminPeopleDirectoryPage() {
 
           <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#EDF2F7] divide-y divide-[#EDF2F7] p-1">
             {filteredProjects.length === 0 ? (
-              <p className="p-6 text-center text-xs text-[#7C879D]">
+              <p className="p-6 text-center text-xs text-[#5F6E85]">
                 Không có dự án nào khớp với tìm kiếm.
               </p>
             ) : (
@@ -940,18 +940,18 @@ export default function AdminPeopleDirectoryPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleToggleProject(p.id)}
-                        className="w-4 h-4 rounded text-[#5D87FF] focus:ring-[#5D87FF]"
+                        className="w-4 h-4 rounded text-[#3453D1] focus:ring-[#5D87FF]"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                          <span className="font-mono text-xs font-bold text-[#3453D1]">
                             {p.projectCode}
                           </span>
                           <span className="text-xs font-bold text-[#24304A] truncate">
                             {p.name}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#7C879D] truncate">
+                        <p className="text-[11px] text-[#5F6E85] truncate">
                           Khách hàng:{" "}
                           {p.clientCompany?.name || "Doanh nghiệp đối tác"}
                         </p>
@@ -976,7 +976,7 @@ export default function AdminPeopleDirectoryPage() {
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7]">
-            <span className="text-xs font-semibold text-[#5D87FF]">
+            <span className="text-xs font-semibold text-[#3453D1]">
               Đã chọn: {assignedProjectIds.length} dự án
             </span>
             <div className="flex items-center gap-2">

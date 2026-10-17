@@ -15,7 +15,7 @@ export default function TeamLeaderTeamsPage() {
   useEffect(() => {
     async function loadTeams() {
       try {
-        const res = await organizationApi.getTeams();
+        const res = await organizationApi.getMyTeams();
         setTeams((res as any) || []);
       } catch {
         // Safe load
@@ -37,7 +37,7 @@ export default function TeamLeaderTeamsPage() {
       {teams.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<Layers className="w-10 h-10 text-[#7C879D]" />}
+            icon={<Layers className="w-10 h-10 text-[#5F6E85]" />}
             title="Chưa có đội nhóm nào"
             description="Thông tin đội nhóm trực thuộc sẽ hiển thị tại đây."
           />
@@ -47,7 +47,7 @@ export default function TeamLeaderTeamsPage() {
           {teams.map((t) => (
             <Card key={t.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                <span className="font-mono text-xs font-bold text-[#3453D1]">
                   {t.code}
                 </span>
                 <Badge variant={t.isActive ? "success" : "default"} size="sm">
@@ -55,7 +55,7 @@ export default function TeamLeaderTeamsPage() {
                 </Badge>
               </div>
               <h4 className="text-sm font-bold text-[#24304A]">{t.name}</h4>
-              <p className="text-xs text-[#7C879D]">{t.description || "—"}</p>
+              <p className="text-xs text-[#5F6E85]">{t.description || "—"}</p>
             </Card>
           ))}
         </div>

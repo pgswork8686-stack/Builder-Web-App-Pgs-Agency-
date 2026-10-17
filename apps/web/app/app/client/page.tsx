@@ -22,6 +22,10 @@ import {
 import { getMe, type UserPayload } from "@/lib/api/auth";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { financeApi } from "@/lib/api/finance";
+import {
+  computeOutstandingByCurrency,
+  computeProjectCompletion,
+} from "@/lib/client-dashboard-kpis";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +37,8 @@ export default function ClientDashboardPage() {
   const [contracts, setContracts] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [projectsFailed, setProjectsFailed] = useState(false);
+  const [invoicesFailed, setInvoicesFailed] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -47,10 +53,12 @@ export default function ClientDashboardPage() {
         if (meRes.status === "fulfilled") setUser(meRes.value.user);
         if (projRes.status === "fulfilled")
           setProjects(projRes.value.items || []);
+        else setProjectsFailed(true);
         if (contRes.status === "fulfilled")
           setContracts(contRes.value?.items || []);
         if (invRes.status === "fulfilled")
           setInvoices(invRes.value?.items || []);
+        else setInvoicesFailed(true);
       } catch {
         // Safe load
       } finally {
@@ -62,6 +70,10 @@ export default function ClientDashboardPage() {
 
   const companyName = user?.fullName || "Quý Khách hàng";
   const activeProjectsCount = projects.length;
+  const completion = computeProjectCompletion(projects);
+  const outstandingEntries = Object.entries(
+    computeOutstandingByCurrency(invoices),
+  );
 
   return (
     <div className="space-y-6">
@@ -71,7 +83,7 @@ export default function ClientDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Chào {companyName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Cổng thông tin khách hàng, theo dõi tiến độ thực hiện và bàn giao
             sản phẩm từ PGS Agency.
           </p>
@@ -100,7 +112,7 @@ export default function ClientDashboardPage() {
                 ? `Dự án đang triển khai (${activeProjectsCount})`
                 : "Chưa có dự án nào đang triển khai"}
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Theo dõi các mốc hoàn thành, kiểm duyệt tài liệu nghiệm thu và hóa
               đơn thanh toán trực tiếp.
             </p>
@@ -127,29 +139,63 @@ export default function ClientDashboardPage() {
         {/* Tiến độ tổng */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Tiến độ tổng
             </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
-              {activeProjectsCount > 0 ? "100%" : "—"}
+              {loading
+                ? "…"
+                : projectsFailed
+                  ? "—"
+                  : `${completion.completed}/${completion.total}`}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#5F6E85] flex items-center gap-1 mt-4">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Đúng tiến độ cam kết
+            {projectsFailed
+              ? "Không tải được dữ liệu dự án"
+              : "Dự án đã hoàn tất / tổng số dự án"}
           </span>
         </div>
 
         {/* Công nợ còn lại */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Công nợ còn lại
             </span>
-            <div className="text-2xl font-black text-[#24304A] mt-2">0 ₫</div>
+            <div className="text-2xl font-black text-[#24304A] mt-2">
+              {loading
+                ? "…"
+                : invoicesFailed
+                  ? "—"
+                  : outstandingEntries.length === 0
+                    ? "0 ₫"
+                    : outstandingEntries
+                        .map(([currency, value]) =>
+                          new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency,
+                            maximumFractionDigits: 0,
+                          }).format(value),
+                        )
+                        .join(" + ")}
+            </div>
           </div>
-          <span className="text-xs font-bold text-[#13DEB9] mt-4">
-            Đã hoàn thành nghĩa vụ
+          <span
+            className={`text-xs font-bold mt-4 ${
+              invoicesFailed
+                ? "text-[#5F6E85]"
+                : outstandingEntries.length === 0
+                  ? "text-[#0A7F6B]"
+                  : "text-[#B45309]"
+            }`}
+          >
+            {invoicesFailed
+              ? "Không tải được dữ liệu hóa đơn"
+              : outstandingEntries.length === 0
+                ? "Không có hóa đơn nào còn nợ"
+                : "Tổng hóa đơn đã phát hành chưa thanh toán"}
           </span>
         </div>
       </div>
@@ -158,7 +204,7 @@ export default function ClientDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Link href="/app/client/projects">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
+            <span className="text-xs font-bold text-[#5F6E85]">Dự án</span>
             <p className="text-2xl font-black text-[#24304A] mt-2">
               {activeProjectsCount}
             </p>
@@ -167,8 +213,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/approvals">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Chờ duyệt</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo dự án
             </p>
           </Card>
@@ -176,8 +222,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/documents">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Tài liệu</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Tài liệu</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo dự án
             </p>
           </Card>
@@ -185,8 +231,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/meetings">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Cuộc họp</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Cuộc họp</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Theo lịch
             </p>
           </Card>
@@ -194,8 +240,8 @@ export default function ClientDashboardPage() {
 
         <Link href="/app/client/support">
           <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
-            <span className="text-xs font-bold text-[#7C879D]">Hỗ trợ</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
+            <span className="text-xs font-bold text-[#5F6E85]">Hỗ trợ</span>
+            <p className="text-xs font-semibold text-[#5F6E85] mt-3">
               Chat nội bộ
             </p>
           </Card>
@@ -211,7 +257,7 @@ export default function ClientDashboardPage() {
             </h3>
             <Link
               href="/app/client/projects"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#3453D1] hover:underline flex items-center gap-1"
             >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -220,7 +266,7 @@ export default function ClientDashboardPage() {
           {projects.length === 0 ? (
             <Card className="p-6 text-center">
               <EmptyState
-                icon={<FolderKanban className="w-8 h-8 text-[#7C879D]" />}
+                icon={<FolderKanban className="w-8 h-8 text-[#5F6E85]" />}
                 title="Chưa có dự án hợp tác"
                 description="Các dự án triển khai giữa doanh nghiệp và PGS Agency sẽ hiển thị tại đây."
               />
@@ -233,7 +279,7 @@ export default function ClientDashboardPage() {
                   className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
                 >
                   <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                    <span className="font-mono text-xs font-bold text-[#3453D1]">
                       {p.projectCode}
                     </span>
                     <h4 className="text-xs font-bold text-[#24304A]">
@@ -260,7 +306,7 @@ export default function ClientDashboardPage() {
           </div>
 
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Hiện tại không có ấn phẩm hoặc tài liệu nào đang chờ quý khách
               nghiệm thu.
             </p>
@@ -275,7 +321,7 @@ export default function ClientDashboardPage() {
             Tài liệu bàn giao
           </h3>
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Chưa có tài liệu đính kèm nào được tải lên.
             </p>
           </Card>
@@ -290,7 +336,7 @@ export default function ClientDashboardPage() {
               href="/app/client/invoices"
               className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-center block"
             >
-              <span className="text-xs font-bold text-[#5D87FF]">
+              <span className="text-xs font-bold text-[#3453D1]">
                 Tra cứu hóa đơn
               </span>
             </Link>

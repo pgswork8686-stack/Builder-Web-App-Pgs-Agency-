@@ -26,7 +26,7 @@ export default function AccountantDebtsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<TrendingUp className="w-10 h-10 text-[#7C879D]" />}
+          icon={<TrendingUp className="w-10 h-10 text-[#5F6E85]" />}
           title="Không có khoản nợ quá hạn nào"
           description="Toàn bộ công nợ khách hàng đang trong trạng thái cân đối."
         />

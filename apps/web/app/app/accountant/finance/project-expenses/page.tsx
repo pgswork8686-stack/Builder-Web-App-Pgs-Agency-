@@ -180,12 +180,12 @@ export default function AccountantProjectExpensesPage() {
         <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#5D87FF]">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-[#7C879D]">Tổng đã duyệt</p>
+              <p className="text-xs text-[#5F6E85]">Tổng đã duyệt</p>
               <p className="text-xl font-bold text-[#2A3547] dark:text-white mt-1">
                 {new Intl.NumberFormat("vi-VN").format(totalApproved)} đ
               </p>
             </div>
-            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#5D87FF]">
+            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#3453D1]">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function AccountantProjectExpensesPage() {
         <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#FFAE1F]">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-[#7C879D]">Chờ duyệt</p>
+              <p className="text-xs text-[#5F6E85]">Chờ duyệt</p>
               <p className="text-xl font-bold text-[#FFAE1F] mt-1">
                 {new Intl.NumberFormat("vi-VN").format(totalPending)} đ
               </p>
@@ -208,12 +208,12 @@ export default function AccountantProjectExpensesPage() {
         <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#13DEB9]">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-[#7C879D]">Tổng số khoản chi</p>
-              <p className="text-xl font-bold text-[#13DEB9] mt-1">
+              <p className="text-xs text-[#5F6E85]">Tổng số khoản chi</p>
+              <p className="text-xl font-bold text-[#0A7F6B] mt-1">
                 {expenses.length}
               </p>
             </div>
-            <div className="p-3 bg-[#E8F7FF] rounded-lg text-[#13DEB9]">
+            <div className="p-3 bg-[#E8F7FF] rounded-lg text-[#0A7F6B]">
               <FolderKanban className="w-5 h-5" />
             </div>
           </div>
@@ -273,14 +273,14 @@ export default function AccountantProjectExpensesPage() {
       {/* Table */}
       <Card className="overflow-hidden border border-[#EAEFF4] dark:border-[#334155]">
         {loading ? (
-          <div className="p-12 text-center text-[#7C879D]">
+          <div className="p-12 text-center text-[#5F6E85]">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
             Đang tải danh sách chi phí...
           </div>
         ) : expenses.length === 0 ? (
           <div className="p-10 text-center">
             <EmptyState
-              icon={<FolderKanban className="w-10 h-10 text-[#7C879D]" />}
+              icon={<FolderKanban className="w-10 h-10 text-[#5F6E85]" />}
               title="Chưa có đề nghị chi phí nào"
               description="Các khoản đề nghị chi phí dự án sẽ hiển thị tại đây."
             />
@@ -288,7 +288,7 @@ export default function AccountantProjectExpensesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã chi phí</th>
                   <th className="px-4 py-3">Tiêu đề khoản chi</th>
@@ -306,13 +306,13 @@ export default function AccountantProjectExpensesPage() {
                     key={exp.id}
                     className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#3453D1]">
                       {exp.expense_code || "CP"}
                     </td>
                     <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
                       {exp.title}
                     </td>
-                    <td className="px-4 py-3 text-[#7C879D]">
+                    <td className="px-4 py-3 text-[#5F6E85]">
                       {exp.project?.name || exp.project_code || "Dự án"}
                     </td>
                     <td className="px-4 py-3 text-xs">
@@ -325,7 +325,7 @@ export default function AccountantProjectExpensesPage() {
                       )}{" "}
                       {exp.currency_code}
                     </td>
-                    <td className="px-4 py-3 text-[#7C879D]">
+                    <td className="px-4 py-3 text-[#5F6E85]">
                       {exp.submitted_by?.full_name || "Nhân viên"}
                     </td>
                     <td className="px-4 py-3">
@@ -373,7 +373,7 @@ export default function AccountantProjectExpensesPage() {
             </h3>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Dự án áp dụng *
                 </label>
                 <select
@@ -392,7 +392,7 @@ export default function AccountantProjectExpensesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Tiêu đề khoản chi *
                 </label>
                 <input
@@ -407,7 +407,7 @@ export default function AccountantProjectExpensesPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                  <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                     Số tiền (VNĐ) *
                   </label>
                   <input
@@ -421,7 +421,7 @@ export default function AccountantProjectExpensesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                  <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                     Danh mục *
                   </label>
                   <select
@@ -439,7 +439,7 @@ export default function AccountantProjectExpensesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Ghi chú chi tiết
                 </label>
                 <textarea
@@ -481,7 +481,7 @@ export default function AccountantProjectExpensesPage() {
             <h3 className="text-lg font-bold text-[#2A3547] dark:text-white mb-2">
               Xét duyệt chi phí ({reviewingExpense.expense_code || "CP"})
             </h3>
-            <p className="text-sm text-[#7C879D] mb-4">
+            <p className="text-sm text-[#5F6E85] mb-4">
               {reviewingExpense.title} —{" "}
               <strong className="text-[#2A3547] dark:text-white">
                 {new Intl.NumberFormat("vi-VN").format(
@@ -492,7 +492,7 @@ export default function AccountantProjectExpensesPage() {
             </p>
 
             <div className="mb-4">
-              <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+              <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                 Lý do từ chối (nếu không duyệt)
               </label>
               <textarea

@@ -89,7 +89,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-black text-[#0F172A] tracking-tight">
               Đăng nhập PGS Hub
             </h2>
-            <p className="mt-1.5 text-xs text-[#64748B]">
+            <p className="mt-1.5 text-xs text-[#5B6B82]">
               Sử dụng tài khoản đã được Admin kích hoạt.
             </p>
           </div>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-[#4F75FF] hover:underline font-medium"
+                  className="text-xs text-[#3453D1] hover:underline font-medium"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -188,11 +188,11 @@ export default function LoginPage() {
           </button>
 
           {/* Footer Register Prompt */}
-          <div className="pt-2 text-center text-xs text-[#64748B]">
+          <div className="pt-2 text-center text-xs text-[#5B6B82]">
             Chưa có tài khoản?{" "}
             <Link
               href="/auth/sign-up"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3453D1] font-bold hover:underline"
             >
               Đăng ký và chờ Admin duyệt
             </Link>

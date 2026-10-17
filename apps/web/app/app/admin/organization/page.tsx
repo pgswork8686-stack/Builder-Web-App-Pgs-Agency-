@@ -21,7 +21,7 @@ export default function AdminOrganizationDashboard() {
       desc: "Quản lý danh sách phòng ban, sơ đồ phòng ban và mã định danh.",
       icon: Building2,
       href: "/app/admin/departments",
-      color: "bg-[#EEF2FF] text-[#4F75FF]",
+      color: "bg-[#EEF2FF] text-[#3453D1]",
       border: "border-[#EDF2F7]",
     },
     {
@@ -37,7 +37,7 @@ export default function AdminOrganizationDashboard() {
       desc: "Hồ sơ nhân viên, chức danh, mã nhân sự và quản lý trực tiếp.",
       icon: UserSquare2,
       href: "/app/admin/people",
-      color: "bg-[#E6FBF5] text-[#059669]",
+      color: "bg-[#E6FBF5] text-[#047857]",
       border: "border-[#EDF2F7]",
     },
     {
@@ -45,7 +45,7 @@ export default function AdminOrganizationDashboard() {
       desc: "Quản lý doanh nghiệp khách hàng và các tài khoản đối tác.",
       icon: Briefcase,
       href: "/app/admin/clients",
-      color: "bg-[#FEF9C3] text-[#CA8A04]",
+      color: "bg-[#FEF9C3] text-[#854D0E]",
       border: "border-[#EDF2F7]",
     },
   ];
@@ -83,16 +83,16 @@ export default function AdminOrganizationDashboard() {
                     <Icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-base text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                    <h3 className="font-extrabold text-base text-[#0F172A] group-hover:text-[#3453D1] transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+                    <p className="text-xs text-[#5B6B82] mt-1 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-between text-xs font-bold text-[#4F75FF] group-hover:translate-x-0.5 transition-transform">
+                <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-between text-xs font-bold text-[#3453D1] group-hover:translate-x-0.5 transition-transform">
                   <span>Truy cập quản lý</span>
                   <ChevronRight className="w-4 h-4" />
                 </div>

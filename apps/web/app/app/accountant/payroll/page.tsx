@@ -299,8 +299,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "runs"
-              ? "border-[#5D87FF] text-[#5D87FF]"
-              : "border-transparent text-[#7C879D] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#5D87FF] text-[#3453D1]"
+              : "border-transparent text-[#5F6E85] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("runs")}
         >
@@ -310,8 +310,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "compensations"
-              ? "border-[#5D87FF] text-[#5D87FF]"
-              : "border-transparent text-[#7C879D] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#5D87FF] text-[#3453D1]"
+              : "border-transparent text-[#5F6E85] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("compensations")}
         >
@@ -321,8 +321,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "reviews"
-              ? "border-[#5D87FF] text-[#5D87FF]"
-              : "border-transparent text-[#7C879D] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#5D87FF] text-[#3453D1]"
+              : "border-transparent text-[#5F6E85] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("reviews")}
         >
@@ -349,14 +349,14 @@ export default function AccountantPayrollPage() {
           </div>
 
           {loading ? (
-            <div className="p-12 text-center text-[#7C879D]">
+            <div className="p-12 text-center text-[#5F6E85]">
               <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
               Đang tải dữ liệu bảng lương...
             </div>
           ) : runs.length === 0 ? (
             <div className="p-10 text-center">
               <EmptyState
-                icon={<FileSpreadsheet className="w-10 h-10 text-[#7C879D]" />}
+                icon={<FileSpreadsheet className="w-10 h-10 text-[#5F6E85]" />}
                 title="Chưa có đợt lương nào"
                 description="Nhấn 'Tính toán tự động' để hệ thống tổng hợp công chấm và lập bảng lương."
               />
@@ -364,7 +364,7 @@ export default function AccountantPayrollPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã đợt lương</th>
                     <th className="px-4 py-3">Kỳ lương</th>
@@ -383,17 +383,17 @@ export default function AccountantPayrollPage() {
                       key={r.id}
                       className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3453D1]">
                         {r.run_code || "BL"}
                       </td>
                       <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
                         {r.period_month}
                       </td>
-                      <td className="px-4 py-3 text-[#7C879D]">{r.title}</td>
+                      <td className="px-4 py-3 text-[#5F6E85]">{r.title}</td>
                       <td className="px-4 py-3 text-center font-semibold text-[#2A3547] dark:text-white">
                         {r.total_employees_count}
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-[#13DEB9]">
+                      <td className="px-4 py-3 text-right font-bold text-[#0A7F6B]">
                         {new Intl.NumberFormat("vi-VN").format(
                           Number(r.total_net_amount),
                         )}{" "}
@@ -454,7 +454,7 @@ export default function AccountantPayrollPage() {
               <h3 className="font-semibold text-[#2A3547] dark:text-white">
                 Cấu hình & Lịch sử mức lương nhân sự
               </h3>
-              <p className="text-xs text-[#7C879D] mt-0.5">
+              <p className="text-xs text-[#5F6E85] mt-0.5">
                 Mỗi lần điều chỉnh mức lương sẽ tạo một phiên bản lịch sử mới có
                 ngày hiệu lực. Không có mức lương mặc định.
               </p>
@@ -470,14 +470,14 @@ export default function AccountantPayrollPage() {
           </div>
 
           {loading ? (
-            <div className="p-12 text-center text-[#7C879D]">
+            <div className="p-12 text-center text-[#5F6E85]">
               <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
               Đang tải danh sách nhân sự...
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã NV</th>
                     <th className="px-4 py-3">Họ tên & Vị trí</th>
@@ -495,14 +495,14 @@ export default function AccountantPayrollPage() {
                       key={emp.userId}
                       className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3453D1]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-[#2A3547] dark:text-white">
                           {emp.fullName || "Nhân sự"}
                         </div>
-                        <div className="text-xs text-[#7C879D]">
+                        <div className="text-xs text-[#5F6E85]">
                           {emp.jobTitle || emp.email}
                         </div>
                       </td>
@@ -526,17 +526,17 @@ export default function AccountantPayrollPage() {
                           ? `${new Intl.NumberFormat("vi-VN").format(emp.baseSalary)} đ`
                           : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right text-[#7C879D]">
+                      <td className="px-4 py-3 text-right text-[#5F6E85]">
                         {emp.allowances !== null
                           ? `${new Intl.NumberFormat("vi-VN").format(emp.allowances)} đ`
                           : "—"}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#7C879D]">
+                      <td className="px-4 py-3 text-xs text-[#5F6E85]">
                         {emp.effectiveFrom || "—"}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
-                          className="inline-flex items-center gap-1 text-xs text-[#5D87FF] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-[#3453D1] hover:underline"
                           onClick={() => openHistoryModal(emp)}
                         >
                           <History className="w-3.5 h-3.5" />
@@ -569,7 +569,7 @@ export default function AccountantPayrollPage() {
               <h3 className="font-semibold text-[#2A3547] dark:text-white">
                 Đánh giá kỷ luật & Thưởng chuyên cần tháng {selectedMonth}
               </h3>
-              <p className="text-xs text-[#7C879D] mt-0.5">
+              <p className="text-xs text-[#5F6E85] mt-0.5">
                 Nhân sự chỉ nhận 250.000 đ thưởng chuyên cần khi: đi muộn ≤ 3
                 lần, không nghỉ làm ngày công chuẩn, không về sớm chưa duyệt và
                 đạt tiêu chuẩn kỷ luật.
@@ -595,7 +595,7 @@ export default function AccountantPayrollPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã NV</th>
                   <th className="px-4 py-3">Nhân sự</th>
@@ -623,7 +623,7 @@ export default function AccountantPayrollPage() {
                       key={emp.userId}
                       className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3453D1]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
                       <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
@@ -704,7 +704,7 @@ export default function AccountantPayrollPage() {
                   Chi tiết đợt lương: {selectedRun.title} (
                   {selectedRun.run_code || "BL"})
                 </h3>
-                <p className="text-xs text-[#7C879D] mt-0.5">
+                <p className="text-xs text-[#5F6E85] mt-0.5">
                   Kỳ công: {selectedRun.period_start_date} đến{" "}
                   {selectedRun.period_end_date}
                 </p>
@@ -719,7 +719,7 @@ export default function AccountantPayrollPage() {
 
             <div className="overflow-y-auto my-4 flex-1">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#5F6E85] uppercase">
                   <tr>
                     <th className="px-3 py-2">Mã phiếu</th>
                     <th className="px-3 py-2">Nhân viên</th>
@@ -741,7 +741,7 @@ export default function AccountantPayrollPage() {
                       key={ps.id}
                       className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-3 py-2.5 font-mono text-[#5D87FF]">
+                      <td className="px-3 py-2.5 font-mono text-[#3453D1]">
                         {ps.payslip_code || "PL"}
                       </td>
                       <td className="px-3 py-2.5 font-medium text-[#2A3547] dark:text-white">
@@ -750,33 +750,33 @@ export default function AccountantPayrollPage() {
                       <td className="px-3 py-2.5 text-center">
                         {ps.actual_worked_days} / {ps.standard_working_days}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-[#7C879D]">
+                      <td className="px-3 py-2.5 text-right text-[#5F6E85]">
                         {new Intl.NumberFormat("vi-VN").format(
                           Number(ps.base_salary),
                         )}{" "}
                         đ
                       </td>
-                      <td className="px-3 py-2.5 text-right text-[#7C879D]">
+                      <td className="px-3 py-2.5 text-right text-[#5F6E85]">
                         {new Intl.NumberFormat("vi-VN").format(
                           Number(ps.allowances),
                         )}{" "}
                         đ
                       </td>
-                      <td className="px-3 py-2.5 text-center text-[#7C879D]">
+                      <td className="px-3 py-2.5 text-center text-[#5F6E85]">
                         {ps.late_occurrences || 0} lần ({ps.late_minutes || 0}{" "}
                         p)
                       </td>
-                      <td className="px-3 py-2.5 text-right text-[#FA896B]">
+                      <td className="px-3 py-2.5 text-right text-[#C2410C]">
                         {ps.attendance_penalty_amount
                           ? `-${new Intl.NumberFormat("vi-VN").format(Number(ps.attendance_penalty_amount))} đ`
                           : "0 đ"}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-[#13DEB9]">
+                      <td className="px-3 py-2.5 text-right text-[#0A7F6B]">
                         {ps.attendance_bonus_amount
                           ? `+${new Intl.NumberFormat("vi-VN").format(Number(ps.attendance_bonus_amount))} đ`
                           : "0 đ"}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-bold text-[#13DEB9]">
+                      <td className="px-3 py-2.5 text-right font-bold text-[#0A7F6B]">
                         {new Intl.NumberFormat("vi-VN").format(
                           Number(ps.net_salary),
                         )}{" "}
@@ -801,7 +801,7 @@ export default function AccountantPayrollPage() {
             <div className="flex justify-between items-center pt-4 border-t border-[#EAEFF4] dark:border-[#334155]">
               <div className="text-sm font-semibold text-[#2A3547] dark:text-white">
                 Tổng thực chi:{" "}
-                <span className="text-[#13DEB9]">
+                <span className="text-[#0A7F6B]">
                   {new Intl.NumberFormat("vi-VN").format(
                     Number(selectedRun.total_net_amount),
                   )}{" "}
@@ -831,7 +831,7 @@ export default function AccountantPayrollPage() {
             </h3>
             <div className="space-y-3 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Lương cơ bản (VND) *
                 </label>
                 <input
@@ -844,7 +844,7 @@ export default function AccountantPayrollPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Phụ cấp (VND)
                 </label>
                 <input
@@ -857,7 +857,7 @@ export default function AccountantPayrollPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Ngày hiệu lực (YYYY-MM-01) *
                 </label>
                 <input
@@ -884,7 +884,7 @@ export default function AccountantPayrollPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#7C879D] mb-1">
+                <label className="block text-xs font-semibold text-[#5F6E85] mb-1">
                   Ghi chú điều chỉnh
                 </label>
                 <textarea
@@ -927,18 +927,18 @@ export default function AccountantPayrollPage() {
             </h3>
 
             {loadingHistory ? (
-              <div className="p-8 text-center text-[#7C879D]">
+              <div className="p-8 text-center text-[#5F6E85]">
                 <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />
                 Đang tải lịch sử...
               </div>
             ) : historyList.length === 0 ? (
-              <div className="p-6 text-center text-xs text-[#7C879D]">
+              <div className="p-6 text-center text-xs text-[#5F6E85]">
                 Chưa có phiên bản lương nào được lưu.
               </div>
             ) : (
               <div className="overflow-y-auto max-h-72">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
+                  <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#5F6E85] uppercase">
                     <tr>
                       <th className="px-3 py-2">Hiệu lực từ</th>
                       <th className="px-3 py-2 text-right">Lương cơ bản</th>
@@ -950,7 +950,7 @@ export default function AccountantPayrollPage() {
                   <tbody className="divide-y divide-[#EAEFF4] dark:divide-[#334155]">
                     {historyList.map((h) => (
                       <tr key={h.id}>
-                        <td className="px-3 py-2 font-mono font-medium text-[#5D87FF]">
+                        <td className="px-3 py-2 font-mono font-medium text-[#3453D1]">
                           {h.effectiveFrom}
                         </td>
                         <td className="px-3 py-2 text-right font-medium text-[#2A3547] dark:text-white">
@@ -959,7 +959,7 @@ export default function AccountantPayrollPage() {
                           )}{" "}
                           đ
                         </td>
-                        <td className="px-3 py-2 text-right text-[#7C879D]">
+                        <td className="px-3 py-2 text-right text-[#5F6E85]">
                           {new Intl.NumberFormat("vi-VN").format(
                             Number(h.allowances),
                           )}{" "}
@@ -973,7 +973,7 @@ export default function AccountantPayrollPage() {
                             {h.payrollEligible ? "Tính lương" : "Miễn tính"}
                           </Badge>
                         </td>
-                        <td className="px-3 py-2 text-xs text-[#7C879D]">
+                        <td className="px-3 py-2 text-xs text-[#5F6E85]">
                           {h.notes || "—"}
                         </td>
                       </tr>

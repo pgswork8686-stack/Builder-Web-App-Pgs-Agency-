@@ -173,12 +173,10 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           ),
         );
       } else if (mode === "client") {
-        const [projectData, taskData] = await Promise.all([
-          projectsApi.getClientProject(projectId),
-          tasksApi.list(projectId, { page: 1, pageSize: 100 }),
-        ]);
-        setProject(projectData);
-        setTasks(taskData.items);
+        // Clients never see internal tasks (API returns 403), so only the
+        // client-scoped project payload is requested here.
+        setProject(await projectsApi.getClientProject(projectId));
+        setTasks([]);
       } else {
         const [projectData, memberData, serviceData, taskData, peopleData] =
           await Promise.all([
@@ -380,12 +378,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         },
       );
     }
-    list.push({
-      value: "tasks",
-      label: "Công việc",
-      icon: ListTodo,
-      count: tasks.length,
-    });
+    if (mode !== "client") {
+      list.push({
+        value: "tasks",
+        label: "Công việc",
+        icon: ListTodo,
+        count: tasks.length,
+      });
+    }
     return list;
   }, [mode, members.length, projectServices.length, tasks.length]);
 
@@ -416,7 +416,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   if (!project) {
     return (
       <EmptyState
-        icon={<AlertCircle className="w-8 h-8 text-rose-400" />}
+        icon={<AlertCircle className="w-8 h-8 text-rose-700" />}
         title="Không tìm thấy dự án"
         description={
           error ?? "Dự án không tồn tại hoặc bạn không có quyền truy cập."
@@ -494,18 +494,22 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Tiến độ công việc"
-          value={`${taskProgress}%`}
-          subtitle={`${completedTasks}/${tasks.length} tasks hoàn thành`}
-          icon={<ListTodo className="w-5 h-5" />}
-        />
-        <StatCard
-          title="Đội ngũ nhân sự"
-          value={`${members.length} thành viên`}
-          subtitle={`PM: ${project.projectManager?.full_name || project.projectManager?.email || "Chưa gán"}`}
-          icon={<Users className="w-5 h-5" />}
-        />
+        {mode !== "client" && (
+          <>
+            <StatCard
+              title="Tiến độ công việc"
+              value={`${taskProgress}%`}
+              subtitle={`${completedTasks}/${tasks.length} tasks hoàn thành`}
+              icon={<ListTodo className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Đội ngũ nhân sự"
+              value={`${members.length} thành viên`}
+              subtitle={`PM: ${project.projectManager?.full_name || project.projectManager?.email || "Chưa gán"}`}
+              icon={<Users className="w-5 h-5" />}
+            />
+          </>
+        )}
         <StatCard
           title="Thời hạn bàn giao"
           value={project.dueDate || "Chưa đặt"}
@@ -529,14 +533,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           >
             <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3453D1] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <LayoutDashboard className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#3453D1] transition-colors">
                     Kanban Board
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Kéo thả & phân bổ task thời gian thực
                   </p>
                 </div>
@@ -549,14 +553,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           >
             <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3453D1] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#3453D1] transition-colors">
                     Lịch biểu dự án
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Theo dõi timeline và deadline công việc
                   </p>
                 </div>
@@ -569,14 +573,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           >
             <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3453D1] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <FolderOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#3453D1] transition-colors">
                     Tệp tin & Tài liệu
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Kho lưu trữ và tài liệu bàn giao
                   </p>
                 </div>
@@ -596,14 +600,14 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onClick={() => setTab(value)}
               className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer ${
                 isActive
-                  ? "border-[#4F75FF] text-[#4F75FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  ? "border-[#4F75FF] text-[#3453D1]"
+                  : "border-transparent text-[#5B6B82] hover:text-[#0F172A]"
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{label}</span>
               {typeof count === "number" && (
-                <span className="px-1.5 py-0.2 rounded-full bg-[#F1F5F9] text-[10px] text-[#64748B]">
+                <span className="px-1.5 py-0.2 rounded-full bg-[#F1F5F9] text-[10px] text-[#5B6B82]">
                   {count}
                 </span>
               )}
@@ -626,7 +630,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
               {mode === "admin" && (
                 <div className="pt-4 border-t border-[#EDF2F7] space-y-3">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
                     Chuyển nhanh trạng thái
                   </label>
                   <Select
@@ -654,13 +658,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Công ty khách hàng:</span>
+                <span className="text-[#5B6B82]">Công ty khách hàng:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.clientCompany?.name || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Project Manager:</span>
+                <span className="text-[#5B6B82]">Project Manager:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.projectManager?.full_name ||
                     project.projectManager?.email ||
@@ -668,18 +672,18 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Ngày khởi động:</span>
+                <span className="text-[#5B6B82]">Ngày khởi động:</span>
                 <span className="text-[#0F172A]">
                   {project.startDate || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
-                <span className="text-[#64748B]">Hạn chót bàn giao:</span>
+                <span className="text-[#5B6B82]">Hạn chót bàn giao:</span>
                 <span className="text-[#0F172A]">{project.dueDate || "—"}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-[#64748B]">Ngày nghiệm thu:</span>
-                <span className="text-[#00B788] font-semibold">
+                <span className="text-[#5B6B82]">Ngày nghiệm thu:</span>
+                <span className="text-[#047857] font-semibold">
                   {project.completedAt || "Chưa nghiệm thu"}
                 </span>
               </div>
@@ -726,7 +730,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-[#64748B] py-8"
+                      className="text-center text-[#5B6B82] py-8"
                     >
                       Chưa có thành viên nào được gán vào dự án.
                     </TableCell>
@@ -737,7 +741,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                       <TableCell className="font-bold text-[#0F172A]">
                         {m.profile?.full_name || m.profile?.email}
                       </TableCell>
-                      <TableCell className="text-[#64748B]">
+                      <TableCell className="text-[#5B6B82]">
                         {m.profile?.email}
                       </TableCell>
                       <TableCell>
@@ -800,7 +804,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-[#64748B] py-8"
+                      className="text-center text-[#5B6B82] py-8"
                     >
                       Chưa có dịch vụ nào được gán cho dự án này.
                     </TableCell>
@@ -808,7 +812,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 ) : (
                   projectServices.map((s) => (
                     <TableRow key={s.id}>
-                      <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                      <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                         {s.service?.code || "—"}
                       </TableCell>
                       <TableCell className="font-bold text-[#0F172A]">
@@ -819,7 +823,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                           {s.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {s.notes || "—"}
                       </TableCell>
                     </TableRow>
@@ -860,8 +864,8 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   onClick={() => setTaskView(value)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     taskView === value
-                      ? "bg-white text-[#4F75FF] shadow-sm border border-[#EDF2F7]"
-                      : "text-[#64748B] hover:text-[#0F172A]"
+                      ? "bg-white text-[#3453D1] shadow-sm border border-[#EDF2F7]"
+                      : "text-[#5B6B82] hover:text-[#0F172A]"
                   }`}
                 >
                   {label}
@@ -899,7 +903,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="text-center text-[#64748B] py-8"
+                        className="text-center text-[#5B6B82] py-8"
                       >
                         Chưa có công việc nào trong dự án này.
                       </TableCell>
@@ -910,12 +914,12 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                         <TableCell className="font-bold text-[#0F172A]">
                           <Link
                             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/tasks/${t.id}`}
-                            className="hover:text-[#4F75FF] transition-colors"
+                            className="hover:text-[#3453D1] transition-colors"
                           >
                             {t.title}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-xs text-[#64748B]">
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {t.assignee?.full_name ||
                             t.assignee?.email ||
                             "Chưa gán"}
@@ -940,7 +944,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                             {t.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-xs text-[#64748B]">
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {t.due_date || "—"}
                         </TableCell>
                       </TableRow>
@@ -1080,7 +1084,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         maxWidth="md"
         title={
           <div className="flex items-center gap-2 text-base font-extrabold text-[#0F172A]">
-            <ListTodo className="w-5 h-5 text-[#4F75FF]" />
+            <ListTodo className="w-5 h-5 text-[#3453D1]" />
             Tạo công việc mới
           </div>
         }
@@ -1164,7 +1168,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           {/* Đường dẫn liên kết / Tài liệu (Link URL) */}
           <div>
             <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
-              <LinkIcon className="w-3.5 h-3.5 text-[#4F75FF]" />
+              <LinkIcon className="w-3.5 h-3.5 text-[#3453D1]" />
               Đường dẫn liên kết / Tài liệu trực tuyến (Tùy chọn)
             </label>
             <input
@@ -1181,19 +1185,19 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           {/* Tải lên tệp đính kèm (Upload File) */}
           <div>
             <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
-              <Paperclip className="w-3.5 h-3.5 text-[#4F75FF]" />
+              <Paperclip className="w-3.5 h-3.5 text-[#3453D1]" />
               Tệp tài liệu đính kèm (Upload File)
             </label>
 
             {taskForm.file ? (
               <div className="flex items-center justify-between p-3 rounded-xl border border-[#4F75FF]/30 bg-[#EEF2FF] text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className="w-4 h-4 text-[#4F75FF] shrink-0" />
+                  <FileText className="w-4 h-4 text-[#3453D1] shrink-0" />
                   <div className="min-w-0">
                     <p className="font-bold text-[#0F172A] truncate">
                       {taskForm.file.name}
                     </p>
-                    <p className="text-[11px] text-[#64748B]">
+                    <p className="text-[11px] text-[#5B6B82]">
                       {(taskForm.file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -1201,7 +1205,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 <button
                   type="button"
                   onClick={() => setTaskForm({ ...taskForm, file: null })}
-                  className="p-1 rounded-lg text-[#64748B] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="p-1 rounded-lg text-[#5B6B82] hover:text-rose-600 hover:bg-rose-50 transition-colors"
                 >
                   <CloseIcon className="w-4 h-4" />
                 </button>
@@ -1209,7 +1213,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             ) : (
               <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
                 <UploadCloud className="w-6 h-6 text-[#94A3B8] mb-1" />
-                <span className="text-xs font-bold text-[#4F75FF]">
+                <span className="text-xs font-bold text-[#3453D1]">
                   Chọn tệp từ máy tính để tải lên
                 </span>
                 <span className="text-[11px] text-[#94A3B8] mt-0.5">
@@ -1231,7 +1235,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           {/* Progress if uploading */}
           {creatingTask && uploadProgress > 0 && uploadProgress < 100 && (
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-[#64748B]">
+              <div className="flex justify-between text-[11px] text-[#5B6B82]">
                 <span>Đang tải tệp lên...</span>
                 <span>{uploadProgress}%</span>
               </div>
@@ -1293,7 +1297,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#5B6B82] leading-relaxed">
             Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
             tra cứu và kiểm toán.
           </p>

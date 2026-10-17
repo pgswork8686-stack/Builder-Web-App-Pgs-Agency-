@@ -1,15 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-interface MonthCalendarProps {
-  highlightSunday?: boolean;
+export interface CalendarDayItem {
+  key: string;
+  label: string;
+  tone?: "default" | "danger" | "success" | "muted";
+  href?: string;
 }
 
-export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
+interface MonthCalendarProps {
+  highlightSunday?: boolean;
+  /** Items keyed by ISO date (YYYY-MM-DD) rendered inside each day cell. */
+  items?: Record<string, CalendarDayItem[]>;
+  /** Fired on mount and whenever the visible month changes. */
+  onMonthChange?: (range: { from: string; to: string }) => void;
+  loading?: boolean;
+}
+
+const TONE_CLASS: Record<NonNullable<CalendarDayItem["tone"]>, string> = {
+  default: "bg-[#EEF2FF] text-[#3730A3]",
+  danger: "bg-rose-50 text-rose-700",
+  success: "bg-emerald-50 text-emerald-700",
+  muted: "bg-[#EDF2F7] text-[#475569]",
+};
+
+export function MonthCalendar({
+  highlightSunday = true,
+  items,
+  onMonthChange,
+  loading = false,
+}: MonthCalendarProps) {
   const today = new Date();
   const [viewDate, setViewDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1),
@@ -17,6 +42,17 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
+
+  useEffect(() => {
+    if (!onMonthChange) return;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const last = new Date(year, month + 1, 0).getDate();
+    onMonthChange({
+      from: `${year}-${pad(month + 1)}-01`,
+      to: `${year}-${pad(month + 1)}-${pad(last)}`,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, month]);
 
   // First weekday of month (0=Sun, convert to Mon-based: Mon=0...Sun=6)
   const firstDayRaw = new Date(year, month, 1).getDay();
@@ -30,6 +66,9 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
 
   const monthLabel = `Tháng ${month + 1}, ${year}`;
   const daysOfWeek = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+  const iso = (day: number) =>
+    `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
   const isToday = (day: number) =>
     day === today.getDate() &&
@@ -50,6 +89,14 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
         </Button>
         <span className="text-sm font-extrabold text-[#24304A]">
           {monthLabel}
+          {loading && (
+            <span
+              className="ml-2 text-xs font-medium text-[#5F6E85]"
+              role="status"
+            >
+              Đang tải...
+            </span>
+          )}
         </span>
         <Button
           variant="secondary"
@@ -69,8 +116,8 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
               key={d}
               className={`text-xs font-bold ${
                 highlightSunday && d === "CN"
-                  ? "text-rose-400"
-                  : "text-[#7C879D]"
+                  ? "text-rose-700"
+                  : "text-[#5F6E85]"
               }`}
             >
               {d}
@@ -102,17 +149,43 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                 <span
                   className={`text-xs font-bold ${
                     todayCell
-                      ? "text-[#5D87FF]"
+                      ? "text-[#3453D1]"
                       : highlightSunday && isSunday
-                        ? "text-rose-400"
+                        ? "text-rose-700"
                         : "text-[#24304A]"
                   }`}
                 >
                   {day}
                 </span>
                 {todayCell && (
-                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#5D87FF] text-white w-fit truncate">
+                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#3F63D6] text-white w-fit truncate">
                     Hôm nay
+                  </span>
+                )}
+                {(items?.[iso(day)] ?? []).slice(0, 3).map((item) => {
+                  const className = `text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded truncate ${TONE_CLASS[item.tone ?? "default"]}`;
+                  return item.href ? (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      title={item.label}
+                      className={`${className} hover:underline`}
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span
+                      key={item.key}
+                      title={item.label}
+                      className={className}
+                    >
+                      {item.label}
+                    </span>
+                  );
+                })}
+                {(items?.[iso(day)]?.length ?? 0) > 3 && (
+                  <span className="text-[9px] text-[#5F6E85]">
+                    +{(items?.[iso(day)]?.length ?? 0) - 3} nữa
                   </span>
                 )}
               </div>

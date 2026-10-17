@@ -142,7 +142,7 @@ function statusClasses(status: AutomationExecutionStatus) {
     running: "bg-amber-400 text-black",
     success: "bg-emerald-400 text-black",
     failed: "bg-red-500 text-white",
-    skipped: "bg-[#F1F5F9] text-[#64748B]",
+    skipped: "bg-[#F1F5F9] text-[#5B6B82]",
   };
   return classes[status];
 }
@@ -307,14 +307,14 @@ export function AutomationWorkspace() {
         <aside className="space-y-6">
           <Card className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="font-bold text-[#0F172A] text-sm">
                   Tạo quy tắc mới
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Hành động chuẩn hóa: `create_notification`.
                 </p>
               </div>
@@ -322,7 +322,7 @@ export function AutomationWorkspace() {
 
             <div className="space-y-3 pt-2">
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Tên quy tắc *
                 </span>
                 <input
@@ -334,7 +334,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Trigger sự kiện *
                 </span>
                 <select
@@ -353,7 +353,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Điều kiện so khớp JSON
                 </span>
                 <textarea
@@ -367,7 +367,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Đối tượng nhận thông báo *
                 </span>
                 <select
@@ -386,7 +386,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Tiêu đề thông báo
                 </span>
                 <input
@@ -398,7 +398,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Nội dung thông báo
                 </span>
                 <textarea
@@ -410,7 +410,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#5B6B82]">
                   Internal Action URL
                 </span>
                 <input
@@ -437,7 +437,7 @@ export function AutomationWorkspace() {
 
           <Card className="p-5 space-y-3">
             <div className="flex items-center gap-2.5">
-              <Play className="h-4 w-4 text-[#4F75FF]" />
+              <Play className="h-4 w-4 text-[#3453D1]" />
               <h2 className="font-bold text-[#0F172A] text-sm">
                 Chạy thử nghiệm
               </h2>
@@ -526,20 +526,20 @@ export function AutomationWorkspace() {
                 <h2 className="font-extrabold text-[#0F172A] text-sm">
                   Danh sách quy tắc
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Đảm bảo Idempotency và cách ly lỗi an toàn.
                 </p>
               </div>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#64748B]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+              <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#5B6B82]">
+                <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
                 Đang tải danh sách quy tắc...
               </div>
             ) : rules.length === 0 ? (
               <EmptyState
-                icon={<Bot className="w-8 h-8 text-[#4F75FF]" />}
+                icon={<Bot className="w-8 h-8 text-[#3453D1]" />}
                 title="Chưa có quy tắc nào"
                 description="Tạo quy tắc tự động hóa đầu tiên bằng biểu mẫu bên trái."
               />
@@ -566,7 +566,7 @@ export function AutomationWorkspace() {
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
                           </Badge>
                         </div>
-                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-[11px] font-mono text-[#64748B]">
+                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-[11px] font-mono text-[#5B6B82]">
                           {JSON.stringify(
                             {
                               conditions: rule.conditions,
@@ -601,7 +601,7 @@ export function AutomationWorkspace() {
               <h2 className="font-extrabold text-[#0F172A] text-sm">
                 Lịch sử thực thi
               </h2>
-              <p className="text-[11px] text-[#64748B]">
+              <p className="text-[11px] text-[#5B6B82]">
                 Ghi nhận chi tiết kết quả chạy tự động.
               </p>
             </div>

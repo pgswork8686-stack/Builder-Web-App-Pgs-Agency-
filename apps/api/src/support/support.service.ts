@@ -238,7 +238,7 @@ export class SupportService {
     let dbQuery = this.client
       .from('support_tickets')
       .select(
-        '*, client_company:client_companies(id, name, client_company_code), project:projects(id, name, project_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, user_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, user_code)',
+        '*, client_company:client_companies(id, name, code, client_code), project:projects(id, name, project_code), creator:profiles!support_tickets_creator_user_id_fkey(id, full_name, email, account_code), assignee:profiles!support_tickets_assignee_user_id_fkey(id, full_name, email, account_code)',
         { count: 'exact' },
       );
 

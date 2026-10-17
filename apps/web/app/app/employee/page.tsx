@@ -110,7 +110,7 @@ export default function EmployeeDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
             Chào {userName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-xs sm:text-sm text-[#5F6E85] mt-1">
             Không gian làm việc cá nhân, quản lý nhiệm vụ và lịch trình hôm nay.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function EmployeeDashboardPage() {
             <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
               Bạn có {taskCount} công việc hôm nay
             </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#7A5700] leading-relaxed font-medium">
               Ưu tiên hoàn thành các đầu việc có deadline gần và cập nhật trạng
               thái trên bảng Kanban.
             </p>
@@ -165,12 +165,12 @@ export default function EmployeeDashboardPage() {
         {/* Chấm công Card */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">Chấm công</span>
+            <span className="text-xs font-bold text-[#5F6E85]">Chấm công</span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
               {checkedInTime || "Chưa check-in"}
             </div>
           </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
+          <span className="text-xs font-semibold text-[#0A7F6B] flex items-center gap-1 mt-4">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {checkedInTime ? "Đúng giờ" : "Vui lòng chấm công trước 08:30"}
           </span>
@@ -179,14 +179,14 @@ export default function EmployeeDashboardPage() {
         {/* Ngày phép còn Card */}
         <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-bold text-[#7C879D]">
+            <span className="text-xs font-bold text-[#5F6E85]">
               Ngày phép còn
             </span>
             <div className="text-3xl font-black text-[#24304A] mt-2">
               {leaveDaysRemaining.toString().padStart(2, "0")}
             </div>
           </div>
-          <span className="text-xs font-bold text-[#FFC400] mt-4">
+          <span className="text-xs font-bold text-[#854D0E] mt-4">
             Ngày phép năm 2026
           </span>
         </div>
@@ -195,29 +195,29 @@ export default function EmployeeDashboardPage() {
       {/* 5-Metric Row: Hôm nay, Đang làm, Chờ duyệt, Quá hạn, Dự án */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Hôm nay</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Hôm nay</span>
           <p className="text-2xl font-black text-[#24304A] mt-2">
             {taskCount.toString().padStart(2, "0")}
           </p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Đang làm</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Đang làm</span>
           <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Chờ duyệt</span>
           <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
         </Card>
 
         <Card className="p-4">
-          <span className="text-xs font-bold text-[#7C879D]">Quá hạn</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Quá hạn</span>
           <p className="text-2xl font-black text-[#24304A] mt-2">00</p>
         </Card>
 
         <Card className="p-4 col-span-2 sm:col-span-1">
-          <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
+          <span className="text-xs font-bold text-[#5F6E85]">Dự án</span>
           <p className="text-2xl font-black text-[#24304A] mt-2">
             {projectCount.toString().padStart(2, "0")}
           </p>
@@ -233,7 +233,7 @@ export default function EmployeeDashboardPage() {
             </h3>
             <Link
               href="/app/employee/tasks"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#3453D1] hover:underline flex items-center gap-1"
             >
               Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -241,7 +241,7 @@ export default function EmployeeDashboardPage() {
 
           <Card className="p-6 text-center">
             <EmptyState
-              icon={<ListTodo className="w-8 h-8 text-[#7C879D]" />}
+              icon={<ListTodo className="w-8 h-8 text-[#5F6E85]" />}
               title="Không có công việc nào cần xử lý gấp"
               description="Bạn đã hoàn thành tất cả công việc hoặc chưa có task mới được giao."
             />
@@ -253,11 +253,11 @@ export default function EmployeeDashboardPage() {
             <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
               Lịch hôm nay
             </h3>
-            <span className="text-xs text-[#7C879D]">Tháng 8/2026</span>
+            <span className="text-xs text-[#5F6E85]">Tháng 8/2026</span>
           </div>
 
           <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
+            <p className="text-xs text-[#5F6E85]">
               Không có sự kiện hoặc cuộc họp nào được lên lịch hôm nay.
             </p>
           </Card>
@@ -287,7 +287,7 @@ export default function EmployeeDashboardPage() {
               href="/app/employee/tasks"
               className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] hover:bg-[#E0EAFF] transition-all text-center block"
             >
-              <span className="text-xs font-bold text-[#5D87FF]">
+              <span className="text-xs font-bold text-[#3453D1]">
                 Cập nhật tiến độ
               </span>
             </Link>

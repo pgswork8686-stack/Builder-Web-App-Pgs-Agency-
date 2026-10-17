@@ -210,7 +210,7 @@ export function FileManager({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 text-[#64748B]">
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 text-[#5B6B82]">
           Đang tải tệp…
         </div>
       ) : files.length === 0 ? (
@@ -220,7 +220,7 @@ export function FileManager({
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
           <table className="w-full min-w-[760px] text-left text-xs">
-            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#F8FAFC]">
+            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#5B6B82] bg-[#F8FAFC]">
               <tr>
                 <th className="p-4">Tệp</th>
                 <th className="p-4">Kích thước</th>
@@ -238,20 +238,20 @@ export function FileManager({
                 >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
-                      <FileText className="h-4 w-4 text-[#4F75FF]" />
+                      <FileText className="h-4 w-4 text-[#3453D1]" />
                       {file.originalName}
                     </span>
                     <p className="mt-0.5 text-[11px] text-[#94A3B8]">
                       {file.mimeType}
                     </p>
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {formatSize(file.sizeBytes)}
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {file.uploader?.full_name || file.uploader?.email || "—"}
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {file.task?.title || "Tệp dự án"}
                   </td>
                   <td className="p-4 text-[#94A3B8] font-mono">
@@ -263,7 +263,7 @@ export function FileManager({
                         type="button"
                         onClick={() => void download(file)}
                         aria-label={`Tải xuống ${file.originalName}`}
-                        className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+                        className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#5B6B82] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
                       >
                         <Download className="h-4 w-4" />
                       </button>
@@ -295,7 +295,7 @@ export function FileManager({
           >
             Trước
           </button>
-          <span className="text-[#64748B]">
+          <span className="text-[#5B6B82]">
             Trang {page}/{totalPages}
           </span>
           <button

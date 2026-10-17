@@ -122,7 +122,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         <button
           type="button"
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-2 rounded-xl text-[#7C879D] hover:text-[#161827] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="lg:hidden p-2 rounded-xl text-[#5F6E85] hover:text-[#161827] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           aria-label="Mở menu điều hướng"
         >
           <Menu className="w-5 h-5" />
@@ -141,7 +141,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         {/* Quick Chat Link */}
         <Link
           href="/app/chat"
-          className="relative p-2 rounded-xl text-[#7C879D] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
+          className="relative p-2 rounded-xl text-[#5F6E85] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
           title="Tin nhắn nội bộ"
           aria-label="Tin nhắn nội bộ"
         >
@@ -165,13 +165,13 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
               <span className="text-xs font-bold text-[#161827] tracking-tight truncate max-w-[130px]">
                 {displayName}
               </span>
-              <span className="text-[10px] text-[#7C879D] font-medium truncate max-w-[130px]">
+              <span className="text-[10px] text-[#5F6E85] font-medium truncate max-w-[130px]">
                 {account.role
                   ? ROLE_LABELS[account.role].split("(")[0].trim()
                   : "Người dùng"}
               </span>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-[#7C879D] hidden sm:block mr-1" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#5F6E85] hidden sm:block mr-1" />
           </button>
 
           {/* Dropdown Menu */}
@@ -196,7 +196,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
                 >
-                  <User className="w-4 h-4 text-[#7C879D]" />
+                  <User className="w-4 h-4 text-[#5F6E85]" />
                   <span>Hồ sơ cá nhân</span>
                 </Link>
 
@@ -216,7 +216,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
                 >
-                  <ExternalLink className="w-4 h-4 text-[#7C879D]" />
+                  <ExternalLink className="w-4 h-4 text-[#5F6E85]" />
                   <span>Đổi mật khẩu</span>
                 </Link>
               </div>

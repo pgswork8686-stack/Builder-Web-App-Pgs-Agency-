@@ -27,7 +27,7 @@ export default function AccountantVouchersPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<FolderOpen className="w-10 h-10 text-[#7C879D]" />}
+          icon={<FolderOpen className="w-10 h-10 text-[#5F6E85]" />}
           title="Kho chứng từ hiện đang trống"
           description="Tải lên tệp chứng từ đầu tiên để lưu trữ bảo mật trên hệ thống."
         />

@@ -28,15 +28,15 @@ export function Badge({
   };
 
   const variantStyles = {
-    default: "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]",
+    default: "bg-[#F1F5F9] text-[#526077] border border-[#E2E8F0]",
     brand:
-      "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold shadow-2xs",
-    blue: "bg-[#EEF2FF] text-[#4F75FF] border border-[#E0EAFF] font-semibold",
-    gold: "bg-[#FFF8E5] text-[#9A7000] border border-[#FDE68A] font-bold",
+      "bg-[#FFF8E5] text-[#7A5700] border border-[#FDE68A] font-bold shadow-2xs",
+    blue: "bg-[#EEF2FF] text-[#3453D1] border border-[#E0EAFF] font-semibold",
+    gold: "bg-[#FFF8E5] text-[#7A5700] border border-[#FDE68A] font-bold",
     success:
-      "bg-[#E6FBF5] text-[#00B788] border border-[#A7F3D0] font-semibold",
+      "bg-[#E6FBF5] text-[#047857] border border-[#A7F3D0] font-semibold",
     warning:
-      "bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] font-semibold",
+      "bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] font-semibold",
     danger: "bg-[#FEE2E2] text-[#EF4444] border border-[#FECACA] font-semibold",
     purple: "bg-[#F3E8FF] text-[#7356F1] border border-[#E9D5FF] font-semibold",
     cyan: "bg-[#E0F7FE] text-[#0284C7] border border-[#BAE6FD] font-semibold",

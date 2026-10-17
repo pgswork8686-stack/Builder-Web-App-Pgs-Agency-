@@ -141,7 +141,7 @@ export function Sidebar({
         {navGroups.map((group, groupIdx) => (
           <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
                 {group.groupTitle}
               </div>
             )}
@@ -165,7 +165,7 @@ export function Sidebar({
                   {!collapsed && (
                     <span
                       className={`text-[10px] font-mono font-medium ${
-                        active ? "text-[#E7AE18]" : "text-[#64748B]"
+                        active ? "text-[#E7AE18]" : "text-[#94A3B8]"
                       }`}
                     >
                       {itemNum}

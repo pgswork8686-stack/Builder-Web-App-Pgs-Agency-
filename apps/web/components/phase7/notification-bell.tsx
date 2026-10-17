@@ -173,7 +173,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#64748B] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#F8FAFC] shadow-2xs"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#5B6B82] transition hover:border-[#4F75FF]/30 hover:text-[#3453D1] hover:bg-[#F8FAFC] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
@@ -189,7 +189,7 @@ export function NotificationBell() {
           <div className="flex items-center justify-between border-b border-[#EDF2F7] px-4 py-3 bg-[#F8FAFC]">
             <div>
               <div className="text-sm font-bold text-[#0F172A]">Thông báo</div>
-              <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#64748B]">
+              <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#5B6B82]">
                 {connectionState === "denied" ? (
                   <WifiOff className="h-3 w-3 text-red-500" />
                 ) : (
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#3453D1] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -235,8 +235,8 @@ export function NotificationBell() {
                 </button>
               </div>
             ) : loading ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#64748B]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+              <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#5B6B82]">
+                <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
@@ -259,7 +259,7 @@ export function NotificationBell() {
                       <div className="line-clamp-1 text-xs font-bold text-[#0F172A]">
                         {item.title}
                       </div>
-                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#64748B]">
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5B6B82]">
                         {item.message}
                       </p>
                       <div className="mt-2 text-[10px] font-mono text-[#94A3B8]">
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
+                            className="rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B6B82] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>
@@ -293,7 +293,7 @@ export function NotificationBell() {
 
           <Link
             href="/app/notifications"
-            className="block border-t border-[#EDF2F7] bg-[#F8FAFC] px-4 py-2.5 text-center text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+            className="block border-t border-[#EDF2F7] bg-[#F8FAFC] px-4 py-2.5 text-center text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
           >
             Xem trung tâm thông báo
           </Link>

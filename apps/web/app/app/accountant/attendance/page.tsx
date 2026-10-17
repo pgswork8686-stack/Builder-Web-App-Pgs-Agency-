@@ -313,8 +313,8 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("company")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "company"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
-                  : "text-[#7C879D] hover:text-[#24304A]"
+                  ? "bg-white text-[#3453D1] shadow-xs"
+                  : "text-[#5F6E85] hover:text-[#24304A]"
               }`}
             >
               Toàn công ty
@@ -323,8 +323,8 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("personal")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "personal"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
-                  : "text-[#7C879D] hover:text-[#24304A]"
+                  ? "bg-white text-[#3453D1] shadow-xs"
+                  : "text-[#5F6E85] hover:text-[#24304A]"
               }`}
             >
               Chấm công của tôi
@@ -339,7 +339,7 @@ export default function AccountantAttendancePage() {
           <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Từ ngày
                 </label>
                 <input
@@ -354,7 +354,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Đến ngày
                 </label>
                 <input
@@ -369,7 +369,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Phòng ban
                 </label>
                 <select
@@ -390,7 +390,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Đội nhóm (Team)
                 </label>
                 <select
@@ -411,7 +411,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Trạng thái
                 </label>
                 <select
@@ -442,7 +442,7 @@ export default function AccountantAttendancePage() {
             </div>
           ) : records.length === 0 ? (
             <EmptyState
-              icon={<Clock className="w-8 h-8 text-[#5D87FF]" />}
+              icon={<Clock className="w-8 h-8 text-[#3453D1]" />}
               title="Không có dữ liệu chấm công"
               description="Không tìm thấy bản ghi chấm công nào phù hợp với bộ lọc đã chọn."
             />
@@ -471,7 +471,7 @@ export default function AccountantAttendancePage() {
                       <TableRow key={r.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#5D87FF] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
+                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3453D1] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
                               {(emp?.full_name || emp?.work_email || "U")
                                 .charAt(0)
                                 .toUpperCase()}
@@ -480,7 +480,7 @@ export default function AccountantAttendancePage() {
                               <span className="block font-bold text-xs text-[#24304A]">
                                 {emp?.full_name || "Chưa có tên"}
                               </span>
-                              <span className="block text-[11px] text-[#7C879D] font-mono">
+                              <span className="block text-[11px] text-[#5F6E85] font-mono">
                                 {emp?.work_email || emp?.employee_code || "—"}
                               </span>
                             </div>
@@ -493,14 +493,14 @@ export default function AccountantAttendancePage() {
 
                         <TableCell className="text-xs">
                           {r.check_in_at ? (
-                            <span className="font-mono font-bold text-[#13DEB9]">
+                            <span className="font-mono font-bold text-[#0A7F6B]">
                               {new Date(r.check_in_at).toLocaleTimeString(
                                 "vi-VN",
                                 { hour: "2-digit", minute: "2-digit" },
                               )}
                             </span>
                           ) : (
-                            <span className="text-[#7C879D]">—</span>
+                            <span className="text-[#5F6E85]">—</span>
                           )}
                           {r.late_minutes ? (
                             <span className="block text-[10px] text-amber-600 font-medium">
@@ -511,14 +511,14 @@ export default function AccountantAttendancePage() {
 
                         <TableCell className="text-xs">
                           {r.check_out_at ? (
-                            <span className="font-mono font-bold text-[#5D87FF]">
+                            <span className="font-mono font-bold text-[#3453D1]">
                               {new Date(r.check_out_at).toLocaleTimeString(
                                 "vi-VN",
                                 { hour: "2-digit", minute: "2-digit" },
                               )}
                             </span>
                           ) : (
-                            <span className="text-[#7C879D]">—</span>
+                            <span className="text-[#5F6E85]">—</span>
                           )}
                           {r.early_leave_minutes ? (
                             <span className="block text-[10px] text-amber-600 font-medium">
@@ -533,7 +533,7 @@ export default function AccountantAttendancePage() {
 
                         <TableCell>{getStatusBadge(r.status)}</TableCell>
 
-                        <TableCell className="text-xs text-[#7C879D] max-w-[200px] truncate">
+                        <TableCell className="text-xs text-[#5F6E85] max-w-[200px] truncate">
                           {r.check_in_note || r.check_out_note || "—"}
                         </TableCell>
                       </TableRow>
@@ -546,7 +546,7 @@ export default function AccountantAttendancePage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#7C879D]">
+            <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5F6E85]">
               <span>
                 Trang {page} / {totalPages} ({total} bản ghi)
               </span>
@@ -637,7 +637,7 @@ export default function AccountantAttendancePage() {
                   <h3 className="text-lg font-bold text-[#24304A] tracking-tight">
                     Điểm danh ca làm việc cá nhân
                   </h3>
-                  <p className="text-xs text-[#7C879D]">
+                  <p className="text-xs text-[#5F6E85]">
                     Văn phòng:{" "}
                     <span className="font-medium text-[#24304A]">
                       Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
@@ -650,7 +650,7 @@ export default function AccountantAttendancePage() {
                   <MapPin
                     className={`w-4 h-4 ${
                       geoCoords
-                        ? "text-[#13DEB9]"
+                        ? "text-[#0A7F6B]"
                         : "text-amber-500 animate-pulse"
                     }`}
                   />
@@ -715,7 +715,7 @@ export default function AccountantAttendancePage() {
               </h4>
               <div className="space-y-3 text-xs border-t border-[#EDF2F7] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Trạng thái:</span>
+                  <span className="text-[#5F6E85]">Trạng thái:</span>
                   <span>
                     {personalSummary?.today?.status
                       ? getStatusBadge(personalSummary.today.status)
@@ -723,7 +723,7 @@ export default function AccountantAttendancePage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Check-in:</span>
+                  <span className="text-[#5F6E85]">Check-in:</span>
                   <span className="font-mono font-bold text-[#24304A]">
                     {personalSummary?.today?.checkInAt
                       ? new Date(
@@ -733,7 +733,7 @@ export default function AccountantAttendancePage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Check-out:</span>
+                  <span className="text-[#5F6E85]">Check-out:</span>
                   <span className="font-mono font-bold text-[#24304A]">
                     {personalSummary?.today?.checkOutAt
                       ? new Date(

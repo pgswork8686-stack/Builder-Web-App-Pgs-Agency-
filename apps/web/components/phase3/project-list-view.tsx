@@ -196,6 +196,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </div>
 
         <select
+          aria-label="Lọc theo trạng thái dự án"
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
           className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
@@ -209,6 +210,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </select>
 
         <select
+          aria-label="Lọc theo độ ưu tiên dự án"
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
           className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
@@ -248,7 +250,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </div>
       ) : result.items.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<FolderOpen className="w-8 h-8 text-[#3453D1]" />}
           title="Không tìm thấy dự án nào"
           description="Chưa có dự án nào phù hợp với bộ lọc hiện tại hoặc bạn chưa được gán vào dự án."
           actionLabel={mode === "admin" ? "Tạo dự án đầu tiên" : undefined}
@@ -271,13 +273,13 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                 <Link href={`${detailBase}/${project.id}`}>
                   <Card className="p-5 hover:border-[#4F75FF]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-start gap-4 min-w-0 pr-12 md:pr-0">
-                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3453D1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <BriefcaseBusiness className="w-5 h-5" />
                       </div>
 
                       <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono text-xs font-bold text-[#4F75FF]">
+                          <span className="font-mono text-xs font-bold text-[#3453D1]">
                             {project.projectCode}
                           </span>
                           <Badge variant={sConf.variant} size="sm">
@@ -288,11 +290,11 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors truncate">
+                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#3453D1] transition-colors truncate">
                           {project.name}
                         </h3>
 
-                        <p className="text-xs text-[#64748B] truncate">
+                        <p className="text-xs text-[#5B6B82] truncate">
                           Khách hàng:{" "}
                           <span className="text-[#0F172A] font-medium">
                             {project.clientCompany?.name ?? "Chưa liên kết"}
@@ -301,7 +303,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#64748B] shrink-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#5B6B82] shrink-0">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span>
@@ -325,7 +327,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                         </Button>
                       )}
 
-                      <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
+                      <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#3453D1] group-hover:translate-x-1 transition-all hidden md:block" />
                     </div>
                   </Card>
                 </Link>
@@ -337,7 +339,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
       {/* Pagination Footer */}
       {result.totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
           <span>
             Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
             dự án)
@@ -393,7 +395,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#5B6B82] leading-relaxed">
             Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
             tra cứu và kiểm toán.
           </p>

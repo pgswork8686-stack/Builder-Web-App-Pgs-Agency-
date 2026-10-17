@@ -60,7 +60,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error ? (
           <p className="text-xs text-[#FF785A]">{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-[#64748B]">{helperText}</p>
+          <p className="text-xs text-[#5B6B82]">{helperText}</p>
         ) : null}
       </div>
     );

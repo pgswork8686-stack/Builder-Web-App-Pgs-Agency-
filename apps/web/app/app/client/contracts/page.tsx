@@ -83,7 +83,7 @@ export default function ClientContractsPage() {
         </div>
       ) : contracts.length === 0 ? (
         <EmptyState
-          icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
           title="Chưa có hợp đồng nào"
           description="Không có hợp đồng nào được công khai cho tài khoản của bạn."
         />
@@ -98,7 +98,7 @@ export default function ClientContractsPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-start gap-3">
                     <div>
-                      <span className="text-[11px] font-mono text-[#64748B] font-bold block">
+                      <span className="text-[11px] font-mono text-[#5B6B82] font-bold block">
                         MÃ SỐ: {c.contract_number}
                       </span>
                       <h4 className="font-extrabold text-[#0F172A] text-base mt-0.5">
@@ -123,8 +123,8 @@ export default function ClientContractsPage() {
                     </Badge>
                   </div>
 
-                  <div className="text-xs text-[#64748B] flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#4F75FF]" />
+                  <div className="text-xs text-[#5B6B82] flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-[#3453D1]" />
                     <span>
                       Hiệu lực:{" "}
                       <span className="font-mono text-[#0F172A] font-semibold">
@@ -137,10 +137,10 @@ export default function ClientContractsPage() {
 
                 <div className="border-t border-[#EDF2F7] pt-4 flex justify-between items-end">
                   <div>
-                    <span className="text-[10px] font-bold text-[#64748B] uppercase block">
+                    <span className="text-[10px] font-bold text-[#5B6B82] uppercase block">
                       Giá trị hợp đồng
                     </span>
-                    <span className="text-lg font-black text-[#4F75FF] block mt-0.5">
+                    <span className="text-lg font-black text-[#3453D1] block mt-0.5">
                       {formatCurrency(c.contract_value, c.currency_code)}
                     </span>
                   </div>
@@ -151,7 +151,7 @@ export default function ClientContractsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
+            <div className="flex items-center justify-between text-xs text-[#5B6B82] pt-4 border-t border-[#EDF2F7]">
               <span>
                 Hiển thị{" "}
                 <span className="font-bold text-[#0F172A]">

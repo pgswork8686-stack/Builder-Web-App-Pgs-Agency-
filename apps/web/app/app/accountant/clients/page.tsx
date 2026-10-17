@@ -51,7 +51,7 @@ export default function AccountantClientsPage() {
       {clients.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<Briefcase className="w-10 h-10 text-[#7C879D]" />}
+            icon={<Briefcase className="w-10 h-10 text-[#5F6E85]" />}
             title="Chưa có khách hàng nào trong hệ thống"
             description="Danh bạ khách hàng doanh nghiệp sẽ hiển thị tại đây khi được thêm mới."
           />
@@ -71,16 +71,16 @@ export default function AccountantClientsPage() {
             <TableBody>
               {clients.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                     {c.code}
                   </TableCell>
                   <TableCell className="font-bold text-xs text-[#24304A]">
                     {c.name}
                   </TableCell>
-                  <TableCell className="text-xs text-[#7C879D] font-mono">
+                  <TableCell className="text-xs text-[#5F6E85] font-mono">
                     {c.taxCode || "—"}
                   </TableCell>
-                  <TableCell className="text-xs text-[#7C879D]">
+                  <TableCell className="text-xs text-[#5F6E85]">
                     {c.contactPerson || "—"}
                   </TableCell>
                   <TableCell>

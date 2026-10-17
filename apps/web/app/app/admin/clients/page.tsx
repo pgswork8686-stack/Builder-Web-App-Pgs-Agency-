@@ -332,7 +332,7 @@ export default function AdminClientsPage() {
         </div>
       ) : companies.length === 0 ? (
         <EmptyState
-          icon={<Building2 className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<Building2 className="w-8 h-8 text-[#3453D1]" />}
           title="Không tìm thấy khách hàng"
           description="Chưa có dữ liệu công ty đối tác nào phù hợp."
           actionLabel="Tạo khách hàng mới"
@@ -357,7 +357,7 @@ export default function AdminClientsPage() {
             <TableBody>
               {companies.map((comp) => (
                 <TableRow key={comp.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
                     {comp.clientCode || comp.code}
                   </TableCell>
 
@@ -373,7 +373,7 @@ export default function AdminClientsPage() {
                           }
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-[#64748B] hover:text-[#4F75FF] flex items-center gap-1 mt-0.5"
+                          className="text-[11px] text-[#5B6B82] hover:text-[#3453D1] flex items-center gap-1 mt-0.5"
                         >
                           <Globe className="w-3 h-3 text-blue-500" />
                           <span>
@@ -384,7 +384,7 @@ export default function AdminClientsPage() {
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-xs text-[#64748B]">
+                  <TableCell className="text-xs text-[#5B6B82]">
                     {comp.email && (
                       <div className="flex items-center gap-1">
                         <Mail className="w-3 h-3 text-[#94A3B8]" />
@@ -443,7 +443,7 @@ export default function AdminClientsPage() {
                     </div>
                   </TableCell>
 
-                  <TableCell className="font-mono text-xs text-[#64748B]">
+                  <TableCell className="font-mono text-xs text-[#5B6B82]">
                     {comp.taxCode || "—"}
                   </TableCell>
 
@@ -471,7 +471,7 @@ export default function AdminClientsPage() {
                         size="sm"
                         onClick={() => handleEdit(comp)}
                         title="Chỉnh sửa thông tin"
-                        className="text-[#64748B] hover:text-[#0F172A]"
+                        className="text-[#5B6B82] hover:text-[#0F172A]"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -804,7 +804,7 @@ export default function AdminClientsPage() {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#5B6B82] leading-relaxed">
             Hồ sơ doanh nghiệp, tài khoản liên kết và toàn bộ dự án vẫn được giữ
             nguyên để bảo toàn lịch sử vận hành.
           </p>

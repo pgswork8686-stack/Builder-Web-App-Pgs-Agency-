@@ -175,7 +175,7 @@ export default function AdminPendingAccountsPage() {
           {notification.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
           )}
           <span>{notification.message}</span>
         </div>
@@ -201,7 +201,7 @@ export default function AdminPendingAccountsPage() {
           />
         </div>
 
-        <div className="text-xs text-[#64748B] hidden sm:block">
+        <div className="text-xs text-[#5B6B82] hidden sm:block">
           Hiển thị:{" "}
           <span className="font-bold text-[#0F172A]">
             {filteredUsers.length}
@@ -259,7 +259,7 @@ export default function AdminPendingAccountsPage() {
                           <p className="font-bold text-[#0F172A]">
                             {user.fullName || "Chưa đặt tên"}
                           </p>
-                          <p className="text-xs text-[#64748B]">{user.email}</p>
+                          <p className="text-xs text-[#5B6B82]">{user.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -272,7 +272,7 @@ export default function AdminPendingAccountsPage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#5B6B82]">
                       {new Date(user.createdAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",
                         month: "2-digit",
@@ -341,7 +341,7 @@ export default function AdminPendingAccountsPage() {
       >
         <div className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
               Lý do từ chối *
             </label>
             <textarea

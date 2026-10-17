@@ -199,7 +199,7 @@ export default function AdminSettingsPage() {
       />
 
       {loading ? (
-        <div className="p-12 text-center text-[#7C879D]">
+        <div className="p-12 text-center text-[#5F6E85]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
           Đang tải thông số cấu hình...
         </div>
@@ -212,14 +212,14 @@ export default function AdminSettingsPage() {
           <Card className="p-6 space-y-4 border border-[#4F75FF]/30 bg-[#EEF2FF]/40 shadow-xs md:col-span-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#4F75FF] text-white flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-[#3F63D6] text-white flex items-center justify-center font-bold">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-[#0F172A]">
                     Lịch Làm Việc Công Ty & Đồng Bộ Ngày Lễ
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#5B6B82]">
                     Cấu hình thứ 7 cách tuần, ngày lễ quốc gia, ngày làm bù và
                     ngoại lệ lịch áp dụng toàn hệ thống.
                   </p>
@@ -237,14 +237,14 @@ export default function AdminSettingsPage() {
           {/* Company Info */}
           <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center">
                 <Globe className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Thông tin Tổ chức
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Tên và thông tin nhận diện doanh nghiệp
                 </p>
               </div>
@@ -312,7 +312,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Quy chuẩn Chấm công & Ca làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Cấu hình bán kính định vị GPS và khung giờ chuẩn
                 </p>
               </div>
@@ -436,7 +436,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={locationRequired}
                     onChange={(e) => setLocationRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
                   />
                   Bắt buộc GPS khi chấm công
                 </label>
@@ -445,7 +445,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={photoRequired}
                     onChange={(e) => setPhotoRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3453D1] focus:ring-[#4F75FF]"
                   />
                   Bắt buộc ảnh bằng chứng khi chấm công
                 </label>
@@ -456,14 +456,14 @@ export default function AdminSettingsPage() {
           {/* Security & Rate Limiting */}
           <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#00B788] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#047857] flex items-center justify-center">
                 <Shield className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-[#0F172A]">
                   Bảo mật & Phiên làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Chính sách hết hạn phiên và giới hạn yêu cầu (Throttling)
                 </p>
               </div>

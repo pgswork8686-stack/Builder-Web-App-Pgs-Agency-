@@ -3,7 +3,7 @@ import { AutomationModule } from '../automation/automation.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { WorkspaceModule } from '../workspace/workspace.module';
-import { TasksController } from './tasks.controller';
+import { AggregateTasksController, TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 
 @Module({
@@ -13,7 +13,7 @@ import { TasksService } from './tasks.service';
     NotificationsModule,
     AutomationModule,
   ],
-  controllers: [TasksController],
+  controllers: [AggregateTasksController, TasksController],
   providers: [TasksService],
   exports: [TasksService],
 })

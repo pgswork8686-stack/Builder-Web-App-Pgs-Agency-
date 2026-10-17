@@ -83,7 +83,7 @@ export default function AuthResolvePage() {
             <h3 className="text-base font-extrabold text-red-600">
               LỖI XÁC THỰC
             </h3>
-            <p className="text-xs text-[#64748B]">{errorMsg}</p>
+            <p className="text-xs text-[#5B6B82]">{errorMsg}</p>
             <Button
               variant="danger"
               size="sm"
@@ -100,9 +100,9 @@ export default function AuthResolvePage() {
           </>
         ) : (
           <>
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin" />
             <h3 className="text-base font-extrabold text-[#0F172A]">PGS HUB</h3>
-            <p className="text-xs text-[#64748B]">{statusText}</p>
+            <p className="text-xs text-[#5B6B82]">{statusText}</p>
           </>
         )}
       </Card>

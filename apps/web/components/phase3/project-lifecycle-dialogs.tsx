@@ -83,7 +83,7 @@ export function ProjectLifecycleDialogs({
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && <p className="text-xs text-rose-700">{error}</p>}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button
@@ -125,7 +125,7 @@ export function ProjectLifecycleDialogs({
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && <p className="text-xs text-rose-700">{error}</p>}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button

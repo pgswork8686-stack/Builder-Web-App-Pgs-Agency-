@@ -43,7 +43,7 @@ export function SectionHeader({
           )}
         </div>
         {description && (
-          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5B6B82] leading-relaxed">
             {description}
           </p>
         )}

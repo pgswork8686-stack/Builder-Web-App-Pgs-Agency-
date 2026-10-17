@@ -59,7 +59,7 @@ export function Dialog({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 rounded-xl p-2 text-[#7C879D] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
+          className="absolute right-5 top-5 rounded-xl p-2 text-[#5F6E85] hover:text-[#24304A] hover:bg-[#F6F8FC] transition-colors cursor-pointer"
           aria-label="Đóng dialog"
         >
           <X className="w-5 h-5" />
@@ -71,7 +71,7 @@ export function Dialog({
               {title}
             </h3>
             {description && (
-              <p className="text-xs sm:text-sm text-[#7C879D] mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#5F6E85] mt-1 leading-relaxed">
                 {description}
               </p>
             )}

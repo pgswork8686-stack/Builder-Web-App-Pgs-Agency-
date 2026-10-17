@@ -33,7 +33,7 @@ export function SessionExpiredModal({
           <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
             Phiên đăng nhập hết hạn
           </h3>
-          <p className="text-xs text-[#64748B] leading-relaxed max-w-xs mx-auto">
+          <p className="text-xs text-[#5B6B82] leading-relaxed max-w-xs mx-auto">
             Để đảm bảo an toàn thông tin doanh nghiệp, vui lòng đăng nhập lại để
             tiếp tục phiên làm việc.
           </p>
