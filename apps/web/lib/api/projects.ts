@@ -188,6 +188,9 @@ export const projectsApi = {
   getProjectServices(projectId: string) {
     return request<ProjectService[]>(`/admin/projects/${projectId}/services`);
   },
+  getInternalProjectServices(projectId: string) {
+    return request<ProjectService[]>(`/projects/${projectId}/services`);
+  },
   addProjectService(
     projectId: string,
     data: {

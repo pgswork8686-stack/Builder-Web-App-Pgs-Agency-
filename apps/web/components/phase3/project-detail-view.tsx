@@ -178,22 +178,31 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         setProject(await projectsApi.getClientProject(projectId));
         setTasks([]);
       } else {
-        const [projectData, memberData, serviceData, taskData, peopleData] =
+        const [projectData, memberData, serviceData, taskData] =
           await Promise.all([
             projectsApi.getInternalProject(projectId),
             projectsApi.getMembers(projectId),
-            projectsApi.getProjectServices(projectId),
+            projectsApi.getInternalProjectServices(projectId),
             tasksApi.list(projectId, { page: 1, pageSize: 100 }),
-            peopleApi.getPeopleDirectory({ page: 1, pageSize: 100 }),
           ]);
         setProject(projectData);
         setMembers(memberData);
         setProjectServices(serviceData);
         setTasks(taskData.items);
+        // Use only the current project's active internal members as task
+        // assignees. Internal roles cannot call the global admin directory.
         setPeople(
-          (peopleData.items ?? []).filter(
-            (p: any) => p.role !== "client" && p.accountStatus === "active",
-          ),
+          memberData
+            .filter(
+              (member: any) =>
+                member.profile?.role !== "client" &&
+                member.profile?.account_status === "active",
+            )
+            .map((member: any) => ({
+              id: member.userId,
+              fullName: member.profile?.full_name,
+              email: member.profile?.email,
+            })),
         );
       }
     } catch (caught) {

@@ -543,12 +543,14 @@ async function upsertOrganizationFixture() {
     {
       ...managedProject,
       companyId: primaryCompany.id,
+      departmentId: primaryDepartment.id,
       managerUserId: leader.id,
       description: "Synthetic project managed by the local UAT leader.",
     },
     {
       ...foreignProject,
       companyId: foreignCompany.id,
+      departmentId: foreignDepartment.id,
       managerUserId: accountant.id,
       description: "Synthetic project intentionally outside leader scope.",
     },
@@ -558,14 +560,15 @@ async function upsertOrganizationFixture() {
       `
         INSERT INTO public.projects (
           id, project_code, client_company_id, name, description, status, priority,
-          project_manager_user_id, start_date, due_date, created_by, updated_by
+          project_manager_user_id, start_date, due_date, created_by, updated_by, department_id
         ) VALUES (
           $1::uuid, $2, $3::uuid, $4, $5,
           'active'::public.project_status, 'medium'::public.project_priority,
-          $6::uuid, '2026-01-01', '2026-12-31', $7::uuid, $7::uuid
+          $6::uuid, '2026-01-01', '2026-12-31', $7::uuid, $7::uuid, $8::uuid
         )
         ON CONFLICT (id) DO UPDATE
         SET client_company_id = EXCLUDED.client_company_id,
+            department_id = EXCLUDED.department_id,
             name = EXCLUDED.name,
             description = EXCLUDED.description,
             status = EXCLUDED.status,
@@ -584,6 +587,7 @@ async function upsertOrganizationFixture() {
         project.description,
         project.managerUserId,
         admin.id,
+        project.departmentId,
       ],
     );
     assert.equal(result.rowCount, 1);

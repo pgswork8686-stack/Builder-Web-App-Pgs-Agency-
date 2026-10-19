@@ -220,6 +220,22 @@ export class ProjectsController {
     );
   }
 
+  @Get('projects/:projectId/services')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
+  async getScopedProjectServices(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+    @CurrentUser('departmentId') departmentId: string | null,
+  ) {
+    return this.projectsService.getScopedProjectServices(
+      userId,
+      role,
+      departmentId,
+      projectId,
+    );
+  }
+
   @Get('projects/:projectId/service-items')
   @Roles('admin', 'team_leader', 'employee', 'accountant', 'client')
   async getProjectServiceItems(

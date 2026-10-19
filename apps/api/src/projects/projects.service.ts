@@ -692,6 +692,19 @@ export class ProjectsService {
     return { success: true };
   }
 
+  // Read-only project services for internal users, with the same department /
+  // membership authorization as the project detail endpoint. Never expose
+  // admin project-service mutation endpoints to non-admin users.
+  async getScopedProjectServices(
+    userId: string,
+    role: AppRole,
+    departmentId: string | null,
+    projectId: string,
+  ) {
+    await this.getInternalProjectById(userId, projectId, role, departmentId);
+    return this.getProjectServices(projectId);
+  }
+
   async getProjectServices(projectId: string) {
     await this.getProjectRow(projectId);
     const { data, error } = await this.client
