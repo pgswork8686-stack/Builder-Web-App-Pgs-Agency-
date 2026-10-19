@@ -4,9 +4,13 @@
 
 Tất cả check-run `success`: Quality gates, Database-backed UAT + browser, API production container, cPanel Node 22 artifact, Vercel Preview Comments.
 
-## Chưa chạy trong phiên này
+## Kết quả trên commit 07970ad (PR #17)
 
-Máy cục bộ chặn `git` HTTPS (Application Control chặn `libcurl-4.dll`), không có Supabase disposable, chưa `pnpm install`. Vì vậy:
+Tất cả check xanh: Quality gates, Database-backed UAT + browser (72/72 lượt PASS: 5 vai trò × route chính × 375/768/1024/1440px, **cổng axe serious/critical đang chặn**), API container, cPanel artifact.
+
+Lưu ý: phạm vi là duyệt trang theo vai trò. Chưa phải E2E nghiệp vụ liên vai trò.
+
+## Chưa làm
 
 - Không chạy được UAT 72/72, typecheck, hay Playwright.
 - Các sửa G-01, G-03, G-04 là **chưa được kiểm chứng bằng chạy**.
