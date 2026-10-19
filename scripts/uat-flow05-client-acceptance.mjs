@@ -317,10 +317,21 @@ async function main() {
     JSON.stringify(notifApi.data).includes(approvalId),
     "Client notification list (API) must contain the approval",
   );
+  const clientProjects = await api("GET", "/client/me/projects", tokens.client);
+  expectStatus(clientProjects, 200, "Client lists own projects");
+  assert.ok(
+    JSON.stringify(clientProjects.data).includes(PROJECT.id),
+    "Client project list must contain the project under acceptance",
+  );
   expectStatus(
-    await api("GET", `/projects/client/${PROJECT.id}`, tokens.client),
+    await api("GET", `/client/me/projects/${PROJECT.id}`, tokens.client),
     200,
     "Client opens own project",
+  );
+  expectStatus(
+    await api("GET", `/client/me/projects/${FOREIGN_PROJECT.id}`, tokens.client),
+    [403, 404],
+    "Client must not open a foreign project",
   );
   const clientList = await api("GET", base, tokens.client);
   expectStatus(clientList, 200, "Client lists approvals");
