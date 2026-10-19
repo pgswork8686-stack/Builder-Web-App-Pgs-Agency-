@@ -54,6 +54,9 @@ await runFlow(flow, async () => {
     adminPage.getByLabel(/^Quản lý dự án/),
     new RegExp(`\\(${escapeRegExp(U.leader.email)}\\)`),
   );
+  await adminPage
+    .getByLabel(/^Phòng ban phụ trách/)
+    .selectOption({ label: LOCAL_UAT.departments.primary.name });
   await adminPage.getByLabel(/^Ngày bắt đầu/).fill("2026-01-05");
   await adminPage.getByLabel(/^Hạn chót dự kiến/).fill("2026-12-31");
   await adminPage.getByLabel(/^Trạng thái kích hoạt ban đầu/).selectOption("active");
@@ -65,7 +68,7 @@ await runFlow(flow, async () => {
       async () =>
         (
           await db.query(
-            `SELECT id, project_code, client_company_id, project_manager_user_id, status::text AS status
+            `SELECT id, project_code, client_company_id, project_manager_user_id, department_id, status::text AS status
                FROM public.projects WHERE name = $1`,
             [projectName],
           )
@@ -76,8 +79,13 @@ await runFlow(flow, async () => {
   assert.equal(project.client_company_id, company.id, "project belongs to the new customer");
   assert.equal(project.project_manager_user_id, U.leader.id, "Team Leader is the project manager");
   assert.equal(project.status, "active");
+  assert.equal(
+    project.department_id,
+    LOCAL_UAT.departments.primary.id,
+    "department chosen in the wizard is stored on the project",
+  );
   assert.match(project.project_code, /^DA_\d+$/);
-  flow.step("2. Admin created the project through the wizard: customer + Team Leader + status stored", {
+  flow.step("2. Admin created the project through the wizard: customer + Team Leader + department + status stored", {
     projectId: project.id,
     projectCode: project.project_code,
   });
@@ -128,19 +136,6 @@ await runFlow(flow, async () => {
   await flow.shot(adminPage, "03-project-members-services");
   flow.step("3b. Admin assigned the service to the project (project_services)");
 
-  // Department: the API supports it, the approved wizard (Figma) has no field.
-  const adminToken = await flow.token("admin");
-  const dept = await flow.api("PATCH", `/admin/projects/${project.id}`, adminToken, {
-    departmentId: LOCAL_UAT.departments.primary.id,
-  });
-  flow.expectStatus(dept, 200, "Assign department");
-  assert.equal(
-    (await db.query(`SELECT department_id FROM public.projects WHERE id = $1::uuid`, [project.id])).rows[0].department_id,
-    LOCAL_UAT.departments.primary.id,
-  );
-  flow.note("Department is assigned via PATCH /admin/projects/:id: the approved project wizard has no department field (design gap).");
-  flow.step("3c. Department stored on the project (API; no UI field in the approved design)");
-
   // ---- 4. Default notifications -------------------------------------------------
   await flow.poll(
     "manager notification",
@@ -179,6 +174,7 @@ await runFlow(flow, async () => {
   flow.step("5b. Employee sees the project he was added to");
 
   // ---- 6. RBAC and tenant isolation ------------------------------------------------
+  const adminToken = await flow.token("admin");
   const leaderToken = await flow.token("leader");
   const employeeToken = await flow.token("employee");
   const foreignToken = await flow.token("foreignEmployee");

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Check,
   ChevronRight,
@@ -22,6 +22,7 @@ import {
   type ProjectStatus,
   projectsApi,
 } from "@/lib/api/projects";
+import { type Department, organizationApi } from "@/lib/api/organization";
 
 export interface ProjectCreateWizardDialogProps {
   isOpen: boolean;
@@ -41,6 +42,25 @@ export function ProjectCreateWizardDialog({
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    organizationApi
+      .getDepartments()
+      .then((rows) => {
+        if (!cancelled)
+          setDepartments(rows.filter((d) => d.isActive !== false));
+      })
+      .catch(() => {
+        // Department is optional: the wizard still works without the list.
+        if (!cancelled) setDepartments([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   const [form, setForm] = useState({
     projectCode: "",
@@ -48,6 +68,7 @@ export function ProjectCreateWizardDialog({
     clientCompanyId: "",
     description: "",
     projectManagerUserId: "",
+    departmentId: "",
     startDate: "",
     dueDate: "",
     priority: "medium" as ProjectPriority,
@@ -112,6 +133,7 @@ export function ProjectCreateWizardDialog({
         clientCompanyId: form.clientCompanyId,
         description: form.description.trim() || undefined,
         projectManagerUserId: form.projectManagerUserId || undefined,
+        departmentId: form.departmentId || undefined,
         startDate: form.startDate,
         dueDate: form.dueDate,
         priority: form.priority,
@@ -126,6 +148,7 @@ export function ProjectCreateWizardDialog({
         clientCompanyId: "",
         description: "",
         projectManagerUserId: "",
+        departmentId: "",
         startDate: "",
         dueDate: "",
         priority: "medium",
@@ -146,6 +169,10 @@ export function ProjectCreateWizardDialog({
   const selectedCompany = companies.find((c) => c.id === form.clientCompanyId);
   const selectedManager = people.find(
     (p) => p.id === form.projectManagerUserId,
+  );
+
+  const selectedDepartment = departments.find(
+    (d) => d.id === form.departmentId,
   );
 
   return (
@@ -319,6 +346,21 @@ export function ProjectCreateWizardDialog({
               </Select>
 
               <Select
+                label="Phòng ban phụ trách"
+                value={form.departmentId}
+                onChange={(e) =>
+                  setForm({ ...form, departmentId: e.target.value })
+                }
+              >
+                <option value="">-- Chưa chỉ định (Tùy chọn) --</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
                 label="Mức độ ưu tiên"
                 value={form.priority}
                 onChange={(e) =>
@@ -398,6 +440,12 @@ export function ProjectCreateWizardDialog({
                     {selectedManager?.fullName ||
                       selectedManager?.email ||
                       "Chưa phân công"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#5F6E85]">Phòng ban:</span>{" "}
+                  <span className="font-bold text-[#24304A]">
+                    {selectedDepartment?.name || "Chưa chỉ định"}
                   </span>
                 </div>
                 <div>

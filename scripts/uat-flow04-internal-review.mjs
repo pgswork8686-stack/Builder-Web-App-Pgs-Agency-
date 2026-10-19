@@ -168,39 +168,67 @@ await runFlow(flow, async () => {
   flow.step("5. The reason is enforced by the API too; employees cannot decide or annotate reviews");
 
   // ---- 6. Approval moves the workflow on ------------------------------------------------------------------------
-  const item = (
+  // Self-contained fixture (disposable DB only) so this branch ALWAYS runs: on the
+  // Team Leader's managed project, item A (open primary task) gates item B
+  // (finish_to_start). Approving A's task must complete A and unlock B.
+  const wfProjectId = LOCAL_UAT.projects.managed.id;
+  const inst = (
+    await db.query(`SELECT public.workflow_instantiate_project_service($1::uuid, $2::uuid, $3::uuid) AS res`, [
+      wfProjectId,
+      LOCAL_UAT.projectService.id,
+      U.admin.id,
+    ])
+  ).rows[0].res;
+  assert.equal(inst.instantiated, true, "Fixture: the managed project must have a runtime workflow (needs a default published template)");
+  const wfItems = (
     await db.query(
-      `SELECT i.id AS item_id, l.task_id, w.id AS workflow_id
+      `SELECT i.id, i.project_service_item_id, i.project_workflow_stage_id
          FROM public.project_workflow_stage_items i
-         JOIN public.project_workflows w ON w.id = i.project_workflow_id
-         JOIN public.project_workflow_task_links l ON l.project_workflow_stage_item_id = i.id AND l.link_type = 'primary'
-         JOIN public.tasks t ON t.id = l.task_id
-        WHERE w.project_id = $1::uuid AND t.status::text IN ('todo', 'in_progress')
-          AND i.status::text IN ('ready', 'in_progress')
-        ORDER BY i.id LIMIT 1`,
-      [projectId],
+        WHERE i.project_workflow_id = $1::uuid
+        ORDER BY i.project_workflow_stage_id, i.id`,
+      [inst.workflowId],
     )
-  ).rows[0];
-  if (item) {
+  ).rows;
+  assert.ok(wfItems.length >= 2, "Fixture: the workflow needs at least two items (predecessor + successor)");
+  const [itemA, itemB] = wfItems;
+  const itemIds = [itemA.id, itemB.id];
+  const stageIds = [...new Set([itemA.project_workflow_stage_id, itemB.project_workflow_stage_id])];
+  await db.query(`DELETE FROM public.project_workflow_item_dependencies WHERE predecessor_stage_item_id = ANY($1::uuid[]) OR successor_stage_item_id = ANY($1::uuid[])`, [itemIds]);
+  await db.query(`DELETE FROM public.project_workflow_task_links WHERE project_workflow_stage_item_id = ANY($1::uuid[])`, [itemIds]);
+  await db.query(`UPDATE public.project_workflow_stages SET status = 'ready', completed_at = NULL WHERE id = ANY($1::uuid[])`, [stageIds]);
+  await db.query(
+    `UPDATE public.project_workflow_stage_items
+        SET completion_mode = 'tasks_done', approval_required = false, approval_scope = NULL, completed_at = NULL,
+            status = CASE WHEN id = $1::uuid THEN 'ready' ELSE 'blocked' END
+      WHERE id = ANY($2::uuid[])`,
+    [itemA.id, itemIds],
+  );
+  await db.query(
+    `INSERT INTO public.project_workflow_item_dependencies (project_workflow_id, predecessor_stage_item_id, successor_stage_item_id)
+     VALUES ($1::uuid, $2::uuid, $3::uuid)`,
+    [inst.workflowId, itemA.id, itemB.id],
+  );
+  const primary = (
     await db.query(
-      `UPDATE public.project_workflow_stage_items
-          SET completion_mode = 'tasks_done', approval_required = false, approval_scope = NULL
-        WHERE id = $1::uuid`,
-      [item.item_id],
-    );
-    const wfTask = `/projects/${projectId}/tasks/${item.task_id}`;
-    flow.expectStatus(await flow.api("PATCH", wfTask, leaderToken, { assigneeUserId: U.employee.id }), 200, "Assign workflow task");
-    flow.expectStatus(await flow.api("PATCH", wfTask, employeeToken, { status: "review" }), 200, "Submit workflow task");
-    flow.expectStatus(await flow.api("PATCH", wfTask, leaderToken, { status: "done" }), 200, "Approve workflow task");
-    await flow.poll(
-      "workflow item completed",
-      async () => (await db.query(`SELECT status::text AS status FROM public.project_workflow_stage_items WHERE id = $1::uuid`, [item.item_id])).rows[0].status,
-      (status) => status === "completed",
-    );
-    flow.step("6. Approving the linked task completed its workflow item (the workflow moved on)", { itemId: item.item_id });
-  } else {
-    flow.note("No ready workflow item with an open primary task: workflow progression was not exercised");
-  }
+      `SELECT public.workflow_create_primary_task($1::uuid, $2::uuid, $3::uuid, $4, $5::uuid) AS res`,
+      [wfProjectId, itemA.id, itemA.project_service_item_id, `[FLOW04] Hạng mục workflow ${Date.now().toString(36)}`, U.admin.id],
+    )
+  ).rows[0].res;
+  const itemStatus = async (id) =>
+    (await db.query(`SELECT status::text AS status FROM public.project_workflow_stage_items WHERE id = $1::uuid`, [id])).rows[0].status;
+  assert.equal(await itemStatus(itemB.id), "blocked", "Fixture: the successor starts blocked");
+  const wfTask = `/projects/${wfProjectId}/tasks/${primary.id}`;
+  flow.expectStatus(await flow.api("PATCH", wfTask, leaderToken, { assigneeUserId: U.employee.id }), 200, "Assign workflow task");
+  flow.expectStatus(await flow.api("PATCH", wfTask, employeeToken, { status: "review" }), 200, "Submit workflow task");
+  assert.equal(await itemStatus(itemA.id) === "completed", false, "A task in review must not complete its workflow item");
+  assert.equal(await itemStatus(itemB.id), "blocked", "The successor stays blocked while the predecessor is in review");
+  flow.expectStatus(await flow.api("PATCH", wfTask, leaderToken, { status: "done" }), 200, "Approve workflow task");
+  await flow.poll("workflow item completed", () => itemStatus(itemA.id), (status) => status === "completed");
+  await flow.poll("successor item unlocked", () => itemStatus(itemB.id), (status) => status === "ready");
+  flow.step("6. Approving the linked task completed its workflow item and unlocked the next item (blocked -> ready)", {
+    itemId: itemA.id,
+    unlockedItemId: itemB.id,
+  });
 
   // ---- 7. Refresh + new login ----------------------------------------------------------------------------------------
   await page.goto(flow.url(url), { waitUntil: "networkidle" });
