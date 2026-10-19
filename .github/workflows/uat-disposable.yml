@@ -138,6 +138,16 @@ jobs:
           PGS_UAT_EVIDENCE_DIR: uat-evidence
         run: node scripts/uat-responsive-capture.mjs
 
+      # Cross-role business chain with database assertions (Team Leader ->
+      # Client -> Team Leader). Kept after the browser gate so a failure here
+      # never hides the axe/responsive evidence.
+      - name: Flow 05 - client acceptance chain (API + database assertions)
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow05-client-acceptance.mjs
+
       - name: Publish summary
         if: always()
         run: |

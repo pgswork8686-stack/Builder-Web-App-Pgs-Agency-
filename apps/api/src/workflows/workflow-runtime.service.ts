@@ -299,12 +299,27 @@ export class WorkflowRuntimeService implements OnModuleInit {
     projectId: string,
     workflowId: string,
     actorId: string,
+    extraPayload: Record<string, unknown> = {},
   ): Promise<void> {
+    if (!this.automation) return;
     try {
-      await this.automation?.runEvent({
+      // Rules can only address the project's client company when the event
+      // payload carries it (clientCompanyMembersFromPayload).
+      const { data: project } = await this.client
+        .from('projects')
+        .select('client_company_id')
+        .eq('id', projectId)
+        .maybeSingle();
+      await this.automation.runEvent({
         triggerType,
         eventKey: `${triggerType}:${entityId}`,
-        payload: { projectId, workflowId, entityId },
+        payload: {
+          projectId,
+          workflowId,
+          entityId,
+          clientCompanyId: project?.client_company_id ?? null,
+          ...extraPayload,
+        },
         actorUserId: actorId,
         entityType: triggerType.includes('approval')
           ? 'workflow_approval'
@@ -1828,6 +1843,10 @@ export class WorkflowRuntimeService implements OnModuleInit {
       projectId,
       workflowId,
       user.profileId,
+      {
+        approvalType: dto.approvalType,
+        requesterUserId: user.profileId,
+      },
     );
     return data;
   }
@@ -1964,6 +1983,11 @@ export class WorkflowRuntimeService implements OnModuleInit {
       projectId,
       workflowId,
       user.profileId,
+      {
+        approvalType: String(approval.approval_type),
+        requesterUserId: String(approval.requested_by_user_id),
+        decision: dto.decision,
+      },
     );
     return data;
   }
