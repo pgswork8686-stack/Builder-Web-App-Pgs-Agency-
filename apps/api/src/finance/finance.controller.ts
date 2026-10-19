@@ -252,6 +252,36 @@ export class FinanceController {
     return this.financeService.getPayments(invoiceId, user);
   }
 
+  @Get('payments')
+  async getPaymentLedger(
+    @Query() rawQuery: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = FinanceQuerySchema.safeParse(rawQuery);
+    if (!result.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_FAILED',
+        message: result.error.errors.map((e) => e.message).join(', '),
+      });
+    }
+    return this.financeService.getPaymentLedger(result.data, user);
+  }
+
+  @Get('receivables')
+  async getReceivables(
+    @Query() rawQuery: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const result = FinanceQuerySchema.safeParse(rawQuery);
+    if (!result.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_FAILED',
+        message: result.error.errors.map((e) => e.message).join(', '),
+      });
+    }
+    return this.financeService.getReceivables(result.data, user);
+  }
+
   @Get('audit')
   async getAuditLogs(
     @Query() rawQuery: unknown,

@@ -263,4 +263,23 @@ export const projectsApi = {
   getClientProject(projectId: string) {
     return request<Project>(`/client/me/projects/${projectId}`);
   },
+  /** Admin: may this project be accepted ("nghiệm thu") right now? */
+  getCompletionCheck(projectId: string) {
+    return request<ProjectCompletionCheck>(
+      `/admin/projects/${projectId}/completion-check`,
+    );
+  },
 };
+
+export interface ProjectCompletionBlocker {
+  code: string;
+  count: number;
+  message: string;
+}
+
+export interface ProjectCompletionCheck {
+  projectId: string;
+  ready: boolean;
+  blockers: ProjectCompletionBlocker[];
+  checkedAt: string;
+}

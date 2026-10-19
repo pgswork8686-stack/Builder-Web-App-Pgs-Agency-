@@ -464,6 +464,21 @@ export class ProjectsService {
       });
     }
 
+    const completing =
+      dto.status === 'completed' && existing.status !== 'completed';
+    if (completing) {
+      const check = await this.getCompletionCheck(projectId);
+      if (!check.ready) {
+        throw new ConflictException({
+          code: 'PROJECT_COMPLETION_BLOCKED',
+          message:
+            'Dự án còn hạng mục chưa hoàn tất nên chưa thể nghiệm thu: ' +
+            check.blockers.map((blocker) => blocker.message).join('; '),
+          blockers: check.blockers,
+        });
+      }
+    }
+
     const payload: Record<string, unknown> = { updated_by: actorUserId };
     if (dto.clientCompanyId !== undefined)
       payload.client_company_id = dto.clientCompanyId;
@@ -514,7 +529,118 @@ export class ProjectsService {
         actorUserId,
       );
     }
+    if (completing) {
+      await this.notifyProjectCompleted(data, actorUserId);
+    }
     return this.mapProject(data);
+  }
+
+  /**
+   * Conditions an Admin must satisfy before accepting ("nghiệm thu") a project:
+   * no task still open and no workflow approval still waiting for an answer.
+   */
+  async getCompletionCheck(projectId: string) {
+    await this.getProjectRow(projectId);
+    const blockers: Array<{ code: string; count: number; message: string }> =
+      [];
+
+    const { count: openTasks, error: taskError } = await this.client
+      .from('tasks')
+      .select('id', { count: 'exact', head: true })
+      .eq('project_id', projectId)
+      .in('status', ['todo', 'in_progress', 'review']);
+    if (taskError) {
+      this.databaseFailure(
+        'PROJECT_COMPLETION_CHECK_FAILED',
+        'Không thể kiểm tra điều kiện hoàn thành.',
+        taskError,
+      );
+    }
+    if ((openTasks ?? 0) > 0) {
+      blockers.push({
+        code: 'OPEN_TASKS',
+        count: openTasks ?? 0,
+        message: `${openTasks} công việc chưa hoàn thành hoặc chưa hủy`,
+      });
+    }
+
+    const { count: pendingApprovals, error: approvalError } = await this.client
+      .from('workflow_approval_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('project_id', projectId)
+      .eq('status', 'pending');
+    if (approvalError) {
+      this.databaseFailure(
+        'PROJECT_COMPLETION_CHECK_FAILED',
+        'Không thể kiểm tra điều kiện hoàn thành.',
+        approvalError,
+      );
+    }
+    if ((pendingApprovals ?? 0) > 0) {
+      blockers.push({
+        code: 'PENDING_APPROVALS',
+        count: pendingApprovals ?? 0,
+        message: `${pendingApprovals} yêu cầu duyệt đang chờ phản hồi`,
+      });
+    }
+
+    return {
+      projectId,
+      ready: blockers.length === 0,
+      blockers,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+
+  /** Always-on notification when a project is accepted: the client and the manager. */
+  private async notifyProjectCompleted(
+    project: ProjectRow,
+    actorUserId: string,
+  ): Promise<void> {
+    if (!this.notifications) return;
+    try {
+      const label = [project.project_code, project.name]
+        .filter(Boolean)
+        .join(' · ');
+      const common = {
+        type: 'project.completed',
+        title: 'Dự án đã hoàn thành nghiệm thu',
+        message: `Dự án ${label} đã được nghiệm thu và hoàn thành.`,
+        entityType: 'project',
+        entityId: String(project.id),
+        metadata: { projectId: project.id },
+        actorUserId,
+      };
+      const { data: members, error } = await this.client
+        .from('client_memberships')
+        .select(
+          'user_id, profile:profiles!client_memberships_user_id_fkey(account_status)',
+        )
+        .eq('client_company_id', project.client_company_id);
+      if (error) throw error;
+      const clients = (members ?? [])
+        .filter((row) => {
+          const profile = Array.isArray(row.profile)
+            ? row.profile[0]
+            : row.profile;
+          return profile?.account_status === 'active';
+        })
+        .map((row) => String(row.user_id));
+      await this.notifications.createForUsers(clients, {
+        ...common,
+        actionUrl: `/app/client/projects/${project.id}`,
+      });
+      if (project.project_manager_user_id) {
+        await this.notifications.createForUsers(
+          [String(project.project_manager_user_id)],
+          { ...common, actionUrl: `/app/projects/${project.id}` },
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `Project completion notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   async deleteProject(projectId: string, actorUserId?: string) {

@@ -990,6 +990,145 @@ export class FinanceService {
     });
   }
 
+  /**
+   * Cross-invoice payment ledger for reconciliation ("đối soát"): every
+   * recorded payment with the invoice it settles, newest first.
+   */
+  async getPaymentLedger(query: FinanceQuery, user: RequestUser) {
+    this.enforceAdminOrAccountant(user);
+
+    const offset = (query.page - 1) * query.pageSize;
+    const { data, count, error } = await this.client
+      .from('invoice_payments')
+      .select(
+        'id, invoice_id, amount, paid_at, payment_reference, payment_method, created_at, recorder:profiles(full_name), invoice:invoices(invoice_number, currency_code, amount, paid_amount, status, client_company:client_companies(name))',
+        { count: 'exact' },
+      )
+      .order('paid_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + query.pageSize - 1);
+
+    if (error) {
+      this.handleDbError(error);
+    }
+
+    const first = <T>(value: T | T[] | null | undefined): T | null =>
+      Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
+    const total = count || 0;
+    return {
+      items: (data || []).map((row: Record<string, any>) => {
+        const invoice = first<Record<string, any>>(row.invoice);
+        const company = first<Record<string, any>>(invoice?.client_company);
+        return {
+          id: row.id,
+          invoiceId: row.invoice_id,
+          invoiceNumber: invoice?.invoice_number ?? null,
+          invoiceStatus: invoice?.status ?? null,
+          clientCompany: company?.name ?? null,
+          currencyCode: invoice?.currency_code ?? null,
+          amount: Number(row.amount),
+          paidAt: row.paid_at,
+          paymentMethod: row.payment_method || null,
+          paymentReference: row.payment_reference || null,
+          recordedBy:
+            first<Record<string, any>>(row.recorder)?.full_name ?? null,
+          invoiceAmount: invoice ? Number(invoice.amount) : null,
+          invoicePaidAmount: invoice ? Number(invoice.paid_amount) : null,
+          invoiceOutstanding: invoice
+            ? Number(invoice.amount) - Number(invoice.paid_amount)
+            : null,
+        };
+      }),
+      page: query.page,
+      pageSize: query.pageSize,
+      total,
+      totalPages: Math.ceil(total / query.pageSize),
+    };
+  }
+
+  /**
+   * Open receivables ("công nợ"): issued / partially paid / overdue invoices,
+   * most overdue first, with the outstanding amount, plus totals per currency
+   * over ALL open invoices (not only the requested page).
+   */
+  async getReceivables(query: FinanceQuery, user: RequestUser) {
+    this.enforceAdminOrAccountant(user);
+
+    const open = ['issued', 'partially_paid', 'overdue'];
+    const today = this.getVietnamDateOnly();
+    const offset = (query.page - 1) * query.pageSize;
+
+    const { data, count, error } = await this.client
+      .from('invoices')
+      .select(
+        'id, invoice_number, issue_date, due_date, amount, paid_amount, currency_code, status, client_company:client_companies(name), project:projects(name)',
+        { count: 'exact' },
+      )
+      .in('status', open)
+      .order('due_date', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + query.pageSize - 1);
+    if (error) {
+      this.handleDbError(error);
+    }
+
+    const { data: everything, error: totalsError } = await this.client
+      .from('invoices')
+      .select('amount, paid_amount, currency_code, due_date')
+      .in('status', open)
+      .limit(5000);
+    if (totalsError) {
+      this.handleDbError(totalsError);
+    }
+    const totals: Record<string, { outstanding: number; overdue: number }> = {};
+    for (const row of everything || []) {
+      const bucket = (totals[row.currency_code] ??= {
+        outstanding: 0,
+        overdue: 0,
+      });
+      const outstanding = Number(row.amount) - Number(row.paid_amount);
+      bucket.outstanding += outstanding;
+      if (row.due_date < today) bucket.overdue += outstanding;
+    }
+
+    const first = <T>(value: T | T[] | null | undefined): T | null =>
+      Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
+    const dayMs = 24 * 60 * 60 * 1000;
+    const total = count || 0;
+    return {
+      items: (data || []).map((row: Record<string, any>) => {
+        const overdueDays =
+          row.due_date < today
+            ? Math.floor(
+                (Date.parse(`${today}T00:00:00Z`) -
+                  Date.parse(`${row.due_date}T00:00:00Z`)) /
+                  dayMs,
+              )
+            : 0;
+        return {
+          id: row.id,
+          invoiceNumber: row.invoice_number,
+          clientCompany:
+            first<Record<string, any>>(row.client_company)?.name ?? null,
+          projectName: first<Record<string, any>>(row.project)?.name ?? null,
+          status: row.status,
+          issueDate: row.issue_date,
+          dueDate: row.due_date,
+          currencyCode: row.currency_code,
+          amount: Number(row.amount),
+          paidAmount: Number(row.paid_amount),
+          outstanding: Number(row.amount) - Number(row.paid_amount),
+          overdueDays,
+        };
+      }),
+      totals,
+      page: query.page,
+      pageSize: query.pageSize,
+      total,
+      totalPages: Math.ceil(total / query.pageSize),
+    };
+  }
+
   async getAuditLogs(query: FinanceQuery, user: RequestUser) {
     this.enforceAdminOrAccountant(user);
 

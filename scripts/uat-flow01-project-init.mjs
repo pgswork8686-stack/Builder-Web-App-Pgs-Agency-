@@ -52,7 +52,7 @@ await runFlow(flow, async () => {
   await adminPage.getByRole("button", { name: "Tiếp tục" }).click();
   await flow.selectByText(
     adminPage.getByLabel(/^Quản lý dự án/),
-    new RegExp(escapeRegExp(U.leader.email)),
+    new RegExp(`\\(${escapeRegExp(U.leader.email)}\\)`),
   );
   await adminPage.getByLabel(/^Ngày bắt đầu/).fill("2026-01-05");
   await adminPage.getByLabel(/^Hạn chót dự kiến/).fill("2026-12-31");
@@ -88,7 +88,7 @@ await runFlow(flow, async () => {
   await adminPage.getByRole("button", { name: "Thêm nhân sự" }).click();
   await flow.selectByText(
     adminPage.getByLabel(/^Chọn nhân viên/),
-    new RegExp(escapeRegExp(U.employee.email)),
+    new RegExp(`\\(${escapeRegExp(U.employee.email)}\\)`),
   );
   await adminPage.getByRole("button", { name: "Lưu thành viên" }).click();
   await flow.poll(

@@ -185,7 +185,14 @@ export async function createFlow({ id, title }) {
         });
         return result.violations
           .filter((v) => ["serious", "critical"].includes(v.impact))
-          .map((v) => `${v.id}(${v.nodes.length})`);
+          .map((v) => {
+            const first = v.nodes[0];
+            const data = (first && first.any[0] && first.any[0].data) || {};
+            const detail = data.fgColor
+              ? ` fg=${data.fgColor} bg=${data.bgColor} ratio=${data.contrastRatio}`
+              : "";
+            return `${v.id}(${v.nodes.length}) ${first ? first.target.join(" ") : ""}${detail}`;
+          });
       });
     },
 

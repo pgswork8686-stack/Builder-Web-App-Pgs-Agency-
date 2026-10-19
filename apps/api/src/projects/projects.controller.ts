@@ -75,6 +75,14 @@ export class ProjectsController {
     return this.projectsService.getAdminProjectById(projectId);
   }
 
+  @Get('admin/projects/:projectId/completion-check')
+  @Roles('admin')
+  async getCompletionCheck(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+  ) {
+    return this.projectsService.getCompletionCheck(projectId);
+  }
+
   @Patch('admin/projects/:projectId')
   @Roles('admin')
   async updateProject(

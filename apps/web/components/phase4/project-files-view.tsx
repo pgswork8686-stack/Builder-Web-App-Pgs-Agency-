@@ -1,9 +1,14 @@
 "use client";
 
-import { Download, FileText, Trash2, Upload } from "lucide-react";
+import { Download, FileText, Send, Trash2, Upload } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { filesApi, uploadToSignedUrl, type ProjectFile } from "@/lib/api/files";
+import {
+  filesApi,
+  HANDOVER_CATEGORY,
+  uploadToSignedUrl,
+  type ProjectFile,
+} from "@/lib/api/files";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import {
   ProjectWorkspaceRealtimeProvider,
@@ -60,6 +65,10 @@ function ProjectFilesContent({
           canUpload={
             mode === "admin" || project?.currentProjectRole !== "viewer"
           }
+          canHandover={
+            mode === "admin" ||
+            project?.currentProjectRole === "project_manager"
+          }
         />
       </div>
     </main>
@@ -72,12 +81,15 @@ export function FileManager({
   compact = false,
   refreshSignal = 0,
   canUpload = true,
+  canHandover = false,
 }: {
   projectId: string;
   taskId?: string;
   compact?: boolean;
   refreshSignal?: number;
   canUpload?: boolean;
+  /** Managers may mark a file as handed over to the client. */
+  canHandover?: boolean;
 }) {
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [page, setPage] = useState(1);
@@ -129,6 +141,24 @@ export function FileManager({
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  const toggleHandover = async (file: ProjectFile) => {
+    setError(null);
+    try {
+      await filesApi.setHandover(
+        projectId,
+        file.id,
+        file.fileCategory !== HANDOVER_CATEGORY,
+      );
+      await load();
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Không thể cập nhật trạng thái bàn giao.",
+      );
     }
   };
 
@@ -244,6 +274,11 @@ export function FileManager({
                     <p className="mt-0.5 text-[11px] text-[#94A3B8]">
                       {file.mimeType}
                     </p>
+                    {file.fileCategory === HANDOVER_CATEGORY && (
+                      <p className="mt-1 text-[11px] font-bold text-[#047857]">
+                        Đã bàn giao cho khách hàng
+                      </p>
+                    )}
                   </td>
                   <td className="p-4 text-[#5B6B82]">
                     {formatSize(file.sizeBytes)}
@@ -259,6 +294,23 @@ export function FileManager({
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
+                      {canHandover && (
+                        <button
+                          type="button"
+                          onClick={() => void toggleHandover(file)}
+                          aria-label={
+                            file.fileCategory === HANDOVER_CATEGORY
+                              ? `Thu hồi bàn giao ${file.originalName}`
+                              : `Bàn giao ${file.originalName} cho khách hàng`
+                          }
+                          className="inline-flex items-center gap-1 rounded-lg border border-[#E2E8F0] px-2 py-1.5 text-[11px] font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                          {file.fileCategory === HANDOVER_CATEGORY
+                            ? "Thu hồi"
+                            : "Bàn giao"}
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => void download(file)}

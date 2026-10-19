@@ -201,7 +201,7 @@ function TaskDetailContent({
                   </span>
                 )}
               </div>
-              <div className="mt-5 grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-4">
+              <dl className="mt-5 grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-4">
                 <Info label="Ưu tiên" value={task.priority} />
                 <Info
                   label="Người phụ trách"
@@ -212,7 +212,7 @@ function TaskDetailContent({
                   value={task.reporter?.full_name || task.reporter?.email}
                 />
                 <Info label="Công việc cha" value={task.parent_task_id} />
-              </div>
+              </dl>
             </section>
 
             <TaskReviewPanel

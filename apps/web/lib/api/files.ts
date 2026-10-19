@@ -121,4 +121,54 @@ export const filesApi = {
       { method: "DELETE" },
     );
   },
+  /** Managers only: mark / unmark a file as handed over to the client. */
+  setHandover(projectId: string, fileId: string, clientVisible: boolean) {
+    return request<{ id: string; clientVisible: boolean; changed: boolean }>(
+      `/projects/${projectId}/files/${fileId}/handover`,
+      { method: "PATCH", body: JSON.stringify({ clientVisible }) },
+    );
+  },
+};
+
+/** Value of project_files.file_category that marks a handed-over file. */
+export const HANDOVER_CATEGORY = "client_handover";
+
+export interface ClientHandoverFile {
+  id: string;
+  projectId: string;
+  projectCode: string | null;
+  projectName: string | null;
+  projectStatus: string | null;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  handedOverAt: string;
+}
+
+export interface ClientHandoverPage {
+  items: ClientHandoverFile[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export const handoverApi = {
+  listForClient(
+    params: { page?: number; pageSize?: number; projectId?: string } = {},
+  ) {
+    const query = new URLSearchParams({
+      page: String(params.page ?? 1),
+      pageSize: String(params.pageSize ?? 20),
+    });
+    if (params.projectId) query.set("projectId", params.projectId);
+    return request<ClientHandoverPage>(
+      `/client/me/handover?${query.toString()}`,
+    );
+  },
+  downloadForClient(fileId: string) {
+    return request<{ signedUrl: string; expiresIn: number }>(
+      `/client/me/handover/${fileId}/download`,
+    );
+  },
 };
