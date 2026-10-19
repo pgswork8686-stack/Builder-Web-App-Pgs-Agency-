@@ -271,7 +271,7 @@ export function FileManager({
                       <FileText className="h-4 w-4 text-[#3453D1]" />
                       {file.originalName}
                     </span>
-                    <p className="mt-0.5 text-[11px] text-[#94A3B8]">
+                    <p className="mt-0.5 text-[11px] text-[#5F6E85]">
                       {file.mimeType}
                     </p>
                     {file.fileCategory === HANDOVER_CATEGORY && (

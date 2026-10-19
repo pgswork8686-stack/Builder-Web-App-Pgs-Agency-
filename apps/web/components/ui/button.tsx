@@ -54,7 +54,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ghost:
         "bg-transparent text-[#5B6B82] hover:text-[#161827] hover:bg-[#F1F5F9] active:scale-[0.98]",
       danger:
-        "bg-[#FF785A] text-white hover:brightness-110 shadow-xs active:scale-[0.98]",
+        "bg-[#C2381B] text-white hover:bg-[#A82F16] shadow-xs active:scale-[0.98]",
     };
 
     return (
