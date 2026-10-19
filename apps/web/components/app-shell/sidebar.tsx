@@ -75,7 +75,7 @@ export function Sidebar({
               <span className="font-black text-sm tracking-tight text-white leading-tight">
                 PGS Hub
               </span>
-              <span className="text-[10px] font-semibold text-[#5F6E85] tracking-tight truncate">
+              <span className="text-[10px] font-semibold text-[#94A3B8] tracking-tight truncate">
                 {subtitle}
               </span>
             </div>
@@ -86,7 +86,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-[#5F6E85] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
         >
@@ -141,7 +141,7 @@ export function Sidebar({
         {navGroups.map((group, groupIdx) => (
           <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#5F6E85]">
+              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
                 {group.groupTitle}
               </div>
             )}
@@ -159,13 +159,13 @@ export function Sidebar({
                   className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150 group relative select-none ${
                     active
                       ? "bg-[#E7AE18]/15 text-[#F3BA2F] font-bold shadow-2xs border-l-2 border-[#E7AE18]"
-                      : "text-[#5F6E85] hover:text-white hover:bg-white/5"
+                      : "text-[#94A3B8] hover:text-white hover:bg-white/5"
                   } ${collapsed ? "justify-center px-0 py-2 border-l-0" : ""}`}
                 >
                   {!collapsed && (
                     <span
                       className={`text-[10px] font-mono font-medium ${
-                        active ? "text-[#E7AE18]" : "text-[#5F6E85]"
+                        active ? "text-[#E7AE18]" : "text-[#94A3B8]"
                       }`}
                     >
                       {itemNum}
@@ -176,7 +176,7 @@ export function Sidebar({
                     className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
                       active
                         ? "text-[#E7AE18]"
-                        : "text-[#5F6E85] group-hover:text-white"
+                        : "text-[#94A3B8] group-hover:text-white"
                     }`}
                   />
                   {!collapsed && (
@@ -202,7 +202,7 @@ export function Sidebar({
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Cần hỗ trợ?</span>
             </div>
-            <p className="text-[10px] text-[#5F6E85] leading-tight">
+            <p className="text-[10px] text-[#94A3B8] leading-tight">
               {account.role === "client"
                 ? "Gửi yêu cầu hỗ trợ và ticket tới bộ phận CSKH."
                 : "Xem hướng dẫn và trung tâm trợ giúp hệ thống."}
@@ -227,7 +227,7 @@ export function Sidebar({
               <p className="text-xs font-bold text-white truncate group-hover:text-[#F3BA2F] transition-colors">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#5F6E85] truncate">{roleLabel}</p>
+              <p className="text-[10px] text-[#94A3B8] truncate">{roleLabel}</p>
             </div>
           </Link>
         </div>

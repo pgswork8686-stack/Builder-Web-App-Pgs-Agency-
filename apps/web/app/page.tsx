@@ -48,7 +48,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex items-center justify-center gap-1.5 text-xs text-[#5F6E85]">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#94A3B8]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#E7AE18]" />
           <span>Bảo mật dữ liệu doanh nghiệp</span>
         </div>
