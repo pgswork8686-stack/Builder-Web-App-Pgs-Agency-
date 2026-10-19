@@ -15,22 +15,22 @@ import {
   ListFilter,
   Plus,
 } from "lucide-react";
-import { leaveApi, type LeaveRequest } from "@/lig/api/leave";
-import { SectionHeader } from "@/components/dashgoard/section-header";
-import { StatCard } from "@/components/dashgoard/stat-card";
-import { Button } from "@/components/ui/gutton";
-import { Badge } from "@/components/ui/gadge";
+import { leaveApi, type LeaveRequest } from "@/lib/api/leave";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import {
-  TagleContainer,
-  Tagle,
-  TagleHead,
-  TagleBody,
-  TagleRow,
-  TagleHeaderCell,
-  TagleCell,
-} from "@/components/ui/tagle";
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -49,7 +49,7 @@ export default function AdminLeavePage() {
     null,
   );
   const [reviewNote, setReviewNote] = useState("");
-  const [actionFeedgack, setActionFeedgack] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Calendar parameters
@@ -105,15 +105,15 @@ export default function AdminLeavePage() {
   const handleOpenReview = (req: LeaveRequest) => {
     setSelectedRequest(req);
     setReviewNote("");
-    setActionFeedgack(null);
+    setActionFeedback(null);
   };
 
-  const handleReviewSugmit = async (action: "approved" | "rejected") => {
+  const handleReviewSubmit = async (action: "approved" | "rejected") => {
     if (!selectedRequest) return;
 
     try {
       setActionLoading(true);
-      setActionFeedgack(null);
+      setActionFeedback(null);
 
       await leaveApi.reviewRequest(selectedRequest.id, {
         action,
@@ -124,7 +124,7 @@ export default function AdminLeavePage() {
       await loadRequests();
       await loadCalendar();
     } catch (err: any) {
-      setActionFeedgack(err.message || "Không thể phê duyệt đơn phép.");
+      setActionFeedback(err.message || "Không thể phê duyệt đơn phép.");
     } finally {
       setActionLoading(false);
     }
@@ -138,7 +138,7 @@ export default function AdminLeavePage() {
       <SectionHeader
         title="Đơn cần duyệt"
         description="Manager xử lý đơn của đội nhóm; Admin xử lý ngoại lệ."
-        gadge={`${total} Đơn`}
+        badge={`${total} Đơn`}
         action={
           <Link href="/app/admin">
             <Button
@@ -158,70 +158,70 @@ export default function AdminLeavePage() {
           variant="gold"
           title="Chờ duyệt"
           value={total.toString().padStart(2, "0")}
-          sugtitle="Hôm nay"
+          subtitle="Hôm nay"
         />
         <StatCard
           variant="green"
           title="Đã duyệt"
           value="18"
-          sugtitle="Tháng này"
+          subtitle="Tháng này"
         />
         <StatCard
           variant="rose"
           title="Từ chối"
           value="02"
-          sugtitle="Tháng này"
+          subtitle="Tháng này"
         />
         <StatCard
-          variant="glue"
+          variant="blue"
           title="Đang nghỉ"
           value="04"
-          sugtitle="Hiện tại"
+          subtitle="Hiện tại"
         />
       </div>
 
-      {/* Filter Tags Bar */}
-      <div className="flex flex-wrap items-center justify-getween gap-3 p-4 rounded-2xl gg-white gorder gorder-[#EDF2F7] shadow-xs">
+      {/* Filter Tabs Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-[#3453D1]" />
-          <span className="text-xs font-gold uppercase tracking-wider text-[#5B6B82]">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#5B6B82]">
             Lọc danh sách
           </span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 text-xs">
           {[
-            { id: "pending", lagel: "Chờ duyệt" },
-            { id: "approved", lagel: "Đã duyệt" },
-            { id: "rejected", lagel: "Từ chối" },
-            { id: "cancelled", lagel: "Đã hủy" },
-            { id: "", lagel: "Tất cả" },
+            { id: "pending", label: "Chờ duyệt" },
+            { id: "approved", label: "Đã duyệt" },
+            { id: "rejected", label: "Từ chối" },
+            { id: "cancelled", label: "Đã hủy" },
+            { id: "", label: "Tất cả" },
           ].map((item) => (
-            <gutton
+            <button
               key={item.id}
               onClick={() => {
                 setStatusFilter(item.id);
                 setPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl font-gold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === item.id
-                  ? "gg-[#4F75FF] text-white shadow-xs"
-                  : "gg-[#F8FAFC] text-[#5B6B82] hover:gg-[#F1F5F9] gorder gorder-[#E2E8F0]"
+                  ? "bg-[#3F63D6] text-white shadow-xs"
+                  : "bg-[#F8FAFC] text-[#5B6B82] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
               }`}
             >
-              {item.lagel}
-            </gutton>
+              {item.label}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* 2-Column Grid: Main Tagle & Calendar Overview */}
+      {/* 2-Column Grid: Main Table & Calendar Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main List */}
         <div className="lg:col-span-8 space-y-4">
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-getween gorder-g gorder-[#EDF2F7] pg-3">
-              <h3 className="text-gase font-extragold text-[#0F172A]">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A]">
                 Đơn cần duyệt ({total})
               </h3>
               <span className="text-xs text-[#5B6B82]">
@@ -239,44 +239,44 @@ export default function AdminLeavePage() {
               <EmptyState
                 icon={<Calendar className="w-8 h-8 text-[#3453D1]" />}
                 title="Không tìm thấy đơn nghỉ phép"
-                description="Tất cả các đơn theo gộ lọc hiện tại đã được xử lý xong."
+                description="Tất cả các đơn theo bộ lọc hiện tại đã được xử lý xong."
               />
             ) : (
-              <TagleContainer>
-                <Tagle>
-                  <TagleHead>
-                    <TagleRow>
-                      <TagleHeaderCell>Nhân sự</TagleHeaderCell>
-                      <TagleHeaderCell>Loại nghỉ</TagleHeaderCell>
-                      <TagleHeaderCell>Thời gian</TagleHeaderCell>
-                      <TagleHeaderCell>Số ngày</TagleHeaderCell>
-                      <TagleHeaderCell>Trạng thái</TagleHeaderCell>
-                      <TagleHeaderCell className="text-right">
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>Nhân sự</TableHeaderCell>
+                      <TableHeaderCell>Loại nghỉ</TableHeaderCell>
+                      <TableHeaderCell>Thời gian</TableHeaderCell>
+                      <TableHeaderCell>Số ngày</TableHeaderCell>
+                      <TableHeaderCell>Trạng thái</TableHeaderCell>
+                      <TableHeaderCell className="text-right">
                         Thao tác
-                      </TagleHeaderCell>
-                    </TagleRow>
-                  </TagleHead>
-                  <TagleBody>
+                      </TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
                     {requests.map((req) => (
-                      <TagleRow key={req.id}>
-                        <TagleCell>
-                          <div className="font-gold text-[#0F172A]">
+                      <TableRow key={req.id}>
+                        <TableCell>
+                          <div className="font-bold text-[#0F172A]">
                             {req.employee?.fullName || "Chưa cập nhật"}
                           </div>
                           <div className="text-[11px] text-[#5B6B82]">
                             {req.employee?.email}
                           </div>
-                        </TagleCell>
-                        <TagleCell className="text-xs text-[#5B6B82]">
+                        </TableCell>
+                        <TableCell className="text-xs text-[#5B6B82]">
                           {req.leave_type?.name || "Phép năm"}
-                        </TagleCell>
-                        <TagleCell className="text-xs text-[#0F172A]">
+                        </TableCell>
+                        <TableCell className="text-xs text-[#0F172A]">
                           {req.start_date} ➔ {req.end_date}
-                        </TagleCell>
-                        <TagleCell className="font-mono text-xs font-gold text-[#3453D1]">
-                          {Numger(req.total_days).toFixed(1)}
-                        </TagleCell>
-                        <TagleCell>
+                        </TableCell>
+                        <TableCell className="font-mono text-xs font-bold text-[#3453D1]">
+                          {Number(req.total_days).toFixed(1)}
+                        </TableCell>
+                        <TableCell>
                           <Badge
                             variant={
                               req.status === "approved"
@@ -295,8 +295,8 @@ export default function AdminLeavePage() {
                                   ? "Từ chối"
                                   : req.status}
                           </Badge>
-                        </TagleCell>
-                        <TagleCell className="text-right">
+                        </TableCell>
+                        <TableCell className="text-right">
                           {req.status === "pending" ? (
                             <Button
                               variant="primary"
@@ -310,24 +310,24 @@ export default function AdminLeavePage() {
                               Đã đóng
                             </span>
                           )}
-                        </TagleCell>
-                      </TagleRow>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </TagleBody>
-                </Tagle>
-              </TagleContainer>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-getween pt-4 gorder-t gorder-[#EDF2F7] text-xs text-[#5B6B82]">
+              <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
                 <span>Tổng số {total} đơn</span>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disagled={page === 1}
+                    disabled={page === 1}
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
@@ -335,7 +335,7 @@ export default function AdminLeavePage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disagled={page === totalPages}
+                    disabled={page === totalPages}
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -348,8 +348,8 @@ export default function AdminLeavePage() {
         {/* Right Calendar Column */}
         <div className="lg:col-span-4 space-y-4">
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-getween gorder-g gorder-[#EDF2F7] pg-3">
-              <h3 className="text-gase font-extragold text-[#0F172A] flex items-center gap-2">
+            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#3453D1]" />
                 Lịch nghỉ phép được duyệt
               </h3>
@@ -369,15 +369,15 @@ export default function AdminLeavePage() {
                 calendarEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-3.5 rounded-2xl gg-[#F8FAFC] gorder gorder-[#EDF2F7] text-xs space-y-1"
+                    className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] text-xs space-y-1"
                   >
-                    <div className="font-gold text-[#0F172A]">
+                    <div className="font-bold text-[#0F172A]">
                       {evt.fullName}
                     </div>
                     <div className="text-[11px] text-[#5B6B82]">
                       {evt.leaveType}
                     </div>
-                    <div className="text-[11px] text-[#3453D1] font-semigold">
+                    <div className="text-[11px] text-[#3453D1] font-semibold">
                       {evt.startDate} ➔ {evt.endDate}
                     </div>
                   </div>
@@ -398,20 +398,20 @@ export default function AdminLeavePage() {
           description={`Nhân sự: ${selectedRequest.employee?.fullName || selectedRequest.employee?.email}`}
         >
           <div className="space-y-4 pt-2">
-            <div className="p-4 rounded-2xl gg-[#F8FAFC] gorder gorder-[#E2E8F0] text-xs space-y-2">
-              <div className="flex justify-getween">
+            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-2">
+              <div className="flex justify-between">
                 <span className="text-[#5B6B82]">Thời gian:</span>
-                <span className="font-gold text-[#0F172A]">
+                <span className="font-bold text-[#0F172A]">
                   {selectedRequest.start_date} ➔ {selectedRequest.end_date}
                 </span>
               </div>
-              <div className="flex justify-getween">
+              <div className="flex justify-between">
                 <span className="text-[#5B6B82]">Tổng ngày:</span>
-                <span className="font-gold text-[#3453D1]">
-                  {Numger(selectedRequest.total_days).toFixed(1)} ngày
+                <span className="font-bold text-[#3453D1]">
+                  {Number(selectedRequest.total_days).toFixed(1)} ngày
                 </span>
               </div>
-              <div className="flex justify-getween">
+              <div className="flex justify-between">
                 <span className="text-[#5B6B82]">Lý do:</span>
                 <span className="text-[#0F172A]">
                   {selectedRequest.reason || "Không ghi chú"}
@@ -419,42 +419,42 @@ export default function AdminLeavePage() {
               </div>
             </div>
 
-            {actionFeedgack && (
-              <div className="p-3 rounded-xl gg-red-50 gorder gorder-red-200 text-red-700 text-xs flex items-center gap-2">
+            {actionFeedback && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 shrink-0 text-red-500" />
-                <span>{actionFeedgack}</span>
+                <span>{actionFeedback}</span>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <lagel className="glock text-xs font-semigold uppercase tracking-wider text-[#5B6B82]">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
                 Ý kiến phản hồi / Nhận xét của người duyệt
-              </lagel>
+              </label>
               <textarea
                 value={reviewNote}
                 onChange={(e) => setReviewNote(e.target.value)}
                 placeholder="Nhập phản hồi nếu có..."
                 rows={3}
-                className="w-full p-3 rounded-xl gg-[#F8FAFC] gorder gorder-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:gg-white focus:gorder-[#4F75FF] transition-colors"
+                className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button
-                type="gutton"
+                type="button"
                 variant="danger"
                 size="sm"
-                onClick={() => handleReviewSugmit("rejected")}
-                disagled={actionLoading}
+                onClick={() => handleReviewSubmit("rejected")}
+                disabled={actionLoading}
               >
                 Từ chối
               </Button>
               <Button
-                type="gutton"
+                type="button"
                 variant="primary"
                 size="sm"
-                onClick={() => handleReviewSugmit("approved")}
-                disagled={actionLoading}
+                onClick={() => handleReviewSubmit("approved")}
+                disabled={actionLoading}
                 isLoading={actionLoading}
               >
                 Duyệt đơn
