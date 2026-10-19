@@ -142,16 +142,31 @@ jobs:
       # Client -> Team Leader). Kept after the browser gate so a failure here
       # never hides the axe/responsive evidence.
       - name: Flow 05 - client acceptance chain (API + database assertions)
+        if: ${{ !cancelled() }}
         env:
           PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
           PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
           PGS_UAT_EVIDENCE_DIR: uat-evidence
         run: node scripts/uat-flow05-client-acceptance.mjs
 
+      # Same chain through the real browser UI (Playwright), Postgres asserted
+      # after every business step; also refresh, brand-new login, 375px and axe.
+      - name: Flow 05 - Team Leader -> Client -> Team Leader in the browser (Playwright)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow05-ui.mjs
+
       - name: Publish summary
         if: always()
         run: |
           if [ -f uat-evidence/responsive-summary.md ]; then cat uat-evidence/responsive-summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json; do
+            if [ -f "$f" ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "**$f**: $(node -e "const j=require('./$f');console.log(j.result+' ('+j.steps.length+' steps)'+(j.error?' - '+j.error:''))")" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
 
       - name: Upload evidence (screenshots, results, service logs)
         if: always()

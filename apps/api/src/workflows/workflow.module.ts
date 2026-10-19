@@ -6,6 +6,8 @@ import { AutomationModule } from '../automation/automation.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { WorkflowTemplateController } from './workflow-template.controller';
 import { WorkflowRuntimeController } from './workflow-runtime.controller';
+import { ClientApprovalsController } from './client-approvals.controller';
+import { WorkflowAutoTaskScheduler } from './workflow-auto-task.scheduler';
 import { WorkflowService } from './workflow.service';
 import { WorkflowRuntimeService } from './workflow-runtime.service';
 import { WorkflowSlaService } from './workflow-sla.service';
@@ -19,10 +21,15 @@ import { WorkflowValidationService } from './workflow-validation.service';
     forwardRef(() => AutomationModule),
     NotificationsModule,
   ],
-  controllers: [WorkflowTemplateController, WorkflowRuntimeController],
+  controllers: [
+    WorkflowTemplateController,
+    WorkflowRuntimeController,
+    ClientApprovalsController,
+  ],
   providers: [
     WorkflowService,
     WorkflowRuntimeService,
+    WorkflowAutoTaskScheduler,
     WorkflowValidationService,
     WorkflowSlaService,
   ],

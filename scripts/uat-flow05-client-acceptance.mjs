@@ -139,6 +139,17 @@ async function itemStatus(itemId) {
   return rows[0]?.status;
 }
 
+async function poll(label, read, accept, timeoutMs = 15_000) {
+  const started = Date.now();
+  let last;
+  while (Date.now() - started < timeoutMs) {
+    last = await read();
+    if (accept(last)) return last;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+  throw new Error(`${label}: timed out; last value ${JSON.stringify(last)}`);
+}
+
 async function pickWorkflowItem() {
   const { rows } = await db.query(
     `SELECT w.id AS workflow_id, i.id AS item_id
@@ -313,6 +324,48 @@ async function main() {
   );
   step("2. Client sees only own project + client approvals; internal data/403s hold");
 
+  // Aggregate endpoint: server-side status filter + pagination, client only.
+  const aggregate = await api(
+    "GET",
+    "/client/me/approvals?status=pending&page=1&pageSize=1",
+    tokens.client,
+  );
+  expectStatus(aggregate, 200, "Client aggregate approvals");
+  assert.equal(aggregate.data.page, 1);
+  assert.equal(aggregate.data.pageSize, 1);
+  assert.ok(aggregate.data.total >= 1, "pending total counts the new approval");
+  assert.ok(aggregate.data.counts.pending >= 1);
+  assert.equal(aggregate.data.items.length, 1, "pageSize=1 returns one row");
+  const aggregated = aggregate.data.items.find((a) => a.id === approvalId);
+  if (aggregate.data.total === 1) {
+    assert.ok(aggregated, "the only pending approval is the one just requested");
+  }
+  for (const hidden of ["request_note", "decision_note", "requested_by_user_id"]) {
+    assert.ok(
+      !JSON.stringify(aggregate.data).includes(hidden),
+      `aggregate view must not expose ${hidden}`,
+    );
+  }
+  const beyond = await api(
+    "GET",
+    "/client/me/approvals?status=pending&page=9999&pageSize=50",
+    tokens.client,
+  );
+  expectStatus(beyond, 200, "Out-of-range page");
+  assert.deepEqual(beyond.data.items, []);
+  assert.equal(beyond.data.total, aggregate.data.total);
+  expectStatus(
+    await api("GET", "/client/me/approvals?status=bogus", tokens.client),
+    400,
+    "Invalid status must be a 400",
+  );
+  expectStatus(
+    await api("GET", "/client/me/approvals", tokens.leader),
+    403,
+    "Only clients may use the client aggregate",
+  );
+  step("2b. Aggregate endpoint: paginated, filtered, no internal notes, client-only");
+
   // ---- 3. Client asks for a revision ----------------------------------------
   const revisionNote = "Logo cần to hơn và đổi màu nền [LOCAL-UAT flow05]";
   expectStatus(
@@ -386,6 +439,43 @@ async function main() {
     itemStatusAfterApproval: finalItem,
   });
 
+  // The client cannot create internal tasks, so a restricted system actor must
+  // have created every ready auto-task item's primary task, without anyone
+  // opening a page (no internal read happens between approval and this check).
+  const missing = await poll(
+    "ready auto-task items without a primary task",
+    async () =>
+      (
+        await db.query(
+          `SELECT i.id
+             FROM public.project_workflow_stage_items i
+            WHERE i.project_workflow_id = $1::uuid
+              AND i.status::text = 'ready'
+              AND i.auto_create_task = true
+              AND NOT EXISTS (
+                SELECT 1 FROM public.project_workflow_task_links l
+                 WHERE l.project_workflow_stage_item_id = i.id
+                   AND l.link_type = 'primary')`,
+          [workflowId],
+        )
+      ).rows,
+    (rows) => rows.length === 0,
+  );
+  const duplicates = await db.query(
+    `SELECT project_workflow_stage_item_id, count(*)::int AS n
+       FROM public.project_workflow_task_links
+      WHERE link_type = 'primary'
+        AND project_workflow_stage_item_id IN (
+          SELECT id FROM public.project_workflow_stage_items
+           WHERE project_workflow_id = $1::uuid)
+      GROUP BY 1 HAVING count(*) > 1`,
+    [workflowId],
+  );
+  assert.equal(duplicates.rowCount, 0, "no item may have two primary tasks");
+  step("4c. Auto tasks created by the system actor after the client's approval; no duplicates", {
+    stillMissing: missing.length,
+  });
+
   // ---- 5. Persistence after a fresh login -----------------------------------
   const freshClient = await login(U.client.email);
   const again = await api("GET", base, freshClient);
@@ -395,7 +485,21 @@ async function main() {
   assert.equal(byId[secondId].status, "approved");
   assert.equal((await approvalRow(approvalId)).status, "rejected");
   assert.equal((await approvalRow(secondId)).status, "approved");
-  step("5. After re-login the decisions are unchanged (API and database agree)");
+  const tabs = {};
+  for (const status of ["pending", "approved", "rejected"]) {
+    const res = await api(
+      "GET",
+      `/client/me/approvals?status=${status}&page=1&pageSize=50`,
+      freshClient,
+    );
+    expectStatus(res, 200, `Aggregate ${status}`);
+    tabs[status] = res.data;
+  }
+  assert.ok(tabs.rejected.items.some((a) => a.id === approvalId));
+  assert.ok(tabs.approved.items.some((a) => a.id === secondId));
+  assert.ok(!tabs.pending.items.some((a) => [approvalId, secondId].includes(a.id)));
+  assert.ok(tabs.approved.counts.approved >= 1 && tabs.approved.counts.rejected >= 1);
+  step("5. After re-login the decisions are unchanged (API, aggregate tabs and database agree)");
 
   evidence.finishedAt = new Date().toISOString();
   evidence.result = "PASS";

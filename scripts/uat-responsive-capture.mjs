@@ -67,6 +67,7 @@ const ROLES = {
     routes: [
       "/app/client",
       "/app/client/projects",
+      "/app/client/approvals",
       "/app/client/invoices",
       "/app/client/support",
     ],

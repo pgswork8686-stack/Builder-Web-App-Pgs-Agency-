@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, MessageSquareWarning, RefreshCw } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquareWarning,
+  RefreshCw,
+} from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,32 +16,29 @@ import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StateBanner } from "@/components/ui/state-banner";
-import { projectsApi } from "@/lib/api/projects";
-import { workflowsApi } from "@/lib/api/workflows";
+import {
+  workflowsApi,
+  type ClientApprovalItem,
+  type ClientApprovalPage,
+  type ClientApprovalStatus,
+} from "@/lib/api/workflows";
 
 type Decision = "approved" | "rejected";
-type TabKey = "pending" | "approved" | "rejected";
 
-interface ApprovalRow {
-  id: string;
-  status: string;
-  requestedAt: string;
-  respondedAt: string | null;
-  projectId: string;
-  projectCode: string;
-  projectName: string;
-  workflowId: string;
-  stageName: string;
-  itemName: string;
-}
+const PAGE_SIZE = 20;
+const MIN_REVISION_NOTE = 5;
 
-const TABS: Array<{ key: TabKey; label: string }> = [
+const TABS: Array<{ key: ClientApprovalStatus; label: string }> = [
   { key: "pending", label: "Chờ phản hồi" },
   { key: "approved", label: "Đã phê duyệt" },
   { key: "rejected", label: "Đã yêu cầu chỉnh sửa" },
 ];
 
-const MIN_REVISION_NOTE = 5;
+const NO_COUNTS: ClientApprovalPage["counts"] = {
+  pending: 0,
+  approved: 0,
+  rejected: 0,
+};
 
 function formatTime(value: string | null): string {
   if (!value) return "—";
@@ -51,60 +54,15 @@ function errorMessage(caught: unknown, fallback: string): string {
   return caught instanceof Error && caught.message ? caught.message : fallback;
 }
 
-async function loadApprovalRows(): Promise<ApprovalRow[]> {
-  const projects = await projectsApi.getClientProjects(1, 100);
-  const perProject = await Promise.all(
-    projects.items.map(async (project) => {
-      const workflows = await workflowsApi.getProjectWorkflows(project.id);
-      return workflows.flatMap((workflow) => {
-        const stages = workflow.stages ?? [];
-        const items = stages.flatMap((stage) => stage.items ?? []);
-        return (workflow.approvals ?? [])
-          .filter((approval) => approval.approval_type === "client")
-          .map((approval): ApprovalRow => {
-            const item = items.find(
-              (candidate) =>
-                candidate.id === approval.project_workflow_stage_item_id,
-            );
-            const stage = stages.find(
-              (candidate) =>
-                candidate.id ===
-                (item?.project_workflow_stage_id ??
-                  approval.project_workflow_stage_id),
-            );
-            const snapshot = item?.project_service_item;
-            const serviceItem = Array.isArray(snapshot)
-              ? snapshot[0]
-              : snapshot;
-            return {
-              id: approval.id,
-              status: approval.status,
-              requestedAt: approval.requested_at,
-              respondedAt: approval.responded_at ?? null,
-              projectId: project.id,
-              projectCode: project.projectCode,
-              projectName: project.name,
-              workflowId: workflow.id,
-              stageName: stage?.name_snapshot ?? "—",
-              itemName: serviceItem?.name ?? "Sản phẩm bàn giao",
-            };
-          });
-      });
-    }),
-  );
-  return perProject
-    .flat()
-    .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
-}
-
 export default function ClientApprovalsPage() {
-  const [rows, setRows] = useState<ApprovalRow[]>([]);
+  const [tab, setTab] = useState<ClientApprovalStatus>("pending");
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState<ClientApprovalPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabKey>("pending");
   const [target, setTarget] = useState<{
-    row: ApprovalRow;
+    row: ClientApprovalItem;
     decision: Decision;
   } | null>(null);
   const [note, setNote] = useState("");
@@ -116,29 +74,38 @@ export default function ClientApprovalsPage() {
     setLoading(true);
     setError(null);
     try {
-      setRows(await loadApprovalRows());
+      const result = await workflowsApi.listClientApprovals({
+        status: tab,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      // The last row of the last page may have just been answered.
+      if (result.items.length === 0 && page > 1 && result.totalPages > 0) {
+        setPage(result.totalPages);
+        return;
+      }
+      setData(result);
     } catch (caught) {
       setError(errorMessage(caught, "Không thể tải danh sách nghiệm thu."));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tab, page]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  const counts = useMemo(
-    () => ({
-      pending: rows.filter((row) => row.status === "pending").length,
-      approved: rows.filter((row) => row.status === "approved").length,
-      rejected: rows.filter((row) => row.status === "rejected").length,
-    }),
-    [rows],
-  );
-  const visible = rows.filter((row) => row.status === tab);
+  const counts = data?.counts ?? NO_COUNTS;
+  const rows = data?.items ?? [];
+  const totalPages = data?.totalPages ?? 0;
 
-  const openDialog = (row: ApprovalRow, decision: Decision) => {
+  const changeTab = (next: ClientApprovalStatus) => {
+    setTab(next);
+    setPage(1);
+  };
+
+  const openDialog = (row: ClientApprovalItem, decision: Decision) => {
     setTarget({ row, decision });
     setNote("");
     setNoteError(null);
@@ -157,6 +124,7 @@ export default function ClientApprovalsPage() {
       );
       return;
     }
+    const itemName = target.row.itemName ?? "Sản phẩm bàn giao";
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -168,8 +136,8 @@ export default function ClientApprovalsPage() {
       );
       setNotice(
         target.decision === "approved"
-          ? `Đã phê duyệt "${target.row.itemName}".`
-          : `Đã gửi yêu cầu chỉnh sửa cho "${target.row.itemName}".`,
+          ? `Đã phê duyệt "${itemName}".`
+          : `Đã gửi yêu cầu chỉnh sửa cho "${itemName}".`,
       );
       setTarget(null);
       await load();
@@ -230,7 +198,7 @@ export default function ClientApprovalsPage() {
             type="button"
             role="tab"
             aria-selected={tab === item.key}
-            onClick={() => setTab(item.key)}
+            onClick={() => changeTab(item.key)}
             className={`px-4 py-3 text-xs font-bold border-b-2 -mb-px cursor-pointer transition-colors ${
               tab === item.key
                 ? "border-[#3453D1] text-[#3453D1]"
@@ -242,11 +210,11 @@ export default function ClientApprovalsPage() {
         ))}
       </div>
 
-      {loading ? (
+      {loading && !data ? (
         <Card className="p-10 text-center text-xs text-[#5F6E85]">
           <div role="status">Đang tải danh sách nghiệm thu…</div>
         </Card>
-      ) : visible.length === 0 ? (
+      ) : rows.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
             icon={<CheckCircle2 className="w-10 h-10 text-[#0A7F6B]" />}
@@ -259,7 +227,10 @@ export default function ClientApprovalsPage() {
           />
         </Card>
       ) : (
-        <Card className="overflow-x-auto p-0">
+        <Card
+          className={`overflow-x-auto p-0 ${loading ? "opacity-60" : ""}`}
+          aria-busy={loading}
+        >
           <table className="w-full text-left text-xs">
             <thead className="bg-[#F6F8FC] text-[#5F6E85] uppercase tracking-wider">
               <tr>
@@ -286,64 +257,102 @@ export default function ClientApprovalsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EDF2F7] text-[#24304A]">
-              {visible.map((row) => (
-                <tr key={row.id}>
-                  <td className="px-5 py-4 font-bold">{row.itemName}</td>
-                  <td className="px-5 py-4">
-                    <Link
-                      href={`/app/client/projects/${row.projectId}`}
-                      className="font-mono font-bold text-[#3453D1] hover:underline"
-                      title={row.projectName}
-                    >
-                      {row.projectCode}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-4 text-[#5F6E85]">{row.stageName}</td>
-                  <td className="px-5 py-4 text-[#5F6E85]">
-                    {formatTime(row.requestedAt)}
-                  </td>
-                  <td className="px-5 py-4">
-                    {tab === "pending" ? (
-                      <Badge variant="warning" size="sm">
-                        Chờ phản hồi
-                      </Badge>
-                    ) : (
-                      <span className="text-[#5F6E85]">
-                        {formatTime(row.respondedAt)}
-                      </span>
-                    )}
-                  </td>
-                  {tab === "pending" && (
+              {rows.map((row) => {
+                const itemName = row.itemName ?? "Sản phẩm bàn giao";
+                return (
+                  <tr key={row.id} data-approval-id={row.id}>
+                    <td className="px-5 py-4 font-bold">{itemName}</td>
                     <td className="px-5 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() => openDialog(row, "approved")}
-                          aria-label={`Phê duyệt ${row.itemName}`}
-                          leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                        >
-                          Phê duyệt
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openDialog(row, "rejected")}
-                          aria-label={`Yêu cầu chỉnh sửa ${row.itemName}`}
-                          leftIcon={
-                            <MessageSquareWarning className="w-3.5 h-3.5" />
-                          }
-                        >
-                          Yêu cầu chỉnh sửa
-                        </Button>
-                      </div>
+                      <Link
+                        href={`/app/client/projects/${row.projectId}`}
+                        className="font-mono font-bold text-[#3453D1] hover:underline"
+                        title={row.projectName ?? undefined}
+                      >
+                        {row.projectCode ?? "—"}
+                      </Link>
                     </td>
-                  )}
-                </tr>
-              ))}
+                    <td className="px-5 py-4 text-[#5F6E85]">
+                      {row.stageName ?? "—"}
+                    </td>
+                    <td className="px-5 py-4 text-[#5F6E85]">
+                      {formatTime(row.requestedAt)}
+                    </td>
+                    <td className="px-5 py-4">
+                      {tab === "pending" ? (
+                        <Badge variant="warning" size="sm">
+                          Chờ phản hồi
+                        </Badge>
+                      ) : (
+                        <span className="text-[#5F6E85]">
+                          {formatTime(row.respondedAt)}
+                        </span>
+                      )}
+                    </td>
+                    {tab === "pending" && (
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => openDialog(row, "approved")}
+                            aria-label={`Phê duyệt ${itemName}`}
+                            leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                          >
+                            Phê duyệt
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openDialog(row, "rejected")}
+                            aria-label={`Yêu cầu chỉnh sửa ${itemName}`}
+                            leftIcon={
+                              <MessageSquareWarning className="w-3.5 h-3.5" />
+                            }
+                          >
+                            Yêu cầu chỉnh sửa
+                          </Button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Card>
+      )}
+
+      {totalPages > 1 && (
+        <nav
+          aria-label="Phân trang nghiệm thu"
+          className="flex items-center justify-between gap-3 text-xs text-[#5F6E85]"
+        >
+          <span>
+            Trang {page} / {totalPages} · {data?.total ?? 0} mục
+          </span>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page <= 1 || loading}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              leftIcon={<ChevronLeft className="w-3.5 h-3.5" />}
+            >
+              Trang trước
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page >= totalPages || loading}
+              onClick={() =>
+                setPage((current) => Math.min(totalPages, current + 1))
+              }
+              rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
+            >
+              Trang sau
+            </Button>
+          </div>
+        </nav>
       )}
 
       <Dialog
@@ -357,7 +366,7 @@ export default function ClientApprovalsPage() {
         }
         description={
           target
-            ? `${target.row.itemName} · ${target.row.projectCode}`
+            ? `${target.row.itemName ?? "Sản phẩm bàn giao"} · ${target.row.projectCode ?? ""}`
             : undefined
         }
       >
