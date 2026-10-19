@@ -1498,7 +1498,13 @@ export class WorkflowRuntimeService implements OnModuleInit {
         }
       }
     }
-    await this.ensureReadyAutoTasks(projectId, workflowId, user);
+    // A client's approval can unlock successors, but clients may never create
+    // internal tasks (TasksService answers 403 TASK_ACCESS_DENIED, which used to
+    // fail the approval after it had already been stored). Their auto-tasks are
+    // created on the next internal read via reconcileWorkflowReadiness.
+    if (user.role !== 'client') {
+      await this.ensureReadyAutoTasks(projectId, workflowId, user);
+    }
   }
 
   async completeStage(projectId: string, stageId: string, user: RequestUser) {
