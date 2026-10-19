@@ -275,7 +275,7 @@ export default function FinanceDashboard({
                   </div>
                 </div>
 
-                <span className="text-[#94A3B8] text-[11px] shrink-0 font-mono">
+                <span className="text-[#5F6E85] text-[11px] shrink-0 font-mono">
                   {new Date(log.created_at).toLocaleString("vi-VN")}
                 </span>
               </div>

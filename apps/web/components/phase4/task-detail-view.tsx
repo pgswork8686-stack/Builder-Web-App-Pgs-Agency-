@@ -257,7 +257,7 @@ function TaskDetailContent({
             <section className="space-y-4 rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
               <h3 className="font-bold text-[#0F172A] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
-                <p className="text-xs text-[#94A3B8]">Chưa có bình luận.</p>
+                <p className="text-xs text-[#5F6E85]">Chưa có bình luận.</p>
               ) : (
                 <div className="space-y-4">
                   {comments.map((comment) => (
@@ -272,7 +272,7 @@ function TaskDetailContent({
                               comment.author?.email ||
                               "Thành viên"}
                           </p>
-                          <p className="text-[11px] text-[#94A3B8] font-mono">
+                          <p className="text-[11px] text-[#5F6E85] font-mono">
                             {new Date(comment.createdAt).toLocaleString(
                               "vi-VN",
                             )}

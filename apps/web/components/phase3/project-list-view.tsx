@@ -185,7 +185,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       {/* Filter / Search Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
           <input
             type="text"
             placeholder="Tìm mã hoặc tên dự án..."
@@ -305,7 +305,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
                     <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#5B6B82] shrink-0">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        <Calendar className="w-3.5 h-3.5 text-[#5F6E85]" />
                         <span>
                           {project.startDate || "—"} ➔ {project.dueDate || "—"}
                         </span>
@@ -327,7 +327,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                         </Button>
                       )}
 
-                      <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#3453D1] group-hover:translate-x-1 transition-all hidden md:block" />
+                      <ChevronRight className="w-4 h-4 text-[#5F6E85] group-hover:text-[#3453D1] group-hover:translate-x-1 transition-all hidden md:block" />
                     </div>
                   </Card>
                 </Link>

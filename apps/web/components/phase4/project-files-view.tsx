@@ -244,7 +244,7 @@ export function FileManager({
           Đang tải tệp…
         </div>
       ) : files.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#94A3B8]">
+        <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#5F6E85]">
           Chưa có tệp nào.
         </div>
       ) : (
@@ -289,7 +289,7 @@ export function FileManager({
                   <td className="p-4 text-[#5B6B82]">
                     {file.task?.title || "Tệp dự án"}
                   </td>
-                  <td className="p-4 text-[#94A3B8] font-mono">
+                  <td className="p-4 text-[#5F6E85] font-mono">
                     {new Date(file.createdAt).toLocaleString("vi-VN")}
                   </td>
                   <td className="p-4">

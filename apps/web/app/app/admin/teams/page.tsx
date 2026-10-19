@@ -257,7 +257,7 @@ export default function AdminTeamsPage() {
       {/* Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#5F6E85]" />
           <input
             type="text"
             value={searchQuery}
@@ -363,7 +363,7 @@ export default function AdminTeamsPage() {
                       </TableCell>
                       <TableCell className="text-xs text-[#5B6B82]">
                         {leader?.fullName || (
-                          <span className="text-[#94A3B8] italic">
+                          <span className="text-[#5F6E85] italic">
                             Chưa chỉ định
                           </span>
                         )}

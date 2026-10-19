@@ -47,7 +47,7 @@ export function MetricCard({
               <div className="flex items-center gap-2">
                 <span className="text-[#0F172A] font-bold">{item.value}</span>
                 {item.subValue && (
-                  <span className="text-[10px] text-[#94A3B8] font-mono">
+                  <span className="text-[10px] text-[#5F6E85] font-mono">
                     {item.subValue}
                   </span>
                 )}

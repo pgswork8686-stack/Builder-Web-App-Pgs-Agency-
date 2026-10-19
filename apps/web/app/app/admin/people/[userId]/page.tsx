@@ -252,7 +252,7 @@ export default function AdminPersonDetailPage() {
                   {person.fullName || "Chưa cập nhật tên"}
                 </h3>
                 <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
-                  <Mail className="w-3 h-3 text-[#94A3B8]" />
+                  <Mail className="w-3 h-3 text-[#5F6E85]" />
                   {person.email}
                 </p>
               </div>
@@ -291,7 +291,7 @@ export default function AdminPersonDetailPage() {
           <div className="lg:col-span-2">
             {person.role === "client" ? (
               <Card className="p-8 text-center space-y-3">
-                <HelpCircle className="w-10 h-10 text-[#94A3B8] mx-auto" />
+                <HelpCircle className="w-10 h-10 text-[#5F6E85] mx-auto" />
                 <h3 className="text-sm font-bold text-[#0F172A]">
                   Tài khoản Khách hàng
                 </h3>
@@ -338,7 +338,7 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) => setEmployeeCode(e.target.value)}
                         disabled={!!person.employeeProfile}
                         placeholder="Ví dụ: PGS0102"
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#5F6E85]"
                       />
                     </div>
 
@@ -457,7 +457,7 @@ export default function AdminPersonDetailPage() {
                         value={leftDate}
                         onChange={(e) => setLeftDate(e.target.value)}
                         disabled={employmentStatus !== "terminated"}
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#5F6E85]"
                       />
                     </div>
                   </div>

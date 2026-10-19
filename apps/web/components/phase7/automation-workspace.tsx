@@ -361,7 +361,7 @@ export function AutomationWorkspace() {
                   onChange={(event) => setConditionsText(event.target.value)}
                   className="mt-1 min-h-20 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
-                <span className="mt-0.5 block text-[10px] text-[#94A3B8]">
+                <span className="mt-0.5 block text-[10px] text-[#5F6E85]">
                   So khớp payload key/value an toàn.
                 </span>
               </label>
@@ -607,7 +607,7 @@ export function AutomationWorkspace() {
             </div>
             <div className="divide-y divide-[#EDF2F7]">
               {executions.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#94A3B8]">
+                <div className="p-8 text-center text-xs text-[#5F6E85]">
                   Chưa có lượt thực thi nào được ghi nhận.
                 </div>
               ) : (
@@ -621,7 +621,7 @@ export function AutomationWorkspace() {
                         <div className="font-bold text-xs text-[#0F172A]">
                           {execution.rule?.name ?? execution.triggerType}
                         </div>
-                        <div className="text-[11px] text-[#94A3B8] font-mono">
+                        <div className="text-[11px] text-[#5F6E85] font-mono">
                           {execution.eventKey}
                         </div>
                       </div>
@@ -638,7 +638,7 @@ export function AutomationWorkspace() {
                         >
                           {execution.status}
                         </Badge>
-                        <span className="text-[11px] text-[#94A3B8] font-mono">
+                        <span className="text-[11px] text-[#5F6E85] font-mono">
                           {formatDateTime(execution.createdAt)}
                         </span>
                       </div>

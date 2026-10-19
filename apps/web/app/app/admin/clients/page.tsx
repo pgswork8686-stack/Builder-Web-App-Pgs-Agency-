@@ -296,7 +296,7 @@ export default function AdminClientsPage() {
       {/* Filter Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
         <div className="relative sm:col-span-2">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên, mã khách hàng, MST, email, số điện thoại..."
@@ -388,13 +388,13 @@ export default function AdminClientsPage() {
                   <TableCell className="text-xs text-[#5B6B82]">
                     {comp.email && (
                       <div className="flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-[#94A3B8]" />
+                        <Mail className="w-3 h-3 text-[#5F6E85]" />
                         <span>{comp.email}</span>
                       </div>
                     )}
                     {comp.phone && (
                       <div className="flex items-center gap-1 mt-0.5">
-                        <Phone className="w-3 h-3 text-[#94A3B8]" />
+                        <Phone className="w-3 h-3 text-[#5F6E85]" />
                         <span>{comp.phone}</span>
                       </div>
                     )}
@@ -439,7 +439,7 @@ export default function AdminClientsPage() {
                         </a>
                       )}
                       {!comp.zalo && !comp.messenger && !comp.facebook && (
-                        <span className="text-xs text-[#94A3B8]">—</span>
+                        <span className="text-xs text-[#5F6E85]">—</span>
                       )}
                     </div>
                   </TableCell>

@@ -110,7 +110,7 @@ export default function UpdatePasswordPage() {
                 Mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required
@@ -127,7 +127,7 @@ export default function UpdatePasswordPage() {
                 Xác nhận mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required

@@ -306,7 +306,7 @@ export default function AdminLeavePage() {
                               Xét duyệt
                             </Button>
                           ) : (
-                            <span className="text-xs text-[#94A3B8]">
+                            <span className="text-xs text-[#5F6E85]">
                               Đã đóng
                             </span>
                           )}

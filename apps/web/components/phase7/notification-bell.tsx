@@ -240,7 +240,7 @@ export function NotificationBell() {
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
-              <div className="px-4 py-8 text-center text-xs text-[#94A3B8]">
+              <div className="px-4 py-8 text-center text-xs text-[#5F6E85]">
                 Chưa có thông báo mới.
               </div>
             ) : (
@@ -262,7 +262,7 @@ export function NotificationBell() {
                       <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5B6B82]">
                         {item.message}
                       </p>
-                      <div className="mt-2 text-[10px] font-mono text-[#94A3B8]">
+                      <div className="mt-2 text-[10px] font-mono text-[#5F6E85]">
                         {formatDateTime(item.createdAt)}
                       </div>
                       <div className="mt-2.5 flex flex-wrap gap-2">

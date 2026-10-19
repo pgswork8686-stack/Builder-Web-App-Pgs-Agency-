@@ -396,7 +396,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 {contract.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
                 ) : (
-                  <EyeOff className="w-4 h-4 text-[#94A3B8]" />
+                  <EyeOff className="w-4 h-4 text-[#5F6E85]" />
                 )}
                 <span className="text-xs font-bold text-[#0F172A]">
                   {contract.client_visible ? "Đang hiển thị" : "Đang ẩn"}
@@ -430,7 +430,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             </div>
 
             {invoices.length === 0 ? (
-              <p className="py-6 text-center text-xs text-[#94A3B8]">
+              <p className="py-6 text-center text-xs text-[#5F6E85]">
                 Chưa có hóa đơn nào liên kết.
               </p>
             ) : (
@@ -444,7 +444,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                       <p className="font-bold text-[#0F172A] font-mono">
                         {inv.invoice_number}
                       </p>
-                      <p className="text-[10px] text-[#94A3B8] font-mono">
+                      <p className="text-[10px] text-[#5F6E85] font-mono">
                         {inv.issue_date}
                       </p>
                     </div>

@@ -480,7 +480,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             {payments.length === 0 ? (
-              <p className="py-6 text-center text-xs text-[#94A3B8]">
+              <p className="py-6 text-center text-xs text-[#5F6E85]">
                 Chưa ghi nhận thanh toán nào cho hóa đơn này.
               </p>
             ) : (
@@ -512,7 +512,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                           {pay.notes}
                         </p>
                       )}
-                      <div className="text-[10px] text-[#94A3B8]">
+                      <div className="text-[10px] text-[#5F6E85]">
                         Người ghi nhận:{" "}
                         <span className="font-semibold text-[#0F172A]">
                           {pay.recordedBy || "Hệ thống"}
@@ -520,7 +520,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                       </div>
                     </div>
 
-                    <span className="text-[#94A3B8] text-[10px] shrink-0 font-mono">
+                    <span className="text-[#5F6E85] text-[10px] shrink-0 font-mono">
                       {formatVietnamDateTime(pay.paidAt)}
                     </span>
                   </div>
@@ -542,7 +542,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 {invoice.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
                 ) : (
-                  <EyeOff className="w-4 h-4 text-[#94A3B8]" />
+                  <EyeOff className="w-4 h-4 text-[#5F6E85]" />
                 )}
                 <span className="font-bold text-xs text-[#0F172A]">
                   {invoice.client_visible ? "Đang hiển thị" : "Đang ẩn"}
@@ -577,7 +577,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 Số tiền thanh toán *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] font-bold">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#5F6E85] font-bold">
                   {invoice.currency_code}
                 </span>
                 <input

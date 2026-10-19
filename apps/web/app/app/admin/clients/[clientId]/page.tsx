@@ -366,7 +366,7 @@ export default function AdminClientDetailPage() {
               </div>
 
               {memberships.length === 0 ? (
-                <div className="py-8 text-center text-xs text-[#94A3B8]">
+                <div className="py-8 text-center text-xs text-[#5F6E85]">
                   Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
@@ -391,7 +391,7 @@ export default function AdminClientDetailPage() {
                           {m.email}
                         </div>
                         {m.title && (
-                          <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                          <div className="text-[11px] text-[#5F6E85] mt-0.5">
                             Chức danh: {m.title}
                           </div>
                         )}
@@ -407,7 +407,7 @@ export default function AdminClientDetailPage() {
                           }
                         >
                           <Star
-                            className={`w-4 h-4 ${m.isPrimary ? "text-[#854D0E] fill-[#CA8A04]" : "text-[#94A3B8]"}`}
+                            className={`w-4 h-4 ${m.isPrimary ? "text-[#854D0E] fill-[#CA8A04]" : "text-[#5F6E85]"}`}
                           />
                         </Button>
                         <Button

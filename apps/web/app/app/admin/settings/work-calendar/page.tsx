@@ -518,7 +518,7 @@ export default function AdminWorkCalendarPage() {
             <tbody className="divide-y divide-[#EDF2F7]">
               {events.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-[#94A3B8]">
+                  <td colSpan={6} className="p-6 text-center text-[#5F6E85]">
                     Chưa có ngoại lệ lịch nào. Bấm &quot;Thêm ngoại lệ&quot; để
                     tạo ngày nghỉ/làm bù mới.
                   </td>

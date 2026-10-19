@@ -191,7 +191,7 @@ export default function AdminPendingAccountsPage() {
       {/* Search & Filter Bar */}
       <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="relative w-full sm:w-80 flex items-center">
-          <Search className="absolute left-3.5 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 w-4 h-4 text-[#5F6E85] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên hoặc email..."

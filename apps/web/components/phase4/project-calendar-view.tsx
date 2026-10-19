@@ -347,7 +347,7 @@ function ProjectCalendarContent({
         </section>
       )}
       {!loading && tasks.length === 0 && (
-        <p className="text-center text-xs text-[#94A3B8]">
+        <p className="text-center text-xs text-[#5F6E85]">
           Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
         </p>
       )}

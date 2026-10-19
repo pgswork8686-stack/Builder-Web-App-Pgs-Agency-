@@ -360,7 +360,7 @@ export default function AdminPeopleDirectoryPage() {
       {/* 5-Dimension Filter Grid */}
       <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
         <div className="relative sm:col-span-2 lg:col-span-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên, email, mã NV..."
@@ -546,7 +546,7 @@ export default function AdminPeopleDirectoryPage() {
                           {ep.jobTitle}
                         </span>
                       ) : (
-                        <span className="text-[#94A3B8]">—</span>
+                        <span className="text-[#5F6E85]">—</span>
                       )}
                     </TableCell>
 
@@ -892,7 +892,7 @@ export default function AdminPeopleDirectoryPage() {
         <div className="space-y-4 pt-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85] pointer-events-none" />
               <input
                 type="text"
                 placeholder="Tìm kiếm dự án theo tên hoặc mã..."

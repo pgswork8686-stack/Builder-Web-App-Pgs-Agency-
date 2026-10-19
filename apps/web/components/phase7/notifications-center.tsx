@@ -325,7 +325,7 @@ export function NotificationsCenter() {
                             {item.message}
                           </p>
                         </div>
-                        <span className="shrink-0 text-[11px] text-[#94A3B8] font-mono">
+                        <span className="shrink-0 text-[11px] text-[#5F6E85] font-mono">
                           {formatDateTime(item.createdAt)}
                         </span>
                       </div>

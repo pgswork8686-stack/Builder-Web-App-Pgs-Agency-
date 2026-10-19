@@ -176,13 +176,13 @@ export default function AdminDocumentsPage() {
         <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#5F6E85] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] text-[#0F172A] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] text-[#0F172A] placeholder:text-[#5F6E85] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               />
             </div>
             <Button
@@ -212,14 +212,14 @@ export default function AdminDocumentsPage() {
 
       {/* Documents Grid / Table */}
       {loading ? (
-        <div className="p-12 text-center text-[#94A3B8] bg-white rounded-2xl border border-[#EDF2F7]">
+        <div className="p-12 text-center text-[#5F6E85] bg-white rounded-2xl border border-[#EDF2F7]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#3453D1]" />
           Đang tải danh sách tài liệu...
         </div>
       ) : documents.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<FolderOpen className="w-10 h-10 text-[#94A3B8]" />}
+            icon={<FolderOpen className="w-10 h-10 text-[#5F6E85]" />}
             title="Thư viện chưa có tài liệu"
             description="Tải lên tài liệu đầu tiên để chia sẻ trong nội bộ PGS Agency."
           />

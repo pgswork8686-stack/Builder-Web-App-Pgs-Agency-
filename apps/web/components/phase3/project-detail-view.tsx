@@ -1222,11 +1222,11 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
             ) : (
               <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
-                <UploadCloud className="w-6 h-6 text-[#94A3B8] mb-1" />
+                <UploadCloud className="w-6 h-6 text-[#5F6E85] mb-1" />
                 <span className="text-xs font-bold text-[#3453D1]">
                   Chọn tệp từ máy tính để tải lên
                 </span>
-                <span className="text-[11px] text-[#94A3B8] mt-0.5">
+                <span className="text-[11px] text-[#5F6E85] mt-0.5">
                   Hỗ trợ PNG, JPG, PDF, ZIP, DOCX, XLSX (tối đa 50MB)
                 </span>
                 <input

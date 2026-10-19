@@ -245,7 +245,7 @@ function ProjectBoardContent({
     <div className="space-y-4">
       <section className="grid gap-3 rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
         <label className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#5F6E85]" />
           <input
             value={filters.q}
             onChange={(event) =>
@@ -456,7 +456,7 @@ function BoardColumn({
             />
           ))}
           {tasks.length === 0 && (
-            <p className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-xs text-[#94A3B8]">
+            <p className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-xs text-[#5F6E85]">
               Chưa có công việc
             </p>
           )}
@@ -504,7 +504,7 @@ function BoardCard({
           <button
             type="button"
             aria-label={`Kéo để sắp xếp ${task.title}`}
-            className="mt-0.5 cursor-grab text-[#94A3B8] active:cursor-grabbing hover:text-[#0F172A]"
+            className="mt-0.5 cursor-grab text-[#5F6E85] active:cursor-grabbing hover:text-[#0F172A]"
             {...attributes}
             {...listeners}
           >
@@ -527,7 +527,7 @@ function BoardCard({
         <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#3453D1]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
-        <span className="text-[#94A3B8] text-[11px] font-mono">
+        <span className="text-[#5F6E85] text-[11px] font-mono">
           {task.due_date || "Chưa có hạn"}
         </span>
       </div>

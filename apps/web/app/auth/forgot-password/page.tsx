@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
                 Email doanh nghiệp
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="email"
                   required

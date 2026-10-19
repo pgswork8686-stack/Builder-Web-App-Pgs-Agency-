@@ -261,12 +261,12 @@ export default function UserProfilePage() {
                 {userProfile.user.fullName || "Chưa cập nhật tên"}
               </h3>
               <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
-                <Mail className="w-3 h-3 text-[#94A3B8]" />
+                <Mail className="w-3 h-3 text-[#5F6E85]" />
                 {userProfile.user.email}
               </p>
               {userProfile.user.phone && (
                 <p className="text-xs text-[#5B6B82] flex items-center justify-center gap-1.5 mt-1">
-                  <Phone className="w-3 h-3 text-[#94A3B8]" />
+                  <Phone className="w-3 h-3 text-[#5F6E85]" />
                   {userProfile.user.phone}
                 </p>
               )}
@@ -285,7 +285,7 @@ export default function UserProfilePage() {
             <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
               <div className="flex justify-between items-center">
                 <span className="text-[#5B6B82] flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  <Shield className="w-3.5 h-3.5 text-[#5F6E85]" />
                   Vai trò
                 </span>
                 <Badge variant="blue" size="sm">
@@ -294,7 +294,7 @@ export default function UserProfilePage() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-[#5B6B82] flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  <CheckCircle className="w-3.5 h-3.5 text-[#5F6E85]" />
                   Tài khoản
                 </span>
                 <Badge variant="success" size="sm">
@@ -304,7 +304,7 @@ export default function UserProfilePage() {
               {userProfile.account.approvedAt && (
                 <div className="flex justify-between items-center">
                   <span className="text-[#5B6B82] flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    <Calendar className="w-3.5 h-3.5 text-[#5F6E85]" />
                     Kích hoạt ngày
                   </span>
                   <span className="font-mono text-[#0F172A] text-xs">
@@ -329,7 +329,7 @@ export default function UserProfilePage() {
                 </div>
 
                 {!orgContext.companies || orgContext.companies.length === 0 ? (
-                  <div className="text-center py-8 text-xs text-[#94A3B8]">
+                  <div className="text-center py-8 text-xs text-[#5F6E85]">
                     Tài khoản của bạn chưa được liên kết với doanh nghiệp khách
                     hàng nào.
                   </div>
@@ -381,7 +381,7 @@ export default function UserProfilePage() {
                 </div>
 
                 {!orgContext?.employee ? (
-                  <div className="text-center py-8 text-xs text-[#94A3B8]">
+                  <div className="text-center py-8 text-xs text-[#5F6E85]">
                     Chưa có hồ sơ nhân sự (employee profile). Vui lòng liên hệ
                     Quản trị viên để khởi tạo mã nhân sự.
                   </div>

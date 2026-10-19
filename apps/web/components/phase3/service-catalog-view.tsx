@@ -499,7 +499,7 @@ export function ServiceCatalogView() {
           <Card className="p-3 bg-white border border-[#E2E8F0] shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[240px]">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5F6E85]" />
                 <input
                   type="text"
                   value={q}
@@ -592,7 +592,7 @@ export function ServiceCatalogView() {
                               : {svc.category.name}
                             </Badge>
                           ) : (
-                            <span className="text-xs text-[#94A3B8]">
+                            <span className="text-xs text-[#5F6E85]">
                               Chưa gán
                             </span>
                           )}
@@ -607,7 +607,7 @@ export function ServiceCatalogView() {
                                 {owner.department_code || "Đã gán"}
                               </Badge>
                             ) : (
-                              <span className="text-xs text-[#94A3B8]">
+                              <span className="text-xs text-[#5F6E85]">
                                 Chưa gán
                               </span>
                             );
@@ -1153,7 +1153,7 @@ export function ServiceCatalogView() {
                       ].includes(departmentId)
                     );
                   }).length === 0 ? (
-                    <div className="text-xs text-[#94A3B8]">
+                    <div className="text-xs text-[#5F6E85]">
                       Chưa có Team phù hợp. Có thể lưu Owner Department trước và
                       gán Team sau.
                     </div>
