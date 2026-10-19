@@ -200,7 +200,7 @@ export function FileManager({
           />
         )}
         {canUpload && (
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3453D1] px-4 py-2 text-xs font-bold text-white hover:bg-[#2B45B0] transition-colors shadow-xs">
             <Upload className="h-4 w-4" /> Chọn tệp tải lên
             <input
               ref={inputRef}

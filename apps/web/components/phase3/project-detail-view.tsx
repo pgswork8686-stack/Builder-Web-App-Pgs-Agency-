@@ -643,6 +643,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     Chuyển nhanh trạng thái
                   </label>
                   <Select
+                    aria-label="Chuyển nhanh trạng thái"
                     value={project.status}
                     onChange={(e) =>
                       void updateProject({
