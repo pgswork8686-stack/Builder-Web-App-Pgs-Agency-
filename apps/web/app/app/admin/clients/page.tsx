@@ -310,6 +310,7 @@ export default function AdminClientsPage() {
         </div>
 
         <select
+          aria-label="Lọc theo trạng thái"
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);

@@ -1,4 +1,4 @@
-﻿// FLOW 06 - Ke toan: invoice -> partial payment -> final payment, duplicate and
+// FLOW 06 - Ke toan: invoice -> partial payment -> final payment, duplicate and
 // overpayment protection, client visibility/tenant isolation, expense approval
 // and reimbursement with notifications, payments ledger + receivables pages.
 // No real payment: every amount is a record in the disposable database.
@@ -7,7 +7,7 @@ import { createFlow, LOCAL_UAT, runFlow, SLOW, U } from "./lib/flow-kit.mjs";
 
 const flow = await createFlow({
   id: "flow06",
-  title: "Káº¿ toÃ¡n vÃ  tÃ i chÃ­nh",
+  title: "Kế toán và tài chính",
 });
 
 await runFlow(flow, async () => {
@@ -76,7 +76,7 @@ await runFlow(flow, async () => {
     amount,
     paidAt: new Date().toISOString(),
     paymentReference: reference,
-    paymentMethod: "Chuyá»ƒn khoáº£n ngÃ¢n hÃ ng",
+    paymentMethod: "Chuyển khoản ngân hàng",
   });
   const early = await flow.api(
     "POST",
@@ -236,7 +236,7 @@ await runFlow(flow, async () => {
   // ---- 6. Expense: employee submits, accountant approves/rejects/reimburses ---------------
   const project = await flow.api("POST", "/admin/projects", adminToken, {
     clientCompanyId: company,
-    name: `[FLOW06] Dá»± Ã¡n chi phÃ­ ${stamp}`,
+    name: `[FLOW06] Dự án chi phí ${stamp}`,
     status: "active",
     priority: "medium",
     projectManagerUserId: U.leader.id,
@@ -274,7 +274,7 @@ await runFlow(flow, async () => {
       )
     ).rows[0]?.status;
 
-  const approvedId = await newExpense(`Chi phÃ­ Ä‘i láº¡i ${stamp}`);
+  const approvedId = await newExpense(`Chi phí đi lại ${stamp}`);
   assert.equal(await expenseStatus(approvedId), "pending");
   await flow.poll(
     "accountant notified of the submitted expense",
@@ -312,7 +312,7 @@ await runFlow(flow, async () => {
     accountantToken,
     {
       action: "rejected",
-      rejectionReason: "Duyá»‡t láº¡i sau khi Ä‘Ã£ duyá»‡t",
+      rejectionReason: "Duyệt lại sau khi đã duyệt",
     },
   );
   assert.ok(!again.ok, "an expense already processed cannot be reviewed again");
@@ -338,7 +338,7 @@ await runFlow(flow, async () => {
     (r) => r.length === 1,
   );
 
-  const rejectedId = await newExpense(`Chi phÃ­ bá»‹ tá»« chá»‘i ${stamp}`);
+  const rejectedId = await newExpense(`Chi phí bị từ chối ${stamp}`);
   flow.expectStatus(
     await flow.api("POST", `/expenses/${rejectedId}/review`, accountantToken, {
       action: "rejected",
@@ -350,7 +350,7 @@ await runFlow(flow, async () => {
   flow.expectStatus(
     await flow.api("POST", `/expenses/${rejectedId}/review`, accountantToken, {
       action: "rejected",
-      rejectionReason: "Thiáº¿u chá»©ng tá»« há»£p lá»‡",
+      rejectionReason: "Thiếu chứng từ hợp lệ",
     }),
     [200, 201],
     "reject with reason",
@@ -361,7 +361,7 @@ await runFlow(flow, async () => {
     () => flow.notifications(U.employee.id, "expense.rejected", rejectedId),
     (r) => r.length === 1,
   );
-  assert.match(`${rejection[0].message}`, /Thiáº¿u chá»©ng tá»« há»£p lá»‡/);
+  assert.match(`${rejection[0].message}`, /Thiếu chứng từ hợp lệ/);
   flow.step(
     "6. Expense: submit -> accountant notified; employee cannot approve; approve/reimburse/reject(+reason) update DB and notify the employee; no double processing",
     {},
@@ -380,7 +380,7 @@ await runFlow(flow, async () => {
   ).rows[0].n;
   assert.ok((await paymentRows.count()) >= 1);
   await page.getByText(`F06-${stamp}`).first().waitFor({ timeout: SLOW });
-  await page.getByText("ÄÃ£ táº¥t toÃ¡n").first().waitFor({ timeout: SLOW });
+  await page.getByText("Đã tất toán").first().waitFor({ timeout: SLOW });
   await flow.shot(page, "payments-ledger");
 
   // second invoice stays open so it appears in receivables
@@ -417,7 +417,7 @@ await runFlow(flow, async () => {
   await openRow.waitFor({ timeout: SLOW });
   assert.ok(
     /4[.,\s]?000[.,\s]?000/.test(
-      (await openRow.innerText()).replace(/Â /g, " "),
+      (await openRow.innerText()).replace(/ /g, " "),
     ),
     "outstanding must be 4,000,000",
   );
@@ -450,7 +450,7 @@ await runFlow(flow, async () => {
       return route.fulfill({
         status: 500,
         contentType: "application/json",
-        body: JSON.stringify({ message: "MÃ¡y chá»§ lá»—i táº¡m thá»i" }),
+        body: JSON.stringify({ message: "Máy chủ lỗi tạm thời" }),
       });
     }
     return route.continue();
@@ -458,10 +458,8 @@ await runFlow(flow, async () => {
   await page.goto(flow.url("/app/accountant/finance/debts"), {
     waitUntil: "networkidle",
   });
-  await page
-    .getByText("KhÃ´ng táº£i Ä‘Æ°á»£c dá»¯ liá»‡u")
-    .waitFor({ timeout: SLOW });
-  await page.getByRole("button", { name: /Thá»­ láº¡i/ }).click();
+  await page.getByText("Không tải được dữ liệu").waitFor({ timeout: SLOW });
+  await page.getByRole("button", { name: /Thử lại/ }).click();
   await openRow.waitFor({ timeout: SLOW });
   await page.unroute("**/finance/receivables**");
 
