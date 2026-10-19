@@ -17,7 +17,12 @@ describe('ProjectsService scoped project-service reads', () => {
       .mockResolvedValue(services as never);
 
     await expect(
-      service.getScopedProjectServices(USER, 'team_leader', DEPARTMENT, PROJECT),
+      service.getScopedProjectServices(
+        USER,
+        'team_leader',
+        DEPARTMENT,
+        PROJECT,
+      ),
     ).resolves.toEqual(services);
     expect(checkAccess).toHaveBeenCalledWith(
       USER,
@@ -36,7 +41,12 @@ describe('ProjectsService scoped project-service reads', () => {
     const readServices = jest.spyOn(service, 'getProjectServices');
 
     await expect(
-      service.getScopedProjectServices(USER, 'team_leader', DEPARTMENT, PROJECT),
+      service.getScopedProjectServices(
+        USER,
+        'team_leader',
+        DEPARTMENT,
+        PROJECT,
+      ),
     ).rejects.toThrow(ForbiddenException);
     expect(readServices).not.toHaveBeenCalled();
   });
