@@ -19,6 +19,7 @@ function fakeClient(
         'select',
         'eq',
         'in',
+        'gt',
         'order',
         'limit',
         'range',
@@ -260,6 +261,100 @@ describe('sweepMissingAutoTasks', () => {
       workflows: 1,
     });
     expect(internals.createAutoTasksAsSystem).toHaveBeenCalledTimes(2);
+  });
+
+  describe('with more ready items than one query returns', () => {
+    const itemId = (n: number) => `item-${String(n).padStart(4, '0')}`;
+    /** 450 ready auto-task items; only #430-#432 still lack a primary task. */
+    const allItems = Array.from({ length: 450 }, (_, n) => ({
+      id: itemId(n),
+      project_workflow_id: n >= 430 && n <= 432 ? 'wf-late' : 'wf-ok',
+      links: n >= 430 && n <= 432 ? [] : [{ link_type: 'primary' }],
+    }));
+
+    function pagedClient() {
+      return fakeClient((table, calls) => {
+        if (table === 'project_workflow_stage_items') {
+          const after = calls.find((call) => call.method === 'gt')?.args[1];
+          const limit = Number(
+            calls.find((call) => call.method === 'limit')?.args[0],
+          );
+          const remaining = allItems.filter(
+            (item) => typeof after !== 'string' || item.id > after,
+          );
+          return { data: remaining.slice(0, limit) };
+        }
+        return {
+          data: [
+            {
+              id: 'wf-late',
+              project_id: 'project-late',
+              status: 'in_progress',
+            },
+          ],
+        };
+      });
+    }
+
+    it('finds missing items beyond the first 200 and the second page', async () => {
+      const client = pagedClient();
+      const service = buildRuntime(client);
+      const internals = service as unknown as Internals;
+      internals.createAutoTasksAsSystem = jest
+        .fn()
+        .mockResolvedValue(undefined);
+
+      await expect(service.sweepMissingAutoTasks(200)).resolves.toEqual({
+        workflows: 1,
+      });
+
+      expect(internals.createAutoTasksAsSystem).toHaveBeenCalledTimes(1);
+      expect(internals.createAutoTasksAsSystem).toHaveBeenCalledWith(
+        'project-late',
+        'wf-late',
+      );
+      const pages = client.log.filter(
+        (entry) => entry.table === 'project_workflow_stage_items',
+      );
+      expect(pages).toHaveLength(3); // 200 + 200 + 50
+      expect(
+        pages.map(
+          (entry) => entry.calls.find((call) => call.method === 'gt')?.args[1],
+        ),
+      ).toEqual([undefined, itemId(199), itemId(399)]);
+    });
+
+    it('stops after maxPages so one sweep stays bounded', async () => {
+      const client = pagedClient();
+      const service = buildRuntime(client);
+      const internals = service as unknown as Internals;
+      internals.createAutoTasksAsSystem = jest
+        .fn()
+        .mockResolvedValue(undefined);
+
+      // 2 pages x 200 = 400 items scanned: the late items (#430+) stay for the next sweep.
+      await expect(service.sweepMissingAutoTasks(200, 2)).resolves.toEqual({
+        workflows: 0,
+      });
+      expect(internals.createAutoTasksAsSystem).not.toHaveBeenCalled();
+    });
+
+    it('recovers after an incident: a failed run is retried by the next sweep', async () => {
+      const service = buildRuntime(pagedClient());
+      const internals = service as unknown as Internals;
+      internals.createAutoTasksAsSystem = jest
+        .fn()
+        .mockRejectedValueOnce(new Error('database restarting'))
+        .mockResolvedValueOnce(undefined);
+
+      await expect(service.sweepMissingAutoTasks(200)).resolves.toEqual({
+        workflows: 0,
+      });
+      await expect(service.sweepMissingAutoTasks(200)).resolves.toEqual({
+        workflows: 1,
+      });
+      expect(internals.createAutoTasksAsSystem).toHaveBeenCalledTimes(2);
+    });
   });
 });
 

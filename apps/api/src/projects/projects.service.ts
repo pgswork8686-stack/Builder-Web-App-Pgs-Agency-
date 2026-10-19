@@ -6,7 +6,9 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import {
   CreateProjectDto,
@@ -26,10 +28,55 @@ type ProjectRow = Record<string, any>;
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly notifications?: NotificationsService,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
+  }
+
+  /**
+   * Always-on notification when someone is made project manager or added to a
+   * project (no automation rule needed). Never fails the write.
+   */
+  private async notifyProjectAssignment(
+    kind: 'manager' | 'member',
+    project: { id: string; name?: string | null; project_code?: string | null },
+    recipientUserId: string,
+    actorUserId: string,
+  ): Promise<void> {
+    if (!this.notifications || recipientUserId === actorUserId) return;
+    const label = [project.project_code, project.name]
+      .filter(Boolean)
+      .join(' · ');
+    try {
+      await this.notifications.createForUser({
+        recipientUserId,
+        type:
+          kind === 'manager'
+            ? 'project.manager_assigned'
+            : 'project.member_added',
+        title:
+          kind === 'manager'
+            ? 'Bạn được giao quản lý dự án'
+            : 'Bạn được thêm vào dự án',
+        message:
+          kind === 'manager'
+            ? `Bạn là quản lý dự án ${label}. Hãy xem yêu cầu và phân công công việc.`
+            : `Bạn đã được thêm vào dự án ${label}.`,
+        entityType: 'project',
+        entityId: project.id,
+        actionUrl: `/app/projects/${project.id}`,
+        metadata: { projectId: project.id },
+        actorUserId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Project assignment notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   private databaseFailure(code: string, message: string, error: any): never {
@@ -382,6 +429,14 @@ export class ProjectsService {
         error,
       );
     }
+    if (dto.projectManagerUserId) {
+      await this.notifyProjectAssignment(
+        'manager',
+        data,
+        dto.projectManagerUserId,
+        actorUserId,
+      );
+    }
     return this.mapProject(data);
   }
 
@@ -446,6 +501,17 @@ export class ProjectsService {
         'PROJECT_UPDATE_FAILED',
         'Không thể cập nhật dự án lúc này.',
         error,
+      );
+    }
+    if (
+      dto.projectManagerUserId &&
+      dto.projectManagerUserId !== existing.project_manager_user_id
+    ) {
+      await this.notifyProjectAssignment(
+        'manager',
+        data,
+        dto.projectManagerUserId,
+        actorUserId,
       );
     }
     return this.mapProject(data);
@@ -576,6 +642,12 @@ export class ProjectsService {
     if (error) {
       this.mapMembershipWriteError(error);
     }
+    await this.notifyProjectAssignment(
+      dto.projectRole === 'project_manager' ? 'manager' : 'member',
+      project,
+      dto.userId,
+      actorUserId,
+    );
     return data;
   }
 

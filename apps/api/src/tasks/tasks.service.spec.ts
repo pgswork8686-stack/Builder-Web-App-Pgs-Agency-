@@ -507,7 +507,7 @@ describe('TasksService', () => {
         queryResult({ data: taskRow({ assignee_user_id: USER_ID }) }),
       );
     client.rpc.mockResolvedValueOnce({
-      data: taskRow({ assignee_user_id: USER_ID, status: 'done' }),
+      data: taskRow({ assignee_user_id: USER_ID, status: 'review' }),
       error: null,
     });
 
@@ -515,10 +515,10 @@ describe('TasksService', () => {
       service.updateTask(
         PROJECT_ID,
         TASK_ID,
-        { status: 'done' },
+        { status: 'review' },
         user('employee'),
       ),
-    ).resolves.toMatchObject({ status: 'done' });
+    ).resolves.toMatchObject({ status: 'review' });
     expect(client.rpc).toHaveBeenCalledWith('phase4_update_task_atomic', {
       p_project_id: PROJECT_ID,
       p_task_id: TASK_ID,
@@ -530,7 +530,7 @@ describe('TasksService', () => {
       p_set_description: false,
       p_description: null,
       p_set_status: true,
-      p_status: 'done',
+      p_status: 'review',
       p_set_priority: false,
       p_priority: null,
       p_set_assignee: false,

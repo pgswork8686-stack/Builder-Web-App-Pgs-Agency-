@@ -62,6 +62,8 @@ export const UpdateTaskSchema = z
     assigneeUserId: z.string().uuid().nullable().optional(),
     startDate: DateSchema.nullable().optional(),
     dueDate: DateSchema.nullable().optional(),
+    // Reason a manager gives when sending a task in review back for changes.
+    reviewNote: z.string().trim().max(1000).optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

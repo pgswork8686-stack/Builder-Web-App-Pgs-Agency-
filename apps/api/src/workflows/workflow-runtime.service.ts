@@ -521,38 +521,54 @@ export class WorkflowRuntimeService implements OnModuleInit {
    * task (for example after a client approval, a restart, or a failed run) and
    * creates them. Returns how many workflows were processed.
    */
-  async sweepMissingAutoTasks(limit = 200): Promise<{ workflows: number }> {
-    const { data: items, error } = await this.client
-      .from('project_workflow_stage_items')
-      .select(
-        'id,project_workflow_id,links:project_workflow_task_links(link_type)',
-      )
-      .eq('status', 'ready')
-      .eq('auto_create_task', true)
-      .limit(limit);
-    if (error) this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', error);
-    const workflowIds = [
-      ...new Set(
-        (items ?? [])
-          .filter(
-            (item) =>
-              !(Array.isArray(item.links) ? item.links : []).some(
-                (link: { link_type?: string }) => link.link_type === 'primary',
-              ),
-          )
-          .map((item) => String(item.project_workflow_id)),
-      ),
-    ];
-    if (workflowIds.length === 0) return { workflows: 0 };
-    const { data: workflows, error: workflowError } = await this.client
-      .from('project_workflows')
-      .select('id,project_id,status')
-      .in('id', workflowIds);
-    if (workflowError) {
-      this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', workflowError);
+  async sweepMissingAutoTasks(
+    pageSize = 200,
+    maxPages = 50,
+  ): Promise<{ workflows: number }> {
+    // Keyset-paginate through ALL ready auto-task items: a single capped query
+    // would never see missing items that sit beyond its limit.
+    const missingWorkflowIds = new Set<string>();
+    let cursor: string | null = null;
+    for (let page = 0; page < maxPages; page += 1) {
+      let query = this.client
+        .from('project_workflow_stage_items')
+        .select(
+          'id,project_workflow_id,links:project_workflow_task_links(link_type)',
+        )
+        .eq('status', 'ready')
+        .eq('auto_create_task', true)
+        .order('id', { ascending: true })
+        .limit(pageSize);
+      if (cursor) query = query.gt('id', cursor);
+      const { data: items, error } = await query;
+      if (error) this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', error);
+      const rows = items ?? [];
+      for (const item of rows) {
+        const hasPrimary = (Array.isArray(item.links) ? item.links : []).some(
+          (link: { link_type?: string }) => link.link_type === 'primary',
+        );
+        if (!hasPrimary)
+          missingWorkflowIds.add(String(item.project_workflow_id));
+      }
+      if (rows.length < pageSize) break;
+      cursor = String(rows[rows.length - 1].id);
+    }
+    if (missingWorkflowIds.size === 0) return { workflows: 0 };
+
+    const workflows: Array<Record<string, unknown>> = [];
+    const ids = [...missingWorkflowIds];
+    for (let start = 0; start < ids.length; start += 100) {
+      const { data, error: workflowError } = await this.client
+        .from('project_workflows')
+        .select('id,project_id,status')
+        .in('id', ids.slice(start, start + 100));
+      if (workflowError) {
+        this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', workflowError);
+      }
+      workflows.push(...(data ?? []));
     }
     let processed = 0;
-    for (const workflow of workflows ?? []) {
+    for (const workflow of workflows) {
       if (['completed', 'cancelled'].includes(String(workflow.status))) {
         continue;
       }

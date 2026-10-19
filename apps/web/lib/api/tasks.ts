@@ -28,6 +28,8 @@ export interface ProjectTask {
   created_at: string;
   updated_at: string;
   canUpdateStatus: boolean;
+  /** Manager-only: may approve a task in review or send it back for changes. */
+  canApprove?: boolean;
   project?: {
     id: string;
     name: string;
@@ -121,6 +123,8 @@ export const tasksApi = {
       startDate?: string | null;
       dueDate?: string | null;
       sortOrder?: number;
+      /** Required by the API when a manager sends a task in review back. */
+      reviewNote?: string;
     },
   ) {
     return request<ProjectTask>(`/projects/${projectId}/tasks/${taskId}`, {

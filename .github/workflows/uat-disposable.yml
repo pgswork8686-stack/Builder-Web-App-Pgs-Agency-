@@ -157,11 +157,47 @@ jobs:
           PGS_UAT_EVIDENCE_DIR: uat-evidence
         run: node scripts/uat-flow05-ui.mjs
 
+      # Cross-role flows 01-04 (Playwright UI + API + Postgres). They chain
+      # through uat-evidence/flow-state.json (project created in 01 is used by
+      # 02-04) but every flow falls back to the seeded project, and each step
+      # runs even if an earlier one failed.
+      - name: Flow 01 - Admin creates customer, project, manager, member, service
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow01-project-init.mjs
+
+      - name: Flow 02 - Team Leader creates and assigns a task
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow02-task-assignment.mjs
+
+      - name: Flow 03 - Employee executes, reports and submits for review
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow03-task-execution.mjs
+
+      - name: Flow 04 - Team Leader rejects and approves (internal review)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow04-internal-review.mjs
+
       - name: Publish summary
         if: always()
         run: |
           if [ -f uat-evidence/responsive-summary.md ]; then cat uat-evidence/responsive-summary.md >> "$GITHUB_STEP_SUMMARY"; fi
-          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json; do
+          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json uat-evidence/flow01/flow01-results.json uat-evidence/flow02/flow02-results.json uat-evidence/flow03/flow03-results.json uat-evidence/flow04/flow04-results.json; do
             if [ -f "$f" ]; then
               echo "" >> "$GITHUB_STEP_SUMMARY"
               echo "**$f**: $(node -e "const j=require('./$f');console.log(j.result+' ('+j.steps.length+' steps)'+(j.error?' - '+j.error:''))")" >> "$GITHUB_STEP_SUMMARY"

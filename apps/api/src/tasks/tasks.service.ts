@@ -86,6 +86,103 @@ export class TasksService {
     }
   }
 
+  /**
+   * Rollback switch for the review gate: TASK_ALLOW_ASSIGNEE_DONE=true lets an
+   * assigned member mark their own task "done" again (previous behaviour).
+   */
+  private assigneeMayApproveOwnWork(): boolean {
+    return process.env.TASK_ALLOW_ASSIGNEE_DONE === 'true';
+  }
+
+  /** The revision reason becomes a normal task comment (visible in the thread). */
+  private async recordReviewNote(
+    taskId: string,
+    manager: RequestUser,
+    note: string,
+  ): Promise<void> {
+    const { error } = await this.client.from('task_comments').insert({
+      task_id: taskId,
+      author_user_id: manager.profileId,
+      content: `Yêu cầu chỉnh sửa: ${note}`,
+    });
+    if (error) {
+      // The status change is already stored and the note still travels in the
+      // notification, so do not fail the request.
+      this.logger.error(`Review note comment failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Always-on notifications for the review loop (no automation rule needed):
+   * submit -> project managers; approve / send back -> the assignee.
+   */
+  private async notifyReviewTransition(
+    projectId: string,
+    previous: Record<string, any>,
+    task: Record<string, any>,
+    actor: RequestUser,
+    note?: string,
+  ): Promise<void> {
+    if (!this.notifications) return;
+    const from = String(previous.status);
+    const to = String(task.status);
+    if (from === to) return;
+    try {
+      const actionUrl = `/app/projects/${projectId}/tasks/${task.id}`;
+      const actorName = actor.fullName ?? actor.email ?? 'Thành viên';
+      const base = {
+        entityType: 'task',
+        entityId: String(task.id),
+        actionUrl,
+        metadata: { projectId },
+        actorUserId: actor.profileId,
+      };
+      if (to === 'review') {
+        const project = await this.requireProject(projectId);
+        const { data: managers } = await this.client
+          .from('project_memberships')
+          .select('user_id')
+          .eq('project_id', projectId)
+          .eq('project_role', 'project_manager');
+        const recipients = [
+          project.project_manager_user_id,
+          ...(Array.isArray(managers)
+            ? managers.map((row) => row.user_id)
+            : []),
+        ].filter((id): id is string => typeof id === 'string' && id.length > 0);
+        await this.notifications.createForUsers(recipients, {
+          ...base,
+          type: 'task.review_requested',
+          title: 'Công việc chờ duyệt',
+          message: `${actorName} đã gửi kết quả công việc "${task.title}" để duyệt.`,
+        });
+        return;
+      }
+      if (from !== 'review' || typeof task.assignee_user_id !== 'string') {
+        return;
+      }
+      if (to === 'done') {
+        await this.notifications.createForUsers([task.assignee_user_id], {
+          ...base,
+          type: 'task.review_approved',
+          title: 'Công việc đã được duyệt',
+          message: `${actorName} đã duyệt hoàn thành công việc "${task.title}".`,
+        });
+      } else if (to === 'todo' || to === 'in_progress') {
+        await this.notifications.createForUsers([task.assignee_user_id], {
+          ...base,
+          type: 'task.review_rejected',
+          title: 'Yêu cầu chỉnh sửa công việc',
+          message: `${actorName} yêu cầu chỉnh sửa công việc "${task.title}".${note ? ` Lý do: ${note}` : ''}`,
+        });
+      }
+    } catch (error) {
+      this.logger.error(
+        `Review notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
   private async runTaskSideEffects(
     triggerType: 'task.created' | 'task.assigned' | 'task.updated',
     eventKey: string,
@@ -454,6 +551,7 @@ export class TasksService {
           access.isAdmin ||
           access.projectRole === 'project_manager' ||
           task.assignee_user_id === user.profileId,
+        canApprove: access.isAdmin || access.projectRole === 'project_manager',
       })),
       page: filters.page,
       pageSize: filters.pageSize,
@@ -587,6 +685,7 @@ export class TasksService {
             user.role === 'admin' ||
             (!isViewer &&
               (isManager || task.assignee_user_id === user.profileId)),
+          canApprove: user.role === 'admin' || (!isViewer && isManager),
         };
       }),
       page: filters.page,
@@ -610,6 +709,7 @@ export class TasksService {
         access.isAdmin ||
         access.projectRole === 'project_manager' ||
         task.assignee_user_id === user.profileId,
+      canApprove: access.isAdmin || access.projectRole === 'project_manager',
     };
   }
 
@@ -707,7 +807,36 @@ export class TasksService {
     return data;
   }
 
+  /**
+   * Updates of the same task run one after another in this process, so two
+   * managers approving at the same moment produce one transition and one set of
+   * notifications (the second sees the task already done). Across several API
+   * instances the DB still keeps the data consistent; only a duplicate
+   * notification would be possible there.
+   */
+  private readonly taskUpdateQueue = new Map<string, Promise<unknown>>();
+
   async updateTask(
+    projectId: string,
+    taskId: string,
+    dto: UpdateTaskDto,
+    user: RequestUser,
+  ) {
+    const previous = this.taskUpdateQueue.get(taskId) ?? Promise.resolve();
+    const run = previous
+      .catch(() => undefined)
+      .then(() => this.updateTaskUnlocked(projectId, taskId, dto, user));
+    this.taskUpdateQueue.set(taskId, run);
+    try {
+      return await run;
+    } finally {
+      if (this.taskUpdateQueue.get(taskId) === run) {
+        this.taskUpdateQueue.delete(taskId);
+      }
+    }
+  }
+
+  private async updateTaskUnlocked(
     projectId: string,
     taskId: string,
     dto: UpdateTaskDto,
@@ -731,6 +860,41 @@ export class TasksService {
           message: 'Thành viên được giao việc chỉ có thể cập nhật trạng thái.',
         });
       }
+    }
+
+    // Review gate: a member submits work for review ("review"); only a manager
+    // approves it ("done") or reopens an approved task. This is what lets the
+    // Team Leader actually decide on an Employee's result.
+    if (
+      dto.status !== undefined &&
+      !manager &&
+      !this.assigneeMayApproveOwnWork() &&
+      (dto.status === 'done' || existing.status === 'done')
+    ) {
+      throw new ForbiddenException({
+        code: 'TASK_REVIEW_REQUIRED',
+        message:
+          'Hãy gửi công việc sang "Đang duyệt"; chỉ Trưởng nhóm/quản lý dự án mới duyệt hoàn thành.',
+      });
+    }
+    if (dto.reviewNote !== undefined && dto.status === undefined) {
+      throw new BadRequestException({
+        code: 'REVIEW_NOTE_NOT_ALLOWED',
+        message: 'Lý do chỉnh sửa chỉ đi kèm việc đổi trạng thái.',
+      });
+    }
+    const sendsBackForChanges =
+      manager &&
+      dto.status !== undefined &&
+      existing.status === 'review' &&
+      ['todo', 'in_progress'].includes(dto.status) &&
+      typeof existing.assignee_user_id === 'string' &&
+      existing.assignee_user_id !== user.profileId;
+    if (sendsBackForChanges && (dto.reviewNote ?? '').trim().length < 5) {
+      throw new BadRequestException({
+        code: 'REVIEW_NOTE_REQUIRED',
+        message: 'Vui lòng nhập lý do yêu cầu chỉnh sửa (tối thiểu 5 ký tự).',
+      });
     }
 
     if (dto.assigneeUserId) {
@@ -859,6 +1023,13 @@ export class TasksService {
         user,
         existing,
       );
+    }
+    if (dto.status !== undefined && data.status !== existing.status) {
+      const note = dto.reviewNote?.trim() || undefined;
+      if (sendsBackForChanges && note) {
+        await this.recordReviewNote(taskId, user, note);
+      }
+      await this.notifyReviewTransition(projectId, existing, data, user, note);
     }
     if (
       dto.status !== undefined &&

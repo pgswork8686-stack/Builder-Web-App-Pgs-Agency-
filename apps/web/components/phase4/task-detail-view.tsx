@@ -7,6 +7,7 @@ import { commentsApi, type TaskComment } from "@/lib/api/comments";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { tasksApi, type ProjectTask, type TaskStatus } from "@/lib/api/tasks";
 import { FileManager } from "./project-files-view";
+import { TaskReviewPanel } from "./task-review-panel";
 import {
   ProjectWorkspaceRealtimeProvider,
   useProjectWorkspaceRealtime,
@@ -180,11 +181,19 @@ function TaskDetailContent({
                     aria-label="Đổi trạng thái công việc"
                     className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-bold text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   >
-                    {statuses.map((status) => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
+                    {statuses
+                      .filter(
+                        (status) =>
+                          // only managers can approve: hide "done" for members
+                          task.canApprove !== false ||
+                          status.value !== "done" ||
+                          task.status === "done",
+                      )
+                      .map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
                   </select>
                 ) : (
                   <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-bold text-[#3453D1]">
@@ -205,6 +214,13 @@ function TaskDetailContent({
                 <Info label="Công việc cha" value={task.parent_task_id} />
               </div>
             </section>
+
+            <TaskReviewPanel
+              task={task}
+              projectId={projectId}
+              onChanged={load}
+              onError={setError}
+            />
 
             <section className="grid gap-5 md:grid-cols-2">
               <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
