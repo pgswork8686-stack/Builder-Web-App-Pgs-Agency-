@@ -51,7 +51,6 @@ const SUPABASE_BASE_URL = assertLoopbackUrl(SUPABASE_URL, "SUPABASE_URL", [
 const U = LOCAL_UAT.users;
 const PROJECT = LOCAL_UAT.projects.managed;
 const FOREIGN_PROJECT = LOCAL_UAT.projects.foreign;
-const RULE_PREFIX = `${LOCAL_UAT.titlePrefix} flow05`;
 
 const db = new Client({ connectionString: DATABASE_URL });
 const evidence = { startedAt: new Date().toISOString(), steps: [] };
@@ -169,56 +168,6 @@ async function pickWorkflowItem() {
   return rows[0];
 }
 
-async function ensureAutomationRules(adminToken) {
-  const rules = [
-    {
-      name: `${RULE_PREFIX} client notified on approval request`,
-      triggerType: "workflow.approval.requested",
-      conditions: { approvalType: "client" },
-      actionConfig: {
-        clientCompanyMembersFromPayload: "clientCompanyId",
-        title: "Có sản phẩm đang chờ bạn nghiệm thu",
-        message: "Agency đã gửi sản phẩm để bạn xem và phê duyệt.",
-        actionUrl: "/app/client/approvals",
-      },
-    },
-    {
-      name: `${RULE_PREFIX} leader notified on client approval`,
-      triggerType: "workflow.approval.approved",
-      conditions: { approvalType: "client" },
-      actionConfig: {
-        recipientFromPayload: "requesterUserId",
-        title: "Khách hàng đã phê duyệt sản phẩm",
-        message: "Khách hàng đã nghiệm thu sản phẩm bạn gửi.",
-        actionUrl: "/app/team-leader/approvals",
-      },
-    },
-    {
-      name: `${RULE_PREFIX} leader notified on client revision request`,
-      triggerType: "workflow.approval.rejected",
-      conditions: { approvalType: "client" },
-      actionConfig: {
-        recipientFromPayload: "requesterUserId",
-        title: "Khách hàng yêu cầu chỉnh sửa",
-        message: "Khách hàng đã gửi yêu cầu chỉnh sửa. Xem chi tiết phản hồi.",
-        actionUrl: "/app/team-leader/approvals",
-      },
-    },
-  ];
-  for (const rule of rules) {
-    const existing = await db.query(
-      `SELECT 1 FROM public.automation_rules WHERE name = $1`,
-      [rule.name],
-    );
-    if (existing.rowCount > 0) continue;
-    const res = await api("POST", "/automation/rules", adminToken, rule);
-    expectStatus(res, [200, 201], `create automation rule ${rule.triggerType}`);
-  }
-  step("Admin configured 3 automation rules via POST /automation/rules", {
-    note: "No default rules ship for workflow.approval.*; see docs/ux/INTERACTION_GAPS.md G-11",
-  });
-}
-
 async function main() {
   await db.connect();
   console.log("\n=== FLOW 05: CLIENT ACCEPTANCE (database-backed) ===\n");
@@ -248,7 +197,6 @@ async function main() {
     workflowId,
     itemId,
   });
-  await ensureAutomationRules(tokens.admin);
   const base = `/projects/${PROJECT.id}/workflows/${workflowId}/approvals`;
 
   // ---- Negative RBAC before the happy path ----------------------------------
@@ -293,7 +241,7 @@ async function main() {
 
   const clientNotes = await notificationsFor(
     U.client.id,
-    "workflow.approval.requested",
+    "workflow.client_approval.requested",
     approvalId,
   );
   assert.equal(
@@ -303,12 +251,12 @@ async function main() {
   );
   assert.equal(clientNotes[0].action_url, "/app/client/approvals");
   assert.equal(
-    (await notificationsFor(U.employee.id, "workflow.approval.requested", approvalId))
+    (await notificationsFor(U.employee.id, "workflow.client_approval.requested", approvalId))
       .length,
     0,
     "Unrelated users must not be notified",
   );
-  step("1c. Client notified (1 row, deep link /app/client/approvals)");
+  step("1c. Client notified by default (1 row, deep link /app/client/approvals) - no automation rule configured");
 
   // ---- 2. Client opens only what they may see --------------------------------
   const notifApi = await api("GET", "/notifications", tokens.client);
@@ -399,7 +347,7 @@ async function main() {
   assert.equal(seen.decision_note, revisionNote);
   const leaderNotes = await notificationsFor(
     U.leader.id,
-    "workflow.approval.rejected",
+    "workflow.client_approval.rejected",
     approvalId,
   );
   assert.equal(leaderNotes.length, 1, "Leader must be notified of the revision request");
@@ -428,7 +376,7 @@ async function main() {
   const finalItem = await itemStatus(itemId);
   assert.notEqual(finalItem, "pending_approval");
   assert.equal(
-    (await notificationsFor(U.leader.id, "workflow.approval.approved", secondId))
+    (await notificationsFor(U.leader.id, "workflow.client_approval.approved", secondId))
       .length,
     1,
     "Leader must be notified of the approval",

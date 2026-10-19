@@ -3,6 +3,7 @@ import { SupabaseModule } from '../supabase/supabase.module';
 import { WorkCalendarModule } from '../work-calendar/work-calendar.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { AutomationModule } from '../automation/automation.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { WorkflowTemplateController } from './workflow-template.controller';
 import { WorkflowRuntimeController } from './workflow-runtime.controller';
 import { WorkflowService } from './workflow.service';
@@ -16,6 +17,7 @@ import { WorkflowValidationService } from './workflow-validation.service';
     WorkCalendarModule,
     forwardRef(() => TasksModule),
     forwardRef(() => AutomationModule),
+    NotificationsModule,
   ],
   controllers: [WorkflowTemplateController, WorkflowRuntimeController],
   providers: [

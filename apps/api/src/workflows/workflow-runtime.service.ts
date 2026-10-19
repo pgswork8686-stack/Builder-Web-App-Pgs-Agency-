@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { TasksService } from '../tasks/tasks.service';
 import type {
@@ -50,6 +51,7 @@ export class WorkflowRuntimeService implements OnModuleInit {
     private readonly tasksService: TasksService,
     private readonly slaService: WorkflowSlaService,
     private readonly automation?: AutomationService,
+    private readonly notifications?: NotificationsService,
   ) {}
 
   onModuleInit(): void {
@@ -334,6 +336,97 @@ export class WorkflowRuntimeService implements OnModuleInit {
     } catch (error) {
       this.logger.error(
         `Workflow automation failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  /**
+   * Client acceptance notifications are part of the business flow, so they do
+   * not depend on admin-configured automation rules: the client company is
+   * told when acceptance is requested, and the requester / project manager are
+   * told of the decision. Failures are logged and never fail the approval.
+   */
+  private async notifyClientApproval(
+    kind: 'requested' | 'approved' | 'rejected',
+    approval: {
+      id: string;
+      approval_type: string;
+      requested_by_user_id: string;
+    },
+    projectId: string,
+    actorId: string,
+    decisionNote?: string | null,
+  ): Promise<void> {
+    if (!this.notifications || approval.approval_type !== 'client') return;
+    try {
+      const { data: project, error: projectError } = await this.client
+        .from('projects')
+        .select('name,client_company_id,project_manager_user_id')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (projectError) throw projectError;
+      if (!project) return;
+
+      let recipients: string[];
+      if (kind === 'requested') {
+        const { data, error } = await this.client
+          .from('client_memberships')
+          .select(
+            'user_id, profile:profiles!client_memberships_user_id_fkey(account_status)',
+          )
+          .eq('client_company_id', project.client_company_id);
+        if (error) throw error;
+        recipients = (data ?? [])
+          .filter((row) => {
+            const profile = Array.isArray(row.profile)
+              ? row.profile[0]
+              : row.profile;
+            return profile?.account_status === 'active';
+          })
+          .map((row) => String(row.user_id));
+      } else {
+        recipients = [
+          approval.requested_by_user_id,
+          project.project_manager_user_id,
+        ].filter(
+          (value): value is string =>
+            typeof value === 'string' && value.length > 0,
+        );
+      }
+
+      const projectName = String(project.name ?? '');
+      const note = decisionNote?.trim().slice(0, 300);
+      const copy = {
+        requested: {
+          title: 'Có sản phẩm đang chờ bạn nghiệm thu',
+          message: `Agency đã gửi sản phẩm của dự án ${projectName} để bạn xem và phê duyệt.`,
+        },
+        approved: {
+          title: 'Khách hàng đã phê duyệt sản phẩm',
+          message: `Khách hàng đã nghiệm thu sản phẩm của dự án ${projectName}.${note ? ` Ghi chú: ${note}` : ''}`,
+        },
+        rejected: {
+          title: 'Khách hàng yêu cầu chỉnh sửa',
+          message: `Khách hàng yêu cầu chỉnh sửa sản phẩm của dự án ${projectName}.${note ? ` Phản hồi: ${note}` : ''}`,
+        },
+      }[kind];
+
+      await this.notifications.createForUsers(recipients, {
+        type: `workflow.client_approval.${kind}`,
+        title: copy.title,
+        message: copy.message,
+        entityType: 'workflow_approval',
+        entityId: approval.id,
+        actionUrl:
+          kind === 'requested'
+            ? '/app/client/approvals'
+            : `/app/projects/${projectId}`,
+        metadata: { projectId, approvalType: 'client' },
+        actorUserId: actorId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Client approval notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
       );
     }
   }
@@ -1848,6 +1941,16 @@ export class WorkflowRuntimeService implements OnModuleInit {
         requesterUserId: user.profileId,
       },
     );
+    await this.notifyClientApproval(
+      'requested',
+      {
+        id: String(data.id),
+        approval_type: dto.approvalType,
+        requested_by_user_id: user.profileId,
+      },
+      projectId,
+      user.profileId,
+    );
     return data;
   }
 
@@ -1988,6 +2091,17 @@ export class WorkflowRuntimeService implements OnModuleInit {
         requesterUserId: String(approval.requested_by_user_id),
         decision: dto.decision,
       },
+    );
+    await this.notifyClientApproval(
+      dto.decision,
+      {
+        id: approvalId,
+        approval_type: String(approval.approval_type),
+        requested_by_user_id: String(approval.requested_by_user_id),
+      },
+      projectId,
+      user.profileId,
+      dto.decisionNote,
     );
     return data;
   }
