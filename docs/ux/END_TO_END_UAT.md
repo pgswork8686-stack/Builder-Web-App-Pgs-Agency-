@@ -1,49 +1,49 @@
 # End-to-End UAT
 
-> Phạm vi: toàn bộ kết quả dưới đây chạy trên Supabase **disposable** cấp trong runner CI, với tài khoản seed tổng hợp. **Không phải UAT trên staging hay production.**
+> Phạm vi: toàn bộ kết quả dưới đây chạy trên Supabase **disposable** cấp trong runner CI, với tài khoản seed tổng hợp. **Không phải UAT trên staging hay production.** Bảng đầy đủ (run, artifact, giờ chạy) nằm ở `docs/release/RELEASE_EVIDENCE_MATRIX.md`.
 
-## Kết quả CI mới nhất: commit `4a08bb4`
+## Kết quả CI mới nhất: commit `429f111`
 
-Commit: `4a08bb4` — `test(uat): exercise workflow unlock in flow 04, department field in flow 01, refresh UAT docs` (nhánh `feat/pgs-audit-ux-uat`, 2026-10-19), nằm ngay sau `8423585`.
+Commit: `429f111a2cc6405425ef0cb8fcb10c36d098ceb7` — `test(uat): Flow 08 respects the assigned-task guard when revoking access` (nhánh `feat/pgs-audit-ux-uat`, 2026-10-20).
 
-Tất cả check-run `success`:
+| Check                         | Run                                                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Database-backed UAT + browser | success — [run 39362211127](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39362211127) |
+| Quality gates                 | success — run 39362211107 (push), 39362214906 (pull_request)                                                           |
+| API production container      | success — cùng hai run; kiểm `/health` trả `release.sha` đúng commit                                                   |
+| cPanel Node 22 artifact       | success — cùng hai run; kiểm `release.sha` khớp `DEPLOYMENT_INFO.txt`                                                  |
+| Artifact bằng chứng           | `uat-evidence` id 12237839838 (20,5 MB): JSON từng flow, 283 ảnh, `responsive-results.json`                            |
 
-| Check                         | Run                                                                                                          |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Database-backed UAT + browser | [run 39235546384](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39235546384) |
-| Quality gates                 | run 39235546395 và 39235552493                                                                               |
-| API production container      | run 39235546395 và 39235552493                                                                               |
-| cPanel Node 22 artifact       | run 39235546395 và 39235552493                                                                               |
-| Vercel Preview Comments       | success                                                                                                      |
+### E2E liên vai trò 01–08
 
-### E2E liên vai trò 01–07
+Mỗi luồng thao tác UI bằng Playwright, truy vấn DB (pg) sau từng bước để xác nhận bản ghi và notification. Số bước lấy từ `uat-evidence/flowNN/flowNN-results.json` của run trên.
 
-Mỗi luồng thao tác UI bằng Playwright, truy vấn DB (pg) sau từng bước để xác nhận bản ghi và notification, có kiểm refresh/đăng nhập mới và 375/768px + axe. Số bước và ghi chú lấy từ `uat-evidence/flowNN/flowNN-results.json` của run trên:
+| Luồng | Script                                                                  | Kết quả | Số bước           | Ghi chú trong file kết quả       |
+| ----- | ----------------------------------------------------------------------- | ------- | ----------------- | -------------------------------- |
+| 01    | `scripts/uat-flow01-project-init.mjs`                                   | PASS    | 12                | không có                         |
+| 02    | `scripts/uat-flow02-task-assignment.mjs`                                | PASS    | 7                 | Dùng dự án do Flow 01 tạo        |
+| 03    | `scripts/uat-flow03-task-execution.mjs`                                 | PASS    | 8                 | Dùng task do Flow 02 tạo         |
+| 04    | `scripts/uat-flow04-internal-review.mjs`                                | PASS    | 9                 | không có                         |
+| 05    | `scripts/uat-flow05-client-acceptance.mjs`, `scripts/uat-flow05-ui.mjs` | PASS    | 13 (API) + 9 (UI) | không có                         |
+| 06    | `scripts/uat-flow06-finance.mjs`                                        | PASS    | 8                 | không có                         |
+| 07    | `scripts/uat-flow07-handover-close.mjs`                                 | PASS    | 9                 | không có                         |
+| 08    | `scripts/uat-flow08-resilience.mjs`                                     | PASS    | 5                 | không có (luồng mới, 2026-10-20) |
 
-| Luồng | Script                                                                  | Kết quả | Số bước           | Ghi chú trong file kết quả |
-| ----- | ----------------------------------------------------------------------- | ------- | ----------------- | -------------------------- |
-| 01    | `scripts/uat-flow01-project-init.mjs`                                   | PASS    | 12                | không có                   |
-| 02    | `scripts/uat-flow02-task-assignment.mjs`                                | PASS    | 7                 | Dùng dự án do Flow 01 tạo  |
-| 03    | `scripts/uat-flow03-task-execution.mjs`                                 | PASS    | 8                 | Dùng task do Flow 02 tạo   |
-| 04    | `scripts/uat-flow04-internal-review.mjs`                                | PASS    | 9                 | không có                   |
-| 05    | `scripts/uat-flow05-client-acceptance.mjs`, `scripts/uat-flow05-ui.mjs` | PASS    | 13 (API) + 9 (UI) | không có                   |
-| 06    | `scripts/uat-flow06-finance.mjs`                                        | PASS    | 8                 | không có                   |
-| 07    | `scripts/uat-flow07-handover-close.mjs`                                 | PASS    | 9                 | không có                   |
+Flow 08 phủ các nhánh lỗi: token rỗng/sai (401, không lộ dữ liệu), mất kết nối API → thông báo lỗi + nút "Thử lại" → phục hồi, hết phiên → về trang đăng nhập → đăng nhập lại, và thu hồi quyền khi đang đăng nhập (chặn xóa thành viên còn việc 409 `PROJECT_MEMBER_HAS_ASSIGNED_TASKS`, sau khi giao lại việc và thu hồi thì API từ chối 403/404, DB không đổi).
 
-Duyệt trang theo vai trò + axe trong cùng run: 76/76 lượt PASS (5 vai trò × route chính × 375/768/1024/1440px), 0 vi phạm axe serious/critical, cổng axe đang chặn (`UAT_AXE_GATE`). Nguồn: `uat-evidence/responsive-summary.md`.
+### Duyệt trang theo vai trò + axe
 
-## Hai khoảng hở đã đóng
+260 lượt PASS, 0 lượt lỗi (4 độ rộng 375/768/1024/1440 px): admin 18 route, team leader 11, employee 11, accountant 14, client 11. Cổng axe chặn serious/critical (`UAT_AXE_GATE`). Trước đây chỉ 76 lượt (accountant 1 route); mở rộng đã phát hiện và buộc sửa 70 lượt lỗi (`docs/release/FINAL_GAP_AUDIT.md` F-03, F-04). Chưa phủ: route động có id (được duyệt bên trong các flow), trang đăng nhập/landing, thao tác Kanban bằng bàn phím, kích thước vùng chạm.
 
-Cả hai được phát hiện ở run của commit `8423585` ([run 39225074368](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39225074368), cũng toàn bộ `success`), và được `4a08bb4` xử lý.
+## Lịch sử các khoảng hở đã đóng
 
-1. **Flow 04 — nhánh workflow.** Ở `8423585`, file kết quả ghi "No ready workflow item with an open primary task: workflow progression was not exercised", vì bước 6 chỉ chạy khi tình cờ có hạng mục workflow sẵn sàng. Nay bước 6 tự dựng fixture trên dự án do Team Leader quản lý: khởi tạo workflow (`workflow_instantiate_project_service`), đặt hạng mục A (task chính mở) chặn hạng mục B (`finish_to_start`, B ở trạng thái `blocked`). Kịch bản kiểm: khi task ở `review` thì A chưa hoàn thành và B vẫn `blocked`; sau khi Team Leader duyệt `done`, A thành `completed` và B chuyển `ready`. Thiếu workflow/hạng mục thì **FAIL**, không còn bỏ qua.
-   - Dẫn chứng ở `4a08bb4`: `flow04-results.json` PASS, không còn ghi chú, bước "6. Approving the linked task completed its workflow item and unlocked the next item (blocked -> ready)".
-2. **Flow 01 — phòng ban.** Ở `8423585`, phòng ban được gán bằng `PATCH /admin/projects/:id` vì wizard chưa có trường. Nay wizard tạo dự án có thêm trường "Phòng ban phụ trách" (bước 2, tùy chọn, `apps/web/components/phase3/project-create-wizard-dialog.tsx`); Flow 01 chọn phòng ban trên giao diện và kiểm `projects.department_id` trong DB, bước gán bằng API đã bỏ.
-   - Dẫn chứng ở `4a08bb4`: `flow01-results.json` PASS, không còn ghi chú "design gap", bước "2. Admin created the project through the wizard: customer + Team Leader + department + status stored".
-
-Hai thay đổi này cũng đã được chạy PASS cục bộ trên Supabase disposable trước khi đẩy lên CI.
+1. **Flow 04 — nhánh workflow** (đóng ở `4a08bb4`): bước 6 tự dựng fixture và kiểm `blocked → ready` khi duyệt task; thiếu fixture thì FAIL, không bỏ qua.
+2. **Flow 01 — phòng ban** (đóng ở `4a08bb4`): wizard có trường "Phòng ban phụ trách"; Flow 01 chọn trên giao diện và kiểm `projects.department_id`.
+3. **Cổng responsive chỉ 76 lượt** (đóng ở `26c8ce1`/`429f111`): mở rộng thành 260 lượt và sửa lỗi phát hiện được.
+4. **Nhánh lỗi chưa kiểm chứng** (đóng ở `429f111`): Flow 08.
 
 ## Chưa làm
 
-- Staging/production UAT (xem `UI_BACKEND_GAPS.md`).
-- Kịch bản từ chối/yêu cầu sửa ở các luồng ngoài Flow 04, và 4 hotspot FALLBACK trong prototype (G-10).
+- Staging/production UAT (xem `docs/release/PRODUCTION_PREFLIGHT_CHECKLIST.md`).
+- Từ chối/yêu cầu sửa của khách hàng ở nhiều khách hàng khác nhau; cô lập khách hàng cho mọi route client.
+- Prototype tablet/mobile trong Figma (G-06).

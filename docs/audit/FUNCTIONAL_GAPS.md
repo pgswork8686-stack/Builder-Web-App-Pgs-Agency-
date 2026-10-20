@@ -21,12 +21,12 @@ Baseline `a07b74e`. Status key: **FIXED** (code + automated test in this branch)
 - Tests: `client-dashboard-kpis.test.ts` (written, **not run**).
 - Remaining risks: (a) no authoritative task-based progress exists for clients — tasks are internal-only, so a true % needs a new client-safe backend aggregation (OPEN); (b) the invoice list is fetched without explicit pagination, so the sum covers only the first page if a client has more invoices than the API default page size (needs check/endpoint-side aggregate).
 
-## FG-3 — Hard-coded numbers in leave pages — OPEN
+## FG-3 — Hard-coded numbers in leave pages — FIXED 2026-10-20 (see docs/release/FINAL_GAP_AUDIT.md F-06)
 
 - Severity: Medium
 - Files: `apps/web/app/app/leave/page.tsx:193` (`value="12 ngày"`), `apps/web/app/app/admin/leave/page.tsx:166,172,178` (`"18"`, `"02"`, `"04"`)
 - Root cause: literal KPI values in JSX. Needs leave-balance / leave-request aggregations from the leave module.
-- Not changed in this branch.
+- Fixed: admin cards read `GET /leave/directory` (now honours `from`/`to`) and the calendar; the employee page shows "Chưa cấp" when no balance exists. Tests: `leave.service.spec.ts` (date range) and `admin/leave/page.test.tsx`.
 
 ## FG-4 — Other dashboards not audited — NOT VERIFIED
 
