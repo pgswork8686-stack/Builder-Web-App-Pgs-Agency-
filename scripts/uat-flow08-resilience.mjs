@@ -76,12 +76,12 @@ await runFlow(flow, async () => {
     "1. Requests with an empty or garbage token get 401 and no task data",
   );
 
-  // ---- 2. API outage: the page explains the failure and recovers on retry --------------------------
+  // ---- 2. API outage (the page lists its projects first): it explains the failure and recovers on retry --------------------------
   const employee = await flow.openSession("employee");
   const page = employee.page;
   let blockTasks = true;
   let blocked = 0;
-  await page.route(/\/api\/v1\/tasks(\?|$)/, (route) => {
+  await page.route(/\/api\/v1\/projects(\?|$)/, (route) => {
     if (blockTasks) {
       blocked += 1;
       return route.abort("connectionrefused");
@@ -100,7 +100,7 @@ await runFlow(flow, async () => {
   blockTasks = false;
   const [recovered] = await Promise.all([
     page.waitForResponse(
-      (r) => /\/api\/v1\/tasks(\?|$)/.test(r.url()) && r.status() === 200,
+      (r) => /\/api\/v1\/projects(\?|$)/.test(r.url()) && r.status() === 200,
       { timeout: SLOW },
     ),
     retry.click(),
@@ -113,7 +113,7 @@ await runFlow(flow, async () => {
   );
 
   // ---- 3. Expired session: protected page sends the user to sign-in, signing in again works --------
-  await page.unroute(/\/api\/v1\/tasks(\?|$)/);
+  await page.unroute(/\/api\/v1\/projects(\?|$)/);
   await employee.context.clearCookies();
   await page.evaluate(() => {
     window.localStorage.clear();
