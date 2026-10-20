@@ -363,6 +363,13 @@ export class LeaveService {
     if (query.userId) {
       dbQuery = dbQuery.eq('user_id', query.userId);
     }
+    // Leave period overlapping [from, to] (same rule as the calendar).
+    if (query.from) {
+      dbQuery = dbQuery.gte('end_date', query.from);
+    }
+    if (query.to) {
+      dbQuery = dbQuery.lte('start_date', query.to);
+    }
 
     // Scoped filtering at DB layer
     if (isLeader) {

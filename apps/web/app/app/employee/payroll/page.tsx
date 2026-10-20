@@ -58,7 +58,12 @@ export default function EmployeePayrollPage() {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Vùng nội dung cuộn ngang"
+          >
             <table className="w-full text-left text-sm">
               <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                 <tr>

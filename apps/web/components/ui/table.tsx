@@ -6,7 +6,11 @@ export function TableContainer({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
+    // A scrollable region must be reachable from the keyboard (axe: scrollable-region-focusable).
     <div
+      tabIndex={0}
+      role="region"
+      aria-label="Bảng dữ liệu"
       className={`w-full overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] ${className}`}
       {...props}
     >

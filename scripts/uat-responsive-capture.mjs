@@ -64,7 +64,7 @@ const ROLES = {
       "/app/team-leader/approvals",
       "/app/team-leader/documents",
       "/app/team-leader/reports",
-      "/app/team-leader/attendance",
+      "/app/attendance",
       "/app/notifications",
       "/app/profile",
     ],

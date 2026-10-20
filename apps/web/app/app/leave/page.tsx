@@ -189,9 +189,9 @@ export default function EmployeeLeavePage() {
         {balances.length === 0 && !loading && (
           <StatCard
             variant="blue"
-            title="Quỹ phép thường niên"
-            value="12 ngày"
-            subtitle="Định mức năm 2026"
+            title="Quỹ phép"
+            value="Chưa cấp"
+            subtitle="Chưa có quỹ phép nào được cấp cho bạn. Liên hệ quản trị viên."
             icon={<Calendar className="w-5 h-5" />}
           />
         )}

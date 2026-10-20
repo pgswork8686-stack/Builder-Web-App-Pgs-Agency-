@@ -19,7 +19,24 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { tasksApi, type ProjectTask, type TaskStatus } from "@/lib/api/tasks";
+import {
+  describeApiError,
+  TASK_STATUS_LABEL,
+  TASK_STATUS_VARIANT,
+} from "@/components/tasks/task-meta";
 import { getMe } from "@/lib/api/auth";
+
+/**
+ * What an assigned employee may do next. Completion is a manager decision
+ * (review gate, ADR 0001), so the employee's last step is "Gửi duyệt".
+ */
+function nextStep(
+  status: TaskStatus,
+): { label: string; status: TaskStatus } | null {
+  if (status === "todo") return { label: "Bắt đầu", status: "in_progress" };
+  if (status === "in_progress") return { label: "Gửi duyệt", status: "review" };
+  return null;
+}
 
 export default function EmployeeTasksPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -27,44 +44,54 @@ export default function EmployeeTasksPage() {
     [],
   );
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [partialFailure, setPartialFailure] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError(null);
+    setPartialFailure(false);
     try {
       const [meRes, projRes] = await Promise.allSettled([
         getMe(),
         projectsApi.getInternalProjects(1, 20),
       ]);
+      // Without the current user the assignee filter would be dropped and the
+      // page would list everybody's tasks as "mine": treat it as a failure.
+      if (meRes.status === "rejected") throw meRes.reason;
+      if (projRes.status === "rejected") throw projRes.reason;
 
-      const currentUserId =
-        meRes.status === "fulfilled" ? meRes.value.user?.id : null;
-      const userProjects =
-        projRes.status === "fulfilled" ? projRes.value.items || [] : [];
+      const currentUserId = meRes.value.user?.id;
+      if (!currentUserId) throw new Error("Không xác định được tài khoản.");
+      const userProjects = projRes.value.items || [];
       setProjects(userProjects);
 
-      if (userProjects.length > 0) {
-        const taskPromises = userProjects.map(async (p) => {
-          try {
-            const taskRes = await tasksApi.list(p.id, {
-              assigneeUserId: currentUserId || undefined,
-              pageSize: 50,
-            });
-            return (taskRes.items || []).map((t) => ({
-              ...t,
-              projectName: p.name,
-            }));
-          } catch {
-            return [];
-          }
-        });
-
-        const allTasksNested = await Promise.all(taskPromises);
-        setTasks(allTasksNested.flat());
+      const results = await Promise.allSettled(
+        userProjects.map(async (p) => {
+          const taskRes = await tasksApi.list(p.id, {
+            assigneeUserId: currentUserId,
+            pageSize: 50,
+          });
+          return (taskRes.items || []).map((t) => ({
+            ...t,
+            projectName: p.name,
+          }));
+        }),
+      );
+      const failed = results.filter((r) => r.status === "rejected");
+      if (userProjects.length > 0 && failed.length === userProjects.length) {
+        throw (failed[0] as PromiseRejectedResult).reason;
       }
-    } catch {
-      // Safe fallback
+      setPartialFailure(failed.length > 0);
+      setTasks(
+        results.flatMap((r) => (r.status === "fulfilled" ? r.value : [])),
+      );
+    } catch (error) {
+      setTasks([]);
+      setLoadError(describeApiError(error));
     } finally {
       setLoading(false);
     }
@@ -80,13 +107,18 @@ export default function EmployeeTasksPage() {
     newStatus: TaskStatus,
   ) => {
     setUpdatingTaskId(taskId);
+    setActionError(null);
     try {
       await tasksApi.update(projectId, taskId, { status: newStatus });
       setTasks((prev) =>
         prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
       );
-    } catch {
-      // Ignore or feedback
+    } catch (error) {
+      setActionError(
+        error instanceof Error && error.message
+          ? error.message
+          : "Không cập nhật được trạng thái công việc.",
+      );
     } finally {
       setUpdatingTaskId(null);
     }
@@ -153,12 +185,45 @@ export default function EmployeeTasksPage() {
         </button>
       </div>
 
+      {actionError ? (
+        <div
+          role="alert"
+          className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"
+        >
+          {actionError}
+        </div>
+      ) : null}
+
+      {partialFailure && !loadError ? (
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-800"
+        >
+          <span>Một số dự án chưa tải được, danh sách có thể chưa đầy đủ.</span>
+          <Button variant="secondary" size="sm" onClick={() => void loadData()}>
+            Thử lại
+          </Button>
+        </div>
+      ) : null}
+
       {loading ? (
         <Card className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#3453D1] mx-auto" />
           <p className="mt-3 text-xs text-[#5F6E85]">
             Đang tải danh sách nhiệm vụ...
           </p>
+        </Card>
+      ) : loadError ? (
+        <Card className="p-6 text-center" role="alert">
+          <p className="text-sm font-semibold text-rose-700">{loadError}</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="mt-3"
+            onClick={() => void loadData()}
+          >
+            Thử lại
+          </Button>
         </Card>
       ) : filteredTasks.length === 0 ? (
         <Card className="p-10 text-center">
@@ -172,6 +237,7 @@ export default function EmployeeTasksPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTasks.map((t) => {
             const isUpdating = updatingTaskId === t.id;
+            const step = nextStep(t.status);
             return (
               <Card
                 key={t.id}
@@ -182,17 +248,8 @@ export default function EmployeeTasksPage() {
                     <span className="text-[11px] font-bold text-[#3453D1] truncate">
                       {t.projectName}
                     </span>
-                    <Badge
-                      variant={
-                        t.status === "done"
-                          ? "success"
-                          : t.status === "in_progress"
-                            ? "blue"
-                            : "default"
-                      }
-                      size="sm"
-                    >
-                      {t.status}
+                    <Badge variant={TASK_STATUS_VARIANT[t.status]} size="sm">
+                      {TASK_STATUS_LABEL[t.status] ?? t.status}
                     </Badge>
                   </div>
                   <h4 className="text-sm font-bold text-[#24304A] leading-snug">
@@ -213,30 +270,29 @@ export default function EmployeeTasksPage() {
                     Chi tiết <ArrowRight className="w-3 h-3" />
                   </Link>
 
-                  {t.status !== "done" ? (
+                  {step ? (
                     <Button
                       variant="secondary"
                       size="sm"
                       disabled={isUpdating}
                       onClick={() =>
-                        handleUpdateStatus(
-                          t.project_id,
-                          t.id,
-                          t.status === "todo" ? "in_progress" : "done",
-                        )
+                        handleUpdateStatus(t.project_id, t.id, step.status)
                       }
                     >
                       {isUpdating ? (
                         <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : t.status === "todo" ? (
-                        "Bắt đầu"
                       ) : (
-                        "Hoàn thành"
+                        step.label
                       )}
                     </Button>
-                  ) : (
+                  ) : t.status === "done" ? (
                     <span className="text-xs font-semibold text-[#0A7F6B] flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Đã xong
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-[#5F6E85] flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {t.status === "review" ? "Đang chờ duyệt" : "Đã huỷ"}
                     </span>
                   )}
                 </div>

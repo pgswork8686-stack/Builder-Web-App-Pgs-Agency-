@@ -202,7 +202,7 @@ export function NotificationsCenter() {
                 size="sm"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
-                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-semibold"
+                className="font-semibold"
               >
                 Gửi thông báo toàn công ty
               </Button>
@@ -304,7 +304,7 @@ export function NotificationsCenter() {
                   <div className="flex items-start gap-3.5">
                     <span
                       className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#3D61E6]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
@@ -414,7 +414,7 @@ export function NotificationsCenter() {
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                className="w-full font-bold"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
               >
@@ -600,7 +600,7 @@ export function NotificationsCenter() {
               size="sm"
               isLoading={broadcasting}
               leftIcon={<Send className="w-3.5 h-3.5" />}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Phát thông báo ngay
             </Button>

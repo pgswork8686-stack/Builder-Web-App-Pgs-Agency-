@@ -425,6 +425,7 @@ export default function InvoicesWorkspace({
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
           <input
+            aria-label="Tìm kiếm theo số hóa đơn..."
             type="text"
             placeholder="Tìm kiếm theo số hóa đơn..."
             value={searchQuery}
@@ -435,6 +436,7 @@ export default function InvoicesWorkspace({
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0">
           <select
+            aria-label="Mọi trạng thái"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
@@ -449,6 +451,7 @@ export default function InvoicesWorkspace({
           </select>
 
           <select
+            aria-label="Mọi khách hàng"
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
@@ -462,6 +465,7 @@ export default function InvoicesWorkspace({
           </select>
 
           <select
+            aria-label="Mọi hợp đồng"
             value={filterContract}
             onChange={(e) => setFilterContract(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
@@ -670,6 +674,7 @@ export default function InvoicesWorkspace({
                   Số hóa đơn *
                 </label>
                 <input
+                  aria-label="Số hóa đơn"
                   type="text"
                   required
                   disabled={
@@ -687,6 +692,7 @@ export default function InvoicesWorkspace({
                   Khách hàng (Công ty) *
                 </label>
                 <select
+                  aria-label="Khách hàng (Công ty)"
                   required
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
@@ -715,6 +721,7 @@ export default function InvoicesWorkspace({
                   Hợp đồng liên kết
                 </label>
                 <select
+                  aria-label="Hợp đồng liên kết"
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
                   }
@@ -736,6 +743,7 @@ export default function InvoicesWorkspace({
                   Dự án liên kết
                 </label>
                 <select
+                  aria-label="Dự án liên kết"
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
                   }
@@ -759,6 +767,7 @@ export default function InvoicesWorkspace({
                   Ngày phát hành *
                 </label>
                 <input
+                  aria-label="Ngày phát hành"
                   type="date"
                   required
                   disabled={
@@ -775,6 +784,7 @@ export default function InvoicesWorkspace({
                   Hạn thanh toán *
                 </label>
                 <input
+                  aria-label="Hạn thanh toán"
                   type="date"
                   required
                   disabled={
@@ -793,6 +803,7 @@ export default function InvoicesWorkspace({
                   Tổng số tiền *
                 </label>
                 <input
+                  aria-label="Tổng số tiền"
                   type="number"
                   required
                   disabled={
@@ -809,6 +820,7 @@ export default function InvoicesWorkspace({
                   Loại tiền *
                 </label>
                 <select
+                  aria-label="Loại tiền"
                   required
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
@@ -829,6 +841,7 @@ export default function InvoicesWorkspace({
                 Ghi chú hóa đơn
               </label>
               <textarea
+                aria-label="Ghi chú hóa đơn"
                 rows={3}
                 placeholder="Ghi chú thanh toán, số tài khoản nhận tiền..."
                 value={formNotes}

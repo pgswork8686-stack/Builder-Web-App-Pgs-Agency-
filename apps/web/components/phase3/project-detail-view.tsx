@@ -1251,7 +1251,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
               <div className="h-1.5 w-full bg-[#EDF2F7] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#4F75FF] transition-all"
+                  className="h-full bg-[#3D61E6] transition-all"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -1273,7 +1273,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               variant="primary"
               size="sm"
               isLoading={creatingTask}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Tạo task
             </Button>

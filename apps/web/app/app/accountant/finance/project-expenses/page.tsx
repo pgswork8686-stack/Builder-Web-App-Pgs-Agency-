@@ -81,7 +81,10 @@ export default function AccountantProjectExpensesPage() {
           category: selectedCategory || undefined,
           projectId: selectedProject || undefined,
         }),
-        projectsApi.getAdminProjects({}).catch(() => ({ items: [] })),
+        // GET /projects is open to accountants; /admin/projects is Admin-only (403).
+        projectsApi
+          .getInternalProjects(1, 100)
+          .catch(() => ({ items: [] as typeof projects })),
       ]);
       setExpenses(expRes.items);
       setProjects(projRes.items || []);
@@ -195,11 +198,11 @@ export default function AccountantProjectExpensesPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#5F6E85]">Chờ duyệt</p>
-              <p className="text-xl font-bold text-[#FFAE1F] mt-1">
+              <p className="text-xl font-bold text-[#8A6400] mt-1">
                 {new Intl.NumberFormat("vi-VN").format(totalPending)} đ
               </p>
             </div>
-            <div className="p-3 bg-[#FEF5E5] rounded-lg text-[#FFAE1F]">
+            <div className="p-3 bg-[#FEF5E5] rounded-lg text-[#8A6400]">
               <Clock className="w-5 h-5" />
             </div>
           </div>
@@ -223,6 +226,7 @@ export default function AccountantProjectExpensesPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 p-4 bg-white dark:bg-[#1E293B] rounded-xl border border-[#EAEFF4] dark:border-[#334155]">
         <select
+          aria-label="Tất cả dự án"
           value={selectedProject}
           onChange={(e) => setSelectedProject(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
@@ -236,6 +240,7 @@ export default function AccountantProjectExpensesPage() {
         </select>
 
         <select
+          aria-label="Tất cả danh mục"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
@@ -249,6 +254,7 @@ export default function AccountantProjectExpensesPage() {
         </select>
 
         <select
+          aria-label="Tất cả trạng thái"
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
@@ -286,7 +292,12 @@ export default function AccountantProjectExpensesPage() {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Vùng nội dung cuộn ngang"
+          >
             <table className="w-full text-left text-sm">
               <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#5F6E85] uppercase">
                 <tr>
@@ -377,6 +388,7 @@ export default function AccountantProjectExpensesPage() {
                   Dự án áp dụng *
                 </label>
                 <select
+                  aria-label="Dự án áp dụng"
                   value={newProjectId}
                   onChange={(e) => setNewProjectId(e.target.value)}
                   required
@@ -396,6 +408,7 @@ export default function AccountantProjectExpensesPage() {
                   Tiêu đề khoản chi *
                 </label>
                 <input
+                  aria-label="Tiêu đề khoản chi"
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
@@ -411,6 +424,7 @@ export default function AccountantProjectExpensesPage() {
                     Số tiền (VNĐ) *
                   </label>
                   <input
+                    aria-label="Số tiền (VNĐ)"
                     type="number"
                     value={newAmount}
                     onChange={(e) => setNewAmount(e.target.value)}
@@ -425,6 +439,7 @@ export default function AccountantProjectExpensesPage() {
                     Danh mục *
                   </label>
                   <select
+                    aria-label="Danh mục"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
@@ -443,6 +458,7 @@ export default function AccountantProjectExpensesPage() {
                   Ghi chú chi tiết
                 </label>
                 <textarea
+                  aria-label="Ghi chú chi tiết"
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   rows={3}
@@ -496,6 +512,7 @@ export default function AccountantProjectExpensesPage() {
                 Lý do từ chối (nếu không duyệt)
               </label>
               <textarea
+                aria-label="Lý do từ chối (nếu không duyệt)"
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={2}

@@ -205,7 +205,7 @@ export default function UserProfilePage() {
             size="sm"
             leftIcon={<Pencil className="w-4 h-4" />}
             onClick={handleOpenEdit}
-            className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            className="font-bold"
           >
             Chỉnh sửa hồ sơ
           </Button>
@@ -537,7 +537,7 @@ export default function UserProfilePage() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     leftIcon={<Upload className="w-3.5 h-3.5" />}
-                    className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white text-xs font-bold"
+                    className="text-xs font-bold"
                   >
                     Tải ảnh từ máy tính
                   </Button>
@@ -617,7 +617,7 @@ export default function UserProfilePage() {
               variant="primary"
               size="sm"
               isLoading={saving}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Lưu thay đổi
             </Button>

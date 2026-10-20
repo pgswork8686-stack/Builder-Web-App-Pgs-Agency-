@@ -34,10 +34,28 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
+/** YYYY-MM-DD in the browser's local calendar (toISOString() shifts the day in UTC+7). */
+function localDate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function currentMonthRange(now = new Date()) {
+  return {
+    from: localDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+    to: localDate(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+  };
+}
+
+type LeaveStats = { pending: number; approved: number; rejected: number };
+
 export default function AdminLeavePage() {
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<LeaveStats | null>(null);
+  const [statsError, setStatsError] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("pending");
@@ -77,15 +95,8 @@ export default function AdminLeavePage() {
   const loadCalendar = async () => {
     try {
       setCalendarLoading(true);
-      const today = new Date();
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        .toISOString()
-        .slice(0, 10);
-      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-        .toISOString()
-        .slice(0, 10);
-
-      const events = await leaveApi.getCalendar(startOfMonth, endOfMonth);
+      const { from, to } = currentMonthRange();
+      const events = await leaveApi.getCalendar(from, to);
       setCalendarEvents(events);
     } catch (err) {
       console.error(err);
@@ -94,12 +105,57 @@ export default function AdminLeavePage() {
     }
   };
 
+  // KPI cards come from the API, independent of the list filter below.
+  const loadStats = async () => {
+    try {
+      setStatsError(false);
+      const { from, to } = currentMonthRange();
+      const [pending, approved, rejected] = await Promise.all([
+        leaveApi.getDirectory({ status: "pending", page: 1, pageSize: 1 }),
+        leaveApi.getDirectory({
+          status: "approved",
+          from,
+          to,
+          page: 1,
+          pageSize: 1,
+        }),
+        leaveApi.getDirectory({
+          status: "rejected",
+          from,
+          to,
+          page: 1,
+          pageSize: 1,
+        }),
+      ]);
+      setStats({
+        pending: pending.total,
+        approved: approved.total,
+        rejected: rejected.total,
+      });
+    } catch (err) {
+      console.error(err);
+      setStats(null);
+      setStatsError(true);
+    }
+  };
+
+  // People whose approved leave covers today (distinct employees).
+  const today = localDate(new Date());
+  const onLeaveNow = new Set(
+    calendarEvents
+      .filter((evt) => evt.startDate <= today && today <= evt.endDate)
+      .map((evt) => evt.userId ?? evt.id),
+  ).size;
+  const kpi = (value: number | undefined) =>
+    value === undefined ? "—" : String(value).padStart(2, "0");
+
   useEffect(() => {
     loadRequests();
   }, [page, statusFilter]);
 
   useEffect(() => {
     loadCalendar();
+    loadStats();
   }, []);
 
   const handleOpenReview = (req: LeaveRequest) => {
@@ -123,6 +179,7 @@ export default function AdminLeavePage() {
       setSelectedRequest(null);
       await loadRequests();
       await loadCalendar();
+      await loadStats();
     } catch (err: any) {
       setActionFeedback(err.message || "Không thể phê duyệt đơn phép.");
     } finally {
@@ -157,26 +214,26 @@ export default function AdminLeavePage() {
         <StatCard
           variant="gold"
           title="Chờ duyệt"
-          value={total.toString().padStart(2, "0")}
-          subtitle="Hôm nay"
+          value={kpi(stats?.pending)}
+          subtitle={statsError ? "Không tải được" : "Tất cả đơn đang chờ"}
         />
         <StatCard
           variant="green"
           title="Đã duyệt"
-          value="18"
-          subtitle="Tháng này"
+          value={kpi(stats?.approved)}
+          subtitle={statsError ? "Không tải được" : "Nghỉ trong tháng này"}
         />
         <StatCard
           variant="rose"
           title="Từ chối"
-          value="02"
-          subtitle="Tháng này"
+          value={kpi(stats?.rejected)}
+          subtitle={statsError ? "Không tải được" : "Nghỉ trong tháng này"}
         />
         <StatCard
           variant="blue"
           title="Đang nghỉ"
-          value="04"
-          subtitle="Hiện tại"
+          value={calendarLoading ? "—" : String(onLeaveNow).padStart(2, "0")}
+          subtitle="Hôm nay"
         />
       </div>
 

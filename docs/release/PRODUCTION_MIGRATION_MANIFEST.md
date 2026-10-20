@@ -108,3 +108,27 @@ The following 43 migrations are declared by repository history as the database b
 ### Group K: Payroll Attendance, Compliance & Bonus Audit Fields
 
 61. `20260821102000_payroll_attendance_and_compliance.sql` — Adds audit columns to payslips (attendance penalty amount, attendance bonus amount, late occurrences, late minutes, absence days, early leave occurrences, early leave minutes, bonus eligibility) and introduces monthly employee compliance reviews.
+
+### Group L: Client Social Links _(added 2026-10-20 — was missing from this manifest)_
+
+62. `20260824090000_add_client_social_links.sql` — Adds social-link columns to `client_companies` (single `ALTER TABLE`, additive).
+
+### Group M: Production Audit Hardening _(added 2026-10-20)_
+
+63. `20260826024721_production_audit_hardening.sql` — Additive RBAC/data-scope tables (`roles`, `permissions`, `role_permissions`, `user_role_assignments`), a column on `projects` with a backfill `UPDATE`, `projects_department_created_idx`, and ~25 foreign-key indexes. `CREATE INDEX` here is not `CONCURRENTLY`: it briefly blocks writes on each table. Measure row counts on staging before production.
+
+### Group N: Safe Account Lifecycle _(added 2026-10-20)_
+
+64. `20260826032457_phase1_safe_account_lifecycle.sql` — Replaces destructive account deletion and non-atomic project-membership replacement with service-role-only RPCs (`phase1_terminate_account`, `phase1_replace_user_project_memberships`) and tightens table grants.
+
+### Group O: Authenticated Profile Select Repair _(added 2026-10-20)_
+
+65. `20260828021004_repair_authenticated_profiles_select.sql` — Re-asserts RLS and the `SELECT` grant on `public.profiles` for `authenticated`; row isolation stays with `profiles_select_own_policy`. Idempotent.
+
+---
+
+## Verification status (read before using this manifest)
+
+- Repository migrations: 65 `.sql` files + `.gitkeep` (66 entries) in `supabase/migrations`. The excluded monolithic `20260819130000_phase10_all_missing_modules.sql` is intentionally absent.
+- Disposable verification: `pnpm test:release-migrations` and `pnpm test:workflow-migrations` run in the UAT workflow on a disposable Supabase stack for every push. Evidence for the exact commit is listed in `RELEASE_EVIDENCE_MATRIX.md`.
+- **Production applied state: NOT VERIFIED.** The "historical baseline" (1–43) and which of 44–65 are applied on production were never read from the production database. Run `WORKFLOW_PREFLIGHT.sql` (read-only) with an authorised role and record the result in `PRODUCTION_PREFLIGHT_CHECKLIST.md` before deciding what to apply.

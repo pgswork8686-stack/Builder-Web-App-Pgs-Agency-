@@ -164,7 +164,7 @@ export default function AdminDocumentsPage() {
             size="sm"
             leftIcon={<Upload className="w-4 h-4" />}
             onClick={() => setShowUploadModal(true)}
-            className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            className="font-bold"
           >
             Tải lên tài liệu
           </Button>
@@ -178,6 +178,7 @@ export default function AdminDocumentsPage() {
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-[#5F6E85] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                aria-label="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 type="text"
                 placeholder="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 value={searchTerm}
@@ -189,7 +190,7 @@ export default function AdminDocumentsPage() {
               type="submit"
               variant="primary"
               size="sm"
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Tìm
             </Button>
@@ -197,6 +198,7 @@ export default function AdminDocumentsPage() {
         </form>
 
         <select
+          aria-label="Tất cả danh mục"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
@@ -317,6 +319,7 @@ export default function AdminDocumentsPage() {
               Tên tài liệu *
             </label>
             <input
+              aria-label="Tên tài liệu"
               type="text"
               value={uploadTitle}
               onChange={(e) => setUploadTitle(e.target.value)}
@@ -332,6 +335,7 @@ export default function AdminDocumentsPage() {
                 Danh mục *
               </label>
               <select
+                aria-label="Danh mục"
                 value={uploadCategory}
                 onChange={(e) => setUploadCategory(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
@@ -348,6 +352,7 @@ export default function AdminDocumentsPage() {
                 Phân quyền truy cập *
               </label>
               <select
+                aria-label="Phân quyền truy cập"
                 value={uploadAccess}
                 onChange={(e) => setUploadAccess(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
@@ -364,6 +369,7 @@ export default function AdminDocumentsPage() {
               Chọn tệp tải lên (PDF, DOCX, XLSX, PNG...) *
             </label>
             <input
+              aria-label="Chọn tệp tải lên (PDF, DOCX, XLSX, PNG...)"
               type="file"
               required
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
@@ -376,6 +382,7 @@ export default function AdminDocumentsPage() {
               Mô tả tài liệu (Tùy chọn)
             </label>
             <textarea
+              aria-label="Mô tả tài liệu (Tùy chọn)"
               value={uploadDescription}
               onChange={(e) => setUploadDescription(e.target.value)}
               rows={3}
@@ -399,7 +406,7 @@ export default function AdminDocumentsPage() {
               variant="primary"
               size="sm"
               isLoading={uploading}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Tải lên
             </Button>

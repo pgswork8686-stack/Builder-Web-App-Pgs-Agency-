@@ -38,7 +38,7 @@ export function Badge({
     warning:
       "bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] font-semibold",
     danger: "bg-[#FEE2E2] text-[#B91C1C] border border-[#FECACA] font-semibold",
-    purple: "bg-[#F3E8FF] text-[#7356F1] border border-[#E9D5FF] font-semibold",
+    purple: "bg-[#F3E8FF] text-[#6D28D9] border border-[#E9D5FF] font-semibold",
     cyan: "bg-[#E0F7FE] text-[#0284C7] border border-[#BAE6FD] font-semibold",
     outline: "bg-white text-[#64748B] border border-[#E2E8F0]",
   };

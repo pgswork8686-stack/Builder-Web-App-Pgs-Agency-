@@ -515,7 +515,7 @@ export function WorkflowBuilder() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Warnings</p>
-                    <p className="font-bold text-amber-600">
+                    <p className="font-bold text-amber-700">
                       {validation.warnings.length}
                     </p>
                   </div>

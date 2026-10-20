@@ -172,7 +172,7 @@ export default function FinanceDashboard({
             return (
               <div key={currency} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4F75FF]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#3D61E6]" />
                   <h3 className="text-sm font-bold text-[#0F172A]">
                     Đơn vị tiền tệ: {currency}
                   </h3>

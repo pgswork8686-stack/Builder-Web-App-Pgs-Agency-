@@ -227,7 +227,7 @@ export default function AdminSettingsPage() {
               </div>
               <a
                 href="/app/admin/settings/work-calendar"
-                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#4F75FF] hover:bg-[#3D61E6] rounded-xl transition-colors shrink-0 shadow-xs"
+                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#3D61E6] hover:bg-[#2F4FC9] rounded-xl transition-colors shrink-0 shadow-xs"
               >
                 Quản lý lịch làm việc →
               </a>
@@ -256,6 +256,7 @@ export default function AdminSettingsPage() {
                   Tên tổ chức / Agency
                 </label>
                 <input
+                  aria-label="Tên tổ chức / Agency"
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
@@ -269,6 +270,7 @@ export default function AdminSettingsPage() {
                     Hotline
                   </label>
                   <input
+                    aria-label="Hotline"
                     type="text"
                     value={companyHotline}
                     onChange={(e) => setCompanyHotline(e.target.value)}
@@ -280,6 +282,7 @@ export default function AdminSettingsPage() {
                     Email CSKH
                   </label>
                   <input
+                    aria-label="Email CSKH"
                     type="email"
                     value={companyEmail}
                     onChange={(e) => setCompanyEmail(e.target.value)}
@@ -293,6 +296,7 @@ export default function AdminSettingsPage() {
                   Địa chỉ trụ sở
                 </label>
                 <input
+                  aria-label="Địa chỉ trụ sở"
                   type="text"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
@@ -338,6 +342,7 @@ export default function AdminSettingsPage() {
                     Giờ vào ca (Sáng)
                   </label>
                   <input
+                    aria-label="Giờ vào ca (Sáng)"
                     type="time"
                     value={workStartTime}
                     onChange={(e) => setWorkStartTime(e.target.value)}
@@ -349,6 +354,7 @@ export default function AdminSettingsPage() {
                     Giờ tan ca (Chiều)
                   </label>
                   <input
+                    aria-label="Giờ tan ca (Chiều)"
                     type="time"
                     value={workEndTime}
                     onChange={(e) => setWorkEndTime(e.target.value)}
@@ -363,6 +369,7 @@ export default function AdminSettingsPage() {
                     Dung sai đi muộn (phút)
                   </label>
                   <input
+                    aria-label="Dung sai đi muộn (phút)"
                     type="number"
                     value={lateGraceMinutes}
                     onChange={(e) => setLateGraceMinutes(e.target.value)}
@@ -376,6 +383,7 @@ export default function AdminSettingsPage() {
                     Dung sai về sớm (phút)
                   </label>
                   <input
+                    aria-label="Dung sai về sớm (phút)"
                     type="number"
                     value={earlyLeaveGraceMinutes}
                     onChange={(e) => setEarlyLeaveGraceMinutes(e.target.value)}
@@ -392,6 +400,7 @@ export default function AdminSettingsPage() {
                     Bán kính Geofence (mét)
                   </label>
                   <input
+                    aria-label="Bán kính Geofence (mét)"
                     type="number"
                     value={radiusMeters}
                     onChange={(e) => setRadiusMeters(e.target.value)}
@@ -405,6 +414,7 @@ export default function AdminSettingsPage() {
                     Vĩ độ văn phòng
                   </label>
                   <input
+                    aria-label="Vĩ độ văn phòng"
                     type="number"
                     step="any"
                     value={officeLatitude}
@@ -419,6 +429,7 @@ export default function AdminSettingsPage() {
                     Kinh độ văn phòng
                   </label>
                   <input
+                    aria-label="Kinh độ văn phòng"
                     type="number"
                     step="any"
                     value={officeLongitude}
@@ -475,6 +486,7 @@ export default function AdminSettingsPage() {
                   Thời gian hết hạn phiên (Giờ)
                 </label>
                 <input
+                  aria-label="Thời gian hết hạn phiên (Giờ)"
                   type="number"
                   value={sessionTimeout}
                   onChange={(e) => setSessionTimeout(Number(e.target.value))}
@@ -489,6 +501,7 @@ export default function AdminSettingsPage() {
                   Giới hạn yêu cầu API (Req / Phút)
                 </label>
                 <input
+                  aria-label="Giới hạn yêu cầu API (Req / Phút)"
                   type="number"
                   value={rateLimitRpm}
                   onChange={(e) => setRateLimitRpm(Number(e.target.value))}

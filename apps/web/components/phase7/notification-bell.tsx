@@ -252,7 +252,7 @@ export function NotificationBell() {
                   <div className="flex items-start gap-3">
                     <span
                       className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#3D61E6]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
@@ -269,7 +269,7 @@ export function NotificationBell() {
                         <Link
                           href={safeActionUrl(item.actionUrl)}
                           onClick={() => void markRead(item)}
-                          className="rounded-lg bg-[#4F75FF] px-2.5 py-1 text-[11px] font-bold text-white hover:bg-[#3D62EE] transition-colors"
+                          className="rounded-lg bg-[#3D61E6] px-2.5 py-1 text-[11px] font-bold text-white hover:bg-[#2F4FC9] transition-colors"
                         >
                           Mở
                         </Link>

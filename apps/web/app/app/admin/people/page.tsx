@@ -362,6 +362,7 @@ export default function AdminPeopleDirectoryPage() {
         <div className="relative sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85] pointer-events-none" />
           <input
+            aria-label="Tìm theo tên, email, mã NV..."
             type="text"
             placeholder="Tìm theo tên, email, mã NV..."
             value={q}
@@ -374,6 +375,7 @@ export default function AdminPeopleDirectoryPage() {
         </div>
 
         <select
+          aria-label="Mọi vai trò"
           value={role}
           onChange={(e) => {
             setRole(e.target.value);
@@ -390,6 +392,7 @@ export default function AdminPeopleDirectoryPage() {
         </select>
 
         <select
+          aria-label="Mọi phòng ban"
           value={departmentId}
           onChange={(e) => {
             setDepartmentId(e.target.value);
@@ -406,6 +409,7 @@ export default function AdminPeopleDirectoryPage() {
         </select>
 
         <select
+          aria-label="Mọi nhóm (Team)"
           value={teamId}
           onChange={(e) => {
             setTeamId(e.target.value);
@@ -422,6 +426,7 @@ export default function AdminPeopleDirectoryPage() {
         </select>
 
         <select
+          aria-label="Tình trạng công tác"
           value={employmentStatus}
           onChange={(e) => {
             setEmploymentStatus(e.target.value);
@@ -668,6 +673,7 @@ export default function AdminPeopleDirectoryPage() {
                 Ảnh đại diện (Avatar URL)
               </label>
               <input
+                aria-label="Ảnh đại diện (Avatar URL)"
                 type="text"
                 value={editAvatarUrl}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
@@ -683,6 +689,7 @@ export default function AdminPeopleDirectoryPage() {
                 Họ và tên *
               </label>
               <input
+                aria-label="Họ và tên"
                 type="text"
                 required
                 value={editFullName}
@@ -697,6 +704,7 @@ export default function AdminPeopleDirectoryPage() {
                 Số điện thoại
               </label>
               <input
+                aria-label="Số điện thoại"
                 type="tel"
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
@@ -712,6 +720,7 @@ export default function AdminPeopleDirectoryPage() {
                 Phân quyền vai trò hệ thống *
               </label>
               <select
+                aria-label="Phân quyền vai trò hệ thống"
                 value={editRole}
                 onChange={(e) => setEditRole(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
@@ -733,6 +742,7 @@ export default function AdminPeopleDirectoryPage() {
                 Trạng thái tài khoản *
               </label>
               <select
+                aria-label="Trạng thái tài khoản"
                 value={editAccountStatus}
                 onChange={(e) => setEditAccountStatus(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
@@ -767,6 +777,7 @@ export default function AdminPeopleDirectoryPage() {
                     )}
                   </label>
                   <input
+                    aria-label="VD: NV-001"
                     type="text"
                     value={editEmployeeCode}
                     disabled={Boolean(
@@ -787,6 +798,7 @@ export default function AdminPeopleDirectoryPage() {
                     Chức danh / Vị trí công việc
                   </label>
                   <input
+                    aria-label="Chức danh / Vị trí công việc"
                     type="text"
                     value={editJobTitle}
                     onChange={(e) => setEditJobTitle(e.target.value)}
@@ -802,6 +814,7 @@ export default function AdminPeopleDirectoryPage() {
                     Phòng ban
                   </label>
                   <select
+                    aria-label="Phòng ban"
                     value={editDeptId}
                     onChange={(e) => {
                       setEditDeptId(e.target.value);
@@ -823,6 +836,7 @@ export default function AdminPeopleDirectoryPage() {
                     Đội nhóm (Team)
                   </label>
                   <select
+                    aria-label="Đội nhóm (Team)"
                     value={editTeamId}
                     onChange={(e) => setEditTeamId(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-white text-xs text-[#24304A] focus:border-[#5D87FF] outline-none"
@@ -842,6 +856,7 @@ export default function AdminPeopleDirectoryPage() {
                   Tình trạng công tác
                 </label>
                 <select
+                  aria-label="Tình trạng công tác"
                   value={editEmpStatus}
                   onChange={(e) => setEditEmpStatus(e.target.value as any)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-white text-xs font-semibold text-[#24304A] focus:border-[#5D87FF] outline-none"
@@ -894,6 +909,7 @@ export default function AdminPeopleDirectoryPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85] pointer-events-none" />
               <input
+                aria-label="Tìm kiếm dự án theo tên hoặc mã..."
                 type="text"
                 placeholder="Tìm kiếm dự án theo tên hoặc mã..."
                 value={projectSearch}
@@ -907,6 +923,7 @@ export default function AdminPeopleDirectoryPage() {
                 Vai trò trong dự án:
               </span>
               <select
+                aria-label="Thành viên (Member)"
                 value={projectRole}
                 onChange={(e) => setProjectRole(e.target.value as any)}
                 className="px-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] outline-none focus:border-[#5D87FF]"

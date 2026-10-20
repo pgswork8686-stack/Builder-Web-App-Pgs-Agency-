@@ -373,6 +373,7 @@ export default function ContractsWorkspace({
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
           <input
+            aria-label="Tìm kiếm theo số hợp đồng hoặc tiêu đề..."
             type="text"
             placeholder="Tìm kiếm theo số hợp đồng hoặc tiêu đề..."
             value={searchQuery}
@@ -383,6 +384,7 @@ export default function ContractsWorkspace({
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0">
           <select
+            aria-label="Mọi trạng thái"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
@@ -395,6 +397,7 @@ export default function ContractsWorkspace({
           </select>
 
           <select
+            aria-label="Mọi khách hàng"
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
@@ -598,6 +601,7 @@ export default function ContractsWorkspace({
                   Mã số hợp đồng *
                 </label>
                 <input
+                  aria-label="Mã số hợp đồng"
                   type="text"
                   required
                   disabled={
@@ -615,6 +619,7 @@ export default function ContractsWorkspace({
                   Khách hàng (Công ty) *
                 </label>
                 <select
+                  aria-label="Khách hàng (Công ty)"
                   required
                   disabled={
                     editingContract ? editingContract.status !== "draft" : false
@@ -641,6 +646,7 @@ export default function ContractsWorkspace({
                 Tiêu đề hợp đồng *
               </label>
               <input
+                aria-label="Tiêu đề hợp đồng"
                 type="text"
                 required
                 disabled={
@@ -659,6 +665,7 @@ export default function ContractsWorkspace({
                   Dự án liên kết
                 </label>
                 <select
+                  aria-label="Dự án liên kết"
                   disabled={
                     editingContract ? editingContract.status !== "draft" : false
                   }
@@ -681,6 +688,7 @@ export default function ContractsWorkspace({
                     Giá trị hợp đồng *
                   </label>
                   <input
+                    aria-label="Giá trị hợp đồng"
                     type="number"
                     required
                     disabled={
@@ -699,6 +707,7 @@ export default function ContractsWorkspace({
                     Tiền tệ *
                   </label>
                   <select
+                    aria-label="Tiền tệ"
                     required
                     disabled={
                       editingContract
@@ -723,6 +732,7 @@ export default function ContractsWorkspace({
                   Ngày bắt đầu hiệu lực *
                 </label>
                 <input
+                  aria-label="Ngày bắt đầu hiệu lực"
                   type="date"
                   required
                   disabled={
@@ -739,6 +749,7 @@ export default function ContractsWorkspace({
                   Ngày kết thúc hiệu lực
                 </label>
                 <input
+                  aria-label="Ngày kết thúc hiệu lực"
                   type="date"
                   disabled={
                     editingContract ? editingContract.status !== "draft" : false
@@ -755,6 +766,7 @@ export default function ContractsWorkspace({
                 Điều khoản & Ghi chú
               </label>
               <textarea
+                aria-label="Điều khoản & Ghi chú"
                 rows={3}
                 placeholder="Nhập ghi chú hoặc điều khoản chính..."
                 value={formNotes}

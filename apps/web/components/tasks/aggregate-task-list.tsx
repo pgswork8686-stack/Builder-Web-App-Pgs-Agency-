@@ -159,7 +159,13 @@ export function AggregateTaskList() {
         </Card>
       ) : (
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto" aria-busy={loading}>
+          <div
+            className="overflow-x-auto"
+            aria-busy={loading}
+            tabIndex={0}
+            role="region"
+            aria-label="Vùng nội dung cuộn ngang"
+          >
             <table className="w-full text-left text-xs">
               <caption className="sr-only">Danh sách công việc</caption>
               <thead className="bg-[#F6F8FC] text-[#5F6E85]">

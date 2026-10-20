@@ -92,6 +92,10 @@ export default function AccountantAttendancePage() {
   // Load departments & teams for filters
   const loadMetadata = async () => {
     try {
+      // The department/team lists are Admin-only endpoints. Accountants would
+      // only get a 403 here, so the two filters are offered to admins only.
+      const me = await getMe().catch(() => null);
+      if (me?.account.role !== "admin") return;
       const [deptsRes, teamsRes] = await Promise.all([
         organizationApi.getDepartments().catch(() => []),
         organizationApi.getTeams().catch(() => []),
@@ -343,6 +347,7 @@ export default function AccountantAttendancePage() {
                   Từ ngày
                 </label>
                 <input
+                  aria-label="Từ ngày"
                   type="date"
                   value={filterFrom}
                   onChange={(e) => {
@@ -358,6 +363,7 @@ export default function AccountantAttendancePage() {
                   Đến ngày
                 </label>
                 <input
+                  aria-label="Đến ngày"
                   type="date"
                   value={filterTo}
                   onChange={(e) => {
@@ -368,53 +374,60 @@ export default function AccountantAttendancePage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
-                  Phòng ban
-                </label>
-                <select
-                  value={filterDept}
-                  onChange={(e) => {
-                    setFilterDept(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
-                >
-                  <option value="">-- Mọi phòng ban --</option>
-                  {departments.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {departments.length > 0 && (
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
+                    Phòng ban
+                  </label>
+                  <select
+                    aria-label="Phòng ban"
+                    value={filterDept}
+                    onChange={(e) => {
+                      setFilterDept(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  >
+                    <option value="">-- Mọi phòng ban --</option>
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
-                  Đội nhóm (Team)
-                </label>
-                <select
-                  value={filterTeam}
-                  onChange={(e) => {
-                    setFilterTeam(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
-                >
-                  <option value="">-- Mọi nhóm --</option>
-                  {teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {teams.length > 0 && (
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
+                    Đội nhóm
+                  </label>
+                  <select
+                    aria-label="Đội nhóm"
+                    value={filterTeam}
+                    onChange={(e) => {
+                      setFilterTeam(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  >
+                    <option value="">-- Mọi nhóm --</option>
+                    {teams.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-[10px] font-bold uppercase text-[#5F6E85] mb-1">
                   Trạng thái
                 </label>
                 <select
+                  aria-label="Trạng thái"
                   value={filterStatus}
                   onChange={(e) => {
                     setFilterStatus(e.target.value);
@@ -503,7 +516,7 @@ export default function AccountantAttendancePage() {
                             <span className="text-[#5F6E85]">—</span>
                           )}
                           {r.late_minutes ? (
-                            <span className="block text-[10px] text-amber-600 font-medium">
+                            <span className="block text-[10px] text-amber-700 font-medium">
                               (Muộn {r.late_minutes}p)
                             </span>
                           ) : null}
@@ -521,7 +534,7 @@ export default function AccountantAttendancePage() {
                             <span className="text-[#5F6E85]">—</span>
                           )}
                           {r.early_leave_minutes ? (
-                            <span className="block text-[10px] text-amber-600 font-medium">
+                            <span className="block text-[10px] text-amber-700 font-medium">
                               (Sớm {r.early_leave_minutes}p)
                             </span>
                           ) : null}
@@ -667,6 +680,7 @@ export default function AccountantAttendancePage() {
                   Ghi chú chấm công
                 </label>
                 <input
+                  aria-label="Ghi chú chấm công"
                   type="text"
                   placeholder="Ghi chú ca làm, làm bù hoặc công tác..."
                   value={personalNote}

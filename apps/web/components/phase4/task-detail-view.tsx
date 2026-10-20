@@ -328,7 +328,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => void saveComment(comment.id)}
-                              className="rounded-lg bg-[#4F75FF] p-1.5 text-white hover:bg-[#3D62EE]"
+                              className="rounded-lg bg-[#3D61E6] p-1.5 text-white hover:bg-[#2F4FC9]"
                               aria-label="Lưu bình luận"
                             >
                               <Check className="h-4 w-4" />
@@ -379,7 +379,7 @@ function TaskDetailContent({
                     className="min-h-24 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   />
                   <div className="flex justify-end">
-                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#3D61E6] px-4 py-2 text-xs font-bold text-white hover:bg-[#2F4FC9] transition-colors shadow-xs">
                       <Send className="h-4 w-4" /> Gửi bình luận
                     </button>
                   </div>

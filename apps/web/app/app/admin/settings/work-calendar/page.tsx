@@ -503,7 +503,12 @@ export default function AdminWorkCalendarPage() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div
+          className="overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="Vùng nội dung cuộn ngang"
+        >
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[#EDF2F7] text-[#5B6B82] font-bold bg-[#F8FAFC]">
@@ -562,7 +567,7 @@ export default function AdminWorkCalendarPage() {
                           ev.source_type === "manual"
                             ? "text-[#3453D1]"
                             : ev.source_type === "api"
-                              ? "text-amber-600"
+                              ? "text-amber-700"
                               : "text-[#5B6B82]"
                         }`}
                       >

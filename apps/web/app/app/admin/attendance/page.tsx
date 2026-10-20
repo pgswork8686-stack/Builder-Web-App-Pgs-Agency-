@@ -248,6 +248,7 @@ export default function AdminAttendancePage() {
             Từ ngày
           </label>
           <input
+            aria-label="Từ ngày"
             type="date"
             value={filterFrom}
             onChange={(e) => {
@@ -262,6 +263,7 @@ export default function AdminAttendancePage() {
             Đến ngày
           </label>
           <input
+            aria-label="Đến ngày"
             type="date"
             value={filterTo}
             onChange={(e) => {
@@ -276,6 +278,7 @@ export default function AdminAttendancePage() {
             Phòng ban
           </label>
           <select
+            aria-label="Phòng ban"
             value={filterDept}
             onChange={(e) => {
               setFilterDept(e.target.value);
@@ -296,6 +299,7 @@ export default function AdminAttendancePage() {
             Đội nhóm
           </label>
           <select
+            aria-label="Đội nhóm"
             value={filterTeam}
             onChange={(e) => {
               setFilterTeam(e.target.value);
@@ -316,6 +320,7 @@ export default function AdminAttendancePage() {
             Trạng thái
           </label>
           <select
+            aria-label="Trạng thái"
             value={filterStatus}
             onChange={(e) => {
               setFilterStatus(e.target.value);
@@ -479,6 +484,7 @@ export default function AdminAttendancePage() {
                   Giờ vào (Check-in)
                 </label>
                 <input
+                  aria-label="Giờ vào (Check-in)"
                   type="datetime-local"
                   value={adjustCheckIn}
                   onChange={(e) => setAdjustCheckIn(e.target.value)}
@@ -490,6 +496,7 @@ export default function AdminAttendancePage() {
                   Giờ ra (Check-out)
                 </label>
                 <input
+                  aria-label="Giờ ra (Check-out)"
                   type="datetime-local"
                   value={adjustCheckOut}
                   onChange={(e) => setAdjustCheckOut(e.target.value)}
@@ -503,6 +510,7 @@ export default function AdminAttendancePage() {
                 Trạng thái chấm công
               </label>
               <select
+                aria-label="Trạng thái chấm công"
                 value={adjustStatus}
                 onChange={(e) => setAdjustStatus(e.target.value)}
                 className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
@@ -520,6 +528,7 @@ export default function AdminAttendancePage() {
                 Lý do hiệu chỉnh *
               </label>
               <textarea
+                aria-label="Lý do hiệu chỉnh"
                 value={adjustReason}
                 onChange={(e) => setAdjustReason(e.target.value)}
                 placeholder="VD: Quên check-out khi ra về, có xác nhận của trưởng nhóm..."

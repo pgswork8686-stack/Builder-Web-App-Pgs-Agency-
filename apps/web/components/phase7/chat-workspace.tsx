@@ -532,7 +532,7 @@ export function ChatWorkspace() {
                 setModalTab("direct");
                 setNewChatModalOpen(true);
               }}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Cuộc trò chuyện mới
             </Button>
@@ -644,7 +644,7 @@ export function ChatWorkspace() {
                         </div>
                       </div>
                       {conversation.hasUnread ? (
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#4F75FF]" />
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#3D61E6]" />
                       ) : null}
                     </div>
                     {conversation.lastMessageAt ? (
@@ -704,7 +704,7 @@ export function ChatWorkspace() {
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white"
+                className="w-full"
                 disabled={isClient}
                 onClick={() => {
                   setModalTab("direct");
@@ -849,7 +849,7 @@ export function ChatWorkspace() {
                   size="sm"
                   leftIcon={<Plus className="w-4 h-4" />}
                   onClick={() => setNewChatModalOpen(true)}
-                  className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white"
+                  className=""
                 >
                   Tạo cuộc trò chuyện mới
                 </Button>
@@ -949,7 +949,7 @@ export function ChatWorkspace() {
                 variant="primary"
                 size="sm"
                 disabled={!selected || sending || !draft.trim()}
-                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                className="font-bold"
                 leftIcon={
                   sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1080,7 +1080,7 @@ export function ChatWorkspace() {
                         <Button
                           variant="primary"
                           size="sm"
-                          className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           Nhắn tin
                         </Button>
@@ -1172,7 +1172,7 @@ export function ChatWorkspace() {
                             <Button
                               variant="primary"
                               size="sm"
-                              className="h-8 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                              className="h-8 text-xs font-bold"
                               onClick={() => void openProjectChat(proj.id)}
                               leftIcon={
                                 <MessageCircle className="w-3.5 h-3.5" />
@@ -1252,7 +1252,7 @@ export function ChatWorkspace() {
                                       <Button
                                         variant="primary"
                                         size="sm"
-                                        className="h-6 text-[10px] px-2 bg-[#4F75FF] hover:bg-[#3D61E6] text-white opacity-90 group-hover:opacity-100 shrink-0"
+                                        className="h-6 text-[10px] px-2 opacity-90 group-hover:opacity-100 shrink-0"
                                       >
                                         Nhắn riêng
                                       </Button>
@@ -1362,7 +1362,7 @@ export function ChatWorkspace() {
                     <Button
                       variant="primary"
                       size="sm"
-                      className="h-7 text-xs bg-[#4F75FF] hover:bg-[#3D61E6] text-white shrink-0 font-bold"
+                      className="h-7 text-xs shrink-0 font-bold"
                       onClick={() => {
                         if (profile?.id) {
                           setViewingProjectMembersModal(false);

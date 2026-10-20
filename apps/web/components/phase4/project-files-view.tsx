@@ -228,7 +228,7 @@ export function FileManager({
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-blue-100">
             <div
-              className="h-full bg-[#4F75FF] transition-all"
+              className="h-full bg-[#3D61E6] transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -248,7 +248,12 @@ export function FileManager({
           Chưa có tệp nào.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="Vùng nội dung cuộn ngang"
+          className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs"
+        >
           <table className="w-full min-w-[760px] text-left text-xs">
             <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#5B6B82] bg-[#F8FAFC]">
               <tr>

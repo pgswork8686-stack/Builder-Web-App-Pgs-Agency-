@@ -150,7 +150,7 @@ function ProjectCalendarContent({
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#4F75FF]" /> Công
+              <span className="h-2.5 w-2.5 rounded-full bg-[#3D61E6]" /> Công
               việc
             </span>
             <span className="inline-flex items-center gap-1.5 text-[#5B6B82]">
@@ -194,7 +194,7 @@ function ProjectCalendarContent({
           <button
             type="button"
             onClick={() => setCreateDate(dateKey(new Date()))}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3D61E6] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#3D61E6] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#2F4FC9] cursor-pointer transition-colors"
           >
             <Plus className="h-4 w-4" />
             Tạo công việc
@@ -234,7 +234,12 @@ function ProjectCalendarContent({
           Đang tải lịch công việc…
         </div>
       ) : (
-        <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+        <section
+          tabIndex={0}
+          role="region"
+          aria-label="Vùng nội dung cuộn ngang"
+          className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs"
+        >
           <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#F8FAFC]">
             {weekdayLabels.map((label) => (
               <div
