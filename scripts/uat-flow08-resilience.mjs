@@ -165,6 +165,40 @@ await runFlow(flow, async () => {
     (m) => (m.userId ?? m.user_id ?? m.user?.id) === U.employee.id,
   );
   assert.ok(membership, "the employee membership must be listed");
+
+  // The system protects work in progress: a member who still owns a task cannot be
+  // removed. Prove the guard first, then hand the task over and revoke.
+  const guarded = await flow.api(
+    "DELETE",
+    `/admin/projects/${projectId}/members/${membership.id}`,
+    adminToken,
+  );
+  flow.expectStatus(guarded, 409, "Removing a member who owns a task");
+  assert.equal(guarded.data.code, "PROJECT_MEMBER_HAS_ASSIGNED_TASKS");
+  assert.equal(
+    (
+      await db.query(
+        `SELECT count(*)::int AS n FROM public.project_memberships
+          WHERE project_id = $1::uuid AND user_id = $2::uuid`,
+        [projectId, U.employee.id],
+      )
+    ).rows[0].n,
+    1,
+    "the refused removal must not change the membership",
+  );
+  flow.expectStatus(
+    await flow.api(
+      "PATCH",
+      `/projects/${projectId}/tasks/${taskId}`,
+      leaderToken,
+      {
+        assigneeUserId: U.leader.id,
+      },
+    ),
+    200,
+    "Manager hands the task over",
+  );
+
   flow.expectStatus(
     await flow.api(
       "DELETE",
@@ -203,6 +237,15 @@ await runFlow(flow, async () => {
     [taskId],
   );
   assert.equal(status.rows[0].status, "todo", "the task was not changed");
+  const owner = await db.query(
+    `SELECT assignee_user_id::text AS assignee FROM public.tasks WHERE id = $1::uuid`,
+    [taskId],
+  );
+  assert.equal(
+    owner.rows[0].assignee,
+    U.leader.id,
+    "the task now belongs to the manager",
+  );
 
   await page.goto(flow.url(`/app/projects/${projectId}`), {
     waitUntil: "networkidle",
@@ -214,6 +257,6 @@ await runFlow(flow, async () => {
   );
   await flow.shot(page, "04-revoked-project-page");
   flow.step(
-    "4. After revocation the API refuses read and write (403/404), the database is unchanged and the UI shows no project data",
+    "4. A member who owns a task cannot be removed (409); after the task is handed over and access revoked, the API refuses read and write (403/404), the task is unchanged and the UI shows no project data",
   );
 });
