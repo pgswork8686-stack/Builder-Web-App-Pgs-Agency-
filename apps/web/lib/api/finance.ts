@@ -96,9 +96,74 @@ export interface FinanceQuery {
   contractId?: string;
 }
 
+export interface PaymentLedgerItem {
+  id: string;
+  invoiceId: string;
+  invoiceNumber: string | null;
+  invoiceStatus: string | null;
+  clientCompany: string | null;
+  currencyCode: string | null;
+  amount: number;
+  paidAt: string;
+  paymentMethod: string | null;
+  paymentReference: string | null;
+  recordedBy: string | null;
+  invoiceAmount: number | null;
+  invoicePaidAmount: number | null;
+  invoiceOutstanding: number | null;
+}
+
+export interface ReceivableItem {
+  id: string;
+  invoiceNumber: string;
+  clientCompany: string | null;
+  projectName: string | null;
+  status: string;
+  issueDate: string;
+  dueDate: string;
+  currencyCode: string;
+  amount: number;
+  paidAmount: number;
+  outstanding: number;
+  overdueDays: number;
+}
+
+export interface FinancePage<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface ReceivablesPage extends FinancePage<ReceivableItem> {
+  /** Outstanding / overdue per currency over ALL open invoices. */
+  totals: Record<string, { outstanding: number; overdue: number }>;
+}
+
 export const financeApi = {
   getSummary: (): Promise<any> => {
     return request("/finance/summary");
+  },
+
+  /** Cross-invoice payment ledger (reconciliation). */
+  getPaymentLedger: (
+    query: { page?: number; pageSize?: number } = {},
+  ): Promise<FinancePage<PaymentLedgerItem>> => {
+    const params = new URLSearchParams();
+    if (query.page) params.append("page", query.page.toString());
+    if (query.pageSize) params.append("pageSize", query.pageSize.toString());
+    return request(`/finance/payments?${params.toString()}`);
+  },
+
+  /** Open receivables with outstanding amounts and ageing. */
+  getReceivables: (
+    query: { page?: number; pageSize?: number } = {},
+  ): Promise<ReceivablesPage> => {
+    const params = new URLSearchParams();
+    if (query.page) params.append("page", query.page.toString());
+    if (query.pageSize) params.append("pageSize", query.pageSize.toString());
+    return request(`/finance/receivables?${params.toString()}`);
   },
 
   getContracts: (

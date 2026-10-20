@@ -1,0 +1,241 @@
+name: UAT (disposable local Supabase)
+
+# Runs the repository's disposable UAT toolkit against a Supabase stack that is
+# created inside this runner (Docker) and destroyed with it. It never touches
+# staging or production, and a PASS here is NOT production/staging UAT.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "feat/pgs-audit-ux-uat"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uat-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  disposable-uat:
+    name: Database-backed UAT + browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      CI: "true"
+      PGS_RELEASE_DB_DISPOSABLE: confirmed
+      WEB_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase (Docker, disposable)
+        run: pnpm exec supabase start
+
+      - name: Reset local database to repository migrations
+        run: pnpm exec supabase db reset --local --no-seed
+
+      - name: Export local keys
+        run: |
+          pnpm exec supabase status -o env > "$RUNNER_TEMP/supabase.env"
+          get() { grep -E "^$1=" "$RUNNER_TEMP/supabase.env" | head -n1 | cut -d= -f2- | tr -d '"'; }
+          PUB="$(get PUBLISHABLE_KEY)"; [ -n "$PUB" ] || PUB="$(get ANON_KEY)"
+          SEC="$(get SECRET_KEY)";      [ -n "$SEC" ] || SEC="$(get SERVICE_ROLE_KEY)"
+          JWT="$(get JWT_SECRET)"
+          test -n "$PUB" && test -n "$SEC" && test -n "$JWT"
+          {
+            echo "::add-mask::$PUB"; echo "::add-mask::$SEC"; echo "::add-mask::$JWT"
+          }
+          {
+            echo "SUPABASE_PUBLISHABLE_KEY=$PUB"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUB"
+            echo "PGS_LOCAL_UAT_SUPABASE_PUBLISHABLE_KEY=$PUB"
+            echo "SUPABASE_SECRET_KEY=$SEC"
+            echo "JWT_SECRET=$JWT"
+          } >> "$GITHUB_ENV"
+
+      - name: Verify migrations (release + workflow)
+        env:
+          DATABASE_URL: postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres
+        run: |
+          pnpm test:release-migrations
+          pnpm test:workflow-migrations
+
+      # Both migration verifiers intentionally rebuild public schema. In particular,
+      # the workflow-only verifier leaves only its 47-migration subset installed.
+      # Restore all repository migrations on disposable Supabase before seeding.
+      - name: Restore complete local schema after destructive migration verification
+        run: pnpm exec supabase db reset --local --no-seed
+
+      # Supabase CLI reset does not preserve the service_role grants installed
+      # by the destructive release-migration verifier. Restore them ONLY on
+      # the confirmed disposable 127.0.0.1 database, never on hosted Supabase.
+      - name: Restore local service_role database privileges
+        env:
+          DATABASE_URL: postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres
+        run: node scripts/prepare-disposable-uat-grants.mjs
+
+      - name: Seed five-role UAT accounts
+        run: node scripts/seed-local-uat.mjs
+
+      - name: Build API and web (NEXT_PUBLIC_* are inlined at build time)
+        env:
+          APP_ENV: development
+          SUPABASE_URL: http://127.0.0.1:54321
+          DATABASE_URL: postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres
+        run: pnpm --filter api build && pnpm --filter web build
+
+      - name: Start API and web
+        env:
+          APP_ENV: development
+          PORT: "3001"
+          SUPABASE_URL: http://127.0.0.1:54321
+          DATABASE_URL: postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres
+          INITIAL_ADMIN_EMAIL: admin@test.local
+          THROTTLE_LIMIT: "100000"
+          TRUST_PROXY: "false"
+        run: |
+          (cd apps/api && nohup node dist/main > "$RUNNER_TEMP/api.log" 2>&1 &)
+          (cd apps/web && nohup pnpm exec next start -p 3000 > "$RUNNER_TEMP/web.log" 2>&1 &)
+          curl --retry 40 --retry-delay 3 --retry-connrefused -fsS http://localhost:3001/api/v1/health
+          curl --retry 40 --retry-delay 3 --retry-connrefused -fsS -o /dev/null http://localhost:3000/auth/login
+
+      - name: Database-backed workflow UAT (five roles, RBAC, workflow, chat)
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+        run: node scripts/run-full-local-uat.mjs
+
+      - name: Install Chromium and axe-core
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          npm install --prefix "$RUNNER_TEMP/axe" axe-core@4.10.2
+          echo "PGS_AXE_PATH=$RUNNER_TEMP/axe/node_modules/axe-core/axe.min.js" >> "$GITHUB_ENV"
+
+      - name: Browser UAT - five roles at 375/768/1024/1440 px
+        env:
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-responsive-capture.mjs
+
+      # Cross-role business chain with database assertions (Team Leader ->
+      # Client -> Team Leader). Kept after the browser gate so a failure here
+      # never hides the axe/responsive evidence.
+      - name: Flow 05 - client acceptance chain (API + database assertions)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow05-client-acceptance.mjs
+
+      # Same chain through the real browser UI (Playwright), Postgres asserted
+      # after every business step; also refresh, brand-new login, 375px and axe.
+      - name: Flow 05 - Team Leader -> Client -> Team Leader in the browser (Playwright)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow05-ui.mjs
+
+      # Cross-role flows 01-04 (Playwright UI + API + Postgres). They chain
+      # through uat-evidence/flow-state.json (project created in 01 is used by
+      # 02-04) but every flow falls back to the seeded project, and each step
+      # runs even if an earlier one failed.
+      - name: Flow 01 - Admin creates customer, project, manager, member, service
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow01-project-init.mjs
+
+      - name: Flow 02 - Team Leader creates and assigns a task
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow02-task-assignment.mjs
+
+      - name: Flow 03 - Employee executes, reports and submits for review
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow03-task-execution.mjs
+
+      - name: Flow 04 - Team Leader rejects and approves (internal review)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow04-internal-review.mjs
+
+      - name: Flow 06 - Accountant finance (invoice, payments, expenses, ledger)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow06-finance.mjs
+
+      - name: Flow 07 - Completion and client handover
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow07-handover-close.mjs
+
+      - name: Flow 08 - Resilience (API outage + retry, expired session, revoked access)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow08-resilience.mjs
+
+      - name: Publish summary
+        if: always()
+        run: |
+          if [ -f uat-evidence/responsive-summary.md ]; then cat uat-evidence/responsive-summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json uat-evidence/flow01/flow01-results.json uat-evidence/flow02/flow02-results.json uat-evidence/flow03/flow03-results.json uat-evidence/flow04/flow04-results.json uat-evidence/flow06/flow06-results.json uat-evidence/flow07/flow07-results.json uat-evidence/flow08/flow08-results.json; do
+            if [ -f "$f" ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "**$f**: $(node -e "const j=require('./$f');console.log(j.result+' ('+j.steps.length+' steps)'+(j.error?' - '+j.error:''))")" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload evidence (screenshots, results, service logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uat-evidence
+          path: |
+            uat-evidence/
+            ${{ runner.temp }}/api.log
+            ${{ runner.temp }}/web.log
+          if-no-files-found: warn
+          retention-days: 14

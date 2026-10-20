@@ -89,7 +89,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-black text-[#0F172A] tracking-tight">
               Đăng nhập PGS Hub
             </h2>
-            <p className="mt-1.5 text-xs text-[#64748B]">
+            <p className="mt-1.5 text-xs text-[#5B6B82]">
               Sử dụng tài khoản đã được Admin kích hoạt.
             </p>
           </div>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-[#4F75FF] hover:underline font-medium"
+                  className="text-xs text-[#3453D1] hover:underline font-medium"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -143,7 +143,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || oauthLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#4F75FF] hover:bg-[#3D62EE] text-white font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#3D61E6] hover:bg-[#2F4FC9] text-white font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? <span>Đang xử lý...</span> : <span>Đăng nhập</span>}
             </button>
@@ -152,7 +152,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative flex items-center justify-center my-4">
             <div className="w-full border-t border-[#E2E8F0]" />
-            <span className="absolute px-3 bg-white text-[11px] text-[#94A3B8]">
+            <span className="absolute px-3 bg-white text-[11px] text-[#5F6E85]">
               Hoặc
             </span>
           </div>
@@ -188,11 +188,11 @@ export default function LoginPage() {
           </button>
 
           {/* Footer Register Prompt */}
-          <div className="pt-2 text-center text-xs text-[#64748B]">
+          <div className="pt-2 text-center text-xs text-[#5B6B82]">
             Chưa có tài khoản?{" "}
             <Link
               href="/auth/sign-up"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3453D1] font-bold hover:underline"
             >
               Đăng ký và chờ Admin duyệt
             </Link>

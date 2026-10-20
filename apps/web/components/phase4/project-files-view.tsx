@@ -1,9 +1,14 @@
 "use client";
 
-import { Download, FileText, Trash2, Upload } from "lucide-react";
+import { Download, FileText, Send, Trash2, Upload } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { filesApi, uploadToSignedUrl, type ProjectFile } from "@/lib/api/files";
+import {
+  filesApi,
+  HANDOVER_CATEGORY,
+  uploadToSignedUrl,
+  type ProjectFile,
+} from "@/lib/api/files";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import {
   ProjectWorkspaceRealtimeProvider,
@@ -60,6 +65,10 @@ function ProjectFilesContent({
           canUpload={
             mode === "admin" || project?.currentProjectRole !== "viewer"
           }
+          canHandover={
+            mode === "admin" ||
+            project?.currentProjectRole === "project_manager"
+          }
         />
       </div>
     </main>
@@ -72,12 +81,15 @@ export function FileManager({
   compact = false,
   refreshSignal = 0,
   canUpload = true,
+  canHandover = false,
 }: {
   projectId: string;
   taskId?: string;
   compact?: boolean;
   refreshSignal?: number;
   canUpload?: boolean;
+  /** Managers may mark a file as handed over to the client. */
+  canHandover?: boolean;
 }) {
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [page, setPage] = useState(1);
@@ -132,6 +144,24 @@ export function FileManager({
     }
   };
 
+  const toggleHandover = async (file: ProjectFile) => {
+    setError(null);
+    try {
+      await filesApi.setHandover(
+        projectId,
+        file.id,
+        file.fileCategory !== HANDOVER_CATEGORY,
+      );
+      await load();
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Không thể cập nhật trạng thái bàn giao.",
+      );
+    }
+  };
+
   const download = async (file: ProjectFile) => {
     try {
       const result = await filesApi.download(projectId, file.id);
@@ -170,7 +200,7 @@ export function FileManager({
           />
         )}
         {canUpload && (
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3453D1] px-4 py-2 text-xs font-bold text-white hover:bg-[#2B45B0] transition-colors shadow-xs">
             <Upload className="h-4 w-4" /> Chọn tệp tải lên
             <input
               ref={inputRef}
@@ -198,7 +228,7 @@ export function FileManager({
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-blue-100">
             <div
-              className="h-full bg-[#4F75FF] transition-all"
+              className="h-full bg-[#3D61E6] transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -210,17 +240,22 @@ export function FileManager({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 text-[#64748B]">
+        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 text-[#5B6B82]">
           Đang tải tệp…
         </div>
       ) : files.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#94A3B8]">
+        <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#5F6E85]">
           Chưa có tệp nào.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="Vùng nội dung cuộn ngang"
+          className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs"
+        >
           <table className="w-full min-w-[760px] text-left text-xs">
-            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#F8FAFC]">
+            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#5B6B82] bg-[#F8FAFC]">
               <tr>
                 <th className="p-4">Tệp</th>
                 <th className="p-4">Kích thước</th>
@@ -238,32 +273,54 @@ export function FileManager({
                 >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
-                      <FileText className="h-4 w-4 text-[#4F75FF]" />
+                      <FileText className="h-4 w-4 text-[#3453D1]" />
                       {file.originalName}
                     </span>
-                    <p className="mt-0.5 text-[11px] text-[#94A3B8]">
+                    <p className="mt-0.5 text-[11px] text-[#5F6E85]">
                       {file.mimeType}
                     </p>
+                    {file.fileCategory === HANDOVER_CATEGORY && (
+                      <p className="mt-1 text-[11px] font-bold text-[#047857]">
+                        Đã bàn giao cho khách hàng
+                      </p>
+                    )}
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {formatSize(file.sizeBytes)}
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {file.uploader?.full_name || file.uploader?.email || "—"}
                   </td>
-                  <td className="p-4 text-[#64748B]">
+                  <td className="p-4 text-[#5B6B82]">
                     {file.task?.title || "Tệp dự án"}
                   </td>
-                  <td className="p-4 text-[#94A3B8] font-mono">
+                  <td className="p-4 text-[#5F6E85] font-mono">
                     {new Date(file.createdAt).toLocaleString("vi-VN")}
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
+                      {canHandover && (
+                        <button
+                          type="button"
+                          onClick={() => void toggleHandover(file)}
+                          aria-label={
+                            file.fileCategory === HANDOVER_CATEGORY
+                              ? `Thu hồi bàn giao ${file.originalName}`
+                              : `Bàn giao ${file.originalName} cho khách hàng`
+                          }
+                          className="inline-flex items-center gap-1 rounded-lg border border-[#E2E8F0] px-2 py-1.5 text-[11px] font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                          {file.fileCategory === HANDOVER_CATEGORY
+                            ? "Thu hồi"
+                            : "Bàn giao"}
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => void download(file)}
                         aria-label={`Tải xuống ${file.originalName}`}
-                        className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+                        className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#5B6B82] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
                       >
                         <Download className="h-4 w-4" />
                       </button>
@@ -295,7 +352,7 @@ export function FileManager({
           >
             Trước
           </button>
-          <span className="text-[#64748B]">
+          <span className="text-[#5B6B82]">
             Trang {page}/{totalPages}
           </span>
           <button

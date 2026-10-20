@@ -75,6 +75,14 @@ export class ProjectsController {
     return this.projectsService.getAdminProjectById(projectId);
   }
 
+  @Get('admin/projects/:projectId/completion-check')
+  @Roles('admin')
+  async getCompletionCheck(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+  ) {
+    return this.projectsService.getCompletionCheck(projectId);
+  }
+
   @Patch('admin/projects/:projectId')
   @Roles('admin')
   async updateProject(
@@ -217,6 +225,22 @@ export class ProjectsController {
     return this.projectsService.deleteProjectService(
       projectId,
       projectServiceId,
+    );
+  }
+
+  @Get('projects/:projectId/services')
+  @Roles('admin', 'team_leader', 'employee', 'accountant')
+  async getScopedProjectServices(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser('profileId') userId: string,
+    @CurrentUser('role') role: AppRole,
+    @CurrentUser('departmentId') departmentId: string | null,
+  ) {
+    return this.projectsService.getScopedProjectServices(
+      userId,
+      role,
+      departmentId,
+      projectId,
     );
   }
 

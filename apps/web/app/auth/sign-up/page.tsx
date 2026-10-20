@@ -114,7 +114,7 @@ export default function SignUpPage() {
           {/* Header Mobile Logo / Text */}
           <div>
             <div className="md:hidden flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-[#4F75FF] text-white font-black flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#3F63D6] text-white font-black flex items-center justify-center">
                 P
               </div>
               <span className="font-bold text-lg text-[#0F172A]">PGS HUB</span>
@@ -123,7 +123,7 @@ export default function SignUpPage() {
             <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
               Tạo tài khoản
             </h2>
-            <p className="mt-1 text-xs text-[#64748B]">
+            <p className="mt-1 text-xs text-[#5B6B82]">
               Đăng ký tài khoản thành viên hệ thống PGS Hub
             </p>
           </div>
@@ -177,7 +177,7 @@ export default function SignUpPage() {
           {/* Divider */}
           <div className="relative flex items-center justify-center my-3">
             <div className="w-full border-t border-[#EDF2F7]" />
-            <span className="absolute px-3 bg-white text-[11px] text-[#94A3B8] uppercase tracking-wider">
+            <span className="absolute px-3 bg-white text-[11px] text-[#5F6E85] uppercase tracking-wider">
               hoặc đăng ký bằng Email
             </span>
           </div>
@@ -185,11 +185,11 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSignUp} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Họ và tên
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="text"
                   required
@@ -202,11 +202,11 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Email doanh nghiệp
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="email"
                   required
@@ -219,11 +219,11 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Mật khẩu
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required
@@ -236,11 +236,11 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Xác nhận mật khẩu
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required
@@ -266,11 +266,11 @@ export default function SignUpPage() {
           </form>
 
           {/* Footer Login Prompt */}
-          <div className="text-center text-xs text-[#64748B]">
+          <div className="text-center text-xs text-[#5B6B82]">
             Đã có tài khoản?{" "}
             <Link
               href="/auth/login"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3453D1] font-bold hover:underline"
             >
               Đăng nhập ngay
             </Link>

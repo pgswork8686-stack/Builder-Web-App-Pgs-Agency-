@@ -8,8 +8,9 @@ import {
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
-import type { RequestUser } from '../auth/auth.types';
+import type { AppRole, RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { TasksService } from '../tasks/tasks.service';
 import type {
@@ -50,6 +51,7 @@ export class WorkflowRuntimeService implements OnModuleInit {
     private readonly tasksService: TasksService,
     private readonly slaService: WorkflowSlaService,
     private readonly automation?: AutomationService,
+    private readonly notifications?: NotificationsService,
   ) {}
 
   onModuleInit(): void {
@@ -299,12 +301,27 @@ export class WorkflowRuntimeService implements OnModuleInit {
     projectId: string,
     workflowId: string,
     actorId: string,
+    extraPayload: Record<string, unknown> = {},
   ): Promise<void> {
+    if (!this.automation) return;
     try {
-      await this.automation?.runEvent({
+      // Rules can only address the project's client company when the event
+      // payload carries it (clientCompanyMembersFromPayload).
+      const { data: project } = await this.client
+        .from('projects')
+        .select('client_company_id')
+        .eq('id', projectId)
+        .maybeSingle();
+      await this.automation.runEvent({
         triggerType,
         eventKey: `${triggerType}:${entityId}`,
-        payload: { projectId, workflowId, entityId },
+        payload: {
+          projectId,
+          workflowId,
+          entityId,
+          clientCompanyId: project?.client_company_id ?? null,
+          ...extraPayload,
+        },
         actorUserId: actorId,
         entityType: triggerType.includes('approval')
           ? 'workflow_approval'
@@ -321,6 +338,423 @@ export class WorkflowRuntimeService implements OnModuleInit {
         `Workflow automation failed: ${error instanceof Error ? error.message : 'unknown error'}`,
       );
     }
+  }
+
+  /**
+   * Client acceptance notifications are part of the business flow, so they do
+   * not depend on admin-configured automation rules: the client company is
+   * told when acceptance is requested, and the requester / project manager are
+   * told of the decision. Failures are logged and never fail the approval.
+   */
+  private async notifyClientApproval(
+    kind: 'requested' | 'approved' | 'rejected',
+    approval: {
+      id: string;
+      approval_type: string;
+      requested_by_user_id: string;
+    },
+    projectId: string,
+    actorId: string,
+    decisionNote?: string | null,
+  ): Promise<void> {
+    if (!this.notifications || approval.approval_type !== 'client') return;
+    try {
+      const { data: project, error: projectError } = await this.client
+        .from('projects')
+        .select('name,client_company_id,project_manager_user_id')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (projectError) throw projectError;
+      if (!project) return;
+
+      let recipients: string[];
+      if (kind === 'requested') {
+        const { data, error } = await this.client
+          .from('client_memberships')
+          .select(
+            'user_id, profile:profiles!client_memberships_user_id_fkey(account_status)',
+          )
+          .eq('client_company_id', project.client_company_id);
+        if (error) throw error;
+        recipients = (data ?? [])
+          .filter((row) => {
+            const profile = Array.isArray(row.profile)
+              ? row.profile[0]
+              : row.profile;
+            return profile?.account_status === 'active';
+          })
+          .map((row) => String(row.user_id));
+      } else {
+        recipients = [
+          approval.requested_by_user_id,
+          project.project_manager_user_id,
+        ].filter(
+          (value): value is string =>
+            typeof value === 'string' && value.length > 0,
+        );
+      }
+
+      const projectName = String(project.name ?? '');
+      const note = decisionNote?.trim().slice(0, 300);
+      const copy = {
+        requested: {
+          title: 'Có sản phẩm đang chờ bạn nghiệm thu',
+          message: `Agency đã gửi sản phẩm của dự án ${projectName} để bạn xem và phê duyệt.`,
+        },
+        approved: {
+          title: 'Khách hàng đã phê duyệt sản phẩm',
+          message: `Khách hàng đã nghiệm thu sản phẩm của dự án ${projectName}.${note ? ` Ghi chú: ${note}` : ''}`,
+        },
+        rejected: {
+          title: 'Khách hàng yêu cầu chỉnh sửa',
+          message: `Khách hàng yêu cầu chỉnh sửa sản phẩm của dự án ${projectName}.${note ? ` Phản hồi: ${note}` : ''}`,
+        },
+      }[kind];
+
+      await this.notifications.createForUsers(recipients, {
+        type: `workflow.client_approval.${kind}`,
+        title: copy.title,
+        message: copy.message,
+        entityType: 'workflow_approval',
+        entityId: approval.id,
+        actionUrl:
+          kind === 'requested'
+            ? '/app/client/approvals'
+            : `/app/projects/${projectId}`,
+        metadata: { projectId, approvalType: 'client' },
+        actorUserId: actorId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Client approval notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  /**
+   * Restricted "system" actors for auto-task creation that must not depend on
+   * who triggered the progression (a client approval, a timer, ...). The
+   * project manager comes first, then the first active admin. These actors
+   * are only ever used by createAutoTasksAsSystem, which can do nothing but
+   * ensure the primary task of ready auto-task items (idempotent in the DB).
+   */
+  private async autoTaskActors(projectId: string): Promise<RequestUser[]> {
+    const columns =
+      'id,email,role,account_status,full_name,avatar_url,approved_at';
+    const toActor = (profile: Record<string, unknown>): RequestUser => ({
+      authUserId: String(profile.id),
+      profileId: String(profile.id),
+      email: typeof profile.email === 'string' ? profile.email : null,
+      phone: null,
+      accountStatus: 'active',
+      role: profile.role as AppRole,
+      fullName:
+        typeof profile.full_name === 'string' ? profile.full_name : null,
+      avatarUrl:
+        typeof profile.avatar_url === 'string' ? profile.avatar_url : null,
+      approvedAt:
+        typeof profile.approved_at === 'string' ? profile.approved_at : null,
+    });
+    const actors: RequestUser[] = [];
+    const { data: project } = await this.client
+      .from('projects')
+      .select('project_manager_user_id')
+      .eq('id', projectId)
+      .maybeSingle();
+    if (typeof project?.project_manager_user_id === 'string') {
+      const { data: manager } = await this.client
+        .from('profiles')
+        .select(columns)
+        .eq('id', project.project_manager_user_id)
+        .eq('account_status', 'active')
+        .maybeSingle();
+      if (manager?.role && manager.role !== 'client') {
+        actors.push(toActor(manager));
+      }
+    }
+    const { data: admin } = await this.client
+      .from('profiles')
+      .select(columns)
+      .eq('role', 'admin')
+      .eq('account_status', 'active')
+      .order('id')
+      .limit(1)
+      .maybeSingle();
+    if (admin && !actors.some((actor) => actor.profileId === admin.id)) {
+      actors.push(toActor(admin));
+    }
+    return actors;
+  }
+
+  /**
+   * Ensures the primary task of every ready auto-task item of one workflow,
+   * independent of any user request. Safe to call repeatedly or from several
+   * instances: workflow_create_primary_task locks the item and the partial
+   * unique index uidx_project_workflow_task_links_primary rejects duplicates.
+   */
+  async createAutoTasksAsSystem(
+    projectId: string,
+    workflowId: string,
+  ): Promise<void> {
+    const actors = await this.autoTaskActors(projectId);
+    if (actors.length === 0) {
+      this.logger.warn(
+        `No project manager or admin can own auto tasks for project ${projectId}`,
+      );
+      return;
+    }
+    let denied: unknown;
+    for (const actor of actors) {
+      try {
+        await this.ensureReadyAutoTasks(projectId, workflowId, actor);
+        return;
+      } catch (error) {
+        if (!(error instanceof ForbiddenException)) throw error;
+        denied = error;
+      }
+    }
+    throw denied;
+  }
+
+  /**
+   * Safety-net sweep: finds ready auto-task items that still have no primary
+   * task (for example after a client approval, a restart, or a failed run) and
+   * creates them. Returns how many workflows were processed.
+   */
+  async sweepMissingAutoTasks(
+    pageSize = 200,
+    maxPages = 50,
+  ): Promise<{ workflows: number }> {
+    // Keyset-paginate through ALL ready auto-task items: a single capped query
+    // would never see missing items that sit beyond its limit.
+    const missingWorkflowIds = new Set<string>();
+    let cursor: string | null = null;
+    for (let page = 0; page < maxPages; page += 1) {
+      let query = this.client
+        .from('project_workflow_stage_items')
+        .select(
+          'id,project_workflow_id,links:project_workflow_task_links(link_type)',
+        )
+        .eq('status', 'ready')
+        .eq('auto_create_task', true)
+        .order('id', { ascending: true })
+        .limit(pageSize);
+      if (cursor) query = query.gt('id', cursor);
+      const { data: items, error } = await query;
+      if (error) this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', error);
+      const rows = items ?? [];
+      for (const item of rows) {
+        const hasPrimary = (Array.isArray(item.links) ? item.links : []).some(
+          (link: { link_type?: string }) => link.link_type === 'primary',
+        );
+        if (!hasPrimary)
+          missingWorkflowIds.add(String(item.project_workflow_id));
+      }
+      if (rows.length < pageSize) break;
+      cursor = String(rows[rows.length - 1].id);
+    }
+    if (missingWorkflowIds.size === 0) return { workflows: 0 };
+
+    const workflows: Array<Record<string, unknown>> = [];
+    const ids = [...missingWorkflowIds];
+    for (let start = 0; start < ids.length; start += 100) {
+      const { data, error: workflowError } = await this.client
+        .from('project_workflows')
+        .select('id,project_id,status')
+        .in('id', ids.slice(start, start + 100));
+      if (workflowError) {
+        this.databaseFailure('WORKFLOW_AUTO_TASK_SWEEP_FAILED', workflowError);
+      }
+      workflows.push(...(data ?? []));
+    }
+    let processed = 0;
+    for (const workflow of workflows) {
+      if (['completed', 'cancelled'].includes(String(workflow.status))) {
+        continue;
+      }
+      try {
+        await this.createAutoTasksAsSystem(
+          String(workflow.project_id),
+          String(workflow.id),
+        );
+        processed += 1;
+      } catch (sweepError) {
+        this.logger.error(
+          `Auto-task sweep failed for workflow ${String(workflow.id)}: ${sweepError instanceof Error ? sweepError.message : 'unknown error'}`,
+        );
+      }
+    }
+    return { workflows: processed };
+  }
+
+  /**
+   * Cross-project list of the client's own acceptance requests (client type
+   * only, no internal notes), paginated and filtered by status, with a count
+   * per status for the tabs. Scope is the client's company memberships.
+   */
+  async listClientApprovals(
+    userId: string,
+    query: {
+      status: 'pending' | 'approved' | 'rejected';
+      page: number;
+      pageSize: number;
+    },
+  ) {
+    const counts = { pending: 0, approved: 0, rejected: 0 };
+    const empty = {
+      items: [] as Array<Record<string, unknown>>,
+      page: query.page,
+      pageSize: query.pageSize,
+      total: 0,
+      totalPages: 0,
+      counts,
+    };
+    const { data: memberships, error: membershipError } = await this.client
+      .from('client_memberships')
+      .select('client_company_id')
+      .eq('user_id', userId);
+    if (membershipError) {
+      this.databaseFailure(
+        'WORKFLOW_CLIENT_APPROVAL_SCOPE_FAILED',
+        membershipError,
+      );
+    }
+    const companyIds = [
+      ...new Set(
+        (memberships ?? []).map((row) => String(row.client_company_id)),
+      ),
+    ];
+    if (companyIds.length === 0) return empty;
+
+    const { data: projects, error: projectError } = await this.client
+      .from('projects')
+      .select('id,project_code,name')
+      .in('client_company_id', companyIds);
+    if (projectError) {
+      this.databaseFailure(
+        'WORKFLOW_CLIENT_APPROVAL_SCOPE_FAILED',
+        projectError,
+      );
+    }
+    const projectById = new Map(
+      (projects ?? []).map((project) => [String(project.id), project]),
+    );
+    const projectIds = [...projectById.keys()];
+    if (projectIds.length === 0) return empty;
+
+    for (const status of ['pending', 'approved', 'rejected'] as const) {
+      const { count, error: countError } = await this.client
+        .from('workflow_approval_requests')
+        .select('id', { count: 'exact', head: true })
+        .in('project_id', projectIds)
+        .eq('approval_type', 'client')
+        .eq('status', status);
+      if (countError) {
+        this.databaseFailure(
+          'WORKFLOW_CLIENT_APPROVAL_LIST_FAILED',
+          countError,
+        );
+      }
+      counts[status] = count ?? 0;
+    }
+
+    const total = counts[query.status];
+    const from = (query.page - 1) * query.pageSize;
+    const result = {
+      ...empty,
+      total,
+      totalPages: Math.ceil(total / query.pageSize),
+    };
+    if (total === 0 || from >= total) return result;
+
+    const { data: approvals, error: listError } = await this.client
+      .from('workflow_approval_requests')
+      .select(
+        'id,status,requested_at,responded_at,project_id,project_workflow_id,project_workflow_stage_id,project_workflow_stage_item_id',
+      )
+      .in('project_id', projectIds)
+      .eq('approval_type', 'client')
+      .eq('status', query.status)
+      .order('requested_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(from, from + query.pageSize - 1);
+    if (listError) {
+      this.databaseFailure('WORKFLOW_CLIENT_APPROVAL_LIST_FAILED', listError);
+    }
+
+    const itemIds = (approvals ?? [])
+      .map((approval) => approval.project_workflow_stage_item_id)
+      .filter((id): id is string => typeof id === 'string');
+    const { data: items, error: itemError } =
+      itemIds.length === 0
+        ? { data: [], error: null }
+        : await this.client
+            .from('project_workflow_stage_items')
+            .select(
+              'id,project_workflow_stage_id,project_service_item:project_service_items(name)',
+            )
+            .in('id', itemIds);
+    if (itemError) {
+      this.databaseFailure('WORKFLOW_CLIENT_APPROVAL_LIST_FAILED', itemError);
+    }
+    const itemById = new Map(
+      (items ?? []).map((item) => [String(item.id), item]),
+    );
+    const stageIds = [
+      ...new Set(
+        [
+          ...(items ?? []).map((item) => item.project_workflow_stage_id),
+          ...(approvals ?? []).map(
+            (approval) => approval.project_workflow_stage_id,
+          ),
+        ].filter((id): id is string => typeof id === 'string'),
+      ),
+    ];
+    const { data: stages, error: stageError } =
+      stageIds.length === 0
+        ? { data: [], error: null }
+        : await this.client
+            .from('project_workflow_stages')
+            .select('id,name_snapshot')
+            .in('id', stageIds);
+    if (stageError) {
+      this.databaseFailure('WORKFLOW_CLIENT_APPROVAL_LIST_FAILED', stageError);
+    }
+    const stageName = new Map(
+      (stages ?? []).map((stage) => [
+        String(stage.id),
+        String(stage.name_snapshot),
+      ]),
+    );
+
+    result.items = (approvals ?? []).map((approval) => {
+      const project = projectById.get(String(approval.project_id));
+      const item = itemById.get(
+        String(approval.project_workflow_stage_item_id),
+      );
+      const snapshot = Array.isArray(item?.project_service_item)
+        ? item?.project_service_item[0]
+        : item?.project_service_item;
+      return {
+        id: approval.id,
+        status: approval.status,
+        requestedAt: approval.requested_at,
+        respondedAt: approval.responded_at ?? null,
+        projectId: approval.project_id,
+        projectCode: project?.project_code ?? null,
+        projectName: project?.name ?? null,
+        workflowId: approval.project_workflow_id,
+        stageName:
+          stageName.get(
+            String(
+              item?.project_workflow_stage_id ??
+                approval.project_workflow_stage_id,
+            ),
+          ) ?? null,
+        itemName: snapshot?.name ?? null,
+      };
+    });
+    return result;
   }
 
   async getProjectWorkflows(projectId: string, user: RequestUser) {
@@ -1390,7 +1824,14 @@ export class WorkflowRuntimeService implements OnModuleInit {
         }
       }
     }
-    await this.ensureReadyAutoTasks(projectId, workflowId, user);
+    // A client's approval can unlock successors, but clients may never create
+    // internal tasks (TasksService answers 403 TASK_ACCESS_DENIED, which used to
+    // fail the approval after it had already been stored). respondApproval
+    // creates them through createAutoTasksAsSystem right afterwards, and
+    // WorkflowAutoTaskScheduler sweeps anything that was missed.
+    if (user.role !== 'client') {
+      await this.ensureReadyAutoTasks(projectId, workflowId, user);
+    }
   }
 
   async completeStage(projectId: string, stageId: string, user: RequestUser) {
@@ -1828,6 +2269,20 @@ export class WorkflowRuntimeService implements OnModuleInit {
       projectId,
       workflowId,
       user.profileId,
+      {
+        approvalType: dto.approvalType,
+        requesterUserId: user.profileId,
+      },
+    );
+    await this.notifyClientApproval(
+      'requested',
+      {
+        id: String(data.id),
+        approval_type: dto.approvalType,
+        requested_by_user_id: user.profileId,
+      },
+      projectId,
+      user.profileId,
     );
     return data;
   }
@@ -1964,7 +2419,34 @@ export class WorkflowRuntimeService implements OnModuleInit {
       projectId,
       workflowId,
       user.profileId,
+      {
+        approvalType: String(approval.approval_type),
+        requesterUserId: String(approval.requested_by_user_id),
+        decision: dto.decision,
+      },
     );
+    await this.notifyClientApproval(
+      dto.decision,
+      {
+        id: approvalId,
+        approval_type: String(approval.approval_type),
+        requested_by_user_id: String(approval.requested_by_user_id),
+      },
+      projectId,
+      user.profileId,
+      dto.decisionNote,
+    );
+    if (dto.decision === 'approved' && user.role === 'client') {
+      // The client cannot create internal tasks, so a restricted system
+      // actor does it right away; the sweep is the safety net.
+      try {
+        await this.createAutoTasksAsSystem(projectId, workflowId);
+      } catch (error) {
+        this.logger.error(
+          `Auto-task creation after client approval failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+        );
+      }
+    }
     return data;
   }
 }

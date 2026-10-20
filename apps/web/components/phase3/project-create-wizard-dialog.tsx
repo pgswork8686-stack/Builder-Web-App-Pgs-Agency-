@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Check,
   ChevronRight,
@@ -22,6 +22,7 @@ import {
   type ProjectStatus,
   projectsApi,
 } from "@/lib/api/projects";
+import { type Department, organizationApi } from "@/lib/api/organization";
 
 export interface ProjectCreateWizardDialogProps {
   isOpen: boolean;
@@ -41,6 +42,25 @@ export function ProjectCreateWizardDialog({
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    organizationApi
+      .getDepartments()
+      .then((rows) => {
+        if (!cancelled)
+          setDepartments(rows.filter((d) => d.isActive !== false));
+      })
+      .catch(() => {
+        // Department is optional: the wizard still works without the list.
+        if (!cancelled) setDepartments([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   const [form, setForm] = useState({
     projectCode: "",
@@ -48,6 +68,7 @@ export function ProjectCreateWizardDialog({
     clientCompanyId: "",
     description: "",
     projectManagerUserId: "",
+    departmentId: "",
     startDate: "",
     dueDate: "",
     priority: "medium" as ProjectPriority,
@@ -112,6 +133,7 @@ export function ProjectCreateWizardDialog({
         clientCompanyId: form.clientCompanyId,
         description: form.description.trim() || undefined,
         projectManagerUserId: form.projectManagerUserId || undefined,
+        departmentId: form.departmentId || undefined,
         startDate: form.startDate,
         dueDate: form.dueDate,
         priority: form.priority,
@@ -126,6 +148,7 @@ export function ProjectCreateWizardDialog({
         clientCompanyId: "",
         description: "",
         projectManagerUserId: "",
+        departmentId: "",
         startDate: "",
         dueDate: "",
         priority: "medium",
@@ -148,6 +171,10 @@ export function ProjectCreateWizardDialog({
     (p) => p.id === form.projectManagerUserId,
   );
 
+  const selectedDepartment = departments.find(
+    (d) => d.id === form.departmentId,
+  );
+
   return (
     <Dialog
       isOpen={isOpen}
@@ -155,7 +182,7 @@ export function ProjectCreateWizardDialog({
       maxWidth="xl"
       title={
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center">
             <FolderPlus className="w-5 h-5" />
           </div>
           <span>Tạo dự án mới (Project Wizard)</span>
@@ -168,7 +195,7 @@ export function ProjectCreateWizardDialog({
         <div className="grid grid-cols-3 gap-2 border-b border-[#EDF2F7] pb-4">
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 1 ? "text-[#5D87FF]" : "text-[#7C879D]"
+              step >= 1 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
@@ -176,8 +203,8 @@ export function ProjectCreateWizardDialog({
                 step > 1
                   ? "bg-[#13DEB9] text-white"
                   : step === 1
-                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
+                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
               {step > 1 ? <Check className="w-4 h-4" /> : "1"}
@@ -187,7 +214,7 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 2 ? "text-[#5D87FF]" : "text-[#7C879D]"
+              step >= 2 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
@@ -195,8 +222,8 @@ export function ProjectCreateWizardDialog({
                 step > 2
                   ? "bg-[#13DEB9] text-white"
                   : step === 2
-                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                    ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
+                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
               {step > 2 ? <Check className="w-4 h-4" /> : "2"}
@@ -206,14 +233,14 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step === 3 ? "text-[#5D87FF]" : "text-[#7C879D]"
+              step === 3 ? "text-[#3453D1]" : "text-[#5F6E85]"
             }`}
           >
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                 step === 3
-                  ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                  : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                  ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#3453D1]"
+                  : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#5F6E85]"
               }`}
             >
               3
@@ -249,7 +276,7 @@ export function ProjectCreateWizardDialog({
                   </option>
                 ))}
               </Select>
-              <p className="text-[11px] text-[#7C879D]">
+              <p className="text-[11px] text-[#5F6E85]">
                 Dự án sẽ được gán trực tiếp cho hồ sơ khách hàng đã chọn để quản
                 lý hợp đồng và nghiệm thu.
               </p>
@@ -319,6 +346,21 @@ export function ProjectCreateWizardDialog({
               </Select>
 
               <Select
+                label="Phòng ban phụ trách"
+                value={form.departmentId}
+                onChange={(e) =>
+                  setForm({ ...form, departmentId: e.target.value })
+                }
+              >
+                <option value="">-- Chưa chỉ định (Tùy chọn) --</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
                 label="Mức độ ưu tiên"
                 value={form.priority}
                 onChange={(e) =>
@@ -371,29 +413,29 @@ export function ProjectCreateWizardDialog({
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in duration-150">
             <div className="p-4 sm:p-5 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#7C879D]">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#5F6E85]">
                 Tóm tắt thông tin dự án
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-[#7C879D]">Mã dự án:</span>{" "}
-                  <span className="font-mono font-bold text-[#5D87FF]">
+                  <span className="text-[#5F6E85]">Mã dự án:</span>{" "}
+                  <span className="font-mono font-bold text-[#3453D1]">
                     {form.projectCode}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#7C879D]">Khách hàng:</span>{" "}
+                  <span className="text-[#5F6E85]">Khách hàng:</span>{" "}
                   <span className="font-bold text-[#24304A]">
                     {selectedCompany?.name || "Chưa chọn"}
                   </span>
                 </div>
                 <div className="sm:col-span-2">
-                  <span className="text-[#7C879D]">Tên dự án:</span>{" "}
+                  <span className="text-[#5F6E85]">Tên dự án:</span>{" "}
                   <span className="font-bold text-[#24304A]">{form.name}</span>
                 </div>
                 <div>
-                  <span className="text-[#7C879D]">Quản lý (PM):</span>{" "}
+                  <span className="text-[#5F6E85]">Quản lý (PM):</span>{" "}
                   <span className="font-bold text-[#24304A]">
                     {selectedManager?.fullName ||
                       selectedManager?.email ||
@@ -401,19 +443,25 @@ export function ProjectCreateWizardDialog({
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#7C879D]">Ưu tiên:</span>{" "}
+                  <span className="text-[#5F6E85]">Phòng ban:</span>{" "}
+                  <span className="font-bold text-[#24304A]">
+                    {selectedDepartment?.name || "Chưa chỉ định"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#5F6E85]">Ưu tiên:</span>{" "}
                   <Badge variant="blue" size="sm">
                     {form.priority.toUpperCase()}
                   </Badge>
                 </div>
                 <div>
-                  <span className="text-[#7C879D]">Ngày bắt đầu:</span>{" "}
+                  <span className="text-[#5F6E85]">Ngày bắt đầu:</span>{" "}
                   <span className="font-medium text-[#24304A]">
                     {form.startDate}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#7C879D]">Hạn chót:</span>{" "}
+                  <span className="text-[#5F6E85]">Hạn chót:</span>{" "}
                   <span className="font-medium text-[#24304A]">
                     {form.dueDate}
                   </span>
@@ -422,7 +470,7 @@ export function ProjectCreateWizardDialog({
 
               {form.description && (
                 <div className="pt-2 border-t border-[#EDF2F7]">
-                  <span className="text-xs text-[#7C879D] block mb-1">
+                  <span className="text-xs text-[#5F6E85] block mb-1">
                     Mô tả:
                   </span>
                   <p className="text-xs text-[#24304A] bg-white p-3 rounded-xl border border-[#EDF2F7]">
@@ -432,7 +480,7 @@ export function ProjectCreateWizardDialog({
               )}
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#3453D1] text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>
                 Sau khi kích hoạt, bạn có thể tạo công việc (Tasks), phân công

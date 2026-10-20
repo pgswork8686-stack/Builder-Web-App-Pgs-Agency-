@@ -30,7 +30,7 @@ export function AuthHero() {
         {/* 3 Translucent Feature Cards from Figma */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/15 border border-white/20 backdrop-blur-xs text-white shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-white text-[#4F75FF] font-mono font-black text-xs flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-white text-[#3453D1] font-mono font-black text-xs flex items-center justify-center shrink-0">
               01
             </div>
             <div>
@@ -44,7 +44,7 @@ export function AuthHero() {
           </div>
 
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/15 border border-white/20 backdrop-blur-xs text-white shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-white text-[#4F75FF] font-mono font-black text-xs flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-white text-[#3453D1] font-mono font-black text-xs flex items-center justify-center shrink-0">
               02
             </div>
             <div>
@@ -58,7 +58,7 @@ export function AuthHero() {
           </div>
 
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/15 border border-white/20 backdrop-blur-xs text-white shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-white text-[#4F75FF] font-mono font-black text-xs flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-white text-[#3453D1] font-mono font-black text-xs flex items-center justify-center shrink-0">
               03
             </div>
             <div>

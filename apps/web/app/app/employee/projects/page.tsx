@@ -38,7 +38,7 @@ export default function EmployeeProjectsPage() {
       {projects.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<FolderKanban className="w-10 h-10 text-[#7C879D]" />}
+            icon={<FolderKanban className="w-10 h-10 text-[#5F6E85]" />}
             title="Chưa tham gia dự án nào"
             description="Khi được quản lý thêm vào nhóm dự án, các dự án sẽ hiển thị tại đây."
           />
@@ -49,7 +49,7 @@ export default function EmployeeProjectsPage() {
             <Link key={p.id} href={`/app/projects/${p.id}`}>
               <Card className="p-5 space-y-3 hover:border-[#5D87FF]/40 transition-all group">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <span className="font-mono text-xs font-bold text-[#3453D1]">
                     {p.projectCode}
                   </span>
                   <Badge
@@ -59,10 +59,10 @@ export default function EmployeeProjectsPage() {
                     {p.status}
                   </Badge>
                 </div>
-                <h4 className="text-sm font-bold text-[#24304A] group-hover:text-[#5D87FF] transition-colors">
+                <h4 className="text-sm font-bold text-[#24304A] group-hover:text-[#3453D1] transition-colors">
                   {p.name}
                 </h4>
-                <p className="text-xs text-[#7C879D]">
+                <p className="text-xs text-[#5F6E85]">
                   Khách hàng: {p.clientCompany?.name || "—"}
                 </p>
               </Card>

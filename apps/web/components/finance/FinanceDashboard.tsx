@@ -102,7 +102,7 @@ export default function FinanceDashboard({
     return (
       <div className="p-8 text-center rounded-2xl bg-white border border-[#EDF2F7] shadow-xs space-y-3">
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-        <p className="text-xs text-[#64748B]">{error}</p>
+        <p className="text-xs text-[#5B6B82]">{error}</p>
         <Button variant="secondary" size="sm" onClick={loadData}>
           Thử lại
         </Button>
@@ -147,7 +147,7 @@ export default function FinanceDashboard({
       {/* Metrics Grid */}
       {currencies.length === 0 ? (
         <EmptyState
-          icon={<DollarSign className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<DollarSign className="w-8 h-8 text-[#3453D1]" />}
           title="Chưa có dữ liệu tài chính"
           description="Chưa có số liệu tài chính được ghi nhận trong hệ thống."
         />
@@ -172,7 +172,7 @@ export default function FinanceDashboard({
             return (
               <div key={currency} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4F75FF]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#3D61E6]" />
                   <h3 className="text-sm font-bold text-[#0F172A]">
                     Đơn vị tiền tệ: {currency}
                   </h3>
@@ -236,13 +236,13 @@ export default function FinanceDashboard({
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
           <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-            <History className="w-4 h-4 text-[#4F75FF]" />
+            <History className="w-4 h-4 text-[#3453D1]" />
             Nhật ký thay đổi tài chính
           </h3>
         </div>
 
         {auditLogs.length === 0 ? (
-          <p className="text-center py-6 text-xs text-[#64748B]">
+          <p className="text-center py-6 text-xs text-[#5B6B82]">
             Chưa có nhật ký hoạt động nào được ghi nhận.
           </p>
         ) : (
@@ -261,13 +261,13 @@ export default function FinanceDashboard({
                       {getActionLabel(log.action)}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#64748B]">
+                  <div className="text-[11px] text-[#5B6B82]">
                     Entity ID:{" "}
                     <span className="font-mono text-[#0F172A]">
                       {log.entity_id}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#64748B]">
+                  <div className="text-[11px] text-[#5B6B82]">
                     Thực hiện bởi:{" "}
                     <span className="font-bold text-[#0F172A]">
                       {log.actor?.full_name || log.actor?.email || "System"}
@@ -275,7 +275,7 @@ export default function FinanceDashboard({
                   </div>
                 </div>
 
-                <span className="text-[#94A3B8] text-[11px] shrink-0 font-mono">
+                <span className="text-[#5F6E85] text-[11px] shrink-0 font-mono">
                   {new Date(log.created_at).toLocaleString("vi-VN")}
                 </span>
               </div>

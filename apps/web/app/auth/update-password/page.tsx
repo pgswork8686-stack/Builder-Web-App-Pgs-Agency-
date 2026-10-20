@@ -74,7 +74,7 @@ export default function UpdatePasswordPage() {
           <div>
             <Link
               href="/auth/login"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#4F75FF] mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#5B6B82] hover:text-[#3453D1] mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Quay lại đăng nhập</span>
@@ -83,7 +83,7 @@ export default function UpdatePasswordPage() {
             <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
               Cập nhật mật khẩu
             </h2>
-            <p className="mt-1 text-xs text-[#64748B]">
+            <p className="mt-1 text-xs text-[#5B6B82]">
               Nhập mật khẩu mới cho tài khoản của bạn.
             </p>
           </div>
@@ -106,11 +106,11 @@ export default function UpdatePasswordPage() {
           {/* Form */}
           <form onSubmit={handleUpdatePassword} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1.5">
                 Mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required
@@ -123,11 +123,11 @@ export default function UpdatePasswordPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1.5">
                 Xác nhận mật khẩu mới
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
                 <input
                   type="password"
                   required

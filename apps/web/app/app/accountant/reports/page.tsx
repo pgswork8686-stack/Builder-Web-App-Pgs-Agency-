@@ -37,37 +37,37 @@ export default function AccountantReportsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-5 space-y-2">
-          <span className="text-xs font-bold text-[#7C879D]">
+          <span className="text-xs font-bold text-[#5F6E85]">
             Báo cáo Doanh thu
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
             Theo dõi Hợp đồng
           </h4>
-          <p className="text-xs text-[#7C879D]">
+          <p className="text-xs text-[#5F6E85]">
             Doanh thu ghi nhận theo từng khách hàng và dự án.
           </p>
         </Card>
 
         <Card className="p-5 space-y-2">
-          <span className="text-xs font-bold text-[#7C879D]">
+          <span className="text-xs font-bold text-[#5F6E85]">
             Báo cáo Công nợ
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
             Tuổi nợ & Hóa đơn
           </h4>
-          <p className="text-xs text-[#7C879D]">
+          <p className="text-xs text-[#5F6E85]">
             Phân tích công nợ đến hạn và các khoản quá hạn.
           </p>
         </Card>
 
         <Card className="p-5 space-y-2">
-          <span className="text-xs font-bold text-[#7C879D]">
+          <span className="text-xs font-bold text-[#5F6E85]">
             Báo cáo Chi phí
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
             Chi phí Hoạt động
           </h4>
-          <p className="text-xs text-[#7C879D]">
+          <p className="text-xs text-[#5F6E85]">
             Tổng hợp chi phí vận hành và lương nhân sự.
           </p>
         </Card>

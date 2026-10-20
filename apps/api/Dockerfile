@@ -21,8 +21,12 @@ RUN pnpm --filter api build \
 
 FROM node:22-bookworm-slim AS runtime
 
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV RELEASE_SHA=$GIT_SHA
+ENV BUILD_TIME=$BUILD_TIME
 
 WORKDIR /app
 

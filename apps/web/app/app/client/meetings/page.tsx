@@ -17,7 +17,7 @@ export default function ClientMeetingsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<CalendarIcon className="w-10 h-10 text-[#7C879D]" />}
+          icon={<CalendarIcon className="w-10 h-10 text-[#5F6E85]" />}
           title="Không có lịch họp nào sắp diễn ra"
           description="Khi có cuộc họp mới được xếp lịch, thông báo và đường dẫn họp online sẽ hiển thị tại đây."
         />

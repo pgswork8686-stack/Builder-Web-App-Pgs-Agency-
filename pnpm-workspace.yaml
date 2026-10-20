@@ -2,6 +2,16 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
+# Security patches for transitive dependencies (pnpm audit --prod, 2026-10-20).
+# Remove an entry once the parent package ships a patched range itself.
+overrides:
+  'proxy-addr@<2.0.8': '2.0.8'
+  'multer@<2.4.0': '2.4.0'
+  'engine.io@<6.6.10': '6.6.11'
+  'qs@<6.16.0': '6.16.1'
+  'sharp@<0.35.5': '0.35.5'
+  'source-map-js@<1.2.2': '1.2.2'
+
 allowBuilds:
   esbuild: true
   sharp: true

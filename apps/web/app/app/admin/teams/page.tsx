@@ -257,7 +257,7 @@ export default function AdminTeamsPage() {
       {/* Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#5F6E85]" />
           <input
             type="text"
             value={searchQuery}
@@ -307,14 +307,14 @@ export default function AdminTeamsPage() {
       <Card className="p-0 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-            <span className="text-xs text-[#64748B]">
+            <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
+            <span className="text-xs text-[#5B6B82]">
               Đang tải danh sách đội nhóm...
             </span>
           </div>
         ) : filteredTeams.length === 0 ? (
           <EmptyState
-            icon={<Users2 className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<Users2 className="w-8 h-8 text-[#3453D1]" />}
             title="Chưa có đội nhóm nào"
             description="Bắt đầu tạo cơ cấu làm việc bằng cách thêm đội nhóm đầu tiên."
             actionLabel="Thêm đội nhóm"
@@ -345,7 +345,7 @@ export default function AdminTeamsPage() {
                   );
                   return (
                     <TableRow key={team.id}>
-                      <TableCell className="font-mono font-bold text-[#4F75FF]">
+                      <TableCell className="font-mono font-bold text-[#3453D1]">
                         {team.code}
                       </TableCell>
                       <TableCell>
@@ -353,7 +353,7 @@ export default function AdminTeamsPage() {
                           {team.name}
                         </div>
                         {team.description && (
-                          <div className="text-[11px] text-[#64748B] line-clamp-1">
+                          <div className="text-[11px] text-[#5B6B82] line-clamp-1">
                             {team.description}
                           </div>
                         )}
@@ -361,9 +361,9 @@ export default function AdminTeamsPage() {
                       <TableCell className="text-xs text-[#0F172A] font-medium">
                         {dept?.name || team.department?.name || "—"}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#5B6B82]">
                         {leader?.fullName || (
-                          <span className="text-[#94A3B8] italic">
+                          <span className="text-[#5F6E85] italic">
                             Chưa chỉ định
                           </span>
                         )}
@@ -418,7 +418,7 @@ export default function AdminTeamsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Phòng ban trực thuộc *
               </label>
               <select
@@ -437,7 +437,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mã đội nhóm *
               </label>
               <input
@@ -451,7 +451,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Tên đội nhóm *
               </label>
               <input
@@ -465,7 +465,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Trưởng nhóm quản lý
               </label>
               <select
@@ -483,7 +483,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mô tả nhiệm vụ
               </label>
               <textarea
@@ -536,7 +536,7 @@ export default function AdminTeamsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Phòng ban trực thuộc *
               </label>
               <select
@@ -559,19 +559,19 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mã đội nhóm (Cố định)
               </label>
               <input
                 type="text"
                 disabled
                 value={editingTeam.code}
-                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#5B6B82] cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Tên đội nhóm *
               </label>
               <input
@@ -586,7 +586,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Trưởng nhóm quản lý
               </label>
               <select
@@ -609,7 +609,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Mô tả nhiệm vụ
               </label>
               <textarea

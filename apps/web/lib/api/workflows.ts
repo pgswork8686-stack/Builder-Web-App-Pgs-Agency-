@@ -256,9 +256,45 @@ export interface RespondApprovalPayload {
   decisionNote?: string | null;
 }
 
+export type ClientApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface ClientApprovalItem {
+  id: string;
+  status: ClientApprovalStatus;
+  requestedAt: string;
+  respondedAt: string | null;
+  projectId: string;
+  projectCode: string | null;
+  projectName: string | null;
+  workflowId: string;
+  stageName: string | null;
+  itemName: string | null;
+}
+
+export interface ClientApprovalPage {
+  items: ClientApprovalItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  counts: Record<ClientApprovalStatus, number>;
+}
+
 const encodeId = (id: string) => encodeURIComponent(id);
 
 export const workflowsApi = {
+  listClientApprovals(params: {
+    status: ClientApprovalStatus;
+    page?: number;
+    pageSize?: number;
+  }): Promise<ClientApprovalPage> {
+    const query = new URLSearchParams({
+      status: params.status,
+      page: String(params.page ?? 1),
+      pageSize: String(params.pageSize ?? 20),
+    });
+    return request(`/client/me/approvals?${query.toString()}`);
+  },
   listTemplates(serviceId?: string): Promise<WorkflowTemplate[]> {
     const query = serviceId ? `?serviceId=${encodeId(serviceId)}` : "";
     return request(`/admin/workflows/templates${query}`);

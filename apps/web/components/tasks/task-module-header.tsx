@@ -42,7 +42,7 @@ export function TaskModuleHeader({
               </Badge>
             )}
           </div>
-          <p className="text-xs text-[#64748B] leading-relaxed max-w-2xl">
+          <p className="text-xs text-[#5B6B82] leading-relaxed max-w-2xl">
             {description}
           </p>
         </div>

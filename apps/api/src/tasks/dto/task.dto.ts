@@ -62,6 +62,8 @@ export const UpdateTaskSchema = z
     assigneeUserId: z.string().uuid().nullable().optional(),
     startDate: DateSchema.nullable().optional(),
     dueDate: DateSchema.nullable().optional(),
+    // Reason a manager gives when sending a task in review back for changes.
+    reviewNote: z.string().trim().max(1000).optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {
@@ -83,3 +85,35 @@ export const TaskListQuerySchema = z.object({
 });
 
 export type TaskListQuery = z.infer<typeof TaskListQuerySchema>;
+
+export const AggregateTaskListQuerySchema = z
+  .object({
+    q: z.string().trim().max(100).optional(),
+    status: TaskStatusSchema.optional(),
+    priority: TaskPrioritySchema.optional(),
+    assigneeUserId: z.string().uuid().optional(),
+    projectId: z.string().uuid().optional(),
+    dueFrom: DateSchema.optional(),
+    dueTo: DateSchema.optional(),
+    openOnly: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    includeCounts: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  })
+  .refine(
+    (value) => !value.dueFrom || !value.dueTo || value.dueTo >= value.dueFrom,
+    {
+      message: 'INVALID_TASK_DATE_RANGE',
+      path: ['dueTo'],
+    },
+  );
+
+export type AggregateTaskListQuery = z.infer<
+  typeof AggregateTaskListQuerySchema
+>;

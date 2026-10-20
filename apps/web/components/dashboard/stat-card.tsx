@@ -32,15 +32,15 @@ export function StatCard({
   const variantStyles = {
     default: {
       bg: "bg-white border-[#EDF2F7] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
-      iconBg: "bg-[#EEF2FF] text-[#4F75FF] border-[#E0EAFF]",
-      titleColor: "text-[#64748B]",
+      iconBg: "bg-[#EEF2FF] text-[#3453D1] border-[#E0EAFF]",
+      titleColor: "text-[#5B6B82]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#EDF2F7]",
     },
     blue: {
       bg: "bg-[#EEF2FF] border-[#E0EAFF] shadow-xs",
-      iconBg: "bg-white text-[#4F75FF] shadow-xs",
-      titleColor: "text-[#4F75FF]",
+      iconBg: "bg-white text-[#3453D1] shadow-xs",
+      titleColor: "text-[#3453D1]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#E0EAFF]",
     },
@@ -53,15 +53,15 @@ export function StatCard({
     },
     gold: {
       bg: "bg-[#FEF9C3] border-[#FEF08A] shadow-xs",
-      iconBg: "bg-white text-[#CA8A04] shadow-xs",
-      titleColor: "text-[#CA8A04]",
+      iconBg: "bg-white text-[#854D0E] shadow-xs",
+      titleColor: "text-[#854D0E]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#FEF08A]",
     },
     green: {
       bg: "bg-[#E6FBF5] border-[#A7F3D0] shadow-xs",
-      iconBg: "bg-white text-[#059669] shadow-xs",
-      titleColor: "text-[#059669]",
+      iconBg: "bg-white text-[#047857] shadow-xs",
+      titleColor: "text-[#047857]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#A7F3D0]",
     },
@@ -74,8 +74,8 @@ export function StatCard({
     },
     rose: {
       bg: "bg-[#FEE2E2] border-[#FECACA] shadow-xs",
-      iconBg: "bg-white text-[#DC2626] shadow-xs",
-      titleColor: "text-[#DC2626]",
+      iconBg: "bg-white text-[#B91C1C] shadow-xs",
+      titleColor: "text-[#B91C1C]",
       valueColor: "text-[#0F172A]",
       borderColor: "border-[#FECACA]",
     },
@@ -153,17 +153,17 @@ export function StatCard({
                   {trend.value}
                 </span>
               ) : (
-                <span className="flex items-center text-[#64748B] font-semibold gap-0.5 shrink-0">
+                <span className="flex items-center text-[#5B6B82] font-semibold gap-0.5 shrink-0">
                   <Minus className="w-3.5 h-3.5" />
                   {trend.value}
                 </span>
               )}
               {trend.label && (
-                <span className="text-[#94A3B8] truncate">{trend.label}</span>
+                <span className="text-[#5B6B82] truncate">{trend.label}</span>
               )}
             </div>
           ) : (
-            <span className="text-[#64748B] text-[11px] font-medium truncate">
+            <span className="text-[#4B5A70] text-[11px] font-medium truncate">
               {subtitle}
             </span>
           )}

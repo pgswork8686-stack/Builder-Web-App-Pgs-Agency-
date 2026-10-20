@@ -27,7 +27,7 @@ export default function TeamLeaderDocumentsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<FolderOpen className="w-10 h-10 text-[#7C879D]" />}
+          icon={<FolderOpen className="w-10 h-10 text-[#5F6E85]" />}
           title="Chưa có tài liệu nào trong thư viện"
           description="Tài liệu hướng dẫn và quy trình dự án sẽ được hiển thị tại đây."
         />

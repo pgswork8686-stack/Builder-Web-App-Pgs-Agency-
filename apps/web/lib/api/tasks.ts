@@ -28,9 +28,43 @@ export interface ProjectTask {
   created_at: string;
   updated_at: string;
   canUpdateStatus: boolean;
+  /** Manager-only: may approve a task in review or send it back for changes. */
+  canApprove?: boolean;
+  project?: {
+    id: string;
+    name: string;
+    project_code: string;
+    project_manager_user_id?: string | null;
+  } | null;
+}
+
+export interface AggregateTaskFilters {
+  q?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  assigneeUserId?: string;
+  projectId?: string;
+  dueFrom?: string;
+  dueTo?: string;
+  openOnly?: boolean;
+  includeCounts?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AggregateTasksResponse extends Paginated<ProjectTask> {
+  statusCounts?: Record<TaskStatus, number>;
 }
 
 export const tasksApi = {
+  /** Cross-project tasks the caller is allowed to see (server-scoped). */
+  listAggregate(filters: AggregateTaskFilters = {}) {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") params.set(key, String(value));
+    });
+    return request<AggregateTasksResponse>(`/tasks?${params.toString()}`);
+  },
   list(
     projectId: string,
     filters: {
@@ -89,6 +123,8 @@ export const tasksApi = {
       startDate?: string | null;
       dueDate?: string | null;
       sortOrder?: number;
+      /** Required by the API when a manager sends a task in review back. */
+      reviewNote?: string;
     },
   ) {
     return request<ProjectTask>(`/projects/${projectId}/tasks/${taskId}`, {

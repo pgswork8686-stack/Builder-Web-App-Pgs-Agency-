@@ -7,6 +7,7 @@ import { commentsApi, type TaskComment } from "@/lib/api/comments";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { tasksApi, type ProjectTask, type TaskStatus } from "@/lib/api/tasks";
 import { FileManager } from "./project-files-view";
+import { TaskReviewPanel } from "./task-review-panel";
 import {
   ProjectWorkspaceRealtimeProvider,
   useProjectWorkspaceRealtime,
@@ -152,7 +153,7 @@ function TaskDetailContent({
           </div>
         )}
         {loading && !task ? (
-          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#5B6B82]">
             Đang tải chi tiết công việc…
           </div>
         ) : !task ? (
@@ -164,7 +165,7 @@ function TaskDetailContent({
             <section className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#4F75FF]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#3453D1]">
                     Thông tin công việc
                   </p>
                   <h2 className="mt-2 text-2xl font-black text-[#0F172A]">
@@ -180,19 +181,27 @@ function TaskDetailContent({
                     aria-label="Đổi trạng thái công việc"
                     className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-bold text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   >
-                    {statuses.map((status) => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
+                    {statuses
+                      .filter(
+                        (status) =>
+                          // only managers can approve: hide "done" for members
+                          task.canApprove !== false ||
+                          status.value !== "done" ||
+                          task.status === "done",
+                      )
+                      .map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
                   </select>
                 ) : (
-                  <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-bold text-[#4F75FF]">
+                  <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-bold text-[#3453D1]">
                     {task.status}
                   </span>
                 )}
               </div>
-              <div className="mt-5 grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-4">
+              <dl className="mt-5 grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-4">
                 <Info label="Ưu tiên" value={task.priority} />
                 <Info
                   label="Người phụ trách"
@@ -203,13 +212,20 @@ function TaskDetailContent({
                   value={task.reporter?.full_name || task.reporter?.email}
                 />
                 <Info label="Công việc cha" value={task.parent_task_id} />
-              </div>
+              </dl>
             </section>
+
+            <TaskReviewPanel
+              task={task}
+              projectId={projectId}
+              onChanged={load}
+              onError={setError}
+            />
 
             <section className="grid gap-5 md:grid-cols-2">
               <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#0F172A] text-sm">Mô tả</h3>
-                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#64748B]">
+                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#5B6B82]">
                   {task.description || "Chưa có mô tả."}
                 </p>
               </div>
@@ -241,7 +257,7 @@ function TaskDetailContent({
             <section className="space-y-4 rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
               <h3 className="font-bold text-[#0F172A] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
-                <p className="text-xs text-[#94A3B8]">Chưa có bình luận.</p>
+                <p className="text-xs text-[#5F6E85]">Chưa có bình luận.</p>
               ) : (
                 <div className="space-y-4">
                   {comments.map((comment) => (
@@ -256,7 +272,7 @@ function TaskDetailContent({
                               comment.author?.email ||
                               "Thành viên"}
                           </p>
-                          <p className="text-[11px] text-[#94A3B8] font-mono">
+                          <p className="text-[11px] text-[#5F6E85] font-mono">
                             {new Date(comment.createdAt).toLocaleString(
                               "vi-VN",
                             )}
@@ -272,7 +288,7 @@ function TaskDetailContent({
                                 setEditingContent(comment.content);
                               }}
                               aria-label="Sửa bình luận"
-                              className="text-[#64748B] hover:text-[#0F172A]"
+                              className="text-[#5B6B82] hover:text-[#0F172A]"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
@@ -304,7 +320,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => setEditingId(null)}
-                              className="rounded-lg border border-[#E2E8F0] bg-white p-1.5 text-[#64748B] hover:text-[#0F172A]"
+                              className="rounded-lg border border-[#E2E8F0] bg-white p-1.5 text-[#5B6B82] hover:text-[#0F172A]"
                               aria-label="Hủy sửa"
                             >
                               <X className="h-4 w-4" />
@@ -312,7 +328,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => void saveComment(comment.id)}
-                              className="rounded-lg bg-[#4F75FF] p-1.5 text-white hover:bg-[#3D62EE]"
+                              className="rounded-lg bg-[#3D61E6] p-1.5 text-white hover:bg-[#2F4FC9]"
                               aria-label="Lưu bình luận"
                             >
                               <Check className="h-4 w-4" />
@@ -338,7 +354,7 @@ function TaskDetailContent({
                   >
                     Trước
                   </button>
-                  <span className="py-1.5 text-[#64748B]">
+                  <span className="py-1.5 text-[#5B6B82]">
                     {commentPage}/{commentPages}
                   </span>
                   <button
@@ -363,7 +379,7 @@ function TaskDetailContent({
                     className="min-h-24 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   />
                   <div className="flex justify-end">
-                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#3D61E6] px-4 py-2 text-xs font-bold text-white hover:bg-[#2F4FC9] transition-colors shadow-xs">
                       <Send className="h-4 w-4" /> Gửi bình luận
                     </button>
                   </div>
@@ -391,7 +407,7 @@ function TaskDetailContent({
 function Info({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex justify-between gap-4 border-b border-[#EDF2F7] pb-2">
-      <dt className="text-[#64748B]">{label}</dt>
+      <dt className="text-[#5B6B82]">{label}</dt>
       <dd className="break-all text-right font-semibold text-[#0F172A]">
         {value || "—"}
       </dd>

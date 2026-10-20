@@ -340,4 +340,57 @@ describe('LeaveService', () => {
       ).rejects.toThrow();
     });
   });
+
+  describe('getDirectory date range', () => {
+    function directoryChain() {
+      const chain: any = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lte: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({ data: [], count: 3, error: null }),
+      };
+      return chain;
+    }
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('filters by leave period overlap when from/to are given', async () => {
+      const chain = directoryChain();
+      jest
+        .spyOn((service as any).supabaseService, 'getSystemClient')
+        .mockReturnValue({ from: jest.fn(() => chain), rpc: jest.fn() } as any);
+
+      const result = await service.getDirectory(
+        {
+          status: 'approved',
+          from: '2026-10-01',
+          to: '2026-10-31',
+          page: 1,
+          pageSize: 1,
+        },
+        user('admin'),
+      );
+
+      expect(chain.eq).toHaveBeenCalledWith('status', 'approved');
+      expect(chain.gte).toHaveBeenCalledWith('end_date', '2026-10-01');
+      expect(chain.lte).toHaveBeenCalledWith('start_date', '2026-10-31');
+      expect(result.total).toBe(3);
+    });
+
+    it('applies no date filter when from/to are absent', async () => {
+      const chain = directoryChain();
+      jest
+        .spyOn((service as any).supabaseService, 'getSystemClient')
+        .mockReturnValue({ from: jest.fn(() => chain), rpc: jest.fn() } as any);
+
+      await service.getDirectory({ page: 1, pageSize: 15 }, user('admin'));
+
+      expect(chain.gte).not.toHaveBeenCalled();
+      expect(chain.lte).not.toHaveBeenCalled();
+    });
+  });
 });

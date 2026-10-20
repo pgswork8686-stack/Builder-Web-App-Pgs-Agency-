@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { CheckCircle2, Archive } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2, Archive } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { projectsApi, type Project } from "@/lib/api/projects";
+import {
+  projectsApi,
+  type Project,
+  type ProjectCompletionCheck,
+} from "@/lib/api/projects";
 
 export interface ProjectLifecycleDialogsProps {
   project: Project;
@@ -25,6 +29,39 @@ export function ProjectLifecycleDialogs({
 }: ProjectLifecycleDialogsProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [check, setCheck] = useState<ProjectCompletionCheck | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+
+  // Every time the acceptance dialog opens, read the conditions again.
+  useEffect(() => {
+    if (!completeOpen) return;
+    let cancelled = false;
+    setChecking(true);
+    setCheck(null);
+    setCheckError(null);
+    setError(null);
+    projectsApi
+      .getCompletionCheck(project.id)
+      .then((result) => {
+        if (!cancelled) setCheck(result);
+      })
+      .catch((caught) => {
+        if (!cancelled) {
+          setCheckError(
+            caught instanceof Error
+              ? caught.message
+              : "Không thể kiểm tra điều kiện hoàn thành.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setChecking(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [completeOpen, project.id]);
 
   const handleComplete = async () => {
     setLoading(true);
@@ -51,7 +88,7 @@ export function ProjectLifecycleDialogs({
     setError(null);
     try {
       const updated = await projectsApi.updateProject(project.id, {
-        status: "cancelled", // hoặc archived
+        status: "archived",
       });
       onUpdated(updated);
       onCloseArchive();
@@ -63,6 +100,8 @@ export function ProjectLifecycleDialogs({
       setLoading(false);
     }
   };
+
+  const blocked = check !== null && !check.ready;
 
   return (
     <>
@@ -83,7 +122,41 @@ export function ProjectLifecycleDialogs({
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          <section aria-label="Điều kiện hoàn thành" className="text-xs">
+            {checking ? (
+              <p role="status" className="text-[#5F6E85]">
+                Đang kiểm tra điều kiện hoàn thành…
+              </p>
+            ) : checkError ? (
+              <p role="alert" className="font-semibold text-[#B91C1C]">
+                {checkError}
+              </p>
+            ) : check?.ready ? (
+              <p className="flex items-center gap-2 font-semibold text-[#047857]">
+                <CheckCircle2 className="h-4 w-4" />
+                Đủ điều kiện nghiệm thu: không còn công việc mở hay yêu cầu
+                duyệt đang chờ.
+              </p>
+            ) : check ? (
+              <div className="rounded-xl border border-[#FDE68A] bg-[#FFF8E5] p-3 text-[#7A5700]">
+                <p className="flex items-center gap-2 font-bold">
+                  <AlertTriangle className="h-4 w-4" />
+                  Chưa đủ điều kiện nghiệm thu
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5">
+                  {check.blockers.map((blocker) => (
+                    <li key={blocker.code}>{blocker.message}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </section>
+
+          {error && (
+            <p role="alert" className="text-xs text-[#B91C1C]">
+              {error}
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button
@@ -101,6 +174,7 @@ export function ProjectLifecycleDialogs({
               size="sm"
               onClick={handleComplete}
               isLoading={loading}
+              disabled={checking || blocked || checkError !== null}
             >
               Xác nhận hoàn tất
             </Button>
@@ -125,7 +199,11 @@ export function ProjectLifecycleDialogs({
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && (
+            <p role="alert" className="text-xs text-[#B91C1C]">
+              {error}
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button

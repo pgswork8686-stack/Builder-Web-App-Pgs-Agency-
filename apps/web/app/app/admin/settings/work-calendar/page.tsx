@@ -255,7 +255,7 @@ export default function AdminWorkCalendarPage() {
       )}
 
       {loading ? (
-        <Card className="p-8 text-center text-xs text-[#64748B]">
+        <Card className="p-8 text-center text-xs text-[#5B6B82]">
           Đang tải dữ liệu cấu hình lịch làm việc...
         </Card>
       ) : (
@@ -263,14 +263,14 @@ export default function AdminWorkCalendarPage() {
           {/* Card 1: Quy tắc chung */}
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-3 border-b border-[#EDF2F7] pb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#3453D1] flex items-center justify-center font-bold">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-[#0F172A]">
                   Quy Tắc Tuần & Thứ 7 Cách Tuần
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Xác định các ngày làm việc tiêu chuẩn và chu kỳ 14 ngày làm
                   việc thứ 7.
                 </p>
@@ -304,8 +304,8 @@ export default function AdminWorkCalendarPage() {
                         onClick={() => toggleDayOfWeek(day)}
                         className={`w-9 h-8 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
                           isSelected
-                            ? "bg-[#4F75FF] text-white border-[#4F75FF]"
-                            : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
+                            ? "bg-[#3F63D6] text-white border-[#3F63D6]"
+                            : "bg-[#F8FAFC] text-[#5B6B82] border-[#E2E8F0] hover:border-[#CBD5E1]"
                         }`}
                       >
                         {label}
@@ -323,7 +323,7 @@ export default function AdminWorkCalendarPage() {
                   <h4 className="text-xs font-bold text-[#0F172A]">
                     Áp dụng thứ 7 cách tuần (Alternate Saturday)
                   </h4>
-                  <p className="text-[11px] text-[#64748B]">
+                  <p className="text-[11px] text-[#5B6B82]">
                     Chu kỳ 14 ngày luân phiên 1 tuần nghỉ, 1 tuần làm việc.
                   </p>
                 </div>
@@ -387,7 +387,7 @@ export default function AdminWorkCalendarPage() {
                 <h4 className="text-xs font-bold text-[#0F172A]">
                   Tự động áp dụng lịch làm bù / hoán đổi của Nhà nước
                 </h4>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Mặc định TẮT. Chỉ bật khi công ty quyết định tuân thủ toàn bộ
                   lịch hoán đổi công chức.
                 </p>
@@ -413,7 +413,7 @@ export default function AdminWorkCalendarPage() {
                 <h3 className="text-sm font-bold text-[#0F172A]">
                   Tự Động Đồng Bộ Ngày Lễ (Holiday API Sync)
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Tích hợp Calendarific API để tự động cập nhật ngày lễ Việt Nam
                   ({holidayCountryCode}).
                 </p>
@@ -434,7 +434,7 @@ export default function AdminWorkCalendarPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
               <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#5B6B82] block text-[10px] uppercase font-bold">
                   Nhà cung cấp
                 </span>
                 <span className="font-semibold text-[#0F172A]">
@@ -442,7 +442,7 @@ export default function AdminWorkCalendarPage() {
                 </span>
               </div>
               <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#5B6B82] block text-[10px] uppercase font-bold">
                   Mã quốc gia
                 </span>
                 <span className="font-semibold text-[#0F172A]">
@@ -450,7 +450,7 @@ export default function AdminWorkCalendarPage() {
                 </span>
               </div>
               <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#5B6B82] block text-[10px] uppercase font-bold">
                   Lần đồng bộ gần nhất
                 </span>
                 <span className="font-semibold text-[#0F172A]">
@@ -487,7 +487,7 @@ export default function AdminWorkCalendarPage() {
             <h3 className="text-sm font-bold text-[#0F172A]">
               Ngoại Lệ Lịch Làm Việc & Ngày Lễ
             </h3>
-            <p className="text-[11px] text-[#64748B]">
+            <p className="text-[11px] text-[#5B6B82]">
               Danh sách ngày nghỉ lễ, ngày làm bù, nghỉ nội bộ do Admin tạo hoặc
               đồng bộ từ API.
             </p>
@@ -503,10 +503,15 @@ export default function AdminWorkCalendarPage() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div
+          className="overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="Vùng nội dung cuộn ngang"
+        >
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#EDF2F7] text-[#64748B] font-bold bg-[#F8FAFC]">
+              <tr className="border-b border-[#EDF2F7] text-[#5B6B82] font-bold bg-[#F8FAFC]">
                 <th className="p-3">Ngày</th>
                 <th className="p-3">Tên sự kiện / Ngày lễ</th>
                 <th className="p-3">Loại</th>
@@ -518,7 +523,7 @@ export default function AdminWorkCalendarPage() {
             <tbody className="divide-y divide-[#EDF2F7]">
               {events.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-[#94A3B8]">
+                  <td colSpan={6} className="p-6 text-center text-[#5F6E85]">
                     Chưa có ngoại lệ lịch nào. Bấm &quot;Thêm ngoại lệ&quot; để
                     tạo ngày nghỉ/làm bù mới.
                   </td>
@@ -535,7 +540,7 @@ export default function AdminWorkCalendarPage() {
                     <td className="p-3 font-semibold text-[#0F172A]">
                       {ev.title}
                       {ev.notes && (
-                        <span className="block text-[11px] font-normal text-[#64748B]">
+                        <span className="block text-[11px] font-normal text-[#5B6B82]">
                           {ev.notes}
                         </span>
                       )}
@@ -560,10 +565,10 @@ export default function AdminWorkCalendarPage() {
                       <span
                         className={`text-[11px] font-semibold ${
                           ev.source_type === "manual"
-                            ? "text-[#4F75FF]"
+                            ? "text-[#3453D1]"
                             : ev.source_type === "api"
-                              ? "text-amber-600"
-                              : "text-[#64748B]"
+                              ? "text-amber-700"
+                              : "text-[#5B6B82]"
                         }`}
                       >
                         {ev.source_type.toUpperCase()}
@@ -574,7 +579,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => openEditEventModal(ev)}
-                          className="p-1.5 text-[#64748B] hover:text-[#4F75FF] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#5B6B82] hover:text-[#3453D1] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
                           title="Sửa ngoại lệ"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -582,7 +587,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteEvent(ev.id)}
-                          className="p-1.5 text-[#64748B] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#5B6B82] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                           title="Xóa ngoại lệ"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

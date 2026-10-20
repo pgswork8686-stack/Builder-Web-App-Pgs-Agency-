@@ -45,7 +45,7 @@ export default function ClientPaymentsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<DollarSign className="w-10 h-10 text-[#7C879D]" />}
+          icon={<DollarSign className="w-10 h-10 text-[#5F6E85]" />}
           title="Chưa có giao dịch thanh toán nào"
           description="Lịch sử đối soát và biên lai thanh toán thành công sẽ được hiển thị tại đây."
         />

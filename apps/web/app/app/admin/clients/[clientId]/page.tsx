@@ -253,8 +253,8 @@ export default function AdminClientDetailPage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
-          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-          <span className="text-xs text-[#64748B]">
+          <Loader2 className="w-8 h-8 text-[#3453D1] animate-spin mb-3" />
+          <span className="text-xs text-[#5B6B82]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
         </div>
@@ -273,21 +273,21 @@ export default function AdminClientDetailPage() {
           {/* Left Column: Company Profile Detail */}
           <div className="space-y-6">
             <Card className="p-6 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#854D0E] shadow-xs">
                 <Briefcase className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-lg font-extrabold text-[#0F172A]">
                   {company.name}
                 </h3>
-                <div className="inline-flex px-2 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-[#3453D1] text-xs font-bold uppercase mt-1">
                   Mã: {company.code}
                 </div>
               </div>
 
               <div className="space-y-3 text-xs border-t border-[#EDF2F7] pt-4">
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                     Mã số thuế
                   </span>
                   <span className="font-mono text-[#0F172A] font-medium">
@@ -295,13 +295,13 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                     Điện thoại
                   </span>
                   <span className="text-[#0F172A]">{company.phone || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
                   <span className="text-[#0F172A] font-mono">
@@ -309,7 +309,7 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                     Website
                   </span>
                   {company.website ? (
@@ -317,7 +317,7 @@ export default function AdminClientDetailPage() {
                       href={company.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#4F75FF] hover:underline"
+                      className="text-[#3453D1] hover:underline"
                     >
                       {company.website}
                     </a>
@@ -326,7 +326,7 @@ export default function AdminClientDetailPage() {
                   )}
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                     Địa chỉ trụ sở
                   </span>
                   <span className="text-[#0F172A]">
@@ -335,10 +335,10 @@ export default function AdminClientDetailPage() {
                 </div>
                 {company.notes && (
                   <div>
-                    <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                    <span className="block text-[#5B6B82] text-[10px] font-bold uppercase tracking-wider">
                       Ghi chú
                     </span>
-                    <span className="text-xs text-[#64748B]">
+                    <span className="text-xs text-[#5B6B82]">
                       {company.notes}
                     </span>
                   </div>
@@ -352,7 +352,7 @@ export default function AdminClientDetailPage() {
             <Card className="p-6 space-y-4">
               <div className="flex justify-between items-center border-b border-[#EDF2F7] pb-3">
                 <h2 className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
-                  <Key className="w-4 h-4 text-[#4F75FF]" />
+                  <Key className="w-4 h-4 text-[#3453D1]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
                 <Button
@@ -366,7 +366,7 @@ export default function AdminClientDetailPage() {
               </div>
 
               {memberships.length === 0 ? (
-                <div className="py-8 text-center text-xs text-[#94A3B8]">
+                <div className="py-8 text-center text-xs text-[#5F6E85]">
                   Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
@@ -387,11 +387,11 @@ export default function AdminClientDetailPage() {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-[11px] font-mono text-[#64748B] mt-0.5">
+                        <div className="text-[11px] font-mono text-[#5B6B82] mt-0.5">
                           {m.email}
                         </div>
                         {m.title && (
-                          <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                          <div className="text-[11px] text-[#5F6E85] mt-0.5">
                             Chức danh: {m.title}
                           </div>
                         )}
@@ -407,7 +407,7 @@ export default function AdminClientDetailPage() {
                           }
                         >
                           <Star
-                            className={`w-4 h-4 ${m.isPrimary ? "text-[#CA8A04] fill-[#CA8A04]" : "text-[#94A3B8]"}`}
+                            className={`w-4 h-4 ${m.isPrimary ? "text-[#854D0E] fill-[#CA8A04]" : "text-[#5F6E85]"}`}
                           />
                         </Button>
                         <Button
@@ -447,7 +447,7 @@ export default function AdminClientDetailPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Chọn tài khoản khách hàng *
               </label>
               <select
@@ -466,7 +466,7 @@ export default function AdminClientDetailPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#5B6B82] uppercase mb-1">
                 Chức danh / Vai trò đại diện
               </label>
               <input

@@ -195,20 +195,20 @@ export function ProjectTaskCreateDialog({
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
         <div className="rounded-xl border border-[#E0EAFF] bg-[#F8FAFF] px-3 py-2.5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-[#5B6B82]">
             Dự án
           </div>
           <div className="mt-1 text-xs font-bold text-[#0F172A]">
             {projectCode ?? "PROJECT"} · {projectName ?? "Dự án hiện tại"}
           </div>
-          <div className="mt-1 text-[11px] text-[#64748B]">
+          <div className="mt-1 text-[11px] text-[#5B6B82]">
             Project ID được lấy từ URL workspace và không thể đổi trong form
             này.
           </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+          <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
             Tên công việc *
           </label>
           <input
@@ -224,7 +224,7 @@ export function ProjectTaskCreateDialog({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+          <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
             Mô tả
           </label>
           <textarea
@@ -240,7 +240,7 @@ export function ProjectTaskCreateDialog({
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+            <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
               Trạng thái
             </label>
             <select
@@ -262,7 +262,7 @@ export function ProjectTaskCreateDialog({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+            <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
               Ưu tiên
             </label>
             <select
@@ -285,7 +285,7 @@ export function ProjectTaskCreateDialog({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+          <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
             Hạng mục triển khai
           </label>
           <select
@@ -314,7 +314,7 @@ export function ProjectTaskCreateDialog({
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+            <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
               Ngày bắt đầu
             </label>
             <input
@@ -337,7 +337,7 @@ export function ProjectTaskCreateDialog({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#64748B]">
+            <label className="mb-1 block text-xs font-semibold text-[#5B6B82]">
               Deadline
             </label>
             <input

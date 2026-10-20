@@ -71,6 +71,16 @@ const PROFILES_PERMISSION_REPAIR_MIGRATIONS = [
   "20260828021004_repair_authenticated_profiles_select.sql",
 ];
 
+const SERVICE_CATALOG_GRANT_HARDENING_MIGRATIONS = [
+  "20261020120000_revoke_client_grants_service_catalog_tables.sql",
+];
+
+const SERVICE_CATALOG_TABLES = [
+  "service_categories",
+  "service_delivery_items",
+  "project_service_items",
+];
+
 const RELEASE_TABLES = [
   // Workflow
   "workflow_templates",
@@ -171,6 +181,7 @@ async function loadManifest() {
     ...BUSINESS_RULES_MIGRATIONS,
     ...PRODUCTION_HARDENING_MIGRATIONS,
     ...PROFILES_PERMISSION_REPAIR_MIGRATIONS,
+    ...SERVICE_CATALOG_GRANT_HARDENING_MIGRATIONS,
   ];
 
   assert(
@@ -184,8 +195,8 @@ async function loadManifest() {
   );
   assert.equal(
     manifest.length,
-    65,
-    "Release manifest must contain the 65 accepted local migrations",
+    66,
+    "Release manifest must contain the 66 accepted local migrations",
   );
   assert.deepEqual(
     manifest,
@@ -515,6 +526,39 @@ async function assertReleaseSchema(client) {
     7,
     "service_role must retain all employee compensation table privileges",
   );
+
+  const serviceCatalogPrivileges = await client.query(
+    `
+    SELECT table_name, role_name, privilege_type
+    FROM unnest($1::text[]) AS table_name
+    CROSS JOIN unnest(ARRAY['anon', 'authenticated', 'service_role']::text[]) AS role_name
+    CROSS JOIN unnest(ARRAY[
+      'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER'
+    ]::text[]) AS privilege_type
+    WHERE has_table_privilege(role_name, 'public.' || table_name, privilege_type)
+  `,
+    [SERVICE_CATALOG_TABLES],
+  );
+  assert.deepEqual(
+    serviceCatalogPrivileges.rows.filter(
+      (row) => row.role_name !== "service_role",
+    ),
+    [],
+    "anon and authenticated must have no service catalog table privileges",
+  );
+  for (const tableName of SERVICE_CATALOG_TABLES) {
+    for (const privilegeType of ["SELECT", "INSERT", "UPDATE", "DELETE"]) {
+      assert(
+        serviceCatalogPrivileges.rows.some(
+          (row) =>
+            row.role_name === "service_role" &&
+            row.table_name === tableName &&
+            row.privilege_type === privilegeType,
+        ),
+        `service_role must retain ${privilegeType} on public.${tableName}`,
+      );
+    }
+  }
 
   const profileLookupPrivileges = await client.query(`
     SELECT

@@ -11,7 +11,12 @@ import { RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
+import {
+  AggregateTaskListQuery,
+  CreateTaskDto,
+  TaskListQuery,
+  UpdateTaskDto,
+} from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 export interface CreatedTaskRow extends Record<string, unknown> {
@@ -77,6 +82,103 @@ export class TasksService {
     } catch (error) {
       this.logger.error(
         `Realtime task broadcast failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  /**
+   * Rollback switch for the review gate: TASK_ALLOW_ASSIGNEE_DONE=true lets an
+   * assigned member mark their own task "done" again (previous behaviour).
+   */
+  private assigneeMayApproveOwnWork(): boolean {
+    return process.env.TASK_ALLOW_ASSIGNEE_DONE === 'true';
+  }
+
+  /** The revision reason becomes a normal task comment (visible in the thread). */
+  private async recordReviewNote(
+    taskId: string,
+    manager: RequestUser,
+    note: string,
+  ): Promise<void> {
+    const { error } = await this.client.from('task_comments').insert({
+      task_id: taskId,
+      author_user_id: manager.profileId,
+      content: `Yêu cầu chỉnh sửa: ${note}`,
+    });
+    if (error) {
+      // The status change is already stored and the note still travels in the
+      // notification, so do not fail the request.
+      this.logger.error(`Review note comment failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Always-on notifications for the review loop (no automation rule needed):
+   * submit -> project managers; approve / send back -> the assignee.
+   */
+  private async notifyReviewTransition(
+    projectId: string,
+    previous: Record<string, any>,
+    task: Record<string, any>,
+    actor: RequestUser,
+    note?: string,
+  ): Promise<void> {
+    if (!this.notifications) return;
+    const from = String(previous.status);
+    const to = String(task.status);
+    if (from === to) return;
+    try {
+      const actionUrl = `/app/projects/${projectId}/tasks/${task.id}`;
+      const actorName = actor.fullName ?? actor.email ?? 'Thành viên';
+      const base = {
+        entityType: 'task',
+        entityId: String(task.id),
+        actionUrl,
+        metadata: { projectId },
+        actorUserId: actor.profileId,
+      };
+      if (to === 'review') {
+        const project = await this.requireProject(projectId);
+        const { data: managers } = await this.client
+          .from('project_memberships')
+          .select('user_id')
+          .eq('project_id', projectId)
+          .eq('project_role', 'project_manager');
+        const recipients = [
+          project.project_manager_user_id,
+          ...(Array.isArray(managers)
+            ? managers.map((row) => row.user_id)
+            : []),
+        ].filter((id): id is string => typeof id === 'string' && id.length > 0);
+        await this.notifications.createForUsers(recipients, {
+          ...base,
+          type: 'task.review_requested',
+          title: 'Công việc chờ duyệt',
+          message: `${actorName} đã gửi kết quả công việc "${task.title}" để duyệt.`,
+        });
+        return;
+      }
+      if (from !== 'review' || typeof task.assignee_user_id !== 'string') {
+        return;
+      }
+      if (to === 'done') {
+        await this.notifications.createForUsers([task.assignee_user_id], {
+          ...base,
+          type: 'task.review_approved',
+          title: 'Công việc đã được duyệt',
+          message: `${actorName} đã duyệt hoàn thành công việc "${task.title}".`,
+        });
+      } else if (to === 'todo' || to === 'in_progress') {
+        await this.notifications.createForUsers([task.assignee_user_id], {
+          ...base,
+          type: 'task.review_rejected',
+          title: 'Yêu cầu chỉnh sửa công việc',
+          message: `${actorName} yêu cầu chỉnh sửa công việc "${task.title}".${note ? ` Lý do: ${note}` : ''}`,
+        });
+      }
+    } catch (error) {
+      this.logger.error(
+        `Review notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
       );
     }
   }
@@ -449,12 +551,153 @@ export class TasksService {
           access.isAdmin ||
           access.projectRole === 'project_manager' ||
           task.assignee_user_id === user.profileId,
+        canApprove: access.isAdmin || access.projectRole === 'project_manager',
       })),
       page: filters.page,
       pageSize: filters.pageSize,
       total,
       totalPages: Math.ceil(total / filters.pageSize),
     };
+  }
+
+  /**
+   * Cross-project task listing used by the Tasks / Kanban / Calendar
+   * aggregate views. Scope: admin sees every project; other internal roles
+   * see only projects they are a member of (same rule as the per-project
+   * endpoints). Clients never see internal tasks.
+   */
+  async getAggregateTasks(filters: AggregateTaskListQuery, user: RequestUser) {
+    if (user.role === 'client') {
+      throw new ForbiddenException({
+        code: 'TASK_ACCESS_DENIED',
+        message: 'Khách hàng không có quyền truy cập công việc nội bộ.',
+      });
+    }
+
+    const projectRoles = new Map<string, string>();
+    let scopedProjectIds: string[] | null = null;
+    if (user.role !== 'admin') {
+      const { data, error } = await this.client
+        .from('project_memberships')
+        .select('project_id,project_role')
+        .eq('user_id', user.profileId);
+      if (error) {
+        this.databaseFailure(
+          'PROJECT_ACCESS_LOOKUP_FAILED',
+          'Không thể kiểm tra quyền truy cập dự án.',
+          error,
+        );
+      }
+      for (const row of data ?? []) {
+        projectRoles.set(row.project_id as string, row.project_role as string);
+      }
+      scopedProjectIds = [...projectRoles.keys()];
+      if (filters.projectId && !projectRoles.has(filters.projectId)) {
+        throw new ForbiddenException({
+          code: 'PROJECT_ACCESS_DENIED',
+          message: 'Bạn không phải thành viên của dự án.',
+        });
+      }
+      if (scopedProjectIds.length === 0) {
+        return {
+          items: [],
+          page: filters.page,
+          pageSize: filters.pageSize,
+          total: 0,
+          totalPages: 0,
+          ...(filters.includeCounts
+            ? { statusCounts: this.emptyStatusCounts() }
+            : {}),
+        };
+      }
+    }
+
+    const applyFilters = (query: any, includeStatus: boolean) => {
+      if (scopedProjectIds) query = query.in('project_id', scopedProjectIds);
+      if (filters.projectId) query = query.eq('project_id', filters.projectId);
+      if (filters.q) query = query.ilike('title', `%${filters.q.trim()}%`);
+      if (includeStatus && filters.status)
+        query = query.eq('status', filters.status);
+      else if (includeStatus && filters.openOnly)
+        query = query.in('status', ['todo', 'in_progress', 'review']);
+      if (filters.priority) query = query.eq('priority', filters.priority);
+      if (filters.assigneeUserId)
+        query = query.eq('assignee_user_id', filters.assigneeUserId);
+      if (filters.dueFrom) query = query.gte('due_date', filters.dueFrom);
+      if (filters.dueTo) query = query.lte('due_date', filters.dueTo);
+      return query;
+    };
+
+    const offset = (filters.page - 1) * filters.pageSize;
+    const { data, count, error } = await applyFilters(
+      this.client
+        .from('tasks')
+        .select(
+          '*, assignee:profiles!tasks_assignee_user_id_fkey(id,full_name,email,avatar_url), project:projects!tasks_project_id_fkey(id,name,project_code,project_manager_user_id)',
+          { count: 'exact' },
+        ),
+      true,
+    )
+      .order('due_date', { ascending: true, nullsFirst: false })
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: false })
+      .range(offset, offset + filters.pageSize - 1);
+    if (error) {
+      this.databaseFailure(
+        'TASKS_LOOKUP_FAILED',
+        'Không thể truy vấn danh sách công việc.',
+        error,
+      );
+    }
+
+    let statusCounts: Record<string, number> | undefined;
+    if (filters.includeCounts) {
+      statusCounts = this.emptyStatusCounts();
+      for (const status of Object.keys(statusCounts)) {
+        const { count: statusCount, error: countError } = await applyFilters(
+          this.client
+            .from('tasks')
+            .select('id', { count: 'exact', head: true }),
+          false,
+        ).eq('status', status);
+        if (countError) {
+          this.databaseFailure(
+            'TASKS_LOOKUP_FAILED',
+            'Không thể truy vấn danh sách công việc.',
+            countError,
+          );
+        }
+        statusCounts[status] = statusCount ?? 0;
+      }
+    }
+
+    const total = count ?? 0;
+    return {
+      items: (data ?? []).map((task: Record<string, any>) => {
+        const isManager =
+          user.role === 'admin' ||
+          projectRoles.get(task.project_id) === 'project_manager' ||
+          task.project?.project_manager_user_id === user.profileId;
+        const isViewer = projectRoles.get(task.project_id) === 'viewer';
+        return {
+          ...task,
+          canUpdateStatus:
+            user.role === 'admin' ||
+            (!isViewer &&
+              (isManager || task.assignee_user_id === user.profileId)),
+          canApprove: user.role === 'admin' || (!isViewer && isManager),
+        };
+      }),
+      page: filters.page,
+      pageSize: filters.pageSize,
+      total,
+      totalPages: Math.ceil(total / filters.pageSize),
+      ...(statusCounts ? { statusCounts } : {}),
+    };
+  }
+
+  private emptyStatusCounts(): Record<string, number> {
+    return { todo: 0, in_progress: 0, review: 0, done: 0, cancelled: 0 };
   }
 
   async getTask(projectId: string, taskId: string, user: RequestUser) {
@@ -466,6 +709,7 @@ export class TasksService {
         access.isAdmin ||
         access.projectRole === 'project_manager' ||
         task.assignee_user_id === user.profileId,
+      canApprove: access.isAdmin || access.projectRole === 'project_manager',
     };
   }
 
@@ -563,7 +807,36 @@ export class TasksService {
     return data;
   }
 
+  /**
+   * Updates of the same task run one after another in this process, so two
+   * managers approving at the same moment produce one transition and one set of
+   * notifications (the second sees the task already done). Across several API
+   * instances the DB still keeps the data consistent; only a duplicate
+   * notification would be possible there.
+   */
+  private readonly taskUpdateQueue = new Map<string, Promise<unknown>>();
+
   async updateTask(
+    projectId: string,
+    taskId: string,
+    dto: UpdateTaskDto,
+    user: RequestUser,
+  ) {
+    const previous = this.taskUpdateQueue.get(taskId) ?? Promise.resolve();
+    const run = previous
+      .catch(() => undefined)
+      .then(() => this.updateTaskUnlocked(projectId, taskId, dto, user));
+    this.taskUpdateQueue.set(taskId, run);
+    try {
+      return await run;
+    } finally {
+      if (this.taskUpdateQueue.get(taskId) === run) {
+        this.taskUpdateQueue.delete(taskId);
+      }
+    }
+  }
+
+  private async updateTaskUnlocked(
     projectId: string,
     taskId: string,
     dto: UpdateTaskDto,
@@ -587,6 +860,41 @@ export class TasksService {
           message: 'Thành viên được giao việc chỉ có thể cập nhật trạng thái.',
         });
       }
+    }
+
+    // Review gate: a member submits work for review ("review"); only a manager
+    // approves it ("done") or reopens an approved task. This is what lets the
+    // Team Leader actually decide on an Employee's result.
+    if (
+      dto.status !== undefined &&
+      !manager &&
+      !this.assigneeMayApproveOwnWork() &&
+      (dto.status === 'done' || existing.status === 'done')
+    ) {
+      throw new ForbiddenException({
+        code: 'TASK_REVIEW_REQUIRED',
+        message:
+          'Hãy gửi công việc sang "Đang duyệt"; chỉ Trưởng nhóm/quản lý dự án mới duyệt hoàn thành.',
+      });
+    }
+    if (dto.reviewNote !== undefined && dto.status === undefined) {
+      throw new BadRequestException({
+        code: 'REVIEW_NOTE_NOT_ALLOWED',
+        message: 'Lý do chỉnh sửa chỉ đi kèm việc đổi trạng thái.',
+      });
+    }
+    const sendsBackForChanges =
+      manager &&
+      dto.status !== undefined &&
+      existing.status === 'review' &&
+      ['todo', 'in_progress'].includes(dto.status) &&
+      typeof existing.assignee_user_id === 'string' &&
+      existing.assignee_user_id !== user.profileId;
+    if (sendsBackForChanges && (dto.reviewNote ?? '').trim().length < 5) {
+      throw new BadRequestException({
+        code: 'REVIEW_NOTE_REQUIRED',
+        message: 'Vui lòng nhập lý do yêu cầu chỉnh sửa (tối thiểu 5 ký tự).',
+      });
     }
 
     if (dto.assigneeUserId) {
@@ -715,6 +1023,13 @@ export class TasksService {
         user,
         existing,
       );
+    }
+    if (dto.status !== undefined && data.status !== existing.status) {
+      const note = dto.reviewNote?.trim() || undefined;
+      if (sendsBackForChanges && note) {
+        await this.recordReviewNote(taskId, user, note);
+      }
+      await this.notifyReviewTransition(projectId, existing, data, user, note);
     }
     if (
       dto.status !== undefined &&

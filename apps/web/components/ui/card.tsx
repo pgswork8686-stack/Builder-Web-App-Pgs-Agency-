@@ -52,7 +52,7 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={`text-xs sm:text-sm text-[#64748B] leading-relaxed ${className}`}
+      className={`text-xs sm:text-sm text-[#5B6B82] leading-relaxed ${className}`}
       {...props}
     >
       {children}

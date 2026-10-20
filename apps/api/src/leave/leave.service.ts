@@ -350,7 +350,7 @@ export class LeaveService {
     let dbQuery = this.client
       .from('leave_requests')
       .select(
-        '*, leave_type:leave_types(*), profile:profiles!inner(id, full_name, email, employee_profile:employee_profiles!inner(team_id, department_id))',
+        '*, leave_type:leave_types(*), profile:profiles!leave_requests_user_id_fkey!inner(id, full_name, email, employee_profile:employee_profiles!employee_profiles_user_id_fkey!inner(team_id, department_id))',
         { count: 'exact' },
       );
 
@@ -362,6 +362,13 @@ export class LeaveService {
     }
     if (query.userId) {
       dbQuery = dbQuery.eq('user_id', query.userId);
+    }
+    // Leave period overlapping [from, to] (same rule as the calendar).
+    if (query.from) {
+      dbQuery = dbQuery.gte('end_date', query.from);
+    }
+    if (query.to) {
+      dbQuery = dbQuery.lte('start_date', query.to);
     }
 
     // Scoped filtering at DB layer
@@ -439,7 +446,7 @@ export class LeaveService {
       const { data: requestUserTeam, error: teamQueryError } = await this.client
         .from('leave_requests')
         .select(
-          'user_id, profile:profiles(employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
+          'user_id, profile:profiles!leave_requests_user_id_fkey(employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
         )
         .eq('id', requestId)
         .maybeSingle();
@@ -640,7 +647,7 @@ export class LeaveService {
     let dbQuery = this.client
       .from('leave_requests')
       .select(
-        'id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles!inner(id, full_name, employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
+        `id, user_id, start_date, end_date, status, leave_type:leave_types(code, name), profile:profiles!leave_requests_user_id_fkey!inner(id, full_name, employee_profile:employee_profiles!employee_profiles_user_id_fkey${isLeader ? '!inner' : ''}(team_id))`,
       )
       .eq('status', 'approved')
       .lte('start_date', to)

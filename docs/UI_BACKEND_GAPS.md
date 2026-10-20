@@ -1,7 +1,7 @@
 # PGS Hub - UI Backend Gaps & Release Readiness Report
 
-> **Document Date:** 2026-08-20  
-> **Status:** All visual modules have complete Backend API, DTO validation, and modular database migration coverage.
+> **Document Date:** 2026-08-20 (historical; current release status is in `docs/release/PRODUCTION_READINESS.md` and `docs/release/FINAL_GAP_AUDIT.md`)  
+> **Status at that date:** the visual modules listed below had Backend API, DTO validation and migrations in source. "Zero gaps" referred to those five modules only. Later audits found other gaps (for example the accountant customer directory, F-05) and the production/staging columns below are still **not verified**.
 
 ---
 

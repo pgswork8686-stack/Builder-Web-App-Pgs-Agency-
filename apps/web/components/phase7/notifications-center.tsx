@@ -202,7 +202,7 @@ export function NotificationsCenter() {
                 size="sm"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
-                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-semibold"
+                className="font-semibold"
               >
                 Gửi thông báo toàn công ty
               </Button>
@@ -237,7 +237,7 @@ export function NotificationsCenter() {
       {broadcastSuccessMsg && (
         <div className="p-4 rounded-2xl bg-[#E6FBF5] border border-[#A7F3D0] text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-[#00B788] shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0" />
             <span>{broadcastSuccessMsg}</span>
           </div>
           <button
@@ -253,14 +253,14 @@ export function NotificationsCenter() {
         <Card className="p-6 space-y-4">
           <div className="flex flex-col gap-3 border-b border-[#EDF2F7] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="text-base font-extrabold text-[#0F172A]">
                   Luồng thông báo của bạn
                 </h2>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#5B6B82]">
                   Dữ liệu được phân trang từ database, scope theo tài khoản hiện
                   tại.
                 </p>
@@ -287,13 +287,13 @@ export function NotificationsCenter() {
           ) : null}
 
           {loading ? (
-            <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#64748B]">
-              <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+            <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#5B6B82]">
+              <Loader2 className="h-4 w-4 animate-spin text-[#3453D1]" />
               Đang tải thông báo...
             </div>
           ) : items.length === 0 ? (
             <EmptyState
-              icon={<Bell className="w-8 h-8 text-[#4F75FF]" />}
+              icon={<Bell className="w-8 h-8 text-[#3453D1]" />}
               title="Không có thông báo phù hợp"
               description="Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại đây."
             />
@@ -304,7 +304,7 @@ export function NotificationsCenter() {
                   <div className="flex items-start gap-3.5">
                     <span
                       className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#3D61E6]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
@@ -321,11 +321,11 @@ export function NotificationsCenter() {
                                 </Badge>
                               )}
                           </div>
-                          <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">
+                          <p className="mt-0.5 text-xs leading-relaxed text-[#5B6B82]">
                             {item.message}
                           </p>
                         </div>
-                        <span className="shrink-0 text-[11px] text-[#94A3B8] font-mono">
+                        <span className="shrink-0 text-[11px] text-[#5F6E85] font-mono">
                           {formatDateTime(item.createdAt)}
                         </span>
                       </div>
@@ -354,7 +354,7 @@ export function NotificationsCenter() {
                             size="sm"
                             disabled={saving === item.id}
                             onClick={() => void markRead(item)}
-                            className="text-[#4F75FF]"
+                            className="text-[#3453D1]"
                           >
                             {saving === item.id ? "Đang lưu..." : "Đã đọc"}
                           </Button>
@@ -376,7 +376,7 @@ export function NotificationsCenter() {
             >
               Trang trước
             </Button>
-            <span className="text-xs text-[#64748B]">
+            <span className="text-xs text-[#5B6B82]">
               Trang {page}/{totalPages || 1}
             </span>
             <Button
@@ -395,26 +395,26 @@ export function NotificationsCenter() {
           {isAdmin && (
             <Card className="p-6 space-y-3.5 border border-[#E0EAFF] bg-[#F8FAFF]">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F75FF] text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3F63D6] text-white">
                   <Megaphone className="h-4 w-4" />
                 </div>
                 <div>
                   <h3 className="font-bold text-xs text-[#0F172A]">
                     Thông báo toàn thể nhân viên
                   </h3>
-                  <p className="text-[10px] text-[#4F75FF] font-semibold">
+                  <p className="text-[10px] text-[#3453D1] font-semibold">
                     Quyền hạn: Admin
                   </p>
                 </div>
               </div>
-              <p className="text-xs text-[#64748B] leading-relaxed">
+              <p className="text-xs text-[#5B6B82] leading-relaxed">
                 Gửi thông báo & tin tức quan trọng đến toàn bộ nhân sự đang hoạt
                 động trong doanh nghiệp.
               </p>
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                className="w-full font-bold"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
               >
@@ -425,14 +425,14 @@ export function NotificationsCenter() {
 
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3453D1]">
                 <Settings className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="font-bold text-[#0F172A] text-sm">
                   Tùy chọn nhận tin
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#5B6B82]">
                   Preferences quản lý thông qua Nest API.
                 </p>
               </div>
@@ -449,7 +449,7 @@ export function NotificationsCenter() {
                   <span className="block text-xs font-bold text-[#0F172A]">
                     Thông báo trong app
                   </span>
-                  <span className="text-[11px] text-[#64748B]">
+                  <span className="text-[11px] text-[#5B6B82]">
                     Áp dụng cho bell, center và realtime.
                   </span>
                 </span>
@@ -471,7 +471,7 @@ export function NotificationsCenter() {
                   <span className="block text-xs font-bold text-[#0F172A]">
                     Email notification
                   </span>
-                  <span className="text-[11px] text-[#64748B]">
+                  <span className="text-[11px] text-[#5B6B82]">
                     Placeholder preference cho email.
                   </span>
                 </span>
@@ -492,13 +492,13 @@ export function NotificationsCenter() {
             <div className="grid gap-2">
               <Link
                 href="/app/chat"
-                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
               >
                 Mở chat nội bộ / project
               </Link>
               <Link
                 href="/app/projects"
-                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-3 text-xs font-bold text-[#3453D1] hover:bg-[#EEF2FF] transition-colors"
               >
                 Xem workspace dự án
               </Link>
@@ -513,7 +513,7 @@ export function NotificationsCenter() {
         onClose={() => !broadcasting && setIsBroadcastOpen(false)}
         title={
           <div className="flex items-center gap-2.5 text-lg font-black text-[#0F172A]">
-            <Megaphone className="w-5 h-5 text-[#4F75FF]" />
+            <Megaphone className="w-5 h-5 text-[#3453D1]" />
             Gửi thông báo đến toàn thể nhân viên
           </div>
         }
@@ -600,7 +600,7 @@ export function NotificationsCenter() {
               size="sm"
               isLoading={broadcasting}
               leftIcon={<Send className="w-3.5 h-3.5" />}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="font-bold"
             >
               Phát thông báo ngay
             </Button>

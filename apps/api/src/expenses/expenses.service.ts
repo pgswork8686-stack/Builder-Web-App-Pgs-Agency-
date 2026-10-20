@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { RequestUser } from '../auth/auth.types';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import {
   CreateExpenseDto,
@@ -17,10 +20,84 @@ import {
 export class ExpensesService {
   private readonly logger = new Logger(ExpensesService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Optional() private readonly notifications?: NotificationsService,
+  ) {}
 
   private get client() {
     return this.supabaseService.getSystemClient();
+  }
+
+  /**
+   * Always-on notifications for the expense loop (no automation rule needed):
+   * a new request goes to the accountants, a decision / reimbursement to the
+   * person who submitted it. Never fails the business write.
+   */
+  private async notifyExpense(
+    kind: 'submitted' | 'approved' | 'rejected' | 'reimbursed',
+    expense: Record<string, any>,
+    actor: RequestUser,
+  ): Promise<void> {
+    if (!this.notifications) return;
+    try {
+      const label = `${expense.title} (${Number(expense.amount).toLocaleString('vi-VN')} ${expense.currency_code ?? 'VND'})`;
+      const project = Array.isArray(expense.project)
+        ? expense.project[0]
+        : expense.project;
+      const where = project?.project_code ? ` · ${project.project_code}` : '';
+      const base = {
+        entityType: 'project_expense',
+        entityId: String(expense.id),
+        metadata: { projectId: expense.project_id },
+        actorUserId: actor.profileId,
+      };
+      if (kind === 'submitted') {
+        const { data, error } = await this.client
+          .from('profiles')
+          .select('id')
+          .eq('role', 'accountant')
+          .eq('account_status', 'active')
+          .limit(100);
+        if (error) throw error;
+        await this.notifications.createForUsers(
+          (data ?? []).map((row) => String(row.id)),
+          {
+            ...base,
+            type: 'expense.submitted',
+            title: 'Có đề nghị chi phí mới',
+            message: `Đề nghị chi phí ${label}${where} đang chờ bạn duyệt.`,
+            actionUrl: '/app/accountant/finance/project-expenses',
+          },
+        );
+        return;
+      }
+      const submitter = String(expense.submitted_by_user_id);
+      const copy = {
+        approved: {
+          title: 'Đề nghị chi phí đã được duyệt',
+          message: `Đề nghị chi phí ${label}${where} đã được duyệt.`,
+        },
+        rejected: {
+          title: 'Đề nghị chi phí bị từ chối',
+          message: `Đề nghị chi phí ${label}${where} bị từ chối.${expense.rejection_reason ? ` Lý do: ${expense.rejection_reason}` : ''}`,
+        },
+        reimbursed: {
+          title: 'Chi phí đã được hoàn ứng',
+          message: `Đề nghị chi phí ${label}${where} đã được hoàn ứng.`,
+        },
+      }[kind];
+      await this.notifications.createForUsers([submitter], {
+        ...base,
+        type: `expense.${kind}`,
+        ...copy,
+        actionUrl: '/app/accountant/finance/project-expenses',
+      });
+    } catch (error) {
+      this.logger.error(
+        `Expense notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
   }
 
   private handleDbError(error: any, message: string): never {
@@ -260,6 +337,7 @@ export class ExpensesService {
       this.handleDbError(error, 'Không thể tạo đề nghị chi phí.');
     }
 
+    await this.notifyExpense('submitted', data, user);
     return data;
   }
 
@@ -279,6 +357,16 @@ export class ExpensesService {
       });
     }
 
+    if (
+      dto.action === 'rejected' &&
+      (dto.rejectionReason ?? '').trim().length < 5
+    ) {
+      throw new BadRequestException({
+        code: 'EXPENSE_REJECTION_REASON_REQUIRED',
+        message: 'Vui lòng nhập lý do từ chối (tối thiểu 5 ký tự).',
+      });
+    }
+
     const updatePayload: Record<string, any> = {
       status: dto.action,
       approved_by_user_id: user.profileId,
@@ -286,19 +374,29 @@ export class ExpensesService {
       rejection_reason: dto.action === 'rejected' ? dto.rejectionReason : null,
     };
 
+    // Conditional on "still pending": two reviewers answering at the same time
+    // cannot overwrite each other's decision.
     const { data, error } = await this.client
       .from('project_expenses')
       .update(updatePayload)
       .eq('id', id)
+      .eq('status', 'pending')
       .select(
         '*, project:projects(id, name, project_code), submitted_by:profiles!project_expenses_submitted_by_user_id_fkey(id, full_name, email, account_code), approved_by:profiles!project_expenses_approved_by_user_id_fkey(id, full_name, email, account_code)',
       )
-      .single();
+      .maybeSingle();
 
     if (error) {
       this.handleDbError(error, 'Không thể cập nhật trạng thái chi phí.');
     }
+    if (!data) {
+      throw new ForbiddenException({
+        code: 'EXPENSE_ALREADY_PROCESSED',
+        message: 'Đề nghị chi phí này đã được xử lý trước đó.',
+      });
+    }
 
+    await this.notifyExpense(dto.action, data, user);
     return data;
   }
 
@@ -318,17 +416,27 @@ export class ExpensesService {
       });
     }
 
+    // Conditional on "still approved": a double click or two accountants can
+    // never reimburse the same expense twice.
     const { data, error } = await this.client
       .from('project_expenses')
       .update({ status: 'reimbursed' })
       .eq('id', id)
-      .select()
-      .single();
+      .eq('status', 'approved')
+      .select('*, project:projects(id, name, project_code)')
+      .maybeSingle();
 
     if (error) {
       this.handleDbError(error, 'Không thể giải ngân chi phí.');
     }
+    if (!data) {
+      throw new ForbiddenException({
+        code: 'EXPENSE_NOT_APPROVED',
+        message: 'Chỉ có thể giải ngân chi phí đã được phê duyệt.',
+      });
+    }
 
+    await this.notifyExpense('reimbursed', data, user);
     return data;
   }
 }

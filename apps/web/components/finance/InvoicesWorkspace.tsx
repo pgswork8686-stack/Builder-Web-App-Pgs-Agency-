@@ -423,8 +423,9 @@ export default function InvoicesWorkspace({
       {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5F6E85]" />
           <input
+            aria-label="Tìm kiếm theo số hóa đơn..."
             type="text"
             placeholder="Tìm kiếm theo số hóa đơn..."
             value={searchQuery}
@@ -435,6 +436,7 @@ export default function InvoicesWorkspace({
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0">
           <select
+            aria-label="Mọi trạng thái"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
@@ -449,6 +451,7 @@ export default function InvoicesWorkspace({
           </select>
 
           <select
+            aria-label="Mọi khách hàng"
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
@@ -462,6 +465,7 @@ export default function InvoicesWorkspace({
           </select>
 
           <select
+            aria-label="Mọi hợp đồng"
             value={filterContract}
             onChange={(e) => setFilterContract(e.target.value)}
             className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
@@ -482,7 +486,7 @@ export default function InvoicesWorkspace({
           <h3 className="text-base font-extrabold text-[#0F172A]">
             Danh sách hóa đơn ({total})
           </h3>
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#5B6B82]">
             Trang {page} / {totalPages || 1}
           </span>
         </div>
@@ -496,14 +500,14 @@ export default function InvoicesWorkspace({
         ) : error ? (
           <div className="text-center p-8 space-y-3">
             <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-            <p className="text-xs text-[#64748B]">{error}</p>
+            <p className="text-xs text-[#5B6B82]">{error}</p>
             <Button variant="secondary" size="sm" onClick={loadInvoices}>
               Thử lại
             </Button>
           </div>
         ) : invoices.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3453D1]" />}
             title="Không tìm thấy hóa đơn"
             description="Chưa có hóa đơn nào phù hợp với bộ lọc tìm kiếm."
             actionLabel="Tạo hóa đơn mới"
@@ -528,19 +532,19 @@ export default function InvoicesWorkspace({
               <TableBody>
                 {invoices.map((inv) => (
                   <TableRow key={inv.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3453D1]">
                       {inv.invoice_number}
                     </TableCell>
                     <TableCell className="font-bold text-[#0F172A]">
                       {inv.client_company?.name || "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B] max-w-[180px] truncate">
+                    <TableCell className="text-xs text-[#5B6B82] max-w-[180px] truncate">
                       {inv.project?.name || "—"}
                     </TableCell>
                     <TableCell className="font-extrabold text-[#0F172A] text-xs">
                       {formatCurrency(inv.amount, inv.currency_code)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[#64748B]">
+                    <TableCell className="font-mono text-xs text-[#5B6B82]">
                       {inv.due_date}
                     </TableCell>
                     <TableCell>
@@ -577,7 +581,7 @@ export default function InvoicesWorkspace({
                             size="sm"
                             onClick={() => openEditModal(inv)}
                             title="Sửa hóa đơn"
-                            className="text-[#64748B] hover:text-[#0F172A]"
+                            className="text-[#5B6B82] hover:text-[#0F172A]"
                           >
                             <Edit2 className="w-4 h-4" />
                           </Button>
@@ -588,7 +592,7 @@ export default function InvoicesWorkspace({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                            className="text-[#3453D1] hover:bg-[#EEF2FF]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -604,7 +608,7 @@ export default function InvoicesWorkspace({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#5B6B82]">
             <span>
               Hiển thị{" "}
               <span className="font-bold text-[#0F172A]">
@@ -666,10 +670,11 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Số hóa đơn *
                 </label>
                 <input
+                  aria-label="Số hóa đơn"
                   type="text"
                   required
                   disabled={
@@ -683,10 +688,11 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Khách hàng (Công ty) *
                 </label>
                 <select
+                  aria-label="Khách hàng (Công ty)"
                   required
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
@@ -711,10 +717,11 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Hợp đồng liên kết
                 </label>
                 <select
+                  aria-label="Hợp đồng liên kết"
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
                   }
@@ -732,10 +739,11 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Dự án liên kết
                 </label>
                 <select
+                  aria-label="Dự án liên kết"
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
                   }
@@ -755,10 +763,11 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Ngày phát hành *
                 </label>
                 <input
+                  aria-label="Ngày phát hành"
                   type="date"
                   required
                   disabled={
@@ -771,10 +780,11 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Hạn thanh toán *
                 </label>
                 <input
+                  aria-label="Hạn thanh toán"
                   type="date"
                   required
                   disabled={
@@ -789,10 +799,11 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Tổng số tiền *
                 </label>
                 <input
+                  aria-label="Tổng số tiền"
                   type="number"
                   required
                   disabled={
@@ -805,10 +816,11 @@ export default function InvoicesWorkspace({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                   Loại tiền *
                 </label>
                 <select
+                  aria-label="Loại tiền"
                   required
                   disabled={
                     editingInvoice ? editingInvoice.status !== "draft" : false
@@ -825,10 +837,11 @@ export default function InvoicesWorkspace({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B82] mb-1">
                 Ghi chú hóa đơn
               </label>
               <textarea
+                aria-label="Ghi chú hóa đơn"
                 rows={3}
                 placeholder="Ghi chú thanh toán, số tài khoản nhận tiền..."
                 value={formNotes}
@@ -847,7 +860,7 @@ export default function InvoicesWorkspace({
               />
               <label
                 htmlFor="formClientVisible"
-                className="text-xs text-[#64748B] cursor-pointer select-none"
+                className="text-xs text-[#5B6B82] cursor-pointer select-none"
               >
                 Cho phép khách hàng nhìn thấy hóa đơn này trên cổng thông tin
               </label>

@@ -108,6 +108,8 @@ export const leaveApi = {
     if (query.leaveTypeId) params.append("leaveTypeId", query.leaveTypeId);
     if (query.userId) params.append("userId", query.userId);
     if (query.teamId) params.append("teamId", query.teamId);
+    if (query.from) params.append("from", query.from);
+    if (query.to) params.append("to", query.to);
     if (query.page) params.append("page", query.page.toString());
     if (query.pageSize) params.append("pageSize", query.pageSize.toString());
 
