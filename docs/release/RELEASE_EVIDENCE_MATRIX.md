@@ -63,9 +63,25 @@ Not covered: dynamic routes with ids (project/task/invoice detail pages are exer
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
 | Web (`hub.pgsagency.vn`)            | not readable — production exposes no release endpoint yet; author's network could not resolve the host on 2026-10-20 | final SHA in `FINAL_GO_NO_GO.md` | **NO**   |
 | API (`apihub.pgsagency.vn`)         | not readable — `/health` has no SHA in the deployed build (confirmed absent on 2026-10-16)                           | same                             | **NO**   |
-| Database migrations                 | not read (no database access)                                                                                        | repository has 65 migrations     | **NO**   |
+| Database migrations                 | not read (no database access)                                                                                        | repository has 66 migrations     | **NO**   |
 | Background worker (auto-task sweep) | runs inside the API process                                                                                          | —                                | **NO**   |
 
-## 7. Not done and why
+## 7. Migration 66 and Staging database (2026-10-20)
 
-Staging UAT, migration dry-run on a production-like copy, backup/restore drill, monitoring and alerting: no access or no environment (`PRODUCTION_PREFLIGHT_CHECKLIST.md`). They are **blocked**, not passed.
+Commit `60963f20e74c68fac316c2d359879f964f76d1f0` adds `20261020120000_revoke_client_grants_service_catalog_tables.sql` (revokes `anon`/`authenticated` grants on three service catalog tables). Application code is unchanged from `429f111`.
+
+| Run         | Workflow                        | Event        | Result  | Link                                                                                      |
+| ----------- | ------------------------------- | ------------ | ------- | ----------------------------------------------------------------------------------------- |
+| 39387891305 | UAT (disposable local Supabase) | push         | success | https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39387891305 |
+| 39387891320 | CI                              | push         | success | https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39387891320 |
+| 39387898052 | CI                              | pull_request | success | https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39387898052 |
+
+UAT run 39387891305: release + workflow migration verifiers (66 migrations, new grant assertions), Flows 01–08 and the five-role responsive/axe capture all success; evidence artifact `uat-evidence` id **12249095828**.
+
+Local gates on the same tree: lint, typecheck, API 693/693, web 145/145, API and web build, `format:check` — all pass.
+
+Staging database `PGS-Hub-Staging` (`silwoecgxpvwotkfhgxf`): 66/66 migrations applied, privileges verified before/after; details in `STAGING_DATABASE_DEPLOYMENT_REPORT.md`. **Staging Web/API and Staging E2E: not deployed / not run.**
+
+## 8. Not done and why
+
+Staging Web/API + Staging UAT, migration dry-run on a production-like copy, backup/restore drill, monitoring and alerting: no access or no environment (`PRODUCTION_PREFLIGHT_CHECKLIST.md`). They are **blocked**, not passed.

@@ -8,16 +8,16 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 | Hạng mục             | Bằng chứng                                                                                                                                                                                    |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Project Staging      | `PGS-Hub-Staging` — ref `silwoecgxpvwotkfhgxf` (ap-southeast-1, ACTIVE_HEALTHY). `supabase/.temp/project-ref` = `silwoecgxpvwotkfhgxf`; `projects list` shows `linked:true` only for this ref |
-| Commit triển khai    | `22ffb16e56e421abcb7652a33c575872ac48fcd1` (branch `feat/pgs-audit-ux-uat`, clean working tree)                                                                                               |
-| Migration dự kiến    | 65 `.sql` files in `supabase/migrations/`                                                                                                                                                     |
-| Migration thực tế    | 65 rows in `supabase_migrations.schema_migrations`, versions `20260810170000` … `20260828021004`; `migration list --linked` shows local = remote for all 65                                   |
+| Commit triển khai    | Migrations 1–65: `22ffb16e56e421abcb7652a33c575872ac48fcd1`; migration 66: `60963f20e74c68fac316c2d359879f964f76d1f0` (branch `feat/pgs-audit-ux-uat`, clean working tree both times)         |
+| Migration dự kiến    | 66 `.sql` files in `supabase/migrations/`                                                                                                                                                     |
+| Migration thực tế    | 66 rows in `supabase_migrations.schema_migrations`, versions `20260810170000` … `20261020120000`; local = remote for all 66                                                                   |
 | PostgreSQL           | 17.11 (`server_version`)                                                                                                                                                                      |
 | Database schema      | PASS — see Schema section                                                                                                                                                                     |
-| RLS                  | PASS with finding F1 (see Findings)                                                                                                                                                           |
+| RLS                  | PASS — F1 fixed by migration 66 (see Findings)                                                                                                                                                |
 | Authentication       | PASS (database layer). Sign-up → profile flow not exercised end-to-end (no Web/API)                                                                                                           |
 | Storage              | PASS — 3 private buckets, no client policies on `storage.objects`                                                                                                                             |
-| Security Advisors    | NOT RUN — Supabase Advisors not reachable from CLI in this session; equivalent read-only SQL checks run instead (see Security)                                                                |
-| Performance Advisors | NOT RUN — same reason; `supabase db lint` run instead (warnings only, no errors)                                                                                                              |
+| Security Advisors    | Dashboard findings reviewed (see Advisors section); SQL equivalents re-run after migration 66: all 0                                                                                          |
+| Performance Advisors | Dashboard findings reviewed: 1 unindexed FK (accepted), unused-index notices (no traffic yet); `supabase db lint`: warnings only                                                              |
 | Web/API Staging      | BLOCKED — no Vercel project or long-running Node/Docker host authorized; no staging URLs exist yet                                                                                            |
 | Staging E2E          | NOT RUN — requires Web/API Staging. Prior GitHub CI E2E is disposable-environment evidence only                                                                                               |
 | Production           | UNCHANGED — ref `umtgfaqjoqbsdzwpqizq` never linked or queried (`linked:false`)                                                                                                               |
@@ -30,6 +30,8 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 4. `supabase db push --linked --dry-run`: 65 pending, `seeds: []`, `roles: []`.
 5. Target re-verified (ref file + HEAD SHA) immediately before apply.
 6. `supabase db push --linked --yes`: exit 0, all 65 migrations applied in order, no errors. No `db reset`, no `migration repair`, no migration edits.
+
+7. Migration 66 (`20261020120000_revoke_client_grants_service_catalog_tables.sql`): first verified on a disposable Supabase stack by UAT run [39387891305](https://github.com/pgswork8686-stack/Builder-Web-App-Pgs-Agency-/actions/runs/39387891305) (release + workflow migration verifiers, Flows 01–08 all success) and CI runs 39387891320 / 39387898052 (success) on `60963f2`. Then, with ref and HEAD re-verified: dry-run listed only migration 66; `supabase db push --linked --yes` applied it with no errors.
 
 ## Schema (read-only `supabase db query --linked`)
 
@@ -74,8 +76,26 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 
 ### Findings
 
-- **F1 (low, hardening):** `anon` and default table grants include `INSERT/SELECT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER` on `service_categories`, `service_delivery_items`, `project_service_items`. RLS is enabled with 0 policies, so row access via PostgREST is denied; however `TRUNCATE` is not governed by RLS (PostgREST does not expose `TRUNCATE`, so not reachable through the Data API). Recommend a follow-up migration revoking `anon`/`authenticated` table privileges on these three tables, applied first to Staging. Not changed here: the release instruction forbids altering migration history to pass checks, and Production likely has the same grants.
+- **F1 (low, hardening) — FIXED by migration 66.** `anon` and `authenticated` held default `INSERT/SELECT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER` on `service_categories`, `service_delivery_items`, `project_service_items` (RLS on, 0 policies; `TRUNCATE` is not governed by RLS). Only the API uses these tables, via `service_role`; the web app never queries them.
+
+  `has_table_privilege` on Staging, before → after:
+
+  | Table                    | anon             | authenticated    | service_role              |
+  | ------------------------ | ---------------- | ---------------- | ------------------------- |
+  | `service_categories`     | all 7 → **none** | all 7 → **none** | all 7 → all 7 (unchanged) |
+  | `service_delivery_items` | all 7 → **none** | all 7 → **none** | all 7 → all 7 (unchanged) |
+  | `project_service_items`  | all 7 → **none** | all 7 → **none** | all 7 → all 7 (unchanged) |
+
+  After migration 66, across all 69 tables and 14 views in `public`: `anon` holds no privilege on any object; `authenticated` holds a privilege on exactly one (`profiles`, own-row RLS).
+
 - **F2 (info):** `supabase db lint --level warning`: unused/shadowed variable warnings in `public.move_task_on_board` and `public.workflow_create_primary_task`. No errors.
+
+## Supabase Advisors review
+
+- **RLS enabled, no policy (68 tables) — accepted by design.** Deny-by-default: browsers only read `profiles` (own row); every other table is served by the NestJS API with `service_role`. Adding policies would widen access without a consumer.
+- **Unindexed foreign key (1): `departments.head_user_id` → `profiles` — accepted.** The departments table holds about ten reference rows; a sequential scan on profile delete/update costs nothing. Revisit only if the table grows.
+- **Unused indexes — not acted on.** Staging has had no traffic, so every index reports as unused; dropping indexes on that basis would be wrong.
+- No other change made; no bulk fixes.
 
 ## Web/API preparation
 
@@ -89,7 +109,6 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 
 1. Web/API Staging hosting not provisioned (BLOCKED).
 2. Synthetic Staging accounts for the 5 roles not seeded (requires API / staging-only tooling).
-3. Supabase Security/Performance Advisors to be reviewed in the dashboard.
-4. Flows 01–08 must not be declared PASS on Staging until E2E runs against Staging Web/API.
+3. Flows 01–08 must not be declared PASS on Staging until E2E runs against Staging Web/API.
 
 PR #17 not merged; Production not deployed.
