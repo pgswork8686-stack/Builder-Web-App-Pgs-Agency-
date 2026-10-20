@@ -5,22 +5,22 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 
 ## Summary
 
-| Hạng mục | Bằng chứng |
-|---|---|
-| Project Staging | `PGS-Hub-Staging` — ref `silwoecgxpvwotkfhgxf` (ap-southeast-1, ACTIVE_HEALTHY). `supabase/.temp/project-ref` = `silwoecgxpvwotkfhgxf`; `projects list` shows `linked:true` only for this ref |
-| Commit triển khai | `22ffb16e56e421abcb7652a33c575872ac48fcd1` (branch `feat/pgs-audit-ux-uat`, clean working tree) |
-| Migration dự kiến | 65 `.sql` files in `supabase/migrations/` |
-| Migration thực tế | 65 rows in `supabase_migrations.schema_migrations`, versions `20260810170000` … `20260828021004`; `migration list --linked` shows local = remote for all 65 |
-| PostgreSQL | 17.11 (`server_version`) |
-| Database schema | PASS — see Schema section |
-| RLS | PASS with finding F1 (see Findings) |
-| Authentication | PASS (database layer). Sign-up → profile flow not exercised end-to-end (no Web/API) |
-| Storage | PASS — 3 private buckets, no client policies on `storage.objects` |
-| Security Advisors | NOT RUN — Supabase Advisors not reachable from CLI in this session; equivalent read-only SQL checks run instead (see Security) |
-| Performance Advisors | NOT RUN — same reason; `supabase db lint` run instead (warnings only, no errors) |
-| Web/API Staging | BLOCKED — no Vercel project or long-running Node/Docker host authorized; no staging URLs exist yet |
-| Staging E2E | NOT RUN — requires Web/API Staging. Prior GitHub CI E2E is disposable-environment evidence only |
-| Production | UNCHANGED — ref `umtgfaqjoqbsdzwpqizq` never linked or queried (`linked:false`) |
+| Hạng mục             | Bằng chứng                                                                                                                                                                                    |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project Staging      | `PGS-Hub-Staging` — ref `silwoecgxpvwotkfhgxf` (ap-southeast-1, ACTIVE_HEALTHY). `supabase/.temp/project-ref` = `silwoecgxpvwotkfhgxf`; `projects list` shows `linked:true` only for this ref |
+| Commit triển khai    | `22ffb16e56e421abcb7652a33c575872ac48fcd1` (branch `feat/pgs-audit-ux-uat`, clean working tree)                                                                                               |
+| Migration dự kiến    | 65 `.sql` files in `supabase/migrations/`                                                                                                                                                     |
+| Migration thực tế    | 65 rows in `supabase_migrations.schema_migrations`, versions `20260810170000` … `20260828021004`; `migration list --linked` shows local = remote for all 65                                   |
+| PostgreSQL           | 17.11 (`server_version`)                                                                                                                                                                      |
+| Database schema      | PASS — see Schema section                                                                                                                                                                     |
+| RLS                  | PASS with finding F1 (see Findings)                                                                                                                                                           |
+| Authentication       | PASS (database layer). Sign-up → profile flow not exercised end-to-end (no Web/API)                                                                                                           |
+| Storage              | PASS — 3 private buckets, no client policies on `storage.objects`                                                                                                                             |
+| Security Advisors    | NOT RUN — Supabase Advisors not reachable from CLI in this session; equivalent read-only SQL checks run instead (see Security)                                                                |
+| Performance Advisors | NOT RUN — same reason; `supabase db lint` run instead (warnings only, no errors)                                                                                                              |
+| Web/API Staging      | BLOCKED — no Vercel project or long-running Node/Docker host authorized; no staging URLs exist yet                                                                                            |
+| Staging E2E          | NOT RUN — requires Web/API Staging. Prior GitHub CI E2E is disposable-environment evidence only                                                                                               |
+| Production           | UNCHANGED — ref `umtgfaqjoqbsdzwpqizq` never linked or queried (`linked:false`)                                                                                                               |
 
 ## Execution log
 
@@ -33,16 +33,16 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 
 ## Schema (read-only `supabase db query --linked`)
 
-| Object | Count |
-|---|---|
-| Tables in `public` | 69 (all with RLS enabled) |
-| Views in `public` | 14 (none selectable by `authenticated`) |
-| Functions in `public` | 170 (44 `SECURITY DEFINER`) |
-| Non-internal triggers in `public` | 180 |
-| Enums in `public` | 18 |
-| Foreign keys in `public` | 188 |
-| Indexes in `public` | 385 |
-| RLS policies in `public` | 1 |
+| Object                            | Count                                   |
+| --------------------------------- | --------------------------------------- |
+| Tables in `public`                | 69 (all with RLS enabled)               |
+| Views in `public`                 | 14 (none selectable by `authenticated`) |
+| Functions in `public`             | 170 (44 `SECURITY DEFINER`)             |
+| Non-internal triggers in `public` | 180                                     |
+| Enums in `public`                 | 18                                      |
+| Foreign keys in `public`          | 188                                     |
+| Indexes in `public`               | 385                                     |
+| RLS policies in `public`          | 1                                       |
 
 `public.profiles`, `public.projects`, `public.tasks` present. Reference/seed migrations (service catalog DV01–DV26, departments, work calendar) applied as part of the official history.
 
@@ -56,11 +56,11 @@ Operator: Supabase CLI 2.111.0 from a developer workstation (`pgs-release-work` 
 
 ## Storage
 
-| Bucket | Public | Size limit | MIME allow-list |
-|---|---|---|---|
-| `company-documents` | false | 50 MB | none |
-| `project-files` | false | 25 MB | images, PDF, Office, text |
-| `attendance-evidence` | false | 5 MB | jpeg/png/webp |
+| Bucket                | Public | Size limit | MIME allow-list           |
+| --------------------- | ------ | ---------- | ------------------------- |
+| `company-documents`   | false  | 50 MB      | none                      |
+| `project-files`       | false  | 25 MB      | images, PDF, Office, text |
+| `attendance-evidence` | false  | 5 MB       | jpeg/png/webp             |
 
 `storage.objects` has 0 policies → no anon/authenticated direct access; objects are reachable only via the server-side API (secret key) / signed URLs.
 

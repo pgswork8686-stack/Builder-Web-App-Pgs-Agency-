@@ -125,10 +125,14 @@ The following 43 migrations are declared by repository history as the database b
 
 65. `20260828021004_repair_authenticated_profiles_select.sql` — Re-asserts RLS and the `SELECT` grant on `public.profiles` for `authenticated`; row isolation stays with `profiles_select_own_policy`. Idempotent.
 
+### Group P: Service Catalog Client Grant Revocation _(added 2026-10-20)_
+
+66. `20261020120000_revoke_client_grants_service_catalog_tables.sql` — Revokes all table privileges of `PUBLIC`, `anon` and `authenticated` on `service_categories`, `service_delivery_items` and `project_service_items` (they still carried Supabase default grants including `TRUNCATE`); keeps `SELECT/INSERT/UPDATE/DELETE` for `service_role`, which the API uses. Asserts the result with `has_table_privilege`. Idempotent.
+
 ---
 
 ## Verification status (read before using this manifest)
 
-- Repository migrations: 65 `.sql` files + `.gitkeep` (66 entries) in `supabase/migrations`. The excluded monolithic `20260819130000_phase10_all_missing_modules.sql` is intentionally absent.
+- Repository migrations: 66 `.sql` files + `.gitkeep` (67 entries) in `supabase/migrations`. The excluded monolithic `20260819130000_phase10_all_missing_modules.sql` is intentionally absent.
 - Disposable verification: `pnpm test:release-migrations` and `pnpm test:workflow-migrations` run in the UAT workflow on a disposable Supabase stack for every push. Evidence for the exact commit is listed in `RELEASE_EVIDENCE_MATRIX.md`.
-- **Production applied state: NOT VERIFIED.** The "historical baseline" (1–43) and which of 44–65 are applied on production were never read from the production database. Run `WORKFLOW_PREFLIGHT.sql` (read-only) with an authorised role and record the result in `PRODUCTION_PREFLIGHT_CHECKLIST.md` before deciding what to apply.
+- **Production applied state: NOT VERIFIED.** The "historical baseline" (1–43) and which of 44–66 are applied on production were never read from the production database. Run `WORKFLOW_PREFLIGHT.sql` (read-only) with an authorised role and record the result in `PRODUCTION_PREFLIGHT_CHECKLIST.md` before deciding what to apply.
