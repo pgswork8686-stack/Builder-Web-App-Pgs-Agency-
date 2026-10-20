@@ -4,6 +4,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readdirSync,
+  readFileSync,
   rmSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -167,6 +168,17 @@ try {
   ) {
     throw new Error(
       "Packaged API health, request ID, or allowed CORS smoke failed",
+    );
+  }
+
+  const deploymentInfo = readFileSync(
+    join(runtimeRoot, "DEPLOYMENT_INFO.txt"),
+    "utf8",
+  );
+  const sourceSha = /^SOURCE_SHA=([0-9a-f]{40})$/m.exec(deploymentInfo)?.[1];
+  if (!sourceSha || body.release?.sha !== sourceSha) {
+    throw new Error(
+      `Packaged API /health release.sha (${body.release?.sha}) does not match DEPLOYMENT_INFO SOURCE_SHA (${sourceSha})`,
     );
   }
 

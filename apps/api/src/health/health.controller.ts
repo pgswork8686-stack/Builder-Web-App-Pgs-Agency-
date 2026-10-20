@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { resolveReleaseInfo } from './release-info';
 
 @Controller('health')
 export class HealthController {
@@ -8,6 +9,7 @@ export class HealthController {
       status: 'ok',
       service: 'pgs-hub-api',
       timestamp: new Date().toISOString(),
+      release: resolveReleaseInfo(),
     };
   }
 }

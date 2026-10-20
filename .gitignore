@@ -51,6 +51,9 @@ apps/web/CLAUDE.md
 # supabase temp
 supabase/.temp/
 
+# UAT evidence is produced by CI (uploaded as a GitHub Actions artifact), never committed
+uat-evidence/
+
 # local database backups (never commit)
 backups/
 **/backups/

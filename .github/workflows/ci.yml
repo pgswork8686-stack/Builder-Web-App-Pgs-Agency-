@@ -86,7 +86,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build production API image
-        run: docker build --file apps/api/Dockerfile --tag pgs-hub-api:ci .
+        run: |
+          docker build --file apps/api/Dockerfile \
+            --build-arg GIT_SHA="${{ github.sha }}" \
+            --build-arg BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --tag pgs-hub-api:ci .
 
       - name: Smoke test health and graceful SIGTERM
         shell: bash
@@ -126,7 +130,7 @@ jobs:
           done
           test "$(docker inspect --format '{{.State.Health.Status}}' "$container")" = healthy
 
-          node -e "fetch('http://127.0.0.1:3001/api/v1/health', { headers: { 'X-Request-Id': 'ci-smoke' } }).then(async (response) => { const body = await response.json(); if (!response.ok || body.status !== 'ok' || response.headers.get('x-request-id') !== 'ci-smoke') process.exit(1) }).catch(() => process.exit(1))"
+          EXPECTED_SHA="${{ github.sha }}" node -e "fetch('http://127.0.0.1:3001/api/v1/health', { headers: { 'X-Request-Id': 'ci-smoke' } }).then(async (response) => { const body = await response.json(); if (!response.ok || body.status !== 'ok' || response.headers.get('x-request-id') !== 'ci-smoke') process.exit(1); if (!body.release || body.release.sha !== process.env.EXPECTED_SHA) { console.error('release.sha mismatch', body.release); process.exit(1) } }).catch(() => process.exit(1))"
 
           docker stop --time 10 "$container"
           test "$(docker inspect --format '{{.State.ExitCode}}' "$container")" = 0

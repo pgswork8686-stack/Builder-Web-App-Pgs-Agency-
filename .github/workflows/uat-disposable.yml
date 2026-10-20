@@ -208,11 +208,20 @@ jobs:
           PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
           PGS_UAT_EVIDENCE_DIR: uat-evidence
         run: node scripts/uat-flow07-handover-close.mjs
+
+      - name: Flow 08 - Resilience (API outage + retry, expired session, revoked access)
+        if: ${{ !cancelled() }}
+        env:
+          PGS_LOCAL_UAT_API_BASE: http://localhost:3001/api/v1
+          PGS_LOCAL_UAT_SUPABASE_URL: http://127.0.0.1:54321
+          PGS_UAT_EVIDENCE_DIR: uat-evidence
+        run: node scripts/uat-flow08-resilience.mjs
+
       - name: Publish summary
         if: always()
         run: |
           if [ -f uat-evidence/responsive-summary.md ]; then cat uat-evidence/responsive-summary.md >> "$GITHUB_STEP_SUMMARY"; fi
-          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json uat-evidence/flow01/flow01-results.json uat-evidence/flow02/flow02-results.json uat-evidence/flow03/flow03-results.json uat-evidence/flow04/flow04-results.json uat-evidence/flow06/flow06-results.json uat-evidence/flow07/flow07-results.json; do
+          for f in uat-evidence/flow05-results.json uat-evidence/flow05-ui/flow05-ui-results.json uat-evidence/flow01/flow01-results.json uat-evidence/flow02/flow02-results.json uat-evidence/flow03/flow03-results.json uat-evidence/flow04/flow04-results.json uat-evidence/flow06/flow06-results.json uat-evidence/flow07/flow07-results.json uat-evidence/flow08/flow08-results.json; do
             if [ -f "$f" ]; then
               echo "" >> "$GITHUB_STEP_SUMMARY"
               echo "**$f**: $(node -e "const j=require('./$f');console.log(j.result+' ('+j.steps.length+' steps)'+(j.error?' - '+j.error:''))")" >> "$GITHUB_STEP_SUMMARY"
