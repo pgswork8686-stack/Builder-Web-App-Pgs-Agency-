@@ -183,7 +183,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       />
 
       {/* Filter / Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <input
@@ -301,7 +301,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#EDF2F7] text-xs text-[#64748B] shrink-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#F2EAD3] text-xs text-[#64748B] shrink-0">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span>
@@ -337,7 +337,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
       {/* Pagination Footer */}
       {result.totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
           <span>
             Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
             dự án)
@@ -398,7 +398,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             tra cứu và kiểm toán.
           </p>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

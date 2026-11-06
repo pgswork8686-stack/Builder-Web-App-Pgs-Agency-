@@ -242,7 +242,7 @@ export default function AdminAttendancePage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
           <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
             Từ ngày
@@ -335,7 +335,7 @@ export default function AdminAttendancePage() {
 
       {/* Main Table Card */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
           <h3 className="text-base font-extrabold text-[#0F172A]">
             Kiểm tra bảng công ({total} lượt)
           </h3>
@@ -432,7 +432,7 @@ export default function AdminAttendancePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
             <span>Tổng số {total} bản ghi</span>
             <div className="flex gap-2">
               <Button

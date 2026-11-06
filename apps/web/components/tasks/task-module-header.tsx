@@ -53,7 +53,7 @@ export function TaskModuleHeader({
       </div>
 
       {/* Bottom row: View Mode Switcher Tabs */}
-      <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+      <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
         <TaskViewTabs active={activeView} role={role} links={links} />
       </div>
     </div>

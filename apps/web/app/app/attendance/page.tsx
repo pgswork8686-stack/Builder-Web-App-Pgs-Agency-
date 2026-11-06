@@ -259,7 +259,7 @@ export default function EmployeeAttendancePage() {
       {/* Main Check-in Action Box */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="p-6 lg:col-span-2 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#EDF2F7] pb-4 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F2EAD3] pb-4 gap-2">
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
                 Điểm danh ca làm việc
@@ -273,7 +273,7 @@ export default function EmployeeAttendancePage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBF0] border border-[#EDF2F7] self-start sm:self-auto">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] self-start sm:self-auto">
               <MapPin
                 className={`w-4 h-4 ${
                   geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
@@ -333,15 +333,15 @@ export default function EmployeeAttendancePage() {
             Quy định ca làm việc
           </h4>
           <div className="space-y-3 text-xs text-[#64748B]">
-            <div className="flex justify-between py-1.5 border-b border-[#EDF2F7]">
+            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Ca sáng:</span>
               <span className="font-bold text-[#0F172A]">08:30 — 12:00</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-[#EDF2F7]">
+            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Nghỉ trưa:</span>
               <span className="font-bold text-[#0F172A]">12:00 — 13:30</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-[#EDF2F7]">
+            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Ca chiều:</span>
               <span className="font-bold text-[#0F172A]">13:30 — 18:00</span>
             </div>

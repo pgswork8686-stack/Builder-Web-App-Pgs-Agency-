@@ -255,7 +255,7 @@ export default function AdminTeamsPage() {
       />
 
       {/* Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
+      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#F2EAD3] shadow-xs">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
           <input
@@ -495,7 +495,7 @@ export default function AdminTeamsPage() {
               />
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -646,7 +646,7 @@ export default function AdminTeamsPage() {
               </label>
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"

@@ -113,7 +113,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "all"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#F2EAD3] text-[#7C879D] hover:bg-[#F6F8FC]"
           }`}
         >
           Tất cả ({tasks.length})
@@ -124,7 +124,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "in_progress"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#F2EAD3] text-[#7C879D] hover:bg-[#F6F8FC]"
           }`}
         >
           Đang làm
@@ -135,7 +135,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "todo"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#F2EAD3] text-[#7C879D] hover:bg-[#F6F8FC]"
           }`}
         >
           Cần làm
@@ -146,7 +146,7 @@ export default function EmployeeTasksPage() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "done"
               ? "bg-[#5D87FF] text-white shadow-xs"
-              : "bg-white border border-[#EDF2F7] text-[#7C879D] hover:bg-[#F6F8FC]"
+              : "bg-white border border-[#F2EAD3] text-[#7C879D] hover:bg-[#F6F8FC]"
           }`}
         >
           Hoàn thành
@@ -205,7 +205,7 @@ export default function EmployeeTasksPage() {
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-[#EDF2F7] flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#F2EAD3] flex items-center justify-between gap-2">
                   <Link
                     href={`/app/projects/${t.project_id}/tasks/${t.id}`}
                     className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"

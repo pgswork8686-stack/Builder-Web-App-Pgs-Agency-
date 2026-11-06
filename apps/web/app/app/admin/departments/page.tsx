@@ -409,7 +409,7 @@ export default function AdminDepartmentsPage() {
               />
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -532,7 +532,7 @@ export default function AdminDepartmentsPage() {
               </label>
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"

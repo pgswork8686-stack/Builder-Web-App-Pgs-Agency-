@@ -133,7 +133,7 @@ export default function TeamLeaderApprovalsPage() {
           />
         </Card>
       ) : (
-        <Card className="overflow-hidden border border-[#EDF2F7]">
+        <Card className="overflow-hidden border border-[#F2EAD3]">
           <TableContainer>
             <Table>
               <TableHead>

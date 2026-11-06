@@ -46,7 +46,7 @@ export function WorkspaceHeader({
   ] as const;
 
   return (
-    <header className="space-y-4 pb-4 border-b border-[#EDF2F7]">
+    <header className="space-y-4 pb-4 border-b border-[#F2EAD3]">
       <Link
         href={base}
         className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#161827] transition-colors"

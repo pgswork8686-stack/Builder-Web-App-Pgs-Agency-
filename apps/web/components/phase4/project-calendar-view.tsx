@@ -202,7 +202,7 @@ function ProjectCalendarContent({
         )}
       </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs">
+      <div className="flex items-center justify-between rounded-2xl border border-[#F2EAD3] bg-white p-4 shadow-xs">
         <button
           type="button"
           onClick={() => changeMonth(-1)}
@@ -230,12 +230,12 @@ function ProjectCalendarContent({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#64748B]">
           Đang tải lịch công việc…
         </div>
       ) : (
-        <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
-          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#FFFBF0]">
+        <section className="overflow-x-auto rounded-2xl border border-[#F2EAD3] bg-white shadow-xs">
+          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#F2EAD3] bg-[#FFFBF0]">
             {weekdayLabels.map((label) => (
               <div
                 key={label}
@@ -272,7 +272,7 @@ function ProjectCalendarContent({
                   onClick={() => {
                     if (canCreateTask) setCreateDate(key);
                   }}
-                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors ${cellBg} hover:bg-[#FFFBF0] ${
+                  className={`min-h-36 border-b border-r border-[#F2EAD3] p-2 transition-colors ${cellBg} hover:bg-[#FFFBF0] ${
                     canCreateTask ? "cursor-pointer" : ""
                   }`}
                   title={

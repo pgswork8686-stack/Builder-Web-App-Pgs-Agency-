@@ -165,7 +165,7 @@ export function ProjectCreateWizardDialog({
     >
       <div className="space-y-6 pt-2">
         {/* Wizard Step Indicator */}
-        <div className="grid grid-cols-3 gap-2 border-b border-[#EDF2F7] pb-4">
+        <div className="grid grid-cols-3 gap-2 border-b border-[#F2EAD3] pb-4">
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
               step >= 1 ? "text-[#5D87FF]" : "text-[#7C879D]"
@@ -177,7 +177,7 @@ export function ProjectCreateWizardDialog({
                   ? "bg-[#13DEB9] text-white"
                   : step === 1
                     ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                    : "border border-[#F2EAD3] bg-[#F6F8FC] text-[#7C879D]"
               }`}
             >
               {step > 1 ? <Check className="w-4 h-4" /> : "1"}
@@ -196,7 +196,7 @@ export function ProjectCreateWizardDialog({
                   ? "bg-[#13DEB9] text-white"
                   : step === 2
                     ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                    : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                    : "border border-[#F2EAD3] bg-[#F6F8FC] text-[#7C879D]"
               }`}
             >
               {step > 2 ? <Check className="w-4 h-4" /> : "2"}
@@ -213,7 +213,7 @@ export function ProjectCreateWizardDialog({
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                 step === 3
                   ? "border-2 border-[#5D87FF] bg-[#EEF2FF] text-[#5D87FF]"
-                  : "border border-[#EDF2F7] bg-[#F6F8FC] text-[#7C879D]"
+                  : "border border-[#F2EAD3] bg-[#F6F8FC] text-[#7C879D]"
               }`}
             >
               3
@@ -288,7 +288,7 @@ export function ProjectCreateWizardDialog({
               </label>
               <textarea
                 rows={3}
-                className="w-full rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3.5 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+                className="w-full rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3.5 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
                 placeholder="Mô tả mục tiêu, yêu cầu nghiệm thu và phạm vi công việc..."
                 value={form.description}
                 onChange={(e) =>
@@ -370,7 +370,7 @@ export function ProjectCreateWizardDialog({
         {/* Step 3: Confirmation Summary */}
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in duration-150">
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#7C879D]">
                 Tóm tắt thông tin dự án
               </h4>
@@ -421,11 +421,11 @@ export function ProjectCreateWizardDialog({
               </div>
 
               {form.description && (
-                <div className="pt-2 border-t border-[#EDF2F7]">
+                <div className="pt-2 border-t border-[#F2EAD3]">
                   <span className="text-xs text-[#7C879D] block mb-1">
                     Mô tả:
                   </span>
-                  <p className="text-xs text-[#24304A] bg-white p-3 rounded-xl border border-[#EDF2F7]">
+                  <p className="text-xs text-[#24304A] bg-white p-3 rounded-xl border border-[#F2EAD3]">
                     {form.description}
                   </p>
                 </div>
@@ -443,7 +443,7 @@ export function ProjectCreateWizardDialog({
         )}
 
         {/* Wizard Footer Controls */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3]">
           {step > 1 ? (
             <Button
               type="button"

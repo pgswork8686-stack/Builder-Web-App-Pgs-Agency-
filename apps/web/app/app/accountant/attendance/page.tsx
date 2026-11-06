@@ -308,7 +308,7 @@ export default function AccountantAttendancePage() {
         description="Đối soát dữ liệu vào ca, thời gian làm việc toàn công ty phục vụ hạch toán bảng lương."
         badge={`${total} Bản ghi chấm công`}
         action={
-          <div className="flex items-center gap-1 bg-[#F6F8FC] p-1 rounded-xl border border-[#EDF2F7]">
+          <div className="flex items-center gap-1 bg-[#F6F8FC] p-1 rounded-xl border border-[#F2EAD3]">
             <button
               onClick={() => setActiveTab("company")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -336,7 +336,7 @@ export default function AccountantAttendancePage() {
       {activeTab === "company" ? (
         <>
           {/* Filters Bar */}
-          <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs space-y-3">
+          <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
                 <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
@@ -349,7 +349,7 @@ export default function AccountantAttendancePage() {
                     setFilterFrom(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 />
               </div>
 
@@ -364,7 +364,7 @@ export default function AccountantAttendancePage() {
                     setFilterTo(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 />
               </div>
 
@@ -378,7 +378,7 @@ export default function AccountantAttendancePage() {
                     setFilterDept(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi phòng ban --</option>
                   {departments.map((d) => (
@@ -399,7 +399,7 @@ export default function AccountantAttendancePage() {
                     setFilterTeam(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi nhóm --</option>
                   {teams.map((t) => (
@@ -420,7 +420,7 @@ export default function AccountantAttendancePage() {
                     setFilterStatus(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi trạng thái --</option>
                   <option value="present">Đúng giờ</option>
@@ -546,7 +546,7 @@ export default function AccountantAttendancePage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#7C879D]">
+            <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#7C879D]">
               <span>
                 Trang {page} / {totalPages} ({total} bản ghi)
               </span>
@@ -632,7 +632,7 @@ export default function AccountantAttendancePage() {
           {/* Action Box */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="p-6 lg:col-span-2 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#EDF2F7] pb-4 gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F2EAD3] pb-4 gap-2">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-[#24304A] tracking-tight">
                     Điểm danh ca làm việc cá nhân
@@ -646,7 +646,7 @@ export default function AccountantAttendancePage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] self-start sm:self-auto">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] self-start sm:self-auto">
                   <MapPin
                     className={`w-4 h-4 ${
                       geoCoords
@@ -671,7 +671,7 @@ export default function AccountantAttendancePage() {
                   placeholder="Ghi chú ca làm, làm bù hoặc công tác..."
                   value={personalNote}
                   onChange={(e) => setPersonalNote(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-xs text-[#24304A] placeholder-[#7C879D] outline-none focus:bg-white focus:border-[#5D87FF] transition-colors"
+                  className="w-full p-3 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] placeholder-[#7C879D] outline-none focus:bg-white focus:border-[#5D87FF] transition-colors"
                 />
               </div>
 
@@ -713,7 +713,7 @@ export default function AccountantAttendancePage() {
               <h4 className="font-bold text-sm text-[#24304A]">
                 Thông tin ca hôm nay
               </h4>
-              <div className="space-y-3 text-xs border-t border-[#EDF2F7] pt-3">
+              <div className="space-y-3 text-xs border-t border-[#F2EAD3] pt-3">
                 <div className="flex justify-between">
                   <span className="text-[#7C879D]">Trạng thái:</span>
                   <span>

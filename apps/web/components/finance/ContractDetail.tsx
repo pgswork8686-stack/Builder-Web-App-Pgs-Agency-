@@ -189,7 +189,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
   if (!contract) {
     return (
-      <div className="p-8 text-center bg-white rounded-2xl border border-[#EDF2F7] space-y-4">
+      <div className="p-8 text-center bg-white rounded-2xl border border-[#F2EAD3] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
         <h2 className="text-base font-bold text-[#0F172A]">
           Không tìm thấy hợp đồng
@@ -292,7 +292,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
           {/* Details Overview Card */}
           <Card className="p-6 space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EDF2F7] pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#F2EAD3] pb-4">
               <div className="space-y-1">
                 <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">
                   Tiêu đề hợp đồng
@@ -345,7 +345,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#EDF2F7] pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#F2EAD3] pt-6">
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-[#4F75FF]" />
                 <div className="space-y-0.5">
@@ -372,11 +372,11 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             </div>
 
             {contract.notes && (
-              <div className="border-t border-[#EDF2F7] pt-6 space-y-2">
+              <div className="border-t border-[#F2EAD3] pt-6 space-y-2">
                 <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider block">
                   Điều khoản & Ghi chú
                 </span>
-                <p className="text-xs text-[#64748B] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#EDF2F7] whitespace-pre-wrap">
+                <p className="text-xs text-[#64748B] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#F2EAD3] whitespace-pre-wrap">
                   {contract.notes}
                 </p>
               </div>
@@ -391,7 +391,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
               Hiển thị với khách hàng
             </h4>
-            <div className="flex items-center justify-between bg-[#FFFBF0] p-3.5 rounded-xl border border-[#EDF2F7]">
+            <div className="flex items-center justify-between bg-[#FFFBF0] p-3.5 rounded-xl border border-[#F2EAD3]">
               <div className="flex items-center gap-2">
                 {contract.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
@@ -416,7 +416,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
           {/* Invoices List Card */}
           <Card className="p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
                 Hóa đơn của hợp đồng
               </h4>
@@ -438,7 +438,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 {invoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3 rounded-xl bg-[#FFFBF0] border border-[#EDF2F7] flex items-center justify-between gap-3 text-xs"
+                    className="p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="space-y-0.5">
                       <p className="font-bold text-[#0F172A] font-mono">

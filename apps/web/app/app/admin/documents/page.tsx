@@ -172,7 +172,7 @@ export default function AdminDocumentsPage() {
       />
 
       {/* Search & Categories Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs flex flex-wrap items-center justify-between gap-3">
         <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -182,7 +182,7 @@ export default function AdminDocumentsPage() {
                 placeholder="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#EDF2F7] text-[#0F172A] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#0F172A] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               />
             </div>
             <Button
@@ -199,7 +199,7 @@ export default function AdminDocumentsPage() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+          className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
         >
           <option value="">Tất cả danh mục</option>
           {Object.entries(CATEGORY_MAP).map(([k, v]) => (
@@ -212,7 +212,7 @@ export default function AdminDocumentsPage() {
 
       {/* Documents Grid / Table */}
       {loading ? (
-        <div className="p-12 text-center text-[#94A3B8] bg-white rounded-2xl border border-[#EDF2F7]">
+        <div className="p-12 text-center text-[#94A3B8] bg-white rounded-2xl border border-[#F2EAD3]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4F75FF]" />
           Đang tải danh sách tài liệu...
         </div>
@@ -322,7 +322,7 @@ export default function AdminDocumentsPage() {
               onChange={(e) => setUploadTitle(e.target.value)}
               placeholder="Ví dụ: Quy chế thưởng & phạt năm 2026"
               required
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -334,7 +334,7 @@ export default function AdminDocumentsPage() {
               <select
                 value={uploadCategory}
                 onChange={(e) => setUploadCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 {Object.entries(CATEGORY_MAP).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -350,7 +350,7 @@ export default function AdminDocumentsPage() {
               <select
                 value={uploadAccess}
                 onChange={(e) => setUploadAccess(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="public_company">Toàn công ty & Khách</option>
                 <option value="internal_only">Nội bộ PGS</option>
@@ -380,11 +380,11 @@ export default function AdminDocumentsPage() {
               onChange={(e) => setUploadDescription(e.target.value)}
               rows={3}
               placeholder="Ghi chú thêm về phiên bản hoặc hướng dẫn sử dụng..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

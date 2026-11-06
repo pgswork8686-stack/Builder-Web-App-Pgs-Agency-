@@ -109,7 +109,7 @@ export default function SignUpPage() {
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
-      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#EDF2F7]">
+      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#F2EAD3]">
         <div className="w-full max-w-md space-y-6">
           {/* Header Mobile Logo / Text */}
           <div>
@@ -149,7 +149,7 @@ export default function SignUpPage() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#EDF2F7] hover:border-[#4F75FF]/40 text-[#0F172A] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#4F75FF]/40 text-[#0F172A] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -176,7 +176,7 @@ export default function SignUpPage() {
 
           {/* Divider */}
           <div className="relative flex items-center justify-center my-3">
-            <div className="w-full border-t border-[#EDF2F7]" />
+            <div className="w-full border-t border-[#F2EAD3]" />
             <span className="absolute px-3 bg-white text-[11px] text-[#94A3B8] uppercase tracking-wider">
               hoặc đăng ký bằng Email
             </span>

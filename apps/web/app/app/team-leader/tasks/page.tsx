@@ -20,7 +20,7 @@ export default function TeamLeaderTasksPage() {
       />
 
       {/* Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#EDF2F7] flex flex-wrap items-center justify-between gap-3 shadow-xs">
+      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-[#7C879D] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -28,7 +28,7 @@ export default function TeamLeaderTasksPage() {
             placeholder="Tìm kiếm công việc theo tên, người phụ trách..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] focus:outline-none focus:border-[#E7AE18]"
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] focus:outline-none focus:border-[#E7AE18]"
           />
         </div>
       </div>

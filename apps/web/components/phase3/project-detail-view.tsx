@@ -587,7 +587,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       )}
 
       {/* Tabs Navigation */}
-      <div className="border-b border-[#EDF2F7] flex gap-2 overflow-x-auto scrollbar-none">
+      <div className="border-b border-[#F2EAD3] flex gap-2 overflow-x-auto scrollbar-none">
         {tabs.map(({ value, label, icon: Icon, count }) => {
           const isActive = tab === value;
           return (
@@ -625,7 +625,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </p>
 
               {mode === "admin" && (
-                <div className="pt-4 border-t border-[#EDF2F7] space-y-3">
+                <div className="pt-4 border-t border-[#F2EAD3] space-y-3">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
                     Chuyển nhanh trạng thái
                   </label>
@@ -653,13 +653,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               <CardTitle>Thông tin Hợp tác</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
-              <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
+              <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Công ty khách hàng:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.clientCompany?.name || "—"}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
+              <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Project Manager:</span>
                 <span className="font-bold text-[#0F172A]">
                   {project.projectManager?.full_name ||
@@ -667,13 +667,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     "Chưa chỉ định"}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
+              <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Ngày khởi động:</span>
                 <span className="text-[#0F172A]">
                   {project.startDate || "—"}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-[#EDF2F7]">
+              <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Hạn chót bàn giao:</span>
                 <span className="text-[#0F172A]">{project.dueDate || "—"}</span>
               </div>
@@ -860,7 +860,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   onClick={() => setTaskView(value)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     taskView === value
-                      ? "bg-white text-[#4F75FF] shadow-sm border border-[#EDF2F7]"
+                      ? "bg-white text-[#4F75FF] shadow-sm border border-[#F2EAD3]"
                       : "text-[#64748B] hover:text-[#0F172A]"
                   }`}
                 >
@@ -1099,7 +1099,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, title: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1114,7 +1114,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, description: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1128,7 +1128,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 onChange={(e) =>
                   setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="">-- Chưa chỉ định --</option>
                 {people.map((p) => (
@@ -1151,7 +1151,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     priority: e.target.value as TaskPriority,
                   })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="low">Thấp (Low)</option>
                 <option value="medium">Vừa (Medium)</option>
@@ -1174,7 +1174,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, linkUrl: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1235,7 +1235,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 <span>Đang tải tệp lên...</span>
                 <span>{uploadProgress}%</span>
               </div>
-              <div className="h-1.5 w-full bg-[#EDF2F7] rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-[#F2EAD3] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#4F75FF] transition-all"
                   style={{ width: `${uploadProgress}%` }}
@@ -1244,7 +1244,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"
@@ -1298,7 +1298,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             tra cứu và kiểm toán.
           </p>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

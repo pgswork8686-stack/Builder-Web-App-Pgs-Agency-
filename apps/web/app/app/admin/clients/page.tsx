@@ -294,7 +294,7 @@ export default function AdminClientsPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="relative sm:col-span-2">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
           <input
@@ -627,14 +627,14 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
               placeholder="Ghi chú về khách hàng, yêu cầu đặc thù..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"
@@ -689,7 +689,7 @@ export default function AdminClientsPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+                className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
                 <option value="active">Đang hoạt động (Active)</option>
                 <option value="inactive">Tạm dừng (Inactive)</option>
@@ -760,14 +760,14 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"
@@ -809,7 +809,7 @@ export default function AdminClientsPage() {
             nguyên để bảo toàn lịch sử vận hành.
           </p>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

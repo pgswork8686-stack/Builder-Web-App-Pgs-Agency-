@@ -27,7 +27,7 @@ export default function AccountPendingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#0F172A] p-6 relative">
-      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#EDF2F7]">
+      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#F2EAD3]">
         {/* Status Icon Header */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
           <Clock className="w-8 h-8 animate-pulse" />
@@ -42,7 +42,7 @@ export default function AccountPendingPage() {
           </h2>
         </div>
 
-        <p className="text-xs text-[#64748B] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#EDF2F7]">
+        <p className="text-xs text-[#64748B] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#F2EAD3]">
           Tài khoản của bạn đã được khởi tạo thành công và đang chờ Quản trị
           viên (Admin) phê duyệt và phân quyền truy cập. Vui lòng thử lại sau
           hoặc liên hệ bộ phận quản lý.
@@ -74,7 +74,7 @@ export default function AccountPendingPage() {
           </Button>
         </div>
 
-        <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-center gap-2 text-xs text-[#94A3B8]">
+        <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-center gap-2 text-xs text-[#94A3B8]">
           <ShieldAlert className="w-3.5 h-3.5 text-[#4F75FF]" />
           <span>PGS Agency Enterprise Operating System</span>
         </div>

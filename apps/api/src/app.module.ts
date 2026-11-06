@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module';
+import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
 import { AutomationModule } from './automation/automation.module';
@@ -47,6 +48,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     SupabaseModule,
     AuthModule,
     AdminModule,
+    AdminDashboardModule,
     OrganizationModule,
     PeopleModule,
     ClientsModule,

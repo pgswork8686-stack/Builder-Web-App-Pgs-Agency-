@@ -63,7 +63,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
 
       <Card className="p-4 sm:p-6">
         {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center pb-3 border-b border-[#EDF2F7]">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center pb-3 border-b border-[#F2EAD3]">
           {daysOfWeek.map((d) => (
             <span
               key={d}
@@ -96,7 +96,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                 className={`min-h-[60px] sm:min-h-[80px] p-1.5 sm:p-2 rounded-xl border flex flex-col gap-1 transition-colors cursor-default ${
                   todayCell
                     ? "bg-[#EEF2FF] border-[#5D87FF]"
-                    : "bg-[#F6F8FC] border-[#EDF2F7] hover:bg-white hover:border-[#CBD5E1]"
+                    : "bg-[#F6F8FC] border-[#F2EAD3] hover:bg-white hover:border-[#CBD5E1]"
                 }`}
               >
                 <span

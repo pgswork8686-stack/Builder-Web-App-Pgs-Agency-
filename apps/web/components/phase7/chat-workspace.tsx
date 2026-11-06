@@ -583,7 +583,7 @@ export function ChatWorkspace() {
                 value={conversationSearch}
                 onChange={(e) => setConversationSearch(e.target.value)}
                 placeholder="Tìm cuộc trò chuyện..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
               />
             </div>
 
@@ -623,7 +623,7 @@ export function ChatWorkspace() {
                     className={`w-full rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${
                       selected?.id === conversation.id
                         ? "border-[#4F75FF] bg-[#EEF2FF]"
-                        : "border-[#EDF2F7] bg-white hover:bg-[#FFFBF0]"
+                        : "border-[#F2EAD3] bg-white hover:bg-[#FFFBF0]"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -777,7 +777,7 @@ export function ChatWorkspace() {
 
         {/* Right Column: Chat window */}
         <Card className="flex min-h-[44rem] flex-col p-0 overflow-hidden">
-          <div className="flex items-center justify-between gap-4 border-b border-[#EDF2F7] p-5">
+          <div className="flex items-center justify-between gap-4 border-b border-[#F2EAD3] p-5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <MessageCircle className="h-5 w-5" />
@@ -926,7 +926,7 @@ export function ChatWorkspace() {
           </div>
 
           <form
-            className="border-t border-[#EDF2F7] p-4 bg-[#FFFBF0]"
+            className="border-t border-[#F2EAD3] p-4 bg-[#FFFBF0]"
             onSubmit={(event) => {
               event.preventDefault();
               void sendMessage();
@@ -978,7 +978,7 @@ export function ChatWorkspace() {
       >
         <div className="space-y-4 pt-2">
           {/* Tabs */}
-          <div className="flex border-b border-[#EDF2F7]">
+          <div className="flex border-b border-[#F2EAD3]">
             <button
               type="button"
               onClick={() => setModalTab("direct")}
@@ -1017,13 +1017,13 @@ export function ChatWorkspace() {
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     placeholder="Tìm kiếm theo tên, email, chức danh..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                   />
                 </div>
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+                  className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
                 >
                   <option value="all">Tất cả vai trò</option>
                   <option value="admin">Admin</option>
@@ -1050,7 +1050,7 @@ export function ChatWorkspace() {
                     <div
                       key={contact.id}
                       onClick={() => void createDirect(contact.id)}
-                      className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                      className="flex items-center justify-between p-3 rounded-xl border border-[#F2EAD3] bg-white hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar
@@ -1103,7 +1103,7 @@ export function ChatWorkspace() {
                   value={projectSearchQuery}
                   onChange={(e) => setProjectSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm dự án theo tên hoặc mã..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                 />
               </div>
 
@@ -1122,7 +1122,7 @@ export function ChatWorkspace() {
                     return (
                       <div
                         key={proj.id}
-                        className="rounded-2xl border border-[#EDF2F7] bg-white overflow-hidden shadow-xs transition-all hover:border-[#4F75FF]/30"
+                        className="rounded-2xl border border-[#F2EAD3] bg-white overflow-hidden shadow-xs transition-all hover:border-[#4F75FF]/30"
                       >
                         {/* Project Header Bar */}
                         <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFBF0]/50">
@@ -1185,7 +1185,7 @@ export function ChatWorkspace() {
 
                         {/* Expanded Members & Clients list for 1-on-1 Direct Chat */}
                         {isExpanded && (
-                          <div className="p-3.5 bg-white border-t border-[#EDF2F7] space-y-2">
+                          <div className="p-3.5 bg-white border-t border-[#F2EAD3] space-y-2">
                             <div className="flex items-center justify-between pb-1">
                               <span className="text-[11px] font-bold text-[#0F172A] uppercase tracking-wide">
                                 Chọn người để Chat riêng (1-on-1):
@@ -1225,7 +1225,7 @@ export function ChatWorkspace() {
                                           void createDirect(profile.id);
                                         }
                                       }}
-                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
                                     >
                                       <div className="flex items-center gap-2.5 min-w-0">
                                         <Avatar
@@ -1271,7 +1271,7 @@ export function ChatWorkspace() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end pt-3 border-t border-[#F2EAD3]">
             <Button
               variant="secondary"
               size="sm"
@@ -1326,7 +1326,7 @@ export function ChatWorkspace() {
                 return (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#FFFBF0] transition-all"
+                    className="flex items-center justify-between p-3 rounded-xl border border-[#F2EAD3] bg-white hover:bg-[#FFFBF0] transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <Avatar
@@ -1379,7 +1379,7 @@ export function ChatWorkspace() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end pt-3 border-t border-[#F2EAD3]">
             <Button
               variant="secondary"
               size="sm"

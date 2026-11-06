@@ -369,7 +369,7 @@ export default function ContractsWorkspace({
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#EDF2F7] shadow-xs">
+      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#F2EAD3] shadow-xs">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <input
@@ -411,7 +411,7 @@ export default function ContractsWorkspace({
 
       {/* Contracts Table Card */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
           <h3 className="text-base font-extrabold text-[#0F172A]">
             Danh sách hợp đồng ({total})
           </h3>
@@ -532,7 +532,7 @@ export default function ContractsWorkspace({
         )}
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
             <span>
               Hiển thị{" "}
               <span className="font-bold text-[#0F172A]">
@@ -779,7 +779,7 @@ export default function ContractsWorkspace({
               </label>
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"

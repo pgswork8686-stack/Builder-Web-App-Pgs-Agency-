@@ -43,7 +43,7 @@ export function DeleteConfirmDialog({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 w-full pt-3 border-t border-[#EDF2F7]">
+        <div className="grid grid-cols-2 gap-3 w-full pt-3 border-t border-[#F2EAD3]">
           <Button
             type="button"
             variant="secondary"

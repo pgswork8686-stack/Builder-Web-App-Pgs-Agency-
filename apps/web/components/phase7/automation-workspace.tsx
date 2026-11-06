@@ -521,7 +521,7 @@ export function AutomationWorkspace() {
           ) : null}
 
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <div>
                 <h2 className="font-extrabold text-[#0F172A] text-sm">
                   Danh sách quy tắc
@@ -544,7 +544,7 @@ export function AutomationWorkspace() {
                 description="Tạo quy tắc tự động hóa đầu tiên bằng biểu mẫu bên trái."
               />
             ) : (
-              <div className="divide-y divide-[#EDF2F7]">
+              <div className="divide-y divide-[#F2EAD3]">
                 {rules.map((rule) => (
                   <article key={rule.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -597,7 +597,7 @@ export function AutomationWorkspace() {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <div className="border-b border-[#EDF2F7] pb-3">
+            <div className="border-b border-[#F2EAD3] pb-3">
               <h2 className="font-extrabold text-[#0F172A] text-sm">
                 Lịch sử thực thi
               </h2>
@@ -605,7 +605,7 @@ export function AutomationWorkspace() {
                 Ghi nhận chi tiết kết quả chạy tự động.
               </p>
             </div>
-            <div className="divide-y divide-[#EDF2F7]">
+            <div className="divide-y divide-[#F2EAD3]">
               {executions.length === 0 ? (
                 <div className="p-8 text-center text-xs text-[#94A3B8]">
                   Chưa có lượt thực thi nào được ghi nhận.

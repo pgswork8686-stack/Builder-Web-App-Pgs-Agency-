@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFFBF0] text-[#161827] p-6 font-sans">
-      <Card className="flex flex-col items-center max-w-lg p-10 bg-white border-[#EDF2F7] rounded-3xl shadow-xl text-center space-y-6">
+      <Card className="flex flex-col items-center max-w-lg p-10 bg-white border-[#F2EAD3] rounded-3xl shadow-xl text-center space-y-6">
         <div className="relative w-16 h-16 rounded-2xl bg-[#161827] p-2 flex items-center justify-center shadow-md">
           <Image
             src="/brand/pgs-agency-logo-transparent.png"
@@ -35,7 +35,7 @@ export default function Home() {
           Hệ thống đang hoạt động ổn định
         </Badge>
 
-        <div className="w-full pt-4 border-t border-[#EDF2F7] flex flex-col gap-3">
+        <div className="w-full pt-4 border-t border-[#F2EAD3] flex flex-col gap-3">
           <Link href="/auth/login" className="w-full">
             <Button
               variant="primary"

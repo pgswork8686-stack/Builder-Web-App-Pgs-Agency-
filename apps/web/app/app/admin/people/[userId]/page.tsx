@@ -215,7 +215,7 @@ export default function AdminPersonDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
           <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
           <span className="text-xs text-[#64748B]">
             Đang tải dữ liệu hồ sơ nhân sự...
@@ -257,7 +257,7 @@ export default function AdminPersonDetailPage() {
                 </p>
               </div>
 
-              <div className="border-t border-[#EDF2F7] pt-4 space-y-2.5 text-left text-xs">
+              <div className="border-t border-[#F2EAD3] pt-4 space-y-2.5 text-left text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-[#64748B]">Vai trò hệ thống</span>
                   <Badge variant="blue" size="sm">
@@ -303,7 +303,7 @@ export default function AdminPersonDetailPage() {
               </Card>
             ) : (
               <Card className="p-6 space-y-6">
-                <div className="flex items-center gap-2 border-b border-[#EDF2F7] pb-3">
+                <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
                   <ShieldCheck className="w-5 h-5 text-[#4F75FF]" />
                   <h2 className="font-extrabold text-sm text-[#0F172A]">
                     {person.employeeProfile
@@ -462,7 +462,7 @@ export default function AdminPersonDetailPage() {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-[#EDF2F7] flex justify-end">
+                  <div className="pt-4 border-t border-[#F2EAD3] flex justify-end">
                     <Button
                       type="submit"
                       variant="primary"

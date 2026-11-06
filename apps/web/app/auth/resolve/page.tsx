@@ -77,7 +77,7 @@ export default function AuthResolvePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFFBF0] text-[#0F172A] p-6">
-      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#EDF2F7]">
+      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#F2EAD3]">
         {errorMsg ? (
           <>
             <h3 className="text-base font-extrabold text-red-600">

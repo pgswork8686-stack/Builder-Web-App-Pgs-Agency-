@@ -250,7 +250,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
   if (!invoice) {
     return (
-      <div className="p-8 text-center bg-white rounded-2xl border border-[#EDF2F7] space-y-4">
+      <div className="p-8 text-center bg-white rounded-2xl border border-[#F2EAD3] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
         <h2 className="text-base font-bold text-[#0F172A]">
           Không tìm thấy hóa đơn
@@ -395,7 +395,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-b border-[#EDF2F7] py-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-b border-[#F2EAD3] py-6">
               <div>
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Khách hàng
@@ -459,11 +459,11 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             </div>
 
             {invoice.notes && (
-              <div className="border-t border-[#EDF2F7] pt-6 space-y-2">
+              <div className="border-t border-[#F2EAD3] pt-6 space-y-2">
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Ghi chú
                 </span>
-                <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line bg-[#FFFBF0] p-4 rounded-xl border border-[#EDF2F7]">
+                <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line bg-[#FFFBF0] p-4 rounded-xl border border-[#F2EAD3]">
                   {invoice.notes}
                 </p>
               </div>
@@ -472,7 +472,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
 
           {/* Payments Timeline */}
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
                 <CreditCard className="w-4.5 h-4.5 text-[#4F75FF]" />
                 Lịch sử thanh toán ({payments.length})
@@ -484,7 +484,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 Chưa ghi nhận thanh toán nào cho hóa đơn này.
               </p>
             ) : (
-              <div className="divide-y divide-[#EDF2F7]">
+              <div className="divide-y divide-[#F2EAD3]">
                 {payments.map((pay) => (
                   <div
                     key={pay.id}
@@ -534,10 +534,10 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
         <div className="space-y-6">
           {/* Client Visibility Panel */}
           <Card className="p-5 space-y-4">
-            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#EDF2F7] pb-3">
+            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#F2EAD3] pb-3">
               Cổng thông tin Khách hàng
             </h3>
-            <div className="flex items-center justify-between text-xs bg-[#FFFBF0] p-3.5 rounded-xl border border-[#EDF2F7]">
+            <div className="flex items-center justify-between text-xs bg-[#FFFBF0] p-3.5 rounded-xl border border-[#F2EAD3]">
               <div className="flex items-center gap-2">
                 {invoice.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
@@ -647,7 +647,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               />
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"

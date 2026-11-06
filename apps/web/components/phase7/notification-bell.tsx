@@ -173,7 +173,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDF2F7] bg-white text-[#64748B] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#FFFBF0] shadow-2xs"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#F2EAD3] bg-white text-[#64748B] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#FFFBF0] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
@@ -185,8 +185,8 @@ export function NotificationBell() {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#EDF2F7] bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-[#EDF2F7] px-4 py-3 bg-[#FFFBF0]">
+        <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#F2EAD3] bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-[#F2EAD3] px-4 py-3 bg-[#FFFBF0]">
             <div>
               <div className="text-sm font-bold text-[#0F172A]">Thông báo</div>
               <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#64748B]">
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -247,7 +247,7 @@ export function NotificationBell() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="border-b border-[#EDF2F7] px-4 py-3 last:border-b-0 hover:bg-[#FFFBF0] transition-colors"
+                  className="border-b border-[#F2EAD3] px-4 py-3 last:border-b-0 hover:bg-[#FFFBF0] transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <span
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#EDF2F7] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
+                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>
@@ -293,7 +293,7 @@ export function NotificationBell() {
 
           <Link
             href="/app/notifications"
-            className="block border-t border-[#EDF2F7] bg-[#FFFBF0] px-4 py-2.5 text-center text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+            className="block border-t border-[#F2EAD3] bg-[#FFFBF0] px-4 py-2.5 text-center text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
           >
             Xem trung tâm thông báo
           </Link>

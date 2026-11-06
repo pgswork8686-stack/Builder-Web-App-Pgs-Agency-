@@ -54,7 +54,7 @@ export function Dialog({
 
       {/* Modal Dialog Box */}
       <div
-        className={`relative w-full ${maxWidthStyles[maxWidth] || "max-w-2xl"} rounded-3xl bg-white border border-[#EDF2F7] p-6 sm:p-8 text-[#24304A] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 my-auto`}
+        className={`relative w-full ${maxWidthStyles[maxWidth] || "max-w-2xl"} rounded-3xl bg-white border border-[#F2EAD3] p-6 sm:p-8 text-[#24304A] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 my-auto`}
       >
         <button
           type="button"

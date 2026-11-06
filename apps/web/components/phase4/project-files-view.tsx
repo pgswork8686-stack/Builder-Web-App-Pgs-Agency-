@@ -155,7 +155,7 @@ export function FileManager({
   return (
     <section className="space-y-4">
       <div
-        className={`grid gap-3 rounded-2xl border border-[#EDF2F7] bg-white p-4 shadow-xs ${compact ? "" : "md:grid-cols-[1fr_auto]"}`}
+        className={`grid gap-3 rounded-2xl border border-[#F2EAD3] bg-white p-4 shadow-xs ${compact ? "" : "md:grid-cols-[1fr_auto]"}`}
       >
         {!compact && (
           <input
@@ -210,7 +210,7 @@ export function FileManager({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 text-[#64748B]">
+        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 text-[#64748B]">
           Đang tải tệp…
         </div>
       ) : files.length === 0 ? (
@@ -218,9 +218,9 @@ export function FileManager({
           Chưa có tệp nào.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
+        <div className="overflow-x-auto rounded-2xl border border-[#F2EAD3] bg-white shadow-xs">
           <table className="w-full min-w-[760px] text-left text-xs">
-            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#FFFBF0]">
+            <thead className="border-b border-[#F2EAD3] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#FFFBF0]">
               <tr>
                 <th className="p-4">Tệp</th>
                 <th className="p-4">Kích thước</th>
@@ -230,7 +230,7 @@ export function FileManager({
                 <th className="p-4 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EDF2F7] text-[#0F172A]">
+            <tbody className="divide-y divide-[#F2EAD3] text-[#0F172A]">
               {files.map((file) => (
                 <tr
                   key={file.id}

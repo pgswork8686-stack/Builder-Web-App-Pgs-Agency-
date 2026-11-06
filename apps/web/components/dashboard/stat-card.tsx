@@ -31,11 +31,11 @@ export function StatCard({
 }: StatCardProps) {
   const variantStyles = {
     default: {
-      bg: "bg-white border-[#EDF2F7] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
+      bg: "bg-white border-[#F2EAD3] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
       iconBg: "bg-[#EEF2FF] text-[#4F75FF] border-[#E0EAFF]",
       titleColor: "text-[#64748B]",
       valueColor: "text-[#0F172A]",
-      borderColor: "border-[#EDF2F7]",
+      borderColor: "border-[#F2EAD3]",
     },
     blue: {
       bg: "bg-[#EEF2FF] border-[#E0EAFF] shadow-xs",

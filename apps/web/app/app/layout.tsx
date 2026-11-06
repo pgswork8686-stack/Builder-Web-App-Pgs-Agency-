@@ -129,7 +129,7 @@ export default function ProtectedAppLayout({
   if (checking || !account) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FFFBF0] text-[#161827]">
-        <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-center shadow-lg">
+        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-center shadow-lg">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#E7AE18]" />
           <p className="mt-4 text-xs font-medium text-[#64748B]">
             Đang kiểm tra quyền truy cập...

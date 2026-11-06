@@ -81,10 +81,10 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#EEF2FF] text-[#5D87FF] border border-[#5D87FF]/20">
             Tháng hiện tại
           </span>
-          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#7C879D] border border-[#EDF2F7] opacity-60 cursor-not-allowed">
+          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#7C879D] border border-[#F2EAD3] opacity-60 cursor-not-allowed">
             Quý này
           </span>
-          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#7C879D] border border-[#EDF2F7] opacity-60 cursor-not-allowed">
+          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#7C879D] border border-[#F2EAD3] opacity-60 cursor-not-allowed">
             Năm nay
           </span>
         </div>

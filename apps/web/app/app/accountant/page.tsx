@@ -62,7 +62,7 @@ export default function AccountantDashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#F2EAD3] shadow-2xs">
             Tháng 8/2026
           </span>
           <Link href="/app/accountant/finance/invoices">
@@ -110,7 +110,7 @@ export default function AccountantDashboardPage() {
         </div>
 
         {/* Dòng tiền ròng */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Dòng tiền ròng
@@ -126,7 +126,7 @@ export default function AccountantDashboardPage() {
         </div>
 
         {/* Quá hạn */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Công nợ quá hạn
@@ -240,7 +240,7 @@ export default function AccountantDashboardPage() {
       </div>
 
       {/* Full-Width Section: Chấm công & Kiểm tra ngày công */}
-      <div className="rounded-3xl bg-white border border-[#EDF2F7] p-6 shadow-xs space-y-4">
+      <div className="rounded-3xl bg-white border border-[#F2EAD3] p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-lg font-extrabold text-[#24304A] tracking-tight flex items-center gap-2">

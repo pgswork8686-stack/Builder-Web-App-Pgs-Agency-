@@ -152,7 +152,7 @@ function TaskDetailContent({
           </div>
         )}
         {loading && !task ? (
-          <div className="rounded-2xl border border-[#EDF2F7] bg-white p-8 text-[#64748B]">
+          <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#64748B]">
             Đang tải chi tiết công việc…
           </div>
         ) : !task ? (
@@ -161,7 +161,7 @@ function TaskDetailContent({
           </div>
         ) : (
           <>
-            <section className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
+            <section className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-[#4F75FF]">
@@ -207,13 +207,13 @@ function TaskDetailContent({
             </section>
 
             <section className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
+              <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#0F172A] text-sm">Mô tả</h3>
                 <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#64748B]">
                   {task.description || "Chưa có mô tả."}
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
+              <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#0F172A] text-sm">Thời gian</h3>
                 <dl className="mt-3 space-y-3 text-xs">
                   <Info label="Bắt đầu" value={task.start_date} />
@@ -238,7 +238,7 @@ function TaskDetailContent({
               </div>
             </section>
 
-            <section className="space-y-4 rounded-2xl border border-[#EDF2F7] bg-white p-6 shadow-xs">
+            <section className="space-y-4 rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
               <h3 className="font-bold text-[#0F172A] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
                 <p className="text-xs text-[#94A3B8]">Chưa có bình luận.</p>
@@ -247,7 +247,7 @@ function TaskDetailContent({
                   {comments.map((comment) => (
                     <article
                       key={comment.id}
-                      className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4"
+                      className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -390,7 +390,7 @@ function TaskDetailContent({
 
 function Info({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-[#EDF2F7] pb-2">
+    <div className="flex justify-between gap-4 border-b border-[#F2EAD3] pb-2">
       <dt className="text-[#64748B]">{label}</dt>
       <dd className="break-all text-right font-semibold text-[#0F172A]">
         {value || "—"}

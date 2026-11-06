@@ -125,7 +125,7 @@ export default function ClientDashboardPage() {
         </div>
 
         {/* Tiến độ tổng */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Tiến độ tổng
@@ -141,7 +141,7 @@ export default function ClientDashboardPage() {
         </div>
 
         {/* Công nợ còn lại */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Công nợ còn lại
@@ -226,7 +226,7 @@ export default function ClientDashboardPage() {
               />
             </Card>
           ) : (
-            <Card className="divide-y divide-[#EDF2F7]">
+            <Card className="divide-y divide-[#F2EAD3]">
               {projects.map((p) => (
                 <div
                   key={p.id}
@@ -296,7 +296,7 @@ export default function ClientDashboardPage() {
             </Link>
             <Link
               href="/app/client/support"
-              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] text-center block"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] text-center block"
             >
               <span className="text-xs font-bold text-[#24304A]">
                 Gửi Ticket hỗ trợ

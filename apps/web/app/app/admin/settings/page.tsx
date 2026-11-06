@@ -235,7 +235,7 @@ export default function AdminSettingsPage() {
           </Card>
 
           {/* Company Info */}
-          <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
+          <Card className="p-6 space-y-4 border border-[#F2EAD3] shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center">
                 <Globe className="w-5 h-5" />
@@ -259,7 +259,7 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={companyHotline}
                     onChange={(e) => setCompanyHotline(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -283,7 +283,7 @@ export default function AdminSettingsPage() {
                     type="email"
                     value={companyEmail}
                     onChange={(e) => setCompanyEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -296,14 +296,14 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
             </div>
           </Card>
 
           {/* Attendance Policy */}
-          <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
+          <Card className="p-6 space-y-4 border border-[#F2EAD3] shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#A16207] flex items-center justify-center">
                 <Settings className="w-5 h-5" />
@@ -328,7 +328,7 @@ export default function AdminSettingsPage() {
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                   aria-label="Múi giờ chấm công"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workStartTime}
                     onChange={(e) => setWorkStartTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workEndTime}
                     onChange={(e) => setWorkEndTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setLateGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -381,7 +381,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setEarlyLeaveGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -397,7 +397,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setRadiusMeters(e.target.value)}
                     min="1"
                     max="100000"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -411,7 +411,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLatitude(e.target.value)}
                     min="-90"
                     max="90"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -425,7 +425,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLongitude(e.target.value)}
                     min="-180"
                     max="180"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -454,7 +454,7 @@ export default function AdminSettingsPage() {
           </Card>
 
           {/* Security & Rate Limiting */}
-          <Card className="p-6 space-y-4 border border-[#EDF2F7] shadow-sm">
+          <Card className="p-6 space-y-4 border border-[#F2EAD3] shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#E6FBF5] text-[#00B788] flex items-center justify-center">
                 <Shield className="w-5 h-5" />
@@ -480,7 +480,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setSessionTimeout(Number(e.target.value))}
                   min="1"
                   max="168"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -494,7 +494,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setRateLimitRpm(Number(e.target.value))}
                   min="30"
                   max="1000"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#EDF2F7] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
             </div>

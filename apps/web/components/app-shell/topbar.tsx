@@ -53,7 +53,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
   // Center title resolution matching module boundaries
   const getCenterTitle = () => {
     // Dashboards
-    if (pathname === "/app/admin") return "Admin Dashboard";
+    if (pathname === "/app/admin") return "Tổng quan quản trị";
     if (pathname === "/app/team-leader") return "Manager Dashboard";
     if (pathname === "/app/employee") return "Employee Dashboard";
     if (pathname === "/app/accountant") return "Accounting Dashboard";
@@ -116,7 +116,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     roleTitle.split("(")[0].trim();
 
   return (
-    <header className="h-[78px] border-b border-[#EDF2F7] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <header className="h-[78px] border-b border-[#F2EAD3] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
       {/* Left side: Hamburger (mobile/tablet) */}
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -156,7 +156,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#EDF2F7] transition-all cursor-pointer select-none"
+            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#F2EAD3] transition-all cursor-pointer select-none"
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
@@ -176,8 +176,8 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#EDF2F7] p-2 text-[#161827] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="p-3 border-b border-[#EDF2F7]">
+            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#F2EAD3] p-2 text-[#161827] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="p-3 border-b border-[#F2EAD3]">
                 <p className="text-xs font-bold text-[#161827] tracking-tight truncate">
                   {displayName}
                 </p>
@@ -221,7 +221,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 </Link>
               </div>
 
-              <div className="pt-1 border-t border-[#EDF2F7]">
+              <div className="pt-1 border-t border-[#F2EAD3]">
                 <button
                   type="button"
                   onClick={handleLogout}

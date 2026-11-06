@@ -367,7 +367,7 @@ export function ProjectTaskCreateDialog({
           </div>
         )}
 
-        <div className="flex justify-end gap-3 border-t border-[#EDF2F7] pt-4">
+        <div className="flex justify-end gap-3 border-t border-[#F2EAD3] pt-4">
           <Button
             type="button"
             variant="secondary"

@@ -262,7 +262,7 @@ export default function AdminWorkCalendarPage() {
         <form onSubmit={handleSaveSettings} className="space-y-6">
           {/* Card 1: Quy tắc chung */}
           <Card className="p-6 space-y-5">
-            <div className="flex items-center gap-3 border-b border-[#EDF2F7] pb-4">
+            <div className="flex items-center gap-3 border-b border-[#F2EAD3] pb-4">
               <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center font-bold">
                 <CalendarIcon className="w-4 h-4" />
               </div>
@@ -317,7 +317,7 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Thứ 7 cách tuần */}
-            <div className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4 space-y-3">
+            <div className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-[#0F172A]">
@@ -382,7 +382,7 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Hoán đổi lịch nhà nước */}
-            <div className="flex items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4">
+            <div className="flex items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4">
               <div>
                 <h4 className="text-xs font-bold text-[#0F172A]">
                   Tự động áp dụng lịch làm bù / hoán đổi của Nhà nước
@@ -408,7 +408,7 @@ export default function AdminWorkCalendarPage() {
 
           {/* Card 2: Holiday Sync */}
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-4">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-4">
               <div>
                 <h3 className="text-sm font-bold text-[#0F172A]">
                   Tự Động Đồng Bộ Ngày Lễ (Holiday API Sync)
@@ -482,7 +482,7 @@ export default function AdminWorkCalendarPage() {
 
       {/* Card 3: Ngoại lệ lịch làm việc */}
       <Card className="p-6 space-y-4 mt-6">
-        <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-4">
+        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-4">
           <div>
             <h3 className="text-sm font-bold text-[#0F172A]">
               Ngoại Lệ Lịch Làm Việc & Ngày Lễ
@@ -506,7 +506,7 @@ export default function AdminWorkCalendarPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#EDF2F7] text-[#64748B] font-bold bg-[#FFFBF0]">
+              <tr className="border-b border-[#F2EAD3] text-[#64748B] font-bold bg-[#FFFBF0]">
                 <th className="p-3">Ngày</th>
                 <th className="p-3">Tên sự kiện / Ngày lễ</th>
                 <th className="p-3">Loại</th>
@@ -515,7 +515,7 @@ export default function AdminWorkCalendarPage() {
                 <th className="p-3 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EDF2F7]">
+            <tbody className="divide-y divide-[#F2EAD3]">
               {events.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-[#94A3B8]">
@@ -710,7 +710,7 @@ export default function AdminWorkCalendarPage() {
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

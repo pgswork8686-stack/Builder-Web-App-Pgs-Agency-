@@ -252,7 +252,7 @@ export default function AdminClientDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#EDF2F7]">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
           <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
           <span className="text-xs text-[#64748B]">
             Đang tải dữ liệu doanh nghiệp...
@@ -285,7 +285,7 @@ export default function AdminClientDetailPage() {
                 </div>
               </div>
 
-              <div className="space-y-3 text-xs border-t border-[#EDF2F7] pt-4">
+              <div className="space-y-3 text-xs border-t border-[#F2EAD3] pt-4">
                 <div>
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Mã số thuế
@@ -350,7 +350,7 @@ export default function AdminClientDetailPage() {
           {/* Right Column: Portal Accounts Membership Association */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-[#EDF2F7] pb-3">
+              <div className="flex justify-between items-center border-b border-[#F2EAD3] pb-3">
                 <h2 className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
                   <Key className="w-4 h-4 text-[#4F75FF]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
@@ -370,7 +370,7 @@ export default function AdminClientDetailPage() {
                   Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
-                <div className="divide-y divide-[#EDF2F7]">
+                <div className="divide-y divide-[#F2EAD3]">
                   {memberships.map((m) => (
                     <div
                       key={m.id}
@@ -494,7 +494,7 @@ export default function AdminClientDetailPage() {
               </label>
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -551,7 +551,7 @@ export default function AdminClientDetailPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+                className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
                 <option value="active">Đang hoạt động (Active)</option>
                 <option value="inactive">Tạm dừng (Inactive)</option>
@@ -601,14 +601,14 @@ export default function AdminClientDetailPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#F6F8FC] border border-[#EDF2F7] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EDF2F7]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

@@ -157,7 +157,7 @@ export default function ClientInvoicesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
+              <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#F2EAD3]">
                 <span>
                   Hiển thị{" "}
                   <span className="font-bold text-[#0F172A]">

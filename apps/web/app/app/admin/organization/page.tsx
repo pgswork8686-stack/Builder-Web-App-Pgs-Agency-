@@ -22,7 +22,7 @@ export default function AdminOrganizationDashboard() {
       icon: Building2,
       href: "/app/admin/departments",
       color: "bg-[#EEF2FF] text-[#4F75FF]",
-      border: "border-[#EDF2F7]",
+      border: "border-[#F2EAD3]",
     },
     {
       title: "Đội nhóm",
@@ -30,7 +30,7 @@ export default function AdminOrganizationDashboard() {
       icon: Users2,
       href: "/app/admin/teams",
       color: "bg-[#F3E8FF] text-[#9333EA]",
-      border: "border-[#EDF2F7]",
+      border: "border-[#F2EAD3]",
     },
     {
       title: "Nhân sự",
@@ -38,7 +38,7 @@ export default function AdminOrganizationDashboard() {
       icon: UserSquare2,
       href: "/app/admin/people",
       color: "bg-[#E6FBF5] text-[#059669]",
-      border: "border-[#EDF2F7]",
+      border: "border-[#F2EAD3]",
     },
     {
       title: "Khách hàng",
@@ -46,7 +46,7 @@ export default function AdminOrganizationDashboard() {
       icon: Briefcase,
       href: "/app/admin/clients",
       color: "bg-[#FEF9C3] text-[#CA8A04]",
-      border: "border-[#EDF2F7]",
+      border: "border-[#F2EAD3]",
     },
   ];
 
@@ -92,7 +92,7 @@ export default function AdminOrganizationDashboard() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#EDF2F7] flex items-center justify-between text-xs font-bold text-[#4F75FF] group-hover:translate-x-0.5 transition-transform">
+                <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-between text-xs font-bold text-[#4F75FF] group-hover:translate-x-0.5 transition-transform">
                   <span>Truy cập quản lý</span>
                   <ChevronRight className="w-4 h-4" />
                 </div>

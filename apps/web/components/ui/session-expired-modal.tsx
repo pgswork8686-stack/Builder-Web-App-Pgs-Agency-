@@ -39,7 +39,7 @@ export function SessionExpiredModal({
           </p>
         </div>
 
-        <div className="w-full pt-3 border-t border-[#EDF2F7]">
+        <div className="w-full pt-3 border-t border-[#F2EAD3]">
           <Button
             type="button"
             variant="primary"

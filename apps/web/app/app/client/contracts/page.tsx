@@ -135,7 +135,7 @@ export default function ClientContractsPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-[#EDF2F7] pt-4 flex justify-between items-end">
+                <div className="border-t border-[#F2EAD3] pt-4 flex justify-between items-end">
                   <div>
                     <span className="text-[10px] font-bold text-[#64748B] uppercase block">
                       Giá trị hợp đồng
@@ -151,7 +151,7 @@ export default function ClientContractsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#EDF2F7]">
+            <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#F2EAD3]">
               <span>
                 Hiển thị{" "}
                 <span className="font-bold text-[#0F172A]">

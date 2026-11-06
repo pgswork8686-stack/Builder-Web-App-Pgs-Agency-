@@ -102,7 +102,7 @@ export default function TeamLeaderDashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#EDF2F7] shadow-2xs">
+          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#F2EAD3] shadow-2xs">
             Tuần này
           </span>
           <Link href="/app/team-leader/projects">
@@ -142,7 +142,7 @@ export default function TeamLeaderDashboardPage() {
                 className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-2xs ${
                   checkedInToday
                     ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
-                    : "bg-white border-[#EDF2F7] text-[#7C879D]"
+                    : "bg-white border-[#F2EAD3] text-[#7C879D]"
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function TeamLeaderDashboardPage() {
         </div>
 
         {/* Team Performance Metric */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Hiệu suất nhóm
@@ -176,7 +176,7 @@ export default function TeamLeaderDashboardPage() {
         </div>
 
         {/* Overdue Tasks Metric */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Task quá hạn
@@ -294,7 +294,7 @@ export default function TeamLeaderDashboardPage() {
               />
             </Card>
           ) : (
-            <Card className="divide-y divide-[#EDF2F7]">
+            <Card className="divide-y divide-[#F2EAD3]">
               {projects.slice(0, 3).map((p) => (
                 <div
                   key={p.id}

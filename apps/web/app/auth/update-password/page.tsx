@@ -69,7 +69,7 @@ export default function UpdatePasswordPage() {
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
-      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#EDF2F7]">
+      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#F2EAD3]">
         <div className="w-full max-w-md space-y-8">
           <div>
             <Link

@@ -100,7 +100,7 @@ export default function FinanceDashboard({
 
   if (error) {
     return (
-      <div className="p-8 text-center rounded-2xl bg-white border border-[#EDF2F7] shadow-xs space-y-3">
+      <div className="p-8 text-center rounded-2xl bg-white border border-[#F2EAD3] shadow-xs space-y-3">
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
         <p className="text-xs text-[#64748B]">{error}</p>
         <Button variant="secondary" size="sm" onClick={loadData}>
@@ -234,7 +234,7 @@ export default function FinanceDashboard({
 
       {/* Audit Log Timeline Card */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
           <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
             <History className="w-4 h-4 text-[#4F75FF]" />
             Nhật ký thay đổi tài chính
@@ -246,7 +246,7 @@ export default function FinanceDashboard({
             Chưa có nhật ký hoạt động nào được ghi nhận.
           </p>
         ) : (
-          <div className="divide-y divide-[#EDF2F7]">
+          <div className="divide-y divide-[#F2EAD3]">
             {auditLogs.map((log) => (
               <div
                 key={log.id}

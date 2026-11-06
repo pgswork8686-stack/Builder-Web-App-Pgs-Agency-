@@ -847,7 +847,7 @@ export function ServiceCatalogView() {
               </label>
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -938,7 +938,7 @@ export function ServiceCatalogView() {
               />
             </div>
 
-            <div className="border-t border-[#EDF2F7] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -1210,7 +1210,7 @@ export function ServiceCatalogView() {
                 </div>
               </div>
 
-              <div className="border-t border-[#EDF2F7] pt-4 flex justify-end gap-3">
+              <div className="border-t border-[#F2EAD3] pt-4 flex justify-end gap-3">
                 <Button
                   type="button"
                   variant="secondary"
@@ -1433,7 +1433,7 @@ export function ServiceCatalogView() {
               </div>
             )}
 
-            <div className="border-t border-[#EDF2F7] pt-3 flex justify-end">
+            <div className="border-t border-[#F2EAD3] pt-3 flex justify-end">
               <Button
                 variant="secondary"
                 size="sm"

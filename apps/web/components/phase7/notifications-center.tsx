@@ -251,7 +251,7 @@ export function NotificationsCenter() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Card className="p-6 space-y-4">
-          <div className="flex flex-col gap-3 border-b border-[#EDF2F7] pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-[#F2EAD3] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
                 <Bell className="h-5 w-5" />
@@ -298,7 +298,7 @@ export function NotificationsCenter() {
               description="Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại đây."
             />
           ) : (
-            <div className="divide-y divide-[#EDF2F7]">
+            <div className="divide-y divide-[#F2EAD3]">
               {items.map((item) => (
                 <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                   <div className="flex items-start gap-3.5">
@@ -367,7 +367,7 @@ export function NotificationsCenter() {
             </div>
           )}
 
-          <div className="flex items-center justify-between border-t border-[#EDF2F7] pt-4">
+          <div className="flex items-center justify-between border-t border-[#F2EAD3] pt-4">
             <Button
               variant="outline"
               size="sm"
@@ -443,7 +443,7 @@ export function NotificationsCenter() {
                 type="button"
                 disabled={!preferences || saving === "preferences"}
                 onClick={toggleInApp}
-                className="flex w-full items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
+                className="flex w-full items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
                   <span className="block text-xs font-bold text-[#0F172A]">
@@ -465,7 +465,7 @@ export function NotificationsCenter() {
                 type="button"
                 disabled={!preferences || saving === "preferences"}
                 onClick={toggleEmail}
-                className="flex w-full items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
+                className="flex w-full items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
                   <span className="block text-xs font-bold text-[#0F172A]">
@@ -492,13 +492,13 @@ export function NotificationsCenter() {
             <div className="grid gap-2">
               <Link
                 href="/app/chat"
-                className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
               >
                 Mở chat nội bộ / project
               </Link>
               <Link
                 href="/app/projects"
-                className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
               >
                 Xem workspace dự án
               </Link>
@@ -531,7 +531,7 @@ export function NotificationsCenter() {
               placeholder="VD: Thông báo nghỉ lễ Quốc Khánh / Họp toàn thể công ty"
               value={broadcastTitle}
               onChange={(e) => setBroadcastTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -543,7 +543,7 @@ export function NotificationsCenter() {
               <select
                 value={broadcastType}
                 onChange={(e) => setBroadcastType(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="announcement">
                   Thông báo chung (Announcement)
@@ -565,7 +565,7 @@ export function NotificationsCenter() {
                 placeholder="VD: /app/admin/documents hoặc /app/calendar"
                 value={broadcastActionUrl}
                 onChange={(e) => setBroadcastActionUrl(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               />
             </div>
           </div>
@@ -580,11 +580,11 @@ export function NotificationsCenter() {
               placeholder="Nhập nội dung thông báo gửi đến toàn thể nhân viên..."
               value={broadcastMessage}
               onChange={(e) => setBroadcastMessage(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#EDF2F7]">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="outline"

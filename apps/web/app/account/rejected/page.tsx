@@ -37,7 +37,7 @@ export default function AccountRejectedPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#0F172A] p-6 relative">
-      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#EDF2F7]">
+      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#F2EAD3]">
         {/* Status Icon Header */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
           <XCircle className="w-8 h-8" />

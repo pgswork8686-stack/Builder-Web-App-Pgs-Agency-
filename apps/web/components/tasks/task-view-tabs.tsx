@@ -67,7 +67,7 @@ export function TaskViewTabs({
   return (
     <nav
       aria-label="Chế độ xem công việc"
-      className={`inline-flex items-center gap-1 p-1 bg-white border border-[#EDF2F7] rounded-xl shadow-2xs overflow-x-auto scrollbar-none max-w-full ${className}`}
+      className={`inline-flex items-center gap-1 p-1 bg-white border border-[#F2EAD3] rounded-xl shadow-2xs overflow-x-auto scrollbar-none max-w-full ${className}`}
     >
       {tabs.map((tab) => {
         const isActive = active === tab.key;

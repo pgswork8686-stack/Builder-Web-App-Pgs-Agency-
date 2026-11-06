@@ -163,7 +163,7 @@ export default function EmployeeDashboardPage() {
         </div>
 
         {/* Chấm công Card */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">Chấm công</span>
             <div className="text-2xl font-black text-[#24304A] mt-2">
@@ -177,7 +177,7 @@ export default function EmployeeDashboardPage() {
         </div>
 
         {/* Ngày phép còn Card */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#EDF2F7] p-6 flex flex-col justify-between shadow-xs">
+        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <span className="text-xs font-bold text-[#7C879D]">
               Ngày phép còn
@@ -293,7 +293,7 @@ export default function EmployeeDashboardPage() {
             </Link>
             <Link
               href="/app/employee/reports"
-              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#EDF2F7] hover:bg-[#EEF2FF] transition-all text-center block"
+              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] hover:bg-[#EEF2FF] transition-all text-center block"
             >
               <span className="text-xs font-bold text-[#24304A]">
                 Gửi báo cáo ngày

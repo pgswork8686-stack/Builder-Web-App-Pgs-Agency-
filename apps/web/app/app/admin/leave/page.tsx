@@ -181,7 +181,7 @@ export default function AdminLeavePage() {
       </div>
 
       {/* Filter Tabs Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDF2F7] shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-[#4F75FF]" />
           <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
@@ -220,7 +220,7 @@ export default function AdminLeavePage() {
         {/* Main List */}
         <div className="lg:col-span-8 space-y-4">
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <h3 className="text-base font-extrabold text-[#0F172A]">
                 Đơn cần duyệt ({total})
               </h3>
@@ -320,7 +320,7 @@ export default function AdminLeavePage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-[#EDF2F7] text-xs text-[#64748B]">
+              <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
                 <span>Tổng số {total} đơn</span>
                 <div className="flex gap-2">
                   <Button
@@ -348,7 +348,7 @@ export default function AdminLeavePage() {
         {/* Right Calendar Column */}
         <div className="lg:col-span-4 space-y-4">
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDF2F7] pb-3">
+            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#4F75FF]" />
                 Lịch nghỉ phép được duyệt
@@ -369,7 +369,7 @@ export default function AdminLeavePage() {
                 calendarEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#EDF2F7] text-xs space-y-1"
+                    className="p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs space-y-1"
                   >
                     <div className="font-bold text-[#0F172A]">
                       {evt.fullName}
