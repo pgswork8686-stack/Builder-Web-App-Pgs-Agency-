@@ -381,7 +381,7 @@ export default function AccountantPayrollPage() {
                   {runs.map((r) => (
                     <tr
                       key={r.id}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors"
+                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
                     >
                       <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
                         {r.run_code || "BL"}
@@ -493,7 +493,7 @@ export default function AccountantPayrollPage() {
                   {compensations.map((emp) => (
                     <tr
                       key={emp.userId}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
                       <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
                         {emp.employeeCode || emp.accountCode || "NV"}
@@ -621,7 +621,7 @@ export default function AccountantPayrollPage() {
                   return (
                     <tr
                       key={emp.userId}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
                       <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
                         {emp.employeeCode || emp.accountCode || "NV"}
@@ -739,7 +739,7 @@ export default function AccountantPayrollPage() {
                   {selectedRun.payslips?.map((ps) => (
                     <tr
                       key={ps.id}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
                       <td className="px-3 py-2.5 font-mono text-[#5D87FF]">
                         {ps.payslip_code || "PL"}

@@ -376,7 +376,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider block">
                   Điều khoản & Ghi chú
                 </span>
-                <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7] whitespace-pre-wrap">
+                <p className="text-xs text-[#64748B] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#EDF2F7] whitespace-pre-wrap">
                   {contract.notes}
                 </p>
               </div>
@@ -391,7 +391,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
               Hiển thị với khách hàng
             </h4>
-            <div className="flex items-center justify-between bg-[#F8FAFC] p-3.5 rounded-xl border border-[#EDF2F7]">
+            <div className="flex items-center justify-between bg-[#FFFBF0] p-3.5 rounded-xl border border-[#EDF2F7]">
               <div className="flex items-center gap-2">
                 {contract.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
@@ -438,7 +438,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 {invoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3 rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] flex items-center justify-between gap-3 text-xs"
+                    className="p-3 rounded-xl bg-[#FFFBF0] border border-[#EDF2F7] flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="space-y-0.5">
                       <p className="font-bold text-[#0F172A] font-mono">

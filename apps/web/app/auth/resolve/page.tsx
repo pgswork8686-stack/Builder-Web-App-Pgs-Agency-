@@ -76,7 +76,7 @@ export default function AuthResolvePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] text-[#0F172A] p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFFBF0] text-[#0F172A] p-6">
       <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#EDF2F7]">
         {errorMsg ? (
           <>

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] text-[#161827] p-6 font-sans">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFFBF0] text-[#161827] p-6 font-sans">
       <Card className="flex flex-col items-center max-w-lg p-10 bg-white border-[#EDF2F7] rounded-3xl shadow-xl text-center space-y-6">
         <div className="relative w-16 h-16 rounded-2xl bg-[#161827] p-2 flex items-center justify-center shadow-md">
           <Image

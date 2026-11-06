@@ -583,7 +583,7 @@ export function ChatWorkspace() {
                 value={conversationSearch}
                 onChange={(e) => setConversationSearch(e.target.value)}
                 placeholder="Tìm cuộc trò chuyện..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
               />
             </div>
 
@@ -623,7 +623,7 @@ export function ChatWorkspace() {
                     className={`w-full rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${
                       selected?.id === conversation.id
                         ? "border-[#4F75FF] bg-[#EEF2FF]"
-                        : "border-[#EDF2F7] bg-white hover:bg-[#F8FAFC]"
+                        : "border-[#EDF2F7] bg-white hover:bg-[#FFFBF0]"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -691,7 +691,7 @@ export function ChatWorkspace() {
                   setPeerUserId(val);
                   if (val) void createDirect(val);
                 }}
-                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
               >
                 <option value="">-- Chọn nhân sự / khách hàng --</option>
                 {contacts.map((user) => (
@@ -749,7 +749,7 @@ export function ChatWorkspace() {
                   setProjectId(val);
                   if (val) void openProjectChat(val);
                 }}
-                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
               >
                 <option value="">-- Chọn dự án --</option>
                 {projectsList.map((proj) => (
@@ -926,7 +926,7 @@ export function ChatWorkspace() {
           </div>
 
           <form
-            className="border-t border-[#EDF2F7] p-4 bg-[#F8FAFC]"
+            className="border-t border-[#EDF2F7] p-4 bg-[#FFFBF0]"
             onSubmit={(event) => {
               event.preventDefault();
               void sendMessage();
@@ -1017,13 +1017,13 @@ export function ChatWorkspace() {
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     placeholder="Tìm kiếm theo tên, email, chức danh..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                   />
                 </div>
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
+                  className="px-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] cursor-pointer"
                 >
                   <option value="all">Tất cả vai trò</option>
                   <option value="admin">Admin</option>
@@ -1103,7 +1103,7 @@ export function ChatWorkspace() {
                   value={projectSearchQuery}
                   onChange={(e) => setProjectSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm dự án theo tên hoặc mã..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                 />
               </div>
 
@@ -1125,7 +1125,7 @@ export function ChatWorkspace() {
                         className="rounded-2xl border border-[#EDF2F7] bg-white overflow-hidden shadow-xs transition-all hover:border-[#4F75FF]/30"
                       >
                         {/* Project Header Bar */}
-                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8FAFC]/50">
+                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFBF0]/50">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center shrink-0">
                               <FolderOpen className="w-5 h-5" />
@@ -1225,7 +1225,7 @@ export function ChatWorkspace() {
                                           void createDirect(profile.id);
                                         }
                                       }}
-                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
+                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#4F75FF]/40 cursor-pointer transition-all group"
                                     >
                                       <div className="flex items-center gap-2.5 min-w-0">
                                         <Avatar
@@ -1326,7 +1326,7 @@ export function ChatWorkspace() {
                 return (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#F8FAFC] transition-all"
+                    className="flex items-center justify-between p-3 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#FFFBF0] transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <Avatar

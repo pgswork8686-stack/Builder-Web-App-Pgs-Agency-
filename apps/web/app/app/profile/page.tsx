@@ -338,7 +338,7 @@ export default function UserProfilePage() {
                     {orgContext.companies.map((comp) => (
                       <div
                         key={comp.id}
-                        className="bg-[#F8FAFC] border border-[#EDF2F7] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="bg-[#FFFBF0] border border-[#EDF2F7] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
                           <div className="flex items-center gap-2">
@@ -387,7 +387,7 @@ export default function UserProfilePage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Mã nhân sự
                       </span>
@@ -396,7 +396,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Chức danh công việc
                       </span>
@@ -405,7 +405,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Phòng ban trực thuộc
                       </span>
@@ -415,7 +415,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Đội nhóm trực thuộc
                       </span>
@@ -425,7 +425,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Người quản lý trực tiếp
                       </span>
@@ -443,7 +443,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] border border-[#EDF2F7] p-3.5 rounded-xl">
+                    <div className="bg-[#FFFBF0] border border-[#EDF2F7] p-3.5 rounded-xl">
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Trạng thái làm việc
                       </span>
@@ -501,7 +501,7 @@ export default function UserProfilePage() {
           />
 
           {/* Avatar Preview & Upload Options */}
-          <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] space-y-3">
+          <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#EDF2F7] space-y-3">
             <div className="flex items-center gap-4">
               <div className="relative group shrink-0">
                 <Avatar
@@ -585,7 +585,7 @@ export default function UserProfilePage() {
               value={editFullName}
               onChange={(e) => setEditFullName(e.target.value)}
               placeholder="Nhập họ và tên đầy đủ..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -598,7 +598,7 @@ export default function UserProfilePage() {
               value={editPhone}
               onChange={(e) => setEditPhone(e.target.value)}
               placeholder="0988xxxxxx"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 

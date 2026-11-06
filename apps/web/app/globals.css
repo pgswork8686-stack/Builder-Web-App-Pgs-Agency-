@@ -2,11 +2,11 @@
 
 @layer base {
   :root {
-    --pgs-bg: #f8fafc;
+    --pgs-bg: #FFFBF0;
     --pgs-surface: #ffffff;
     --pgs-card: #ffffff;
     --pgs-card-border: #edf2f7;
-    --pgs-border-subtle: #f1f5f9;
+    --pgs-border-subtle: #F2EAD3;
 
     /* PGS Brand Identity - Navy & Gold */
     --pgs-navy: #161827;

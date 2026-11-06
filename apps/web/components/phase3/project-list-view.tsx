@@ -191,14 +191,14 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             placeholder="Tìm mã hoặc tên dự án..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
-          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi trạng thái --</option>
           {Object.entries(statusConfig).map(([key, value]) => (
@@ -211,7 +211,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
-          className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi mức ưu tiên --</option>
           {Object.entries(priorityConfig).map(([key, value]) => (

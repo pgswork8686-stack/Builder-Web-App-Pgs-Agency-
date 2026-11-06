@@ -338,7 +338,7 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) => setEmployeeCode(e.target.value)}
                         disabled={!!person.employeeProfile}
                         placeholder="Ví dụ: PGS0102"
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
                       />
                     </div>
 
@@ -351,7 +351,7 @@ export default function AdminPersonDetailPage() {
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
                         placeholder="Ví dụ: Chuyên viên SEO"
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       />
                     </div>
                   </div>
@@ -367,7 +367,7 @@ export default function AdminPersonDetailPage() {
                           setDepartmentId(e.target.value);
                           setTeamId("");
                         }}
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="">-- Chưa phân bổ phòng ban --</option>
                         {departments.map((d) => (
@@ -385,7 +385,7 @@ export default function AdminPersonDetailPage() {
                       <select
                         value={teamId}
                         onChange={(e) => setTeamId(e.target.value)}
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="">-- Chưa phân bổ đội nhóm --</option>
                         {availableTeams.map((t) => (
@@ -404,7 +404,7 @@ export default function AdminPersonDetailPage() {
                     <select
                       value={reportsToUserId}
                       onChange={(e) => setReportsToUserId(e.target.value)}
-                      className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                      className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                     >
                       <option value="">-- Không có người quản lý --</option>
                       {managers.map((m) => (
@@ -425,7 +425,7 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) =>
                           setEmploymentStatus(e.target.value as any)
                         }
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       >
                         <option value="probation">Thử việc (probation)</option>
                         <option value="active">Chính thức (active)</option>
@@ -444,7 +444,7 @@ export default function AdminPersonDetailPage() {
                         type="date"
                         value={joinedDate}
                         onChange={(e) => setJoinedDate(e.target.value)}
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                       />
                     </div>
 
@@ -457,7 +457,7 @@ export default function AdminPersonDetailPage() {
                         value={leftDate}
                         onChange={(e) => setLeftDate(e.target.value)}
                         disabled={employmentStatus !== "terminated"}
-                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
+                        className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:bg-[#F1F5F9] disabled:text-[#94A3B8]"
                       />
                     </div>
                   </div>

@@ -29,7 +29,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             id={selectId}
             ref={ref}
-            className={`w-full appearance-none rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-sm outline-none transition-all duration-150 focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed pl-4 pr-10 py-2.5 sm:py-3 ${
+            className={`w-full appearance-none rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-sm outline-none transition-all duration-150 focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed pl-4 pr-10 py-2.5 sm:py-3 ${
               error
                 ? "border-[#FF785A] focus:border-[#FF785A] focus:ring-[#FF785A]/20"
                 : ""

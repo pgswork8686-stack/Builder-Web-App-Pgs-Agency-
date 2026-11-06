@@ -206,7 +206,7 @@ export default function AdminLeavePage() {
               className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === item.id
                   ? "bg-[#4F75FF] text-white shadow-xs"
-                  : "bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
+                  : "bg-[#FFFBF0] text-[#64748B] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
               }`}
             >
               {item.label}
@@ -369,7 +369,7 @@ export default function AdminLeavePage() {
                 calendarEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#EDF2F7] text-xs space-y-1"
+                    className="p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#EDF2F7] text-xs space-y-1"
                   >
                     <div className="font-bold text-[#0F172A]">
                       {evt.fullName}
@@ -398,7 +398,7 @@ export default function AdminLeavePage() {
           description={`Nhân sự: ${selectedRequest.employee?.fullName || selectedRequest.employee?.email}`}
         >
           <div className="space-y-4 pt-2">
-            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-2">
+            <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#64748B]">Thời gian:</span>
                 <span className="font-bold text-[#0F172A]">
@@ -435,7 +435,7 @@ export default function AdminLeavePage() {
                 onChange={(e) => setReviewNote(e.target.value)}
                 placeholder="Nhập phản hồi nếu có..."
                 rows={3}
-                className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
               />
             </div>
 

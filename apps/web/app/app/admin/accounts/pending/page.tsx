@@ -197,7 +197,7 @@ export default function AdminPendingAccountsPage() {
             placeholder="Tìm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
           />
         </div>
 
@@ -288,7 +288,7 @@ export default function AdminPendingAccountsPage() {
                         onChange={(e) =>
                           handleRoleChange(user.id, e.target.value)
                         }
-                        className="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                        className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
                       >
                         <option value="">-- Chọn vai trò --</option>
                         {ROLE_OPTIONS.map((opt) => (
@@ -350,7 +350,7 @@ export default function AdminPendingAccountsPage() {
               placeholder="VD: Không thuộc danh sách nhân sự chính thức của doanh nghiệp..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
             />
           </div>
 

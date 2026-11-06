@@ -329,7 +329,7 @@ export function AutomationWorkspace() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Ví dụ: Nhắc nhở khi giao task mới"
-                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
@@ -342,7 +342,7 @@ export function AutomationWorkspace() {
                   onChange={(event) =>
                     setTriggerType(event.target.value as AutomationTrigger)
                   }
-                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 >
                   {automationTriggers.map((trigger) => (
                     <option key={trigger} value={trigger}>
@@ -359,7 +359,7 @@ export function AutomationWorkspace() {
                 <textarea
                   value={conditionsText}
                   onChange={(event) => setConditionsText(event.target.value)}
-                  className="mt-1 min-h-20 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 min-h-20 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
                 <span className="mt-0.5 block text-[10px] text-[#94A3B8]">
                   So khớp payload key/value an toàn.
@@ -375,7 +375,7 @@ export function AutomationWorkspace() {
                   onChange={(event) =>
                     setRecipientMode(event.target.value as RecipientMode)
                   }
-                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 >
                   {recipientModes.map((mode) => (
                     <option key={mode.value} value={mode.value}>
@@ -393,7 +393,7 @@ export function AutomationWorkspace() {
                   value={actionTitle}
                   onChange={(event) => setActionTitle(event.target.value)}
                   placeholder="Để trống sẽ dùng tên mặc định"
-                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
@@ -405,7 +405,7 @@ export function AutomationWorkspace() {
                   value={actionMessage}
                   onChange={(event) => setActionMessage(event.target.value)}
                   placeholder="Để trống sẽ dùng nội dung event mặc định"
-                  className="mt-1 min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
@@ -417,7 +417,7 @@ export function AutomationWorkspace() {
                   value={actionUrl}
                   onChange={(event) => setActionUrl(event.target.value)}
                   placeholder="/app/tasks hoặc /app/chat"
-                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </label>
 
@@ -459,12 +459,12 @@ export function AutomationWorkspace() {
                 value={manualEventKey}
                 onChange={(event) => setManualEventKey(event.target.value)}
                 placeholder="Nhập Event Key (>= 8 ký tự)..."
-                className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
               <textarea
                 value={manualPayloadText}
                 onChange={(event) => setManualPayloadText(event.target.value)}
-                className="min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="min-h-16 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 font-mono text-[11px] text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
               <Button
                 variant="outline"
@@ -566,7 +566,7 @@ export function AutomationWorkspace() {
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
                           </Badge>
                         </div>
-                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-[11px] font-mono text-[#64748B]">
+                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] p-3 text-[11px] font-mono text-[#64748B]">
                           {JSON.stringify(
                             {
                               conditions: rule.conditions,

@@ -351,7 +351,7 @@ export default function EmployeeLeavePage() {
               placeholder="VD: Nghỉ phép thường niên cùng gia đình, giải quyết việc cá nhân..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
             />
           </div>
 

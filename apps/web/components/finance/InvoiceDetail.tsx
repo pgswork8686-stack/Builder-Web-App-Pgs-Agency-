@@ -463,7 +463,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Ghi chú
                 </span>
-                <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line bg-[#F8FAFC] p-4 rounded-xl border border-[#EDF2F7]">
+                <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line bg-[#FFFBF0] p-4 rounded-xl border border-[#EDF2F7]">
                   {invoice.notes}
                 </p>
               </div>
@@ -537,7 +537,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
             <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#EDF2F7] pb-3">
               Cổng thông tin Khách hàng
             </h3>
-            <div className="flex items-center justify-between text-xs bg-[#F8FAFC] p-3.5 rounded-xl border border-[#EDF2F7]">
+            <div className="flex items-center justify-between text-xs bg-[#FFFBF0] p-3.5 rounded-xl border border-[#EDF2F7]">
               <div className="flex items-center gap-2">
                 {invoice.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
@@ -586,7 +586,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                   placeholder="VD: 5000000"
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full pl-12 pr-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs font-bold outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="w-full pl-12 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs font-bold outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </div>
             </div>
@@ -600,7 +600,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 required
                 value={payDate}
                 onChange={(e) => setPayDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -611,7 +611,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               <select
                 value={payMethod}
                 onChange={(e) => setPayMethod(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="Chuyển khoản ngân hàng">
                   Chuyển khoản ngân hàng
@@ -630,7 +630,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 placeholder="Mã giao dịch ngân hàng, mã bill..."
                 value={payReference}
                 onChange={(e) => setPayReference(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -643,7 +643,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 placeholder="Ghi chú thêm về giao dịch..."
                 value={payNotes}
                 onChange={(e) => setPayNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 

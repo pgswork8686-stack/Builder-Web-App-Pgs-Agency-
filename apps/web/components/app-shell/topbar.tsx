@@ -156,7 +156,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#F8FAFC] border border-transparent hover:border-[#EDF2F7] transition-all cursor-pointer select-none"
+            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#EDF2F7] transition-all cursor-pointer select-none"
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >

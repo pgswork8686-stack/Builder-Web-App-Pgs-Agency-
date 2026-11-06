@@ -304,7 +304,7 @@ export default function AccountantProjectExpensesPage() {
                 {expenses.map((exp) => (
                   <tr
                     key={exp.id}
-                    className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors"
+                    className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
                     <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
                       {exp.expense_code || "CP"}

@@ -505,14 +505,14 @@ export function ServiceCatalogView() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Tìm kiếm dịch vụ theo tên, mã..."
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none focus:border-[#4F75FF] focus:bg-white"
+                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none focus:border-[#4F75FF] focus:bg-white"
                 />
               </div>
 
               <select
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="py-1.5 px-3 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
               >
                 <option value="">Tất cả nhóm dịch vụ</option>
                 {categories.map((cat) => (
@@ -525,7 +525,7 @@ export function ServiceCatalogView() {
               <select
                 value={activeFilter}
                 onChange={(e) => setActiveFilter(e.target.value as any)}
-                className="py-1.5 px-3 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
               >
                 <option value="">Tất cả trạng thái</option>
                 <option value="true">Đang hoạt động</option>
@@ -770,7 +770,7 @@ export function ServiceCatalogView() {
                   setServiceForm({ ...serviceForm, name: e.target.value })
                 }
                 placeholder="VD: Thiết kế Website, Google Ads..."
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -783,7 +783,7 @@ export function ServiceCatalogView() {
                 onChange={(e) =>
                   setServiceForm({ ...serviceForm, categoryId: e.target.value })
                 }
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chọn nhóm dịch vụ --</option>
                 {categories.map((c) => (
@@ -808,7 +808,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="VD: WEB_DESIGN (Hệ thống tự sinh DV_XX)"
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -826,7 +826,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="Mô tả phạm vi, quy cách cung cấp dịch vụ..."
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -900,7 +900,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="VD: WEBSITE_SEO, PERFORMANCE..."
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
               />
             </div>
 
@@ -916,7 +916,7 @@ export function ServiceCatalogView() {
                   setCategoryForm({ ...categoryForm, name: e.target.value })
                 }
                 placeholder="VD: Website & SEO"
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -934,7 +934,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="Mô tả phạm vi nhóm dịch vụ..."
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -1017,7 +1017,7 @@ export function ServiceCatalogView() {
                         collaboratorTeamIds: nextCollaboratorTeamIds,
                       });
                     }}
-                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   >
                     <option value="">-- Chọn phòng chủ quản --</option>
                     {departments.map((department) => (
@@ -1051,7 +1051,7 @@ export function ServiceCatalogView() {
                       });
                     }}
                     disabled={!responsibilityForm.ownerDepartmentId}
-                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+                    className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
                   >
                     <option value="">-- Chưa gán Team chủ quản --</option>
                     {teams
@@ -1077,7 +1077,7 @@ export function ServiceCatalogView() {
                     Phòng ban phối hợp
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
                   {departments
                     .filter(
                       (department) =>
@@ -1141,7 +1141,7 @@ export function ServiceCatalogView() {
                     Team phối hợp
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
                   {teams.filter((team) => {
                     const departmentId =
                       team.departmentId ?? team.department_id;
@@ -1266,7 +1266,7 @@ export function ServiceCatalogView() {
 
             {/* Inline Add / Edit Form */}
             {showItemForm && (
-              <Card className="p-4 bg-[#F8FAFC] border border-[#CBD5E1]">
+              <Card className="p-4 bg-[#FFFBF0] border border-[#CBD5E1]">
                 <form onSubmit={handleSaveItem} className="space-y-3">
                   <div className="font-semibold text-xs text-[#0F172A]">
                     {editingItemId
@@ -1364,7 +1364,7 @@ export function ServiceCatalogView() {
                 Đang tải hạng mục...
               </div>
             ) : deliveryItems.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[#64748B] bg-[#F8FAFC] rounded-xl border border-dashed border-[#CBD5E1]">
+              <div className="py-8 text-center text-xs text-[#64748B] bg-[#FFFBF0] rounded-xl border border-dashed border-[#CBD5E1]">
                 Chưa có hạng mục mẫu nào cho dịch vụ này.
               </div>
             ) : (

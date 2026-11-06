@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8FAFC] text-[#0F172A]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#0F172A]">
       {/* Video Hero Left Panel (~52%) */}
       <AuthHero />
 
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pgsagency.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
                 />
               </div>
             </div>

@@ -338,7 +338,7 @@ export default function ClientSupportPage() {
                     className={`p-3 rounded-xl border transition-all cursor-pointer ${
                       selectedTicket?.id === t.id
                         ? "border-[#5D87FF] bg-[#ECF2FF]/40"
-                        : "border-[#EAEFF4] dark:border-[#334155] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50"
+                        : "border-[#EAEFF4] dark:border-[#334155] hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -367,7 +367,7 @@ export default function ClientSupportPage() {
           </Card>
 
           {/* Contact Box */}
-          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#F8FAFC] dark:bg-[#0F172A]">
+          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#FFFBF0] dark:bg-[#0F172A]">
             <h4 className="text-xs font-bold text-[#7C879D] uppercase tracking-wider">
               Kênh liên hệ khẩn cấp
             </h4>

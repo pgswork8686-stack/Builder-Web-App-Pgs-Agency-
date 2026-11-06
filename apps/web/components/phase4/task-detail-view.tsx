@@ -137,7 +137,7 @@ function TaskDetailContent({
     mode === "admin" || project?.currentProjectRole !== "viewer";
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -178,7 +178,7 @@ function TaskDetailContent({
                       void updateStatus(event.target.value as TaskStatus)
                     }
                     aria-label="Đổi trạng thái công việc"
-                    className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-bold text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs font-bold text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   >
                     {statuses.map((status) => (
                       <option key={status.value} value={status.value}>
@@ -247,7 +247,7 @@ function TaskDetailContent({
                   {comments.map((comment) => (
                     <article
                       key={comment.id}
-                      className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-4"
+                      className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -360,7 +360,7 @@ function TaskDetailContent({
                     maxLength={10000}
                     placeholder="Viết bình luận…"
                     aria-label="Bình luận mới"
-                    className="min-h-24 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="min-h-24 w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                   />
                   <div className="flex justify-end">
                     <button className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">

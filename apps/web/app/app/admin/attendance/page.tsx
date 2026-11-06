@@ -254,7 +254,7 @@ export default function AdminAttendancePage() {
               setFilterFrom(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         </div>
         <div>
@@ -268,7 +268,7 @@ export default function AdminAttendancePage() {
               setFilterTo(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         </div>
         <div>
@@ -281,7 +281,7 @@ export default function AdminAttendancePage() {
               setFilterDept(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Tất cả phòng ban</option>
             {departments.map((d) => (
@@ -301,7 +301,7 @@ export default function AdminAttendancePage() {
               setFilterTeam(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Tất cả đội nhóm</option>
             {teams.map((t) => (
@@ -321,7 +321,7 @@ export default function AdminAttendancePage() {
               setFilterStatus(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Tất cả trạng thái</option>
             <option value="present">Đúng giờ (Present)</option>
@@ -482,7 +482,7 @@ export default function AdminAttendancePage() {
                   type="datetime-local"
                   value={adjustCheckIn}
                   onChange={(e) => setAdjustCheckIn(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </div>
               <div>
@@ -493,7 +493,7 @@ export default function AdminAttendancePage() {
                   type="datetime-local"
                   value={adjustCheckOut}
                   onChange={(e) => setAdjustCheckOut(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </div>
             </div>
@@ -505,7 +505,7 @@ export default function AdminAttendancePage() {
               <select
                 value={adjustStatus}
                 onChange={(e) => setAdjustStatus(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="present">Đúng giờ (Present)</option>
                 <option value="late">Đi muộn (Late)</option>
@@ -525,7 +525,7 @@ export default function AdminAttendancePage() {
                 placeholder="VD: Quên check-out khi ra về, có xác nhận của trưởng nhóm..."
                 rows={3}
                 required
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl p-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 

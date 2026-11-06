@@ -70,12 +70,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8FAFC] text-[#0F172A] font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#0F172A] font-sans">
       {/* Left Blue Hero Panel */}
       <AuthHero />
 
       {/* Right Form Panel */}
-      <div className="w-full md:w-[50%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-[#F8FAFC]">
+      <div className="w-full md:w-[50%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-[#FFFBF0]">
         <div className="w-full max-w-md bg-white border border-[#E2E8F0] p-8 sm:p-10 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header */}
           <div>
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@pgsagency.vn"
-                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#0F172A] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#0F172A] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
@@ -136,7 +136,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#0F172A] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#0F172A] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
@@ -162,7 +162,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#1E293B] font-semibold text-xs transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#FFFBF0] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#1E293B] font-semibold text-xs transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path

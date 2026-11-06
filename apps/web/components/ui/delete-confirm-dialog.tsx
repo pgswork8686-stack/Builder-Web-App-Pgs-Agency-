@@ -37,7 +37,7 @@ export function DeleteConfirmDialog({
             {description}
           </p>
           {itemName && (
-            <p className="text-xs font-mono font-bold text-[#0F172A] bg-[#F8FAFC] p-2 rounded-xl border border-[#E2E8F0] mt-2 truncate">
+            <p className="text-xs font-mono font-bold text-[#0F172A] bg-[#FFFBF0] p-2 rounded-xl border border-[#E2E8F0] mt-2 truncate">
               {itemName}
             </p>
           )}

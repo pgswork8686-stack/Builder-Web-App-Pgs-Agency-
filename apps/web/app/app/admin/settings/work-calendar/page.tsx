@@ -286,7 +286,7 @@ export default function AdminWorkCalendarPage() {
                   type="text"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
                 />
               </div>
 
@@ -305,7 +305,7 @@ export default function AdminWorkCalendarPage() {
                         className={`w-9 h-8 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
                           isSelected
                             ? "bg-[#4F75FF] text-white border-[#4F75FF]"
-                            : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
+                            : "bg-[#FFFBF0] text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
                         }`}
                       >
                         {label}
@@ -317,7 +317,7 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Thứ 7 cách tuần */}
-            <div className="rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-4 space-y-3">
+            <div className="rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-[#0F172A]">
@@ -382,7 +382,7 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Hoán đổi lịch nhà nước */}
-            <div className="flex items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] p-4">
+            <div className="flex items-center justify-between rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] p-4">
               <div>
                 <h4 className="text-xs font-bold text-[#0F172A]">
                   Tự động áp dụng lịch làm bù / hoán đổi của Nhà nước
@@ -433,7 +433,7 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
                 <span className="text-[#64748B] block text-[10px] uppercase font-bold">
                   Nhà cung cấp
                 </span>
@@ -441,7 +441,7 @@ export default function AdminWorkCalendarPage() {
                   {holidayProvider || "Calendarific"}
                 </span>
               </div>
-              <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
                 <span className="text-[#64748B] block text-[10px] uppercase font-bold">
                   Mã quốc gia
                 </span>
@@ -449,7 +449,7 @@ export default function AdminWorkCalendarPage() {
                   {holidayCountryCode}
                 </span>
               </div>
-              <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
                 <span className="text-[#64748B] block text-[10px] uppercase font-bold">
                   Lần đồng bộ gần nhất
                 </span>
@@ -506,7 +506,7 @@ export default function AdminWorkCalendarPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#EDF2F7] text-[#64748B] font-bold bg-[#F8FAFC]">
+              <tr className="border-b border-[#EDF2F7] text-[#64748B] font-bold bg-[#FFFBF0]">
                 <th className="p-3">Ngày</th>
                 <th className="p-3">Tên sự kiện / Ngày lễ</th>
                 <th className="p-3">Loại</th>
@@ -527,7 +527,7 @@ export default function AdminWorkCalendarPage() {
                 events.map((ev) => (
                   <tr
                     key={ev.id}
-                    className="hover:bg-[#F8FAFC] transition-colors"
+                    className="hover:bg-[#FFFBF0] transition-colors"
                   >
                     <td className="p-3 font-mono font-bold text-[#0F172A]">
                       {ev.event_date}
@@ -621,7 +621,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, eventDate: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
             />
           </div>
 
@@ -637,7 +637,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, title: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
             />
           </div>
 
@@ -654,7 +654,7 @@ export default function AdminWorkCalendarPage() {
                     eventType: e.target.value as any,
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
               >
                 <option value="company_holiday">
                   Nghỉ nội bộ (company_holiday)
@@ -683,7 +683,7 @@ export default function AdminWorkCalendarPage() {
                     isWorkingDay: e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
               >
                 <option value="false">
                   Nghỉ làm việc (is_working_day = false)
@@ -706,7 +706,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, notes: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] text-[#0F172A] outline-none focus:border-[#4F75FF]"
             />
           </div>
 

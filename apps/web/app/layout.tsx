@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" className={`${spaceGrotesk.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-[#F8FAFC] text-[#0F172A]">
+      <body className="min-h-full flex flex-col font-sans bg-[#FFFBF0] text-[#0F172A]">
         {children}
       </body>
     </html>

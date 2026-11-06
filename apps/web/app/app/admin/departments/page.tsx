@@ -360,7 +360,7 @@ export default function AdminDepartmentsPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="VD: SEO, TECH, HR, MKT"
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -374,7 +374,7 @@ export default function AdminDepartmentsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="VD: Phòng Tối ưu hóa Tìm kiếm (SEO)"
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -385,7 +385,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={headUserId}
                 onChange={(e) => setHeadUserId(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa bổ nhiệm --</option>
                 {employees.map((emp) => (
@@ -405,7 +405,7 @@ export default function AdminDepartmentsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Mô tả phạm vi và nhiệm vụ của phòng ban..."
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -472,7 +472,7 @@ export default function AdminDepartmentsPage() {
                 onChange={(e) =>
                   setEditingDept({ ...editingDept, name: e.target.value })
                 }
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -483,7 +483,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={editHeadUserId}
                 onChange={(e) => setEditHeadUserId(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa bổ nhiệm (Trống) --</option>
                 {employees.map((emp) => (
@@ -507,7 +507,7 @@ export default function AdminDepartmentsPage() {
                     description: e.target.value,
                   })
                 }
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 

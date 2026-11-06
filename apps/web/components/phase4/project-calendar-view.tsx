@@ -235,7 +235,7 @@ function ProjectCalendarContent({
         </div>
       ) : (
         <section className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
-          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#F8FAFC]">
+          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#EDF2F7] bg-[#FFFBF0]">
             {weekdayLabels.map((label) => (
               <div
                 key={label}
@@ -272,7 +272,7 @@ function ProjectCalendarContent({
                   onClick={() => {
                     if (canCreateTask) setCreateDate(key);
                   }}
-                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors ${cellBg} hover:bg-[#F8FAFC] ${
+                  className={`min-h-36 border-b border-r border-[#EDF2F7] p-2 transition-colors ${cellBg} hover:bg-[#FFFBF0] ${
                     canCreateTask ? "cursor-pointer" : ""
                   }`}
                   title={
@@ -369,7 +369,7 @@ function ProjectCalendarContent({
   if (embedded) return inner;
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-[1500px] space-y-6">
         <WorkspaceHeader
           mode={mode}

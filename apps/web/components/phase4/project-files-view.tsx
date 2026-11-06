@@ -45,7 +45,7 @@ function ProjectFilesContent({
   }, [mode, projectId]);
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -166,7 +166,7 @@ export function FileManager({
             }}
             placeholder="Tìm theo tên tệp..."
             aria-label="Tìm tệp"
-            className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         )}
         {canUpload && (
@@ -220,7 +220,7 @@ export function FileManager({
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-[#EDF2F7] bg-white shadow-xs">
           <table className="w-full min-w-[760px] text-left text-xs">
-            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#F8FAFC]">
+            <thead className="border-b border-[#EDF2F7] text-[11px] uppercase tracking-wider text-[#64748B] bg-[#FFFBF0]">
               <tr>
                 <th className="p-4">Tệp</th>
                 <th className="p-4">Kích thước</th>
@@ -234,7 +234,7 @@ export function FileManager({
               {files.map((file) => (
                 <tr
                   key={file.id}
-                  className="hover:bg-[#F8FAFC] transition-colors"
+                  className="hover:bg-[#FFFBF0] transition-colors"
                 >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
@@ -291,7 +291,7 @@ export function FileManager({
             type="button"
             disabled={page <= 1}
             onClick={() => setPage((value) => value - 1)}
-            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#F8FAFC]"
+            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#FFFBF0]"
           >
             Trước
           </button>
@@ -302,7 +302,7 @@ export function FileManager({
             type="button"
             disabled={page >= totalPages}
             onClick={() => setPage((value) => value + 1)}
-            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#F8FAFC]"
+            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#FFFBF0]"
           >
             Sau
           </button>

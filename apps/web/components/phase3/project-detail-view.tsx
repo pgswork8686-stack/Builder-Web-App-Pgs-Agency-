@@ -1099,7 +1099,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, title: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1114,7 +1114,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, description: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1128,7 +1128,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 onChange={(e) =>
                   setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="">-- Chưa chỉ định --</option>
                 {people.map((p) => (
@@ -1151,7 +1151,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     priority: e.target.value as TaskPriority,
                   })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="low">Thấp (Low)</option>
                 <option value="medium">Vừa (Medium)</option>
@@ -1174,7 +1174,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, linkUrl: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#F8FAFC] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDF2F7] bg-[#FFFBF0] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
@@ -1207,7 +1207,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
                 <UploadCloud className="w-6 h-6 text-[#94A3B8] mb-1" />
                 <span className="text-xs font-bold text-[#4F75FF]">
                   Chọn tệp từ máy tính để tải lên

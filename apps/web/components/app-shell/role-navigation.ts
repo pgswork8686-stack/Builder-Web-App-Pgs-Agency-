@@ -69,7 +69,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "01",
-              title: "Dashboard",
+              title: "Tổng quan",
               href: "/app/admin",
               icon: LayoutDashboard,
               exact: true,
@@ -93,7 +93,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
             {
               index: "04",
-              title: "Teams",
+              title: "Đội nhóm",
               href: "/app/admin/teams",
               icon: Users,
             },
@@ -174,7 +174,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "14",
-              title: "Finance",
+              title: "Tài chính",
               href: "/app/admin/finance",
               icon: CreditCard,
             },
@@ -191,7 +191,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "16",
-              title: "Tin nhắn (Chat)",
+              title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },

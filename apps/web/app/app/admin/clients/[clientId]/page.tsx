@@ -280,7 +280,7 @@ export default function AdminClientDetailPage() {
                 <h3 className="text-lg font-extrabold text-[#0F172A]">
                   {company.name}
                 </h3>
-                <div className="inline-flex px-2 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#E2E8F0] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
                   Mã: {company.code}
                 </div>
               </div>
@@ -454,7 +454,7 @@ export default function AdminClientDetailPage() {
                 required
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chọn tài khoản client --</option>
                 {clientUsers.map((cu) => (
@@ -474,7 +474,7 @@ export default function AdminClientDetailPage() {
                 placeholder="Ví dụ: Đại diện pháp luật, Giám đốc IT..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 

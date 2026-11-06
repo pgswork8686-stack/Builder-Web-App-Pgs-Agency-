@@ -429,7 +429,7 @@ export default function InvoicesWorkspace({
             placeholder="Tìm kiếm theo số hóa đơn..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
           />
         </div>
 
@@ -437,7 +437,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">-- Mọi trạng thái --</option>
             <option value="draft">Nháp</option>
@@ -451,7 +451,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
+            className="bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
           >
             <option value="">-- Mọi khách hàng --</option>
             {clients.map((c) => (
@@ -464,7 +464,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterContract}
             onChange={(e) => setFilterContract(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
+            className="bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
           >
             <option value="">-- Mọi hợp đồng --</option>
             {contracts.map((c) => (
@@ -678,7 +678,7 @@ export default function InvoicesWorkspace({
                   placeholder="VD: INV-2026-001"
                   value={formInvoiceNumber}
                   onChange={(e) => setFormInvoiceNumber(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 />
               </div>
 
@@ -697,7 +697,7 @@ export default function InvoicesWorkspace({
                     setFormProjectId("");
                     setFormContractId("");
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 >
                   <option value="">Chọn công ty khách hàng</option>
                   {clients.map((c) => (
@@ -720,7 +720,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formContractId}
                   onChange={(e) => setFormContractId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 >
                   <option value="">Chọn hợp đồng (Không bắt buộc)</option>
                   {filteredContracts.map((c) => (
@@ -741,7 +741,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formProjectId}
                   onChange={(e) => setFormProjectId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 >
                   <option value="">Chọn dự án (Không bắt buộc)</option>
                   {filteredProjects.map((p) => (
@@ -766,7 +766,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formIssueDate}
                   onChange={(e) => setFormIssueDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 />
               </div>
 
@@ -782,7 +782,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formDueDate}
                   onChange={(e) => setFormDueDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 />
               </div>
             </div>
@@ -801,7 +801,7 @@ export default function InvoicesWorkspace({
                   placeholder="VD: 10000000"
                   value={formAmount}
                   onChange={(e) => setFormAmount(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 />
               </div>
               <div>
@@ -815,7 +815,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formCurrencyCode}
                   onChange={(e) => setFormCurrencyCode(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
                 >
                   <option value="">Chọn</option>
                   <option value="VND">VND</option>
@@ -833,7 +833,7 @@ export default function InvoicesWorkspace({
                 placeholder="Ghi chú thanh toán, số tài khoản nhận tiền..."
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 

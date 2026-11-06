@@ -273,7 +273,7 @@ export default function EmployeeAttendancePage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#EDF2F7] self-start sm:self-auto">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBF0] border border-[#EDF2F7] self-start sm:self-auto">
               <MapPin
                 className={`w-4 h-4 ${
                   geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
@@ -296,7 +296,7 @@ export default function EmployeeAttendancePage() {
               placeholder="VD: Đi công tác tại cơ quan khách hàng, làm ngoài giờ..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
             />
           </div>
 
