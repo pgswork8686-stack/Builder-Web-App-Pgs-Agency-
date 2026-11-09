@@ -202,11 +202,6 @@ export function Sidebar({
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Cần hỗ trợ?</span>
             </div>
-            <p className="text-[10px] text-[#475569] leading-tight text-balance">
-              {account.role === "client"
-                ? "Gửi yêu cầu hỗ trợ tới bộ phận CSKH."
-                : "Xem hướng dẫn sử dụng và trung tâm trợ giúp."}
-            </p>
             <Link
               href={supportHref}
               className="w-full py-1.5 px-2 rounded-lg bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] text-[10px] font-black transition-colors block text-center shadow-xs"
