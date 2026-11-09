@@ -37,7 +37,7 @@ export default function AccountRejectedPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#161827] p-6 relative">
-      <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#F2EAD3]">
+      <Card className="max-w-[460px] w-full rounded-3xl p-8 text-center space-y-6 border-[#F2EAD3]">
         {/* Status Icon Header */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
           <XCircle className="w-8 h-8" />
@@ -68,7 +68,7 @@ export default function AccountRejectedPage() {
             href="mailto:admin@pgsagency.com"
             className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white border border-[#CBD5E1] text-[#161827] font-bold text-xs hover:bg-[#FFFBF0] transition-colors"
           >
-            <Mail className="w-4 h-4 text-[#4F75FF]" />
+            <Mail className="w-4 h-4 text-[#3B5BDB]" />
             <span>Liên hệ Quản trị viên</span>
           </a>
 

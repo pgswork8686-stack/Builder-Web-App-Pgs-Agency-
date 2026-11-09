@@ -75,21 +75,21 @@ export default function LoginPage() {
       <AuthHero />
 
       {/* Right Form Panel */}
-      <div className="w-full md:w-[50%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-[#FFFBF0]">
-        <div className="w-full max-w-md bg-white border border-[#F2EAD3] p-8 sm:p-10 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
+      <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#F2EAD3] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header */}
           <div>
-            <div className="md:hidden flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-xl bg-[#FFB800] text-black font-black flex items-center justify-center">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 rounded-xl bg-[#FFB800] text-black font-bold flex items-center justify-center">
                 P
               </div>
               <span className="font-bold text-lg text-[#161827]">PGS Hub</span>
             </div>
 
-            <h2 className="text-2xl font-black text-[#161827] tracking-tight">
+            <h2 className="text-2xl font-bold text-[#161827] tracking-tight">
               Đăng nhập PGS Hub
             </h2>
-            <p className="mt-1.5 text-xs text-[#64748B]">
+            <p className="mt-1.5 text-xs text-[#475569]">
               Sử dụng tài khoản đã được Admin kích hoạt.
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function LoginPage() {
           {/* Email / Password Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#475569]">
+              <label className="block text-xs font-bold text-[#475569]">
                 Email
               </label>
               <input
@@ -114,18 +114,18 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@pgsagency.vn"
-                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-[#475569]">
+                <label className="text-xs font-bold text-[#475569]">
                   Mật khẩu
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-[#4F75FF] hover:underline font-medium"
+                  className="text-xs text-[#3B5BDB] hover:underline font-medium"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -136,14 +136,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] focus:ring-2 focus:ring-[#4F75FF]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || oauthLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#4F75FF] hover:bg-[#3D62EE] text-white font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? <span>Đang xử lý...</span> : <span>Đăng nhập</span>}
             </button>
@@ -188,11 +188,11 @@ export default function LoginPage() {
           </button>
 
           {/* Footer Register Prompt */}
-          <div className="pt-2 text-center text-xs text-[#64748B]">
+          <div className="pt-2 text-center text-xs text-[#475569]">
             Chưa có tài khoản?{" "}
             <Link
               href="/auth/sign-up"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3B5BDB] font-bold hover:underline"
             >
               Đăng ký và chờ Admin duyệt
             </Link>

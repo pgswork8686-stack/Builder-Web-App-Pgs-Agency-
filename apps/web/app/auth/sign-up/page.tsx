@@ -109,12 +109,12 @@ export default function SignUpPage() {
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
-      <div className="w-full md:w-[48%] min-h-screen flex items-center justify-center p-6 lg:p-12 bg-white border-l border-[#F2EAD3]">
-        <div className="w-full max-w-md space-y-6">
+      <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#F2EAD3] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header Mobile Logo / Text */}
           <div>
             <div className="md:hidden flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-[#4F75FF] text-white font-black flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#4F75FF] text-white font-bold flex items-center justify-center">
                 P
               </div>
               <span className="font-bold text-lg text-[#161827]">PGS HUB</span>
@@ -123,7 +123,7 @@ export default function SignUpPage() {
             <h2 className="text-2xl font-extrabold text-[#161827] tracking-tight">
               Tạo tài khoản
             </h2>
-            <p className="mt-1 text-xs text-[#64748B]">
+            <p className="mt-1 text-xs text-[#475569]">
               Đăng ký tài khoản thành viên hệ thống PGS Hub
             </p>
           </div>
@@ -185,7 +185,7 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSignUp} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Họ và tên
               </label>
               <div className="relative">
@@ -196,13 +196,13 @@ export default function SignUpPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nguyễn Văn A"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Email doanh nghiệp
               </label>
               <div className="relative">
@@ -213,13 +213,13 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pgsagency.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Mật khẩu
               </label>
               <div className="relative">
@@ -230,13 +230,13 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Xác nhận mật khẩu
               </label>
               <div className="relative">
@@ -247,7 +247,7 @@ export default function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -266,11 +266,11 @@ export default function SignUpPage() {
           </form>
 
           {/* Footer Login Prompt */}
-          <div className="text-center text-xs text-[#64748B]">
+          <div className="text-center text-xs text-[#475569]">
             Đã có tài khoản?{" "}
             <Link
               href="/auth/login"
-              className="text-[#4F75FF] font-bold hover:underline"
+              className="text-[#3B5BDB] font-bold hover:underline"
             >
               Đăng nhập ngay
             </Link>

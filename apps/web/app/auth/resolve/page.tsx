@@ -77,13 +77,13 @@ export default function AuthResolvePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFFBF0] text-[#161827] p-6">
-      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-md w-full shadow-lg border-[#F2EAD3]">
+      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-[460px] w-full rounded-3xl border-[#F2EAD3]">
         {errorMsg ? (
           <>
             <h3 className="text-base font-extrabold text-red-600">
               LỖI XÁC THỰC
             </h3>
-            <p className="text-xs text-[#64748B]">{errorMsg}</p>
+            <p className="text-xs text-[#475569]">{errorMsg}</p>
             <Button
               variant="danger"
               size="sm"
@@ -100,9 +100,9 @@ export default function AuthResolvePage() {
           </>
         ) : (
           <>
-            <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
             <h3 className="text-base font-extrabold text-[#161827]">PGS HUB</h3>
-            <p className="text-xs text-[#64748B]">{statusText}</p>
+            <p className="text-xs text-[#475569]">{statusText}</p>
           </>
         )}
       </Card>
