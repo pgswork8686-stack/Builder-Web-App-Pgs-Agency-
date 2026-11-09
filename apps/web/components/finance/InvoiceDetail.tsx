@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -294,7 +296,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
       <SectionHeader
         title={`Hóa đơn: ${invoice.invoice_number}`}
         description={`Khách hàng: ${invoice.client_company?.name || "—"}`}
-        badge={invoice.status ? invoice.status.toUpperCase() : undefined}
+        badge={invoice.status ? statusLabel(invoice.status) : undefined}
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance/invoices`}>

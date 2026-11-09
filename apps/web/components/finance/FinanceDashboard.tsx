@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -255,7 +257,7 @@ export default function FinanceDashboard({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Badge variant="blue" size="sm">
-                      {log.entity_type.toUpperCase()}
+                      {statusLabel(log.entity_type)}
                     </Badge>
                     <span className="font-bold text-[#161827]">
                       {getActionLabel(log.action)}

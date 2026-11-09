@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel as viLabel } from "@/lib/labels";
+
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
@@ -483,7 +485,7 @@ export default function AdminPeopleDirectoryPage() {
                             ? "CHỜ DUYỆT"
                             : person.accountStatus === "active"
                               ? "CHÍNH THỨC"
-                              : person.accountStatus.toUpperCase();
+                              : viLabel(person.accountStatus);
 
                 return (
                   <TableRow key={person.id}>
@@ -525,7 +527,7 @@ export default function AdminPeopleDirectoryPage() {
                         }
                         size="sm"
                       >
-                        {person.role ? person.role.toUpperCase() : "CHƯA GÁN"}
+                        {person.role ? viLabel(person.role) : "Chưa gán"}
                       </Badge>
                     </TableCell>
 

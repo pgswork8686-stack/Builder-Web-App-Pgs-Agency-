@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -220,7 +222,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
       <SectionHeader
         title={`Hợp đồng: ${contract.contract_number}`}
         description={contract.title}
-        badge={contract.status ? contract.status.toUpperCase() : undefined}
+        badge={contract.status ? statusLabel(contract.status) : undefined}
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance/contracts`}>

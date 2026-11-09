@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -435,7 +437,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       <SectionHeader
         title={project.name}
         description={`Mã dự án: ${project.projectCode} • Khách hàng: ${project.clientCompany?.name ?? "Chưa liên kết"}`}
-        badge={project.status ? project.status.toUpperCase() : undefined}
+        badge={project.status ? statusLabel(project.status) : undefined}
         action={
           <div className="flex items-center gap-2">
             {mode !== "client" && (

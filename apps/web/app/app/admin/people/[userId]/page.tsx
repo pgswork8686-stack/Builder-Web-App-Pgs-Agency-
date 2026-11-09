@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -261,7 +263,7 @@ export default function AdminPersonDetailPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-[#64748B]">Vai trò hệ thống</span>
                   <Badge variant="blue" size="sm">
-                    {person.role ? person.role.toUpperCase() : "CHƯA GÁN"}
+                    {person.role ? statusLabel(person.role) : "Chưa gán"}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">

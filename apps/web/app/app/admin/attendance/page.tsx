@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -410,7 +412,7 @@ export default function AdminAttendancePage() {
                         }
                         size="sm"
                       >
-                        {rec.status ? rec.status.toUpperCase() : "—"}
+                        {statusLabel(rec.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

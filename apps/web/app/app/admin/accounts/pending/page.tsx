@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import {
   Users,
@@ -267,8 +269,8 @@ export default function AdminPendingAccountsPage() {
                     <TableCell>
                       <Badge variant="gold" size="sm">
                         {user.accountStatus
-                          ? user.accountStatus.toUpperCase()
-                          : "PENDING"}
+                          ? statusLabel(user.accountStatus)
+                          : "Chờ duyệt"}
                       </Badge>
                     </TableCell>
 

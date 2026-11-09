@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
@@ -289,7 +291,7 @@ export default function UserProfilePage() {
                   Vai trò
                 </span>
                 <Badge variant="blue" size="sm">
-                  {userProfile.account.role?.toUpperCase()}
+                  {statusLabel(userProfile.account.role)}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">

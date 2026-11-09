@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -184,8 +186,8 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <Badge variant="brand" size="sm">
                     {account.role
-                      ? account.role.toUpperCase()
-                      : "CHƯA PHÂN QUYỀN"}
+                      ? statusLabel(account.role)
+                      : "Chưa phân quyền"}
                   </Badge>
                 </div>
               </div>

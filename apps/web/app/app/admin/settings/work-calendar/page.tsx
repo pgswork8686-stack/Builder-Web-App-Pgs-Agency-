@@ -1,5 +1,7 @@
 "use client";
 
+import { statusLabel } from "@/lib/labels";
+
 import React, { useEffect, useState } from "react";
 import {
   Calendar as CalendarIcon,
@@ -566,7 +568,7 @@ export default function AdminWorkCalendarPage() {
                               : "text-[#64748B]"
                         }`}
                       >
-                        {ev.source_type.toUpperCase()}
+                        {statusLabel(ev.source_type)}
                       </span>
                     </td>
                     <td className="p-3 text-right">
