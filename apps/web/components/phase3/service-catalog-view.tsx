@@ -454,13 +454,13 @@ export function ServiceCatalogView() {
       />
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E2E8F0]">
+      <div className="flex items-center gap-2 border-b border-[#F2EAD3]">
         <button
           onClick={() => setActiveTab("services")}
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "services"
               ? "border-[#4F75FF] text-[#4F75FF]"
-              : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+              : "border-transparent text-[#64748B] hover:text-[#161827]"
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -471,7 +471,7 @@ export function ServiceCatalogView() {
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "categories"
               ? "border-[#4F75FF] text-[#4F75FF]"
-              : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+              : "border-transparent text-[#64748B] hover:text-[#161827]"
           }`}
         >
           <FolderKanban className="w-4 h-4" />
@@ -496,7 +496,7 @@ export function ServiceCatalogView() {
       {activeTab === "services" && (
         <div className="space-y-4">
           {/* Filters Bar */}
-          <Card className="p-3 bg-white border border-[#E2E8F0] shadow-sm">
+          <Card className="p-3 bg-white border border-[#F2EAD3] shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[240px]">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
@@ -505,14 +505,14 @@ export function ServiceCatalogView() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Tìm kiếm dịch vụ theo tên, mã..."
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none focus:border-[#4F75FF] focus:bg-white"
+                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#FFFBF0] border border-[#F2EAD3] rounded-lg outline-none focus:border-[#4F75FF] focus:bg-white"
                 />
               </div>
 
               <select
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#F2EAD3] rounded-lg outline-none text-[#161827] focus:border-[#4F75FF]"
               >
                 <option value="">Tất cả nhóm dịch vụ</option>
                 {categories.map((cat) => (
@@ -525,7 +525,7 @@ export function ServiceCatalogView() {
               <select
                 value={activeFilter}
                 onChange={(e) => setActiveFilter(e.target.value as any)}
-                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#E2E8F0] rounded-lg outline-none text-[#0F172A] focus:border-[#4F75FF]"
+                className="py-1.5 px-3 text-xs bg-[#FFFBF0] border border-[#F2EAD3] rounded-lg outline-none text-[#161827] focus:border-[#4F75FF]"
               >
                 <option value="">Tất cả trạng thái</option>
                 <option value="true">Đang hoạt động</option>
@@ -575,7 +575,7 @@ export function ServiceCatalogView() {
                           {svc.service_code || svc.serviceCode || svc.code}
                         </TableCell>
                         <TableCell>
-                          <div className="font-semibold text-[#0F172A]">
+                          <div className="font-semibold text-[#161827]">
                             {svc.name}
                           </div>
                           {svc.description && (
@@ -698,10 +698,10 @@ export function ServiceCatalogView() {
                     <TableCell className="font-mono font-bold text-[#4F75FF]">
                       {cat.serviceCategoryCode}
                     </TableCell>
-                    <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
+                    <TableCell className="font-mono text-xs font-semibold text-[#161827]">
                       {cat.code}
                     </TableCell>
-                    <TableCell className="font-bold text-[#0F172A]">
+                    <TableCell className="font-bold text-[#161827]">
                       {cat.name}
                     </TableCell>
                     <TableCell>
@@ -770,7 +770,7 @@ export function ServiceCatalogView() {
                   setServiceForm({ ...serviceForm, name: e.target.value })
                 }
                 placeholder="VD: Thiết kế Website, Google Ads..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -783,7 +783,7 @@ export function ServiceCatalogView() {
                 onChange={(e) =>
                   setServiceForm({ ...serviceForm, categoryId: e.target.value })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chọn nhóm dịch vụ --</option>
                 {categories.map((c) => (
@@ -808,7 +808,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="VD: WEB_DESIGN (Hệ thống tự sinh DV_XX)"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -826,12 +826,12 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="Mô tả phạm vi, quy cách cung cấp dịch vụ..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
             <div className="flex items-center gap-4 pt-1">
-              <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-semibold text-[#161827] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={serviceForm.active}
@@ -900,7 +900,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="VD: WEBSITE_SEO, PERFORMANCE..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
               />
             </div>
 
@@ -916,7 +916,7 @@ export function ServiceCatalogView() {
                   setCategoryForm({ ...categoryForm, name: e.target.value })
                 }
                 placeholder="VD: Website & SEO"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -934,7 +934,7 @@ export function ServiceCatalogView() {
                   })
                 }
                 placeholder="Mô tả phạm vi nhóm dịch vụ..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -1017,7 +1017,7 @@ export function ServiceCatalogView() {
                         collaboratorTeamIds: nextCollaboratorTeamIds,
                       });
                     }}
-                    className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
                   >
                     <option value="">-- Chọn phòng chủ quản --</option>
                     {departments.map((department) => (
@@ -1051,7 +1051,7 @@ export function ServiceCatalogView() {
                       });
                     }}
                     disabled={!responsibilityForm.ownerDepartmentId}
-                    className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
+                    className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-60"
                   >
                     <option value="">-- Chưa gán Team chủ quản --</option>
                     {teams
@@ -1073,11 +1073,11 @@ export function ServiceCatalogView() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Building2 className="w-4 h-4 text-[#4F75FF]" />
-                  <span className="text-xs font-bold text-[#0F172A]">
+                  <span className="text-xs font-bold text-[#161827]">
                     Phòng ban phối hợp
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
                   {departments
                     .filter(
                       (department) =>
@@ -1137,11 +1137,11 @@ export function ServiceCatalogView() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <UsersRound className="w-4 h-4 text-[#4F75FF]" />
-                  <span className="text-xs font-bold text-[#0F172A]">
+                  <span className="text-xs font-bold text-[#161827]">
                     Team phối hợp
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#E2E8F0]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
                   {teams.filter((team) => {
                     const departmentId =
                       team.departmentId ?? team.department_id;
@@ -1268,7 +1268,7 @@ export function ServiceCatalogView() {
             {showItemForm && (
               <Card className="p-4 bg-[#FFFBF0] border border-[#CBD5E1]">
                 <form onSubmit={handleSaveItem} className="space-y-3">
-                  <div className="font-semibold text-xs text-[#0F172A]">
+                  <div className="font-semibold text-xs text-[#161827]">
                     {editingItemId
                       ? "Chỉnh sửa hạng mục mẫu"
                       : "Thêm hạng mục triển khai mẫu"}
@@ -1285,7 +1285,7 @@ export function ServiceCatalogView() {
                         setItemForm({ ...itemForm, name: e.target.value })
                       }
                       placeholder="VD: Khảo sát yêu cầu, Thiết kế wireframe..."
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF]"
+                      className="w-full bg-white border border-[#F2EAD3] rounded-lg px-3 py-1.5 text-xs text-[#161827] outline-none focus:border-[#4F75FF]"
                     />
                   </div>
                   <div>
@@ -1302,11 +1302,11 @@ export function ServiceCatalogView() {
                         })
                       }
                       placeholder="Nội dung, tiêu chuẩn đầu ra của hạng mục..."
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#4F75FF] resize-none"
+                      className="w-full bg-white border border-[#F2EAD3] rounded-lg px-3 py-1.5 text-xs text-[#161827] outline-none focus:border-[#4F75FF] resize-none"
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-4">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#161827] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={itemForm.isRequired}
@@ -1320,7 +1320,7 @@ export function ServiceCatalogView() {
                       />
                       Hạng mục bắt buộc
                     </label>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A] cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#161827] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={itemForm.isActive}
@@ -1372,7 +1372,7 @@ export function ServiceCatalogView() {
                 {deliveryItems.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="p-3 bg-white rounded-xl border border-[#E2E8F0] flex items-center justify-between hover:border-[#CBD5E1] transition-colors"
+                    className="p-3 bg-white rounded-xl border border-[#F2EAD3] flex items-center justify-between hover:border-[#CBD5E1] transition-colors"
                   >
                     <div className="flex items-start gap-3">
                       <span className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#4F75FF] font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
@@ -1380,7 +1380,7 @@ export function ServiceCatalogView() {
                       </span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-[#0F172A]">
+                          <span className="font-bold text-xs text-[#161827]">
                             {item.name}
                           </span>
                           <span className="font-mono text-[10px] text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">

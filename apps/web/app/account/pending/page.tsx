@@ -26,7 +26,7 @@ export default function AccountPendingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#0F172A] p-6 relative">
+    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#161827] p-6 relative">
       <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-xl border-[#F2EAD3]">
         {/* Status Icon Header */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
@@ -37,7 +37,7 @@ export default function AccountPendingPage() {
           <Badge variant="gold" size="md">
             Trạng thái: Chờ duyệt
           </Badge>
-          <h2 className="text-xl font-extrabold text-[#0F172A] tracking-tight">
+          <h2 className="text-xl font-extrabold text-[#161827] tracking-tight">
             Tài khoản đang chờ phê duyệt
           </h2>
         </div>

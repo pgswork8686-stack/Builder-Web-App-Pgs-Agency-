@@ -270,10 +270,10 @@ export default function AdminDepartmentsPage() {
                     <TableCell className="font-mono font-bold text-[#4F75FF]">
                       {dept.departmentCode}
                     </TableCell>
-                    <TableCell className="font-mono text-xs font-semibold text-[#0F172A]">
+                    <TableCell className="font-mono text-xs font-semibold text-[#161827]">
                       {dept.code}
                     </TableCell>
-                    <TableCell className="font-bold text-[#0F172A]">
+                    <TableCell className="font-bold text-[#161827]">
                       {dept.name}
                     </TableCell>
                     <TableCell>
@@ -283,7 +283,7 @@ export default function AdminDepartmentsPage() {
                             {dept.head.fullName.charAt(0)}
                           </div>
                           <div>
-                            <div className="font-semibold text-xs text-[#0F172A]">
+                            <div className="font-semibold text-xs text-[#161827]">
                               {dept.head.fullName}
                             </div>
                             <div className="text-[10px] text-[#64748B] font-mono">
@@ -360,7 +360,7 @@ export default function AdminDepartmentsPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="VD: SEO, TECH, HR, MKT"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -374,7 +374,7 @@ export default function AdminDepartmentsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="VD: Phòng Tối ưu hóa Tìm kiếm (SEO)"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -385,7 +385,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={headUserId}
                 onChange={(e) => setHeadUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa bổ nhiệm --</option>
                 {employees.map((emp) => (
@@ -405,7 +405,7 @@ export default function AdminDepartmentsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Mô tả phạm vi và nhiệm vụ của phòng ban..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -457,7 +457,7 @@ export default function AdminDepartmentsPage() {
                 type="text"
                 disabled
                 value={`${editingDept.departmentCode} (${editingDept.code})`}
-                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+                className="w-full bg-[#FBF3DC] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
               />
             </div>
 
@@ -472,7 +472,7 @@ export default function AdminDepartmentsPage() {
                 onChange={(e) =>
                   setEditingDept({ ...editingDept, name: e.target.value })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -483,7 +483,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={editHeadUserId}
                 onChange={(e) => setEditHeadUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa bổ nhiệm (Trống) --</option>
                 {employees.map((emp) => (
@@ -507,7 +507,7 @@ export default function AdminDepartmentsPage() {
                     description: e.target.value,
                   })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -526,7 +526,7 @@ export default function AdminDepartmentsPage() {
               />
               <label
                 htmlFor="edit_is_active"
-                className="text-xs font-semibold text-[#0F172A] cursor-pointer select-none"
+                className="text-xs font-semibold text-[#161827] cursor-pointer select-none"
               >
                 Phòng ban đang hoạt động
               </label>

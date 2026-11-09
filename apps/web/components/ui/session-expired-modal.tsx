@@ -30,7 +30,7 @@ export function SessionExpiredModal({
         </div>
 
         <div className="space-y-1.5">
-          <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
+          <h3 className="text-lg font-bold text-[#161827] tracking-tight">
             Phiên đăng nhập hết hạn
           </h3>
           <p className="text-xs text-[#64748B] leading-relaxed max-w-xs mx-auto">

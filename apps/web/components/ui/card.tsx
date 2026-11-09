@@ -7,7 +7,7 @@ export function Card({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`rounded-2xl bg-white border border-[#F2EAD3] text-[#0F172A] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] transition-all ${className}`}
+      className={`rounded-2xl bg-white border border-[#F2EAD3] text-[#161827] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] transition-all ${className}`}
       {...props}
     >
       {children}
@@ -37,7 +37,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={`text-lg sm:text-xl font-extrabold text-[#0F172A] tracking-tight ${className}`}
+      className={`text-lg sm:text-xl font-extrabold text-[#161827] tracking-tight ${className}`}
       {...props}
     >
       {children}

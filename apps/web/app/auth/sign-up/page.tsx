@@ -104,7 +104,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#0F172A]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#161827]">
       {/* Video Hero Left Panel (~52%) */}
       <AuthHero />
 
@@ -117,10 +117,10 @@ export default function SignUpPage() {
               <div className="w-8 h-8 rounded-lg bg-[#4F75FF] text-white font-black flex items-center justify-center">
                 P
               </div>
-              <span className="font-bold text-lg text-[#0F172A]">PGS HUB</span>
+              <span className="font-bold text-lg text-[#161827]">PGS HUB</span>
             </div>
 
-            <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
+            <h2 className="text-2xl font-extrabold text-[#161827] tracking-tight">
               Tạo tài khoản
             </h2>
             <p className="mt-1 text-xs text-[#64748B]">
@@ -149,7 +149,7 @@ export default function SignUpPage() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#4F75FF]/40 text-[#0F172A] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#4F75FF]/40 text-[#161827] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -196,7 +196,7 @@ export default function SignUpPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nguyễn Văn A"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pgsagency.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] focus:bg-white focus:border-[#4F75FF] text-[#0F172A] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>

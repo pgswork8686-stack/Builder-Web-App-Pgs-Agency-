@@ -263,14 +263,14 @@ export default function AdminTeamsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo tên, mã đội nhóm..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         </div>
 
         <select
           value={filterDept}
           onChange={(e) => setFilterDept(e.target.value)}
-          className="bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi phòng ban --</option>
           {departments.map((d) => (
@@ -283,7 +283,7 @@ export default function AdminTeamsPage() {
         <select
           value={filterActive}
           onChange={(e) => setFilterActive(e.target.value)}
-          className="bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi trạng thái --</option>
           <option value="true">Đang hoạt động</option>
@@ -349,7 +349,7 @@ export default function AdminTeamsPage() {
                         {team.code}
                       </TableCell>
                       <TableCell>
-                        <div className="font-bold text-[#0F172A]">
+                        <div className="font-bold text-[#161827]">
                           {team.name}
                         </div>
                         {team.description && (
@@ -358,7 +358,7 @@ export default function AdminTeamsPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-[#0F172A] font-medium">
+                      <TableCell className="text-xs text-[#161827] font-medium">
                         {dept?.name || team.department?.name || "—"}
                       </TableCell>
                       <TableCell className="text-xs text-[#64748B]">
@@ -425,7 +425,7 @@ export default function AdminTeamsPage() {
                 required
                 value={departmentId}
                 onChange={(e) => setDepartmentId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chọn phòng ban --</option>
                 {departments.map((d) => (
@@ -446,7 +446,7 @@ export default function AdminTeamsPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="VD: SEO-ONPAGE, DEV-FE"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -460,7 +460,7 @@ export default function AdminTeamsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="VD: Nhóm SEO Onpage & Content"
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -471,7 +471,7 @@ export default function AdminTeamsPage() {
               <select
                 value={leaderUserId}
                 onChange={(e) => setLeaderUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa chỉ định trưởng nhóm --</option>
                 {leaders.map((l) => (
@@ -491,7 +491,7 @@ export default function AdminTeamsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Mô tả phạm vi hoạt động của nhóm..."
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -548,7 +548,7 @@ export default function AdminTeamsPage() {
                     department_id: e.target.value,
                   })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -566,7 +566,7 @@ export default function AdminTeamsPage() {
                 type="text"
                 disabled
                 value={editingTeam.code}
-                className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+                className="w-full bg-[#FBF3DC] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
               />
             </div>
 
@@ -581,7 +581,7 @@ export default function AdminTeamsPage() {
                 onChange={(e) =>
                   setEditingTeam({ ...editingTeam, name: e.target.value })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -597,7 +597,7 @@ export default function AdminTeamsPage() {
                     leader_user_id: e.target.value || null,
                   })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chưa chỉ định trưởng nhóm --</option>
                 {leaders.map((l) => (
@@ -621,7 +621,7 @@ export default function AdminTeamsPage() {
                     description: e.target.value,
                   })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
@@ -640,7 +640,7 @@ export default function AdminTeamsPage() {
               />
               <label
                 htmlFor="edit_team_active"
-                className="text-xs font-semibold text-[#0F172A] cursor-pointer select-none"
+                className="text-xs font-semibold text-[#161827] cursor-pointer select-none"
               >
                 Đội nhóm đang hoạt động
               </label>

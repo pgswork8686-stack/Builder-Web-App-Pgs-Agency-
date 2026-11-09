@@ -45,7 +45,7 @@ function ProjectFilesContent({
   }, [mode, projectId]);
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -166,7 +166,7 @@ export function FileManager({
             }}
             placeholder="Tìm theo tên tệp..."
             aria-label="Tìm tệp"
-            className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         )}
         {canUpload && (
@@ -230,14 +230,14 @@ export function FileManager({
                 <th className="p-4 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F2EAD3] text-[#0F172A]">
+            <tbody className="divide-y divide-[#F2EAD3] text-[#161827]">
               {files.map((file) => (
                 <tr
                   key={file.id}
                   className="hover:bg-[#FFFBF0] transition-colors"
                 >
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-2 font-bold text-[#0F172A]">
+                    <span className="inline-flex items-center gap-2 font-bold text-[#161827]">
                       <FileText className="h-4 w-4 text-[#4F75FF]" />
                       {file.originalName}
                     </span>
@@ -263,7 +263,7 @@ export function FileManager({
                         type="button"
                         onClick={() => void download(file)}
                         aria-label={`Tải xuống ${file.originalName}`}
-                        className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+                        className="rounded-lg border border-[#F2EAD3] p-1.5 text-[#64748B] hover:text-[#161827] hover:bg-[#FBF3DC] transition-colors"
                       >
                         <Download className="h-4 w-4" />
                       </button>
@@ -291,7 +291,7 @@ export function FileManager({
             type="button"
             disabled={page <= 1}
             onClick={() => setPage((value) => value - 1)}
-            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#FFFBF0]"
+            className="rounded-lg border border-[#F2EAD3] bg-white px-3 py-1.5 text-[#161827] disabled:opacity-40 hover:bg-[#FFFBF0]"
           >
             Trước
           </button>
@@ -302,7 +302,7 @@ export function FileManager({
             type="button"
             disabled={page >= totalPages}
             onClick={() => setPage((value) => value + 1)}
-            className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-[#0F172A] disabled:opacity-40 hover:bg-[#FFFBF0]"
+            className="rounded-lg border border-[#F2EAD3] bg-white px-3 py-1.5 text-[#161827] disabled:opacity-40 hover:bg-[#FFFBF0]"
           >
             Sau
           </button>

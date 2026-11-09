@@ -199,7 +199,7 @@ export default function EmployeeLeavePage() {
 
       {/* Requests History */}
       <div className="space-y-3">
-        <h3 className="text-base font-bold text-[#0F172A]">
+        <h3 className="text-base font-bold text-[#161827]">
           Lịch sử đơn nghỉ phép ({totalRequests})
         </h3>
 
@@ -233,7 +233,7 @@ export default function EmployeeLeavePage() {
               <TableBody>
                 {requests.map((r) => (
                   <TableRow key={r.id}>
-                    <TableCell className="font-bold text-[#0F172A]">
+                    <TableCell className="font-bold text-[#161827]">
                       {r.leave_type?.name || "Nghỉ phép"}
                     </TableCell>
 
@@ -276,7 +276,7 @@ export default function EmployeeLeavePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#E2E8F0] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
             <span>
               Trang {page} / {totalPages}
             </span>
@@ -351,11 +351,11 @@ export default function EmployeeLeavePage() {
               placeholder="VD: Nghỉ phép thường niên cùng gia đình, giải quyết việc cá nhân..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
             <Button
               type="button"
               variant="secondary"

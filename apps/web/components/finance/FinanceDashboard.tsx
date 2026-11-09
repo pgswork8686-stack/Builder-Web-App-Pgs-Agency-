@@ -173,7 +173,7 @@ export default function FinanceDashboard({
               <div key={currency} className="space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#4F75FF]" />
-                  <h3 className="text-sm font-bold text-[#0F172A]">
+                  <h3 className="text-sm font-bold text-[#161827]">
                     Đơn vị tiền tệ: {currency}
                   </h3>
                 </div>
@@ -235,7 +235,7 @@ export default function FinanceDashboard({
       {/* Audit Log Timeline Card */}
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-          <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
+          <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
             <History className="w-4 h-4 text-[#4F75FF]" />
             Nhật ký thay đổi tài chính
           </h3>
@@ -257,19 +257,19 @@ export default function FinanceDashboard({
                     <Badge variant="blue" size="sm">
                       {log.entity_type.toUpperCase()}
                     </Badge>
-                    <span className="font-bold text-[#0F172A]">
+                    <span className="font-bold text-[#161827]">
                       {getActionLabel(log.action)}
                     </span>
                   </div>
                   <div className="text-[11px] text-[#64748B]">
                     Entity ID:{" "}
-                    <span className="font-mono text-[#0F172A]">
+                    <span className="font-mono text-[#161827]">
                       {log.entity_id}
                     </span>
                   </div>
                   <div className="text-[11px] text-[#64748B]">
                     Thực hiện bởi:{" "}
-                    <span className="font-bold text-[#0F172A]">
+                    <span className="font-bold text-[#161827]">
                       {log.actor?.full_name || log.actor?.email || "System"}
                     </span>
                   </div>

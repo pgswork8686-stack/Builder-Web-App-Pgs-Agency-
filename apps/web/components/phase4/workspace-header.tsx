@@ -83,7 +83,7 @@ export function WorkspaceHeader({
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-150 select-none ${
                 isActive
                   ? "bg-[#E7AE18] text-[#161827] shadow-xs"
-                  : "bg-white text-[#64748B] hover:text-[#161827] border border-[#E2E8F0] hover:bg-[#FFF8E5]"
+                  : "bg-white text-[#64748B] hover:text-[#161827] border border-[#F2EAD3] hover:bg-[#FFF8E5]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />

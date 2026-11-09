@@ -166,10 +166,10 @@ function ProjectCalendarContent({
             </span>
           </div>
 
-          <div className="h-4 w-px bg-[#E2E8F0] hidden sm:block" />
+          <div className="h-4 w-px bg-[#F2EAD3] hidden sm:block" />
 
           <div className="flex items-center gap-3">
-            <label className="inline-flex items-center gap-1.5 text-xs text-[#0F172A] cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#161827] cursor-pointer">
               <input
                 type="checkbox"
                 checked={showTasks}
@@ -178,7 +178,7 @@ function ProjectCalendarContent({
               />
               <span>Công việc</span>
             </label>
-            <label className="inline-flex items-center gap-1.5 text-xs text-[#0F172A] cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#161827] cursor-pointer">
               <input
                 type="checkbox"
                 checked={showWorkSchedule}
@@ -207,18 +207,18 @@ function ProjectCalendarContent({
           type="button"
           onClick={() => changeMonth(-1)}
           aria-label="Tháng trước"
-          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#64748B] hover:text-[#161827] transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <h2 className="font-bold text-[#0F172A] text-base">
+        <h2 className="font-bold text-[#161827] text-base">
           Tháng {month.getUTCMonth() + 1}/{month.getUTCFullYear()}
         </h2>
         <button
           type="button"
           onClick={() => changeMonth(1)}
           aria-label="Tháng sau"
-          className="rounded-xl border border-[#E2E8F0] p-2 hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition-colors"
+          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#64748B] hover:text-[#161827] transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -284,7 +284,7 @@ function ProjectCalendarContent({
                   <div className="mb-2 flex items-start justify-between">
                     <p
                       className={`text-xs font-bold ${
-                        currentMonth ? "text-[#0F172A]" : "text-[#CBD5E1]"
+                        currentMonth ? "text-[#161827]" : "text-[#CBD5E1]"
                       }`}
                     >
                       {day.getUTCDate()}
@@ -369,7 +369,7 @@ function ProjectCalendarContent({
   if (embedded) return inner;
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
       <div className="mx-auto max-w-[1500px] space-y-6">
         <WorkspaceHeader
           mode={mode}

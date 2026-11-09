@@ -305,7 +305,7 @@ export default function AdminClientsPage() {
               setQ(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
           />
         </div>
 
@@ -315,7 +315,7 @@ export default function AdminClientsPage() {
             setStatus(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi trạng thái --</option>
           <option value="active">Đang hoạt động (Active)</option>
@@ -363,7 +363,7 @@ export default function AdminClientsPage() {
 
                   <TableCell>
                     <div>
-                      <p className="font-bold text-[#0F172A]">{comp.name}</p>
+                      <p className="font-bold text-[#161827]">{comp.name}</p>
                       {comp.website && (
                         <a
                           href={
@@ -471,7 +471,7 @@ export default function AdminClientsPage() {
                         size="sm"
                         onClick={() => handleEdit(comp)}
                         title="Chỉnh sửa thông tin"
-                        className="text-[#64748B] hover:text-[#0F172A]"
+                        className="text-[#64748B] hover:text-[#161827]"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>

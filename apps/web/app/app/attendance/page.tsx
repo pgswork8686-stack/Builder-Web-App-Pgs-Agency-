@@ -261,12 +261,12 @@ export default function EmployeeAttendancePage() {
         <Card className="p-6 lg:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F2EAD3] pb-4 gap-2">
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
+              <h3 className="text-lg font-bold text-[#161827] tracking-tight">
                 Điểm danh ca làm việc
               </h3>
               <p className="text-xs text-[#64748B]">
                 Văn phòng:{" "}
-                <span className="font-medium text-[#0F172A]">
+                <span className="font-medium text-[#161827]">
                   Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
                   Phúc, Hà Đông, Hà Nội
                 </span>
@@ -279,7 +279,7 @@ export default function EmployeeAttendancePage() {
                   geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
                 }`}
               />
-              <span className="text-xs font-mono font-bold text-[#0F172A]">
+              <span className="text-xs font-mono font-bold text-[#161827]">
                 {geoCoords
                   ? `${geoCoords.latitude.toFixed(4)}, ${geoCoords.longitude.toFixed(4)}`
                   : geoError || "Đang lấy GPS..."}
@@ -296,7 +296,7 @@ export default function EmployeeAttendancePage() {
               placeholder="VD: Đi công tác tại cơ quan khách hàng, làm ngoài giờ..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
             />
           </div>
 
@@ -335,15 +335,15 @@ export default function EmployeeAttendancePage() {
           <div className="space-y-3 text-xs text-[#64748B]">
             <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Ca sáng:</span>
-              <span className="font-bold text-[#0F172A]">08:30 — 12:00</span>
+              <span className="font-bold text-[#161827]">08:30 — 12:00</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Nghỉ trưa:</span>
-              <span className="font-bold text-[#0F172A]">12:00 — 13:30</span>
+              <span className="font-bold text-[#161827]">12:00 — 13:30</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
               <span>Ca chiều:</span>
-              <span className="font-bold text-[#0F172A]">13:30 — 18:00</span>
+              <span className="font-bold text-[#161827]">13:30 — 18:00</span>
             </div>
             <div className="flex justify-between py-1.5">
               <span>Bán kính GPS hợp lệ:</span>
@@ -355,7 +355,7 @@ export default function EmployeeAttendancePage() {
 
       {/* History Table */}
       <div className="space-y-3">
-        <h3 className="text-base font-bold text-[#0F172A]">
+        <h3 className="text-base font-bold text-[#161827]">
           Lịch sử chấm công gần đây ({historyTotal} lượt)
         </h3>
 
@@ -402,7 +402,7 @@ export default function EmployeeAttendancePage() {
 
                   return (
                     <TableRow key={rec.id}>
-                      <TableCell className="font-bold text-[#0F172A]">
+                      <TableCell className="font-bold text-[#161827]">
                         {rec.attendance_date}
                       </TableCell>
                       <TableCell className="text-xs text-[#64748B]">

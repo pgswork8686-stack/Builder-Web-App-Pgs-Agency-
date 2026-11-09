@@ -257,7 +257,7 @@ export function NotificationsCenter() {
                 <Bell className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-extrabold text-[#0F172A]">
+                <h2 className="text-base font-extrabold text-[#161827]">
                   Luồng thông báo của bạn
                 </h2>
                 <p className="text-xs text-[#64748B]">
@@ -311,7 +311,7 @@ export function NotificationsCenter() {
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-sm text-[#0F172A]">
+                            <h3 className="font-bold text-sm text-[#161827]">
                               {item.title}
                             </h3>
                             {item.metadata &&
@@ -399,7 +399,7 @@ export function NotificationsCenter() {
                   <Megaphone className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-xs text-[#0F172A]">
+                  <h3 className="font-bold text-xs text-[#161827]">
                     Thông báo toàn thể nhân viên
                   </h3>
                   <p className="text-[10px] text-[#4F75FF] font-semibold">
@@ -429,7 +429,7 @@ export function NotificationsCenter() {
                 <Settings className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-[#0F172A] text-sm">
+                <h2 className="font-bold text-[#161827] text-sm">
                   Tùy chọn nhận tin
                 </h2>
                 <p className="text-[11px] text-[#64748B]">
@@ -446,7 +446,7 @@ export function NotificationsCenter() {
                 className="flex w-full items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
-                  <span className="block text-xs font-bold text-[#0F172A]">
+                  <span className="block text-xs font-bold text-[#161827]">
                     Thông báo trong app
                   </span>
                   <span className="text-[11px] text-[#64748B]">
@@ -468,7 +468,7 @@ export function NotificationsCenter() {
                 className="flex w-full items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-left disabled:opacity-50 hover:bg-white transition-colors cursor-pointer"
               >
                 <span>
-                  <span className="block text-xs font-bold text-[#0F172A]">
+                  <span className="block text-xs font-bold text-[#161827]">
                     Email notification
                   </span>
                   <span className="text-[11px] text-[#64748B]">
@@ -486,7 +486,7 @@ export function NotificationsCenter() {
           </Card>
 
           <Card className="p-6 space-y-3">
-            <h2 className="font-bold text-[#0F172A] text-sm">
+            <h2 className="font-bold text-[#161827] text-sm">
               Đường dẫn nhanh
             </h2>
             <div className="grid gap-2">
@@ -512,7 +512,7 @@ export function NotificationsCenter() {
         isOpen={isBroadcastOpen}
         onClose={() => !broadcasting && setIsBroadcastOpen(false)}
         title={
-          <div className="flex items-center gap-2.5 text-lg font-black text-[#0F172A]">
+          <div className="flex items-center gap-2.5 text-lg font-black text-[#161827]">
             <Megaphone className="w-5 h-5 text-[#4F75FF]" />
             Gửi thông báo đến toàn thể nhân viên
           </div>
@@ -522,7 +522,7 @@ export function NotificationsCenter() {
       >
         <form onSubmit={handleBroadcast} className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Tiêu đề thông báo *
             </label>
             <input
@@ -531,19 +531,19 @@ export function NotificationsCenter() {
               placeholder="VD: Thông báo nghỉ lễ Quốc Khánh / Họp toàn thể công ty"
               value={broadcastTitle}
               onChange={(e) => setBroadcastTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-[#161827] mb-1.5">
                 Loại thông báo
               </label>
               <select
                 value={broadcastType}
                 onChange={(e) => setBroadcastType(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="announcement">
                   Thông báo chung (Announcement)
@@ -557,7 +557,7 @@ export function NotificationsCenter() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-[#161827] mb-1.5">
                 Đường dẫn liên kết (Tùy chọn)
               </label>
               <input
@@ -565,13 +565,13 @@ export function NotificationsCenter() {
                 placeholder="VD: /app/admin/documents hoặc /app/calendar"
                 value={broadcastActionUrl}
                 onChange={(e) => setBroadcastActionUrl(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Nội dung thông báo chi tiết *
             </label>
             <textarea
@@ -580,7 +580,7 @@ export function NotificationsCenter() {
               placeholder="Nhập nội dung thông báo gửi đến toàn thể nhân viên..."
               value={broadcastMessage}
               onChange={(e) => setBroadcastMessage(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 

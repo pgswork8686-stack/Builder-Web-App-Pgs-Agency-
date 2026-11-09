@@ -22,7 +22,7 @@ export function Table({
 }: React.TableHTMLAttributes<HTMLTableElement>) {
   return (
     <table
-      className={`w-full text-left border-collapse text-sm text-[#0F172A] ${className}`}
+      className={`w-full text-left border-collapse text-sm text-[#161827] ${className}`}
       {...props}
     >
       {children}

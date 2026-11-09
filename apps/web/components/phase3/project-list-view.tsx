@@ -191,14 +191,14 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             placeholder="Tìm mã hoặc tên dự án..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi trạng thái --</option>
           {Object.entries(statusConfig).map(([key, value]) => (
@@ -211,7 +211,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi mức ưu tiên --</option>
           {Object.entries(priorityConfig).map(([key, value]) => (
@@ -288,13 +288,13 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors truncate">
+                        <h3 className="text-base font-extrabold text-[#161827] group-hover:text-[#4F75FF] transition-colors truncate">
                           {project.name}
                         </h3>
 
                         <p className="text-xs text-[#64748B] truncate">
                           Khách hàng:{" "}
-                          <span className="text-[#0F172A] font-medium">
+                          <span className="text-[#161827] font-medium">
                             {project.clientCompany?.name ?? "Chưa liên kết"}
                           </span>
                         </p>

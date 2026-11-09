@@ -172,7 +172,7 @@ export default function ClientSupportPage() {
                 </div>
               </div>
 
-              <div className="p-3.5 bg-[#F6F8FC] dark:bg-[#0F172A] rounded-xl text-xs text-[#2A3547] dark:text-white leading-relaxed">
+              <div className="p-3.5 bg-[#F6F8FC] dark:bg-[#161827] rounded-xl text-xs text-[#2A3547] dark:text-white leading-relaxed">
                 {selectedTicket.description}
               </div>
 
@@ -367,7 +367,7 @@ export default function ClientSupportPage() {
           </Card>
 
           {/* Contact Box */}
-          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#FFFBF0] dark:bg-[#0F172A]">
+          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#FFFBF0] dark:bg-[#161827]">
             <h4 className="text-xs font-bold text-[#7C879D] uppercase tracking-wider">
               Kênh liên hệ khẩn cấp
             </h4>

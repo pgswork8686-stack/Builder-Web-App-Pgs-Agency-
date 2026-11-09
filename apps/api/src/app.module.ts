@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module';
+import { EmployeeDashboardModule } from './employee-dashboard/employee-dashboard.module';
 import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 import { TeamLeaderDashboardModule } from './team-leader-dashboard/team-leader-dashboard.module';
 import { AttendanceModule } from './attendance/attendance.module';
@@ -50,6 +51,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     AuthModule,
     AdminModule,
     AdminDashboardModule,
+    EmployeeDashboardModule,
     TeamLeaderDashboardModule,
     OrganizationModule,
     PeopleModule,

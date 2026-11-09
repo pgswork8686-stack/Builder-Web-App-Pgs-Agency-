@@ -362,7 +362,7 @@ export default function AdminDashboardPage() {
         >
           {staff && staff.total > 0 ? (
             <>
-              <div className="h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden flex">
+              <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
                 <span style={{ width: `${((staff.present - staff.late) / staff.total) * 100}%` }} className="bg-[#00D09C]" />
                 <span style={{ width: `${(staff.late / staff.total) * 100}%` }} className="bg-[#FF9F24]" />
                 <span style={{ width: `${(staff.onLeave / staff.total) * 100}%` }} className="bg-[#3B5BDB]" />
@@ -414,7 +414,7 @@ export default function AdminDashboardPage() {
                         {w.overdue > 0 && <b className="text-[#DC2626]"> · {w.overdue} quá hạn</b>}
                       </span>
                     </div>
-                    <div className="h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden flex">
+                    <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
                       <span style={{ width: `${((w.open - w.overdue) / max) * 100}%` }} className="bg-[#E7AE18]" />
                       <span style={{ width: `${(w.overdue / max) * 100}%` }} className="bg-[#FF785A]" />
                     </div>
@@ -499,7 +499,7 @@ export default function AdminDashboardPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="h-2 rounded-full bg-[#F1F5F9] overflow-hidden mt-2">
+                    <div className="h-2 rounded-full bg-[#FBF3DC] overflow-hidden mt-2">
                       <span
                         style={{ width: `${p.progress}%` }}
                         className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#E7AE18]"}`}

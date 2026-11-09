@@ -533,7 +533,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <LayoutDashboard className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
                     Kanban Board
                   </h4>
                   <p className="text-xs text-[#64748B]">
@@ -553,7 +553,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
                     Lịch biểu dự án
                   </h4>
                   <p className="text-xs text-[#64748B]">
@@ -573,7 +573,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   <FolderOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
                     Tệp tin & Tài liệu
                   </h4>
                   <p className="text-xs text-[#64748B]">
@@ -597,13 +597,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer ${
                 isActive
                   ? "border-[#4F75FF] text-[#4F75FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  : "border-transparent text-[#64748B] hover:text-[#161827]"
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{label}</span>
               {typeof count === "number" && (
-                <span className="px-1.5 py-0.2 rounded-full bg-[#F1F5F9] text-[10px] text-[#64748B]">
+                <span className="px-1.5 py-0.2 rounded-full bg-[#FBF3DC] text-[10px] text-[#64748B]">
                   {count}
                 </span>
               )}
@@ -655,13 +655,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             <CardContent className="space-y-3 text-xs">
               <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Công ty khách hàng:</span>
-                <span className="font-bold text-[#0F172A]">
+                <span className="font-bold text-[#161827]">
                   {project.clientCompany?.name || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Project Manager:</span>
-                <span className="font-bold text-[#0F172A]">
+                <span className="font-bold text-[#161827]">
                   {project.projectManager?.full_name ||
                     project.projectManager?.email ||
                     "Chưa chỉ định"}
@@ -669,13 +669,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
               <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Ngày khởi động:</span>
-                <span className="text-[#0F172A]">
+                <span className="text-[#161827]">
                   {project.startDate || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
                 <span className="text-[#64748B]">Hạn chót bàn giao:</span>
-                <span className="text-[#0F172A]">{project.dueDate || "—"}</span>
+                <span className="text-[#161827]">{project.dueDate || "—"}</span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-[#64748B]">Ngày nghiệm thu:</span>
@@ -692,7 +692,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       {tab === "members" && mode !== "client" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#0F172A]">
+            <h3 className="text-base font-bold text-[#161827]">
               Danh sách thành viên dự án
             </h3>
             {mode === "admin" && (
@@ -734,7 +734,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 ) : (
                   members.map((m) => (
                     <TableRow key={m.id}>
-                      <TableCell className="font-bold text-[#0F172A]">
+                      <TableCell className="font-bold text-[#161827]">
                         {m.profile?.full_name || m.profile?.email}
                       </TableCell>
                       <TableCell className="text-[#64748B]">
@@ -770,7 +770,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       {tab === "services" && mode !== "client" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#0F172A]">
+            <h3 className="text-base font-bold text-[#161827]">
               Gói dịch vụ cung cấp
             </h3>
             {mode === "admin" && (
@@ -811,7 +811,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                       <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
                         {s.service?.code || "—"}
                       </TableCell>
-                      <TableCell className="font-bold text-[#0F172A]">
+                      <TableCell className="font-bold text-[#161827]">
                         {s.service?.name || "—"}
                       </TableCell>
                       <TableCell>
@@ -846,7 +846,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         <div className="space-y-4">
           {/* Sub-tab switcher */}
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-1 bg-[#F1F5F9] rounded-xl p-1">
+            <div className="flex items-center gap-1 bg-[#FBF3DC] rounded-xl p-1">
               {(
                 [
                   { value: "list" as TaskView, label: "☰ Danh sách" },
@@ -861,7 +861,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     taskView === value
                       ? "bg-white text-[#4F75FF] shadow-sm border border-[#F2EAD3]"
-                      : "text-[#64748B] hover:text-[#0F172A]"
+                      : "text-[#64748B] hover:text-[#161827]"
                   }`}
                 >
                   {label}
@@ -907,7 +907,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   ) : (
                     tasks.map((t) => (
                       <TableRow key={t.id}>
-                        <TableCell className="font-bold text-[#0F172A]">
+                        <TableCell className="font-bold text-[#161827]">
                           <Link
                             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/tasks/${t.id}`}
                             className="hover:text-[#4F75FF] transition-colors"
@@ -1079,7 +1079,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         onClose={() => !creatingTask && setAddTaskOpen(false)}
         maxWidth="md"
         title={
-          <div className="flex items-center gap-2 text-base font-extrabold text-[#0F172A]">
+          <div className="flex items-center gap-2 text-base font-extrabold text-[#161827]">
             <ListTodo className="w-5 h-5 text-[#4F75FF]" />
             Tạo công việc mới
           </div>
@@ -1088,7 +1088,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       >
         <form onSubmit={handleAddTask} className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Tiêu đề công việc *
             </label>
             <input
@@ -1099,12 +1099,12 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, title: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Mô tả chi tiết công việc (Tùy chọn)
             </label>
             <textarea
@@ -1114,13 +1114,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, description: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-[#161827] mb-1.5">
                 Người phụ trách
               </label>
               <select
@@ -1128,7 +1128,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 onChange={(e) =>
                   setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="">-- Chưa chỉ định --</option>
                 {people.map((p) => (
@@ -1140,7 +1140,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-[#161827] mb-1.5">
                 Mức độ ưu tiên
               </label>
               <select
@@ -1151,7 +1151,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     priority: e.target.value as TaskPriority,
                   })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="low">Thấp (Low)</option>
                 <option value="medium">Vừa (Medium)</option>
@@ -1163,7 +1163,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
           {/* Đường dẫn liên kết / Tài liệu (Link URL) */}
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
               <LinkIcon className="w-3.5 h-3.5 text-[#4F75FF]" />
               Đường dẫn liên kết / Tài liệu trực tuyến (Tùy chọn)
             </label>
@@ -1174,13 +1174,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, linkUrl: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-mono text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-mono text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
           {/* Tải lên tệp đính kèm (Upload File) */}
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
               <Paperclip className="w-3.5 h-3.5 text-[#4F75FF]" />
               Tệp tài liệu đính kèm (Upload File)
             </label>
@@ -1190,7 +1190,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 <div className="flex items-center gap-2.5 min-w-0">
                   <FileText className="w-4 h-4 text-[#4F75FF] shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-bold text-[#0F172A] truncate">
+                    <p className="font-bold text-[#161827] truncate">
                       {taskForm.file.name}
                     </p>
                     <p className="text-[11px] text-[#64748B]">

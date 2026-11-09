@@ -364,7 +364,7 @@ export default function AccountantPayrollPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã đợt lương</th>
                     <th className="px-4 py-3">Kỳ lương</th>
@@ -477,7 +477,7 @@ export default function AccountantPayrollPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã NV</th>
                     <th className="px-4 py-3">Họ tên & Vị trí</th>
@@ -595,7 +595,7 @@ export default function AccountantPayrollPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#7C879D] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã NV</th>
                   <th className="px-4 py-3">Nhân sự</th>
@@ -719,7 +719,7 @@ export default function AccountantPayrollPage() {
 
             <div className="overflow-y-auto my-4 flex-1">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
                   <tr>
                     <th className="px-3 py-2">Mã phiếu</th>
                     <th className="px-3 py-2">Nhân viên</th>
@@ -938,7 +938,7 @@ export default function AccountantPayrollPage() {
             ) : (
               <div className="overflow-y-auto max-h-72">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F6F9FC] dark:bg-[#0F172A] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
+                  <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#7C879D] uppercase">
                     <tr>
                       <th className="px-3 py-2">Hiệu lực từ</th>
                       <th className="px-3 py-2 text-right">Lương cơ bản</th>

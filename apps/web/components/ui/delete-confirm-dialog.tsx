@@ -30,14 +30,14 @@ export function DeleteConfirmDialog({
         </div>
 
         <div className="space-y-1.5">
-          <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
+          <h3 className="text-lg font-bold text-[#161827] tracking-tight">
             {title}
           </h3>
           <p className="text-xs text-[#64748B] leading-relaxed max-w-xs mx-auto">
             {description}
           </p>
           {itemName && (
-            <p className="text-xs font-mono font-bold text-[#0F172A] bg-[#FFFBF0] p-2 rounded-xl border border-[#E2E8F0] mt-2 truncate">
+            <p className="text-xs font-mono font-bold text-[#161827] bg-[#FFFBF0] p-2 rounded-xl border border-[#F2EAD3] mt-2 truncate">
               {itemName}
             </p>
           )}

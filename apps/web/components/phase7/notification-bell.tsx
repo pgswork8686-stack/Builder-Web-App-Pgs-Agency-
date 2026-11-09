@@ -188,7 +188,7 @@ export function NotificationBell() {
         <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#F2EAD3] bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-[#F2EAD3] px-4 py-3 bg-[#FFFBF0]">
             <div>
-              <div className="text-sm font-bold text-[#0F172A]">Thông báo</div>
+              <div className="text-sm font-bold text-[#161827]">Thông báo</div>
               <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#64748B]">
                 {connectionState === "denied" ? (
                   <WifiOff className="h-3 w-3 text-red-500" />
@@ -256,7 +256,7 @@ export function NotificationBell() {
                       }`}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="line-clamp-1 text-xs font-bold text-[#0F172A]">
+                      <div className="line-clamp-1 text-xs font-bold text-[#161827]">
                         {item.title}
                       </div>
                       <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#64748B]">
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] disabled:opacity-50 transition-colors"
+                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#161827] hover:bg-[#FBF3DC] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>

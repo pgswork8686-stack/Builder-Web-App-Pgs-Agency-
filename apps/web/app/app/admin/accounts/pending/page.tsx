@@ -197,13 +197,13 @@ export default function AdminPendingAccountsPage() {
             placeholder="Tìm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
           />
         </div>
 
         <div className="text-xs text-[#64748B] hidden sm:block">
           Hiển thị:{" "}
-          <span className="font-bold text-[#0F172A]">
+          <span className="font-bold text-[#161827]">
             {filteredUsers.length}
           </span>{" "}
           tài khoản
@@ -256,7 +256,7 @@ export default function AdminPendingAccountsPage() {
                           size="md"
                         />
                         <div>
-                          <p className="font-bold text-[#0F172A]">
+                          <p className="font-bold text-[#161827]">
                             {user.fullName || "Chưa đặt tên"}
                           </p>
                           <p className="text-xs text-[#64748B]">{user.email}</p>
@@ -288,7 +288,7 @@ export default function AdminPendingAccountsPage() {
                         onChange={(e) =>
                           handleRoleChange(user.id, e.target.value)
                         }
-                        className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2 outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                        className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
                       >
                         <option value="">-- Chọn vai trò --</option>
                         {ROLE_OPTIONS.map((opt) => (
@@ -350,7 +350,7 @@ export default function AdminPendingAccountsPage() {
               placeholder="VD: Không thuộc danh sách nhân sự chính thức của doanh nghiệp..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
             />
           </div>
 

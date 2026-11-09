@@ -119,7 +119,7 @@ export default function ClientInvoicesPage() {
                       <TableCell className="font-mono text-xs text-[#64748B]">
                         {i.due_date}
                       </TableCell>
-                      <TableCell className="font-extrabold text-[#0F172A] text-xs">
+                      <TableCell className="font-extrabold text-[#161827] text-xs">
                         {formatCurrency(i.amount, i.currency_code)}
                       </TableCell>
                       <TableCell className="font-extrabold text-emerald-600 text-xs">
@@ -160,7 +160,7 @@ export default function ClientInvoicesPage() {
               <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#F2EAD3]">
                 <span>
                   Hiển thị{" "}
-                  <span className="font-bold text-[#0F172A]">
+                  <span className="font-bold text-[#161827]">
                     {invoices.length}
                   </span>{" "}
                   / {total} hóa đơn
@@ -174,7 +174,7 @@ export default function ClientInvoicesPage() {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span className="font-bold text-[#0F172A]">
+                  <span className="font-bold text-[#161827]">
                     Trang {page} / {totalPages}
                   </span>
                   <Button

@@ -277,10 +277,10 @@ export default function AdminClientDetailPage() {
                 <Briefcase className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-extrabold text-[#0F172A]">
+                <h3 className="text-lg font-extrabold text-[#161827]">
                   {company.name}
                 </h3>
-                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#E2E8F0] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#F2EAD3] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
                   Mã: {company.code}
                 </div>
               </div>
@@ -290,7 +290,7 @@ export default function AdminClientDetailPage() {
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Mã số thuế
                   </span>
-                  <span className="font-mono text-[#0F172A] font-medium">
+                  <span className="font-mono text-[#161827] font-medium">
                     {company.taxCode || "—"}
                   </span>
                 </div>
@@ -298,13 +298,13 @@ export default function AdminClientDetailPage() {
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Điện thoại
                   </span>
-                  <span className="text-[#0F172A]">{company.phone || "—"}</span>
+                  <span className="text-[#161827]">{company.phone || "—"}</span>
                 </div>
                 <div>
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
-                  <span className="text-[#0F172A] font-mono">
+                  <span className="text-[#161827] font-mono">
                     {company.email || "—"}
                   </span>
                 </div>
@@ -322,14 +322,14 @@ export default function AdminClientDetailPage() {
                       {company.website}
                     </a>
                   ) : (
-                    <span className="text-[#0F172A]">—</span>
+                    <span className="text-[#161827]">—</span>
                   )}
                 </div>
                 <div>
                   <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
                     Địa chỉ trụ sở
                   </span>
-                  <span className="text-[#0F172A]">
+                  <span className="text-[#161827]">
                     {company.address || "—"}
                   </span>
                 </div>
@@ -351,7 +351,7 @@ export default function AdminClientDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 space-y-4">
               <div className="flex justify-between items-center border-b border-[#F2EAD3] pb-3">
-                <h2 className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
+                <h2 className="text-sm font-extrabold text-[#161827] flex items-center gap-2">
                   <Key className="w-4 h-4 text-[#4F75FF]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
@@ -378,7 +378,7 @@ export default function AdminClientDetailPage() {
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#0F172A]">
+                          <span className="font-bold text-[#161827]">
                             {m.fullName || "Chưa cập nhật tên"}
                           </span>
                           {m.isPrimary && (
@@ -454,7 +454,7 @@ export default function AdminClientDetailPage() {
                 required
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="">-- Chọn tài khoản client --</option>
                 {clientUsers.map((cu) => (
@@ -474,7 +474,7 @@ export default function AdminClientDetailPage() {
                 placeholder="Ví dụ: Đại diện pháp luật, Giám đốc IT..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -488,7 +488,7 @@ export default function AdminClientDetailPage() {
               />
               <label
                 htmlFor="is_primary_company"
-                className="text-xs font-semibold text-[#0F172A] cursor-pointer select-none"
+                className="text-xs font-semibold text-[#161827] cursor-pointer select-none"
               >
                 Đây là công ty chính liên kết với tài khoản này
               </label>

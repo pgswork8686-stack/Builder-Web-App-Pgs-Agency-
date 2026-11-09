@@ -257,7 +257,7 @@ export default function UserProfilePage() {
               </button>
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-[#0F172A]">
+              <h3 className="text-base font-extrabold text-[#161827]">
                 {userProfile.user.fullName || "Chưa cập nhật tên"}
               </h3>
               <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
@@ -277,7 +277,7 @@ export default function UserProfilePage() {
               size="sm"
               leftIcon={<Pencil className="w-3.5 h-3.5" />}
               onClick={handleOpenEdit}
-              className="w-full text-xs font-semibold text-[#0F172A]"
+              className="w-full text-xs font-semibold text-[#161827]"
             >
               Chỉnh sửa thông tin
             </Button>
@@ -307,7 +307,7 @@ export default function UserProfilePage() {
                     <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
                     Kích hoạt ngày
                   </span>
-                  <span className="font-mono text-[#0F172A] text-xs">
+                  <span className="font-mono text-[#161827] text-xs">
                     {new Date(
                       userProfile.account.approvedAt,
                     ).toLocaleDateString("vi-VN")}
@@ -323,7 +323,7 @@ export default function UserProfilePage() {
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
                   <Briefcase className="w-5 h-5 text-[#CA8A04]" />
-                  <h2 className="text-sm font-extrabold text-[#0F172A]">
+                  <h2 className="text-sm font-extrabold text-[#161827]">
                     Liên Kết Doanh Nghiệp Khách Hàng
                   </h2>
                 </div>
@@ -342,7 +342,7 @@ export default function UserProfilePage() {
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-sm text-[#0F172A]">
+                            <h4 className="font-bold text-sm text-[#161827]">
                               {comp.name}
                             </h4>
                             {comp.isPrimary && (
@@ -354,7 +354,7 @@ export default function UserProfilePage() {
                           <div className="flex items-center gap-3 text-xs text-[#64748B] mt-1 font-mono">
                             <span>Mã: {comp.code}</span>
                             {comp.title && (
-                              <span className="text-[#0F172A] font-sans font-medium">
+                              <span className="text-[#161827] font-sans font-medium">
                                 • {comp.title}
                               </span>
                             )}
@@ -375,7 +375,7 @@ export default function UserProfilePage() {
               <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
                   <Award className="w-5 h-5 text-[#4F75FF]" />
-                  <h2 className="text-sm font-extrabold text-[#0F172A]">
+                  <h2 className="text-sm font-extrabold text-[#161827]">
                     Thông Tin Hồ Sơ Nhân Sự
                   </h2>
                 </div>
@@ -400,7 +400,7 @@ export default function UserProfilePage() {
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Chức danh công việc
                       </span>
-                      <span className="text-sm font-bold text-[#0F172A]">
+                      <span className="text-sm font-bold text-[#161827]">
                         {orgContext.employee.jobTitle || "Chưa cập nhật"}
                       </span>
                     </div>
@@ -409,7 +409,7 @@ export default function UserProfilePage() {
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Phòng ban trực thuộc
                       </span>
-                      <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-[#161827] flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-[#64748B]" />
                         {orgContext.department?.name || "Chưa phân bổ"}
                       </span>
@@ -419,7 +419,7 @@ export default function UserProfilePage() {
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Đội nhóm trực thuộc
                       </span>
-                      <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-[#161827] flex items-center gap-1.5">
                         <Users2 className="w-3.5 h-3.5 text-[#64748B]" />
                         {orgContext.team?.name || "Chưa phân bổ"}
                       </span>
@@ -429,7 +429,7 @@ export default function UserProfilePage() {
                       <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block mb-1">
                         Người quản lý trực tiếp
                       </span>
-                      <span className="text-xs text-[#0F172A]">
+                      <span className="text-xs text-[#161827]">
                         {orgContext.manager?.fullName ? (
                           <span className="font-semibold">
                             {orgContext.manager.fullName}{" "}
@@ -522,7 +522,7 @@ export default function UserProfilePage() {
 
               <div className="flex-1 min-w-0 space-y-2">
                 <div>
-                  <label className="block text-xs font-bold text-[#0F172A]">
+                  <label className="block text-xs font-bold text-[#161827]">
                     Ảnh đại diện
                   </label>
                   <p className="text-[11px] text-[#64748B]">
@@ -570,13 +570,13 @@ export default function UserProfilePage() {
                 disabled={editAvatarUrl.startsWith("data:")}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3.5 py-1.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#0F172A] focus:border-[#4F75FF] outline-none transition-all disabled:bg-slate-100 disabled:text-[#64748B]"
+                className="w-full px-3.5 py-1.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#161827] focus:border-[#4F75FF] outline-none transition-all disabled:bg-slate-100 disabled:text-[#64748B]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Họ và tên đầy đủ *
             </label>
             <input
@@ -585,12 +585,12 @@ export default function UserProfilePage() {
               value={editFullName}
               onChange={(e) => setEditFullName(e.target.value)}
               placeholder="Nhập họ và tên đầy đủ..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+            <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Số điện thoại
             </label>
             <input
@@ -598,7 +598,7 @@ export default function UserProfilePage() {
               value={editPhone}
               onChange={(e) => setEditPhone(e.target.value)}
               placeholder="0988xxxxxx"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
             />
           </div>
 

@@ -216,7 +216,7 @@ export default function AdminSettingsPage() {
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A]">
+                  <h4 className="text-sm font-bold text-[#161827]">
                     Lịch Làm Việc Công Ty & Đồng Bộ Ngày Lễ
                   </h4>
                   <p className="text-xs text-[#64748B]">
@@ -241,7 +241,7 @@ export default function AdminSettingsPage() {
                 <Globe className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-[#0F172A]">
+                <h4 className="text-sm font-bold text-[#161827]">
                   Thông tin Tổ chức
                 </h4>
                 <p className="text-xs text-[#64748B]">
@@ -259,7 +259,7 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={companyHotline}
                     onChange={(e) => setCompanyHotline(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -283,7 +283,7 @@ export default function AdminSettingsPage() {
                     type="email"
                     value={companyEmail}
                     onChange={(e) => setCompanyEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -296,7 +296,7 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function AdminSettingsPage() {
                 <Settings className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-[#0F172A]">
+                <h4 className="text-sm font-bold text-[#161827]">
                   Quy chuẩn Chấm công & Ca làm việc
                 </h4>
                 <p className="text-xs text-[#64748B]">
@@ -328,7 +328,7 @@ export default function AdminSettingsPage() {
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                   aria-label="Múi giờ chấm công"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workStartTime}
                     onChange={(e) => setWorkStartTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workEndTime}
                     onChange={(e) => setWorkEndTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setLateGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -381,7 +381,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setEarlyLeaveGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -397,7 +397,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setRadiusMeters(e.target.value)}
                     min="1"
                     max="100000"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -411,7 +411,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLatitude(e.target.value)}
                     min="-90"
                     max="90"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -425,7 +425,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLongitude(e.target.value)}
                     min="-180"
                     max="180"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -460,7 +460,7 @@ export default function AdminSettingsPage() {
                 <Shield className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-[#0F172A]">
+                <h4 className="text-sm font-bold text-[#161827]">
                   Bảo mật & Phiên làm việc
                 </h4>
                 <p className="text-xs text-[#64748B]">
@@ -480,7 +480,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setSessionTimeout(Number(e.target.value))}
                   min="1"
                   max="168"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
 
@@ -494,7 +494,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setRateLimitRpm(Number(e.target.value))}
                   min="30"
                   max="1000"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#0F172A] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
                 />
               </div>
             </div>

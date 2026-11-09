@@ -45,7 +45,7 @@ export function MetricCard({
             <div className="flex items-center justify-between text-xs sm:text-sm">
               <span className="text-[#64748B] font-medium">{item.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-[#0F172A] font-bold">{item.value}</span>
+                <span className="text-[#161827] font-bold">{item.value}</span>
                 {item.subValue && (
                   <span className="text-[10px] text-[#94A3B8] font-mono">
                     {item.subValue}
@@ -55,7 +55,7 @@ export function MetricCard({
             </div>
 
             {typeof item.percentage === "number" && (
-              <div className="h-1.5 w-full rounded-full bg-[#F1F5F9] overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-[#FBF3DC] overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     item.color || "bg-gradient-to-r from-[#4F75FF] to-[#38BDF8]"

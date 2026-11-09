@@ -253,7 +253,7 @@ function ProjectBoardContent({
             }
             placeholder="Tìm theo tên công việc"
             aria-label="Tìm công việc"
-            className="w-full rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] py-2 pl-9 pr-3 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] py-2 pl-9 pr-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
           />
         </label>
         <select
@@ -265,7 +265,7 @@ function ProjectBoardContent({
             })
           }
           aria-label="Lọc mức ưu tiên"
-          className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">Mọi ưu tiên</option>
           {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
@@ -282,7 +282,7 @@ function ProjectBoardContent({
             setFilters({ ...filters, assigneeUserId: event.target.value })
           }
           aria-label="Lọc người phụ trách"
-          className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">Mọi người phụ trách</option>
           {assignees.map(([id, name]) => (
@@ -300,7 +300,7 @@ function ProjectBoardContent({
             })
           }
           aria-label="Lọc trạng thái"
-          className="rounded-xl border border-[#E2E8F0] bg-[#FFFBF0] px-3 py-2 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">Mọi trạng thái</option>
           {columns.map((column) => (
@@ -373,7 +373,7 @@ function ProjectBoardContent({
   if (embedded) return inner;
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#0F172A] lg:px-8">
+    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
       <div className="mx-auto max-w-[1600px] space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -419,13 +419,13 @@ function BoardColumn({
       className={`w-[310px] shrink-0 rounded-2xl border p-3.5 shadow-xs transition-colors ${
         isOver
           ? "border-[#4F75FF] bg-[#EEF2FF]/60"
-          : "border-[#F2EAD3] bg-[#F1F5F9]/50"
+          : "border-[#F2EAD3] bg-[#FBF3DC]/50"
       }`}
     >
       <div className="mb-3 flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2">
-          <h2 className="font-bold text-[#0F172A] text-sm">{label}</h2>
-          <span className="rounded-full bg-white border border-[#E2E8F0] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
+          <h2 className="font-bold text-[#161827] text-sm">{label}</h2>
+          <span className="rounded-full bg-white border border-[#F2EAD3] px-2.5 py-0.5 text-xs font-bold text-[#4F75FF] shadow-xs">
             {tasks.length}
           </span>
         </div>
@@ -504,7 +504,7 @@ function BoardCard({
           <button
             type="button"
             aria-label={`Kéo để sắp xếp ${task.title}`}
-            className="mt-0.5 cursor-grab text-[#94A3B8] active:cursor-grabbing hover:text-[#0F172A]"
+            className="mt-0.5 cursor-grab text-[#94A3B8] active:cursor-grabbing hover:text-[#161827]"
             {...attributes}
             {...listeners}
           >
@@ -514,7 +514,7 @@ function BoardCard({
         <div className="min-w-0 flex-1">
           <Link
             href={href}
-            className="font-bold text-sm text-[#0F172A] hover:text-[#4F75FF] transition-colors"
+            className="font-bold text-sm text-[#161827] hover:text-[#4F75FF] transition-colors"
           >
             {task.title}
           </Link>
@@ -524,7 +524,7 @@ function BoardCard({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
+        <span className="rounded-full bg-[#FBF3DC] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
         <span className="text-[#94A3B8] text-[11px] font-mono">
@@ -539,7 +539,7 @@ function BoardCard({
             onStatus(task, event.target.value as BoardStatus)
           }
           aria-label={`Đổi trạng thái ${task.title}`}
-          className="mt-3 w-full rounded-lg border border-[#E2E8F0] bg-[#FFFBF0] px-2 py-1.5 text-xs text-[#0F172A] outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="mt-3 w-full rounded-lg border border-[#F2EAD3] bg-[#FFFBF0] px-2 py-1.5 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           {columns.map((column) => (
             <option key={column.status} value={column.status}>

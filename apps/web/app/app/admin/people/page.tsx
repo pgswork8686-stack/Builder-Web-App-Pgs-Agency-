@@ -369,7 +369,7 @@ export default function AdminPeopleDirectoryPage() {
               setQ(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
           />
         </div>
 
@@ -379,7 +379,7 @@ export default function AdminPeopleDirectoryPage() {
             setRole(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi vai trò --</option>
           <option value="admin">Quản trị viên (Admin)</option>
@@ -395,7 +395,7 @@ export default function AdminPeopleDirectoryPage() {
             setDepartmentId(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi phòng ban --</option>
           {departments.map((d) => (
@@ -411,7 +411,7 @@ export default function AdminPeopleDirectoryPage() {
             setTeamId(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi nhóm (Team) --</option>
           {teams.map((t) => (
@@ -427,7 +427,7 @@ export default function AdminPeopleDirectoryPage() {
             setEmploymentStatus(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs text-[#0F172A] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Tình trạng công tác --</option>
           <option value="active">Đang làm việc (Active)</option>
@@ -496,7 +496,7 @@ export default function AdminPeopleDirectoryPage() {
                           className="ring-1 ring-[#F2EAD3]"
                         />
                         <div>
-                          <p className="font-bold text-[#0F172A]">
+                          <p className="font-bold text-[#161827]">
                             {person.fullName || "Chưa cập nhật"}
                           </p>
                           <p className="text-xs text-[#64748B]">
@@ -530,7 +530,7 @@ export default function AdminPeopleDirectoryPage() {
                     </TableCell>
 
                     <TableCell className="text-xs text-[#64748B]">
-                      <p className="text-[#0F172A] font-medium">
+                      <p className="text-[#161827] font-medium">
                         {ep?.departmentName || "Chưa gán PB"}
                       </p>
                       {ep?.teamName && (

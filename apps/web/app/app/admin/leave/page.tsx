@@ -206,7 +206,7 @@ export default function AdminLeavePage() {
               className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === item.id
                   ? "bg-[#4F75FF] text-white shadow-xs"
-                  : "bg-[#FFFBF0] text-[#64748B] hover:bg-[#F1F5F9] border border-[#E2E8F0]"
+                  : "bg-[#FFFBF0] text-[#64748B] hover:bg-[#FBF3DC] border border-[#F2EAD3]"
               }`}
             >
               {item.label}
@@ -221,7 +221,7 @@ export default function AdminLeavePage() {
         <div className="lg:col-span-8 space-y-4">
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-              <h3 className="text-base font-extrabold text-[#0F172A]">
+              <h3 className="text-base font-extrabold text-[#161827]">
                 Đơn cần duyệt ({total})
               </h3>
               <span className="text-xs text-[#64748B]">
@@ -260,7 +260,7 @@ export default function AdminLeavePage() {
                     {requests.map((req) => (
                       <TableRow key={req.id}>
                         <TableCell>
-                          <div className="font-bold text-[#0F172A]">
+                          <div className="font-bold text-[#161827]">
                             {req.employee?.fullName || "Chưa cập nhật"}
                           </div>
                           <div className="text-[11px] text-[#64748B]">
@@ -270,7 +270,7 @@ export default function AdminLeavePage() {
                         <TableCell className="text-xs text-[#64748B]">
                           {req.leave_type?.name || "Phép năm"}
                         </TableCell>
-                        <TableCell className="text-xs text-[#0F172A]">
+                        <TableCell className="text-xs text-[#161827]">
                           {req.start_date} ➔ {req.end_date}
                         </TableCell>
                         <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
@@ -349,7 +349,7 @@ export default function AdminLeavePage() {
         <div className="lg:col-span-4 space-y-4">
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#4F75FF]" />
                 Lịch nghỉ phép được duyệt
               </h3>
@@ -371,7 +371,7 @@ export default function AdminLeavePage() {
                     key={evt.id}
                     className="p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs space-y-1"
                   >
-                    <div className="font-bold text-[#0F172A]">
+                    <div className="font-bold text-[#161827]">
                       {evt.fullName}
                     </div>
                     <div className="text-[11px] text-[#64748B]">
@@ -398,10 +398,10 @@ export default function AdminLeavePage() {
           description={`Nhân sự: ${selectedRequest.employee?.fullName || selectedRequest.employee?.email}`}
         >
           <div className="space-y-4 pt-2">
-            <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#E2E8F0] text-xs space-y-2">
+            <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#64748B]">Thời gian:</span>
-                <span className="font-bold text-[#0F172A]">
+                <span className="font-bold text-[#161827]">
                   {selectedRequest.start_date} ➔ {selectedRequest.end_date}
                 </span>
               </div>
@@ -413,7 +413,7 @@ export default function AdminLeavePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#64748B]">Lý do:</span>
-                <span className="text-[#0F172A]">
+                <span className="text-[#161827]">
                   {selectedRequest.reason || "Không ghi chú"}
                 </span>
               </div>
@@ -435,7 +435,7 @@ export default function AdminLeavePage() {
                 onChange={(e) => setReviewNote(e.target.value)}
                 placeholder="Nhập phản hồi nếu có..."
                 rows={3}
-                className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
               />
             </div>
 

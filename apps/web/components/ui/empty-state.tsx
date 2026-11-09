@@ -21,12 +21,12 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#E2E8F0] bg-white p-8 sm:p-12 text-center shadow-xs ${className}`}
+      className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#F2EAD3] bg-white p-8 sm:p-12 text-center shadow-xs ${className}`}
     >
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] mb-4">
         {icon || <FolderOpen className="w-7 h-7" />}
       </div>
-      <h3 className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">
+      <h3 className="text-base sm:text-lg font-bold text-[#161827] tracking-tight">
         {title}
       </h3>
       {description && (

@@ -252,7 +252,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-[#F2EAD3] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
-        <h2 className="text-base font-bold text-[#0F172A]">
+        <h2 className="text-base font-bold text-[#161827]">
           Không tìm thấy hóa đơn
         </h2>
         <p className="text-xs text-[#64748B]">
@@ -380,7 +380,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
                   Mã số hóa đơn
                 </span>
-                <h2 className="text-xl font-extrabold text-[#0F172A] mt-1 font-mono">
+                <h2 className="text-xl font-extrabold text-[#161827] mt-1 font-mono">
                   {invoice.invoice_number}
                 </h2>
               </div>
@@ -400,7 +400,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Khách hàng
                 </span>
-                <span className="text-sm font-semibold text-[#0F172A] mt-1 block">
+                <span className="text-sm font-semibold text-[#161827] mt-1 block">
                   {invoice.client_company?.name || "—"}
                 </span>
               </div>
@@ -408,7 +408,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Hợp đồng liên quan
                 </span>
-                <span className="text-sm font-semibold text-[#0F172A] mt-1 block">
+                <span className="text-sm font-semibold text-[#161827] mt-1 block">
                   {invoice.contract_id ? (
                     <Link
                       href={`${roleBasePath}/finance/contracts/${invoice.contract_id}`}
@@ -430,7 +430,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                   <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                     Ngày phát hành
                   </span>
-                  <span className="text-sm text-[#0F172A] font-mono font-medium mt-0.5 block">
+                  <span className="text-sm text-[#161827] font-mono font-medium mt-0.5 block">
                     {invoice.issue_date}
                   </span>
                 </div>
@@ -442,7 +442,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                   <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                     Hạn thanh toán
                   </span>
-                  <span className="text-sm text-[#0F172A] font-mono font-medium mt-0.5 block">
+                  <span className="text-sm text-[#161827] font-mono font-medium mt-0.5 block">
                     {invoice.due_date}
                   </span>
                 </div>
@@ -452,7 +452,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Dư nợ còn lại
                 </span>
-                <span className="text-sm font-bold text-[#0F172A] block mt-0.5">
+                <span className="text-sm font-bold text-[#161827] block mt-0.5">
                   {formatCurrency(outstanding, invoice.currency_code)}
                 </span>
               </div>
@@ -473,7 +473,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
           {/* Payments Timeline */}
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
                 <CreditCard className="w-4.5 h-4.5 text-[#4F75FF]" />
                 Lịch sử thanh toán ({payments.length})
               </h3>
@@ -502,7 +502,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                       {pay.paymentReference && (
                         <div className="text-[#64748B] text-[11px]">
                           Mã tham chiếu:{" "}
-                          <span className="font-mono text-[#0F172A]">
+                          <span className="font-mono text-[#161827]">
                             {pay.paymentReference}
                           </span>
                         </div>
@@ -514,7 +514,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                       )}
                       <div className="text-[10px] text-[#94A3B8]">
                         Người ghi nhận:{" "}
-                        <span className="font-semibold text-[#0F172A]">
+                        <span className="font-semibold text-[#161827]">
                           {pay.recordedBy || "Hệ thống"}
                         </span>
                       </div>
@@ -534,7 +534,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
         <div className="space-y-6">
           {/* Client Visibility Panel */}
           <Card className="p-5 space-y-4">
-            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#F2EAD3] pb-3">
+            <h3 className="text-xs font-bold text-[#161827] uppercase tracking-wider border-b border-[#F2EAD3] pb-3">
               Cổng thông tin Khách hàng
             </h3>
             <div className="flex items-center justify-between text-xs bg-[#FFFBF0] p-3.5 rounded-xl border border-[#F2EAD3]">
@@ -544,7 +544,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 ) : (
                   <EyeOff className="w-4 h-4 text-[#94A3B8]" />
                 )}
-                <span className="font-bold text-xs text-[#0F172A]">
+                <span className="font-bold text-xs text-[#161827]">
                   {invoice.client_visible ? "Đang hiển thị" : "Đang ẩn"}
                 </span>
               </div>
@@ -586,7 +586,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                   placeholder="VD: 5000000"
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full pl-12 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs font-bold outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="w-full pl-12 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs font-bold outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
               </div>
             </div>
@@ -600,7 +600,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 required
                 value={payDate}
                 onChange={(e) => setPayDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -611,7 +611,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
               <select
                 value={payMethod}
                 onChange={(e) => setPayMethod(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               >
                 <option value="Chuyển khoản ngân hàng">
                   Chuyển khoản ngân hàng
@@ -630,7 +630,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 placeholder="Mã giao dịch ngân hàng, mã bill..."
                 value={payReference}
                 onChange={(e) => setPayReference(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF]"
               />
             </div>
 
@@ -643,7 +643,7 @@ export default function InvoiceDetail({ roleBasePath }: InvoiceDetailProps) {
                 placeholder="Ghi chú thêm về giao dịch..."
                 value={payNotes}
                 onChange={(e) => setPayNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#E2E8F0] text-[#0F172A] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
               />
             </div>
 
