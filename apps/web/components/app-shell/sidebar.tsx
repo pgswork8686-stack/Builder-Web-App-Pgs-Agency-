@@ -202,10 +202,10 @@ export function Sidebar({
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Cần hỗ trợ?</span>
             </div>
-            <p className="text-[10px] text-[#475569] leading-tight">
+            <p className="text-[10px] text-[#475569] leading-tight text-balance">
               {account.role === "client"
-                ? "Gửi yêu cầu hỗ trợ và ticket tới bộ phận CSKH."
-                : "Xem hướng dẫn và trung tâm trợ giúp hệ thống."}
+                ? "Gửi yêu cầu hỗ trợ tới bộ phận CSKH."
+                : "Xem hướng dẫn sử dụng và trung tâm trợ giúp."}
             </p>
             <Link
               href={supportHref}

@@ -54,6 +54,14 @@
     overflow-x: hidden;
   }
 
+  /* Không để lại một từ lẻ ở cuối dòng: tiêu đề cân bằng, đoạn văn tránh dòng mồ côi */
+  h1, h2, h3, h4, h5 {
+    text-wrap: balance;
+  }
+  p, li, blockquote, figcaption {
+    text-wrap: pretty;
+  }
+
   /* Custom subtle scrollbar */
   ::-webkit-scrollbar {
     width: 6px;

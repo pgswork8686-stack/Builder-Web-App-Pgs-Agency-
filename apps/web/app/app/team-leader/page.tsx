@@ -85,7 +85,7 @@ export default function TeamLeaderDashboardPage() {
             Mở Kanban
           </Link>
           <Link
-            href="/app/team-leader/tasks"
+            href="/app/team-leader/tasks?new=1"
             className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
           >
             Giao việc mới
