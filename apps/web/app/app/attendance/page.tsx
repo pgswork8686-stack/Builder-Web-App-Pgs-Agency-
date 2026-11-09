@@ -292,10 +292,11 @@ export default function EmployeeAttendancePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label htmlFor="attendance-note" className="block text-xs font-bold text-[#475569]">
               Ghi chú chấm công (Tùy chọn)
             </label>
             <input
+              id="attendance-note"
               type="text"
               placeholder="VD: Đi công tác tại cơ quan khách hàng, làm ngoài giờ..."
               value={note}

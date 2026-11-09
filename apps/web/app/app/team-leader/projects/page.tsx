@@ -60,7 +60,7 @@ export default function TeamLeaderProjectsPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm mã hoặc tên dự án…"
+            aria-label="Tìm dự án" placeholder="Tìm mã hoặc tên dự án…"
             className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm text-[#161827] placeholder:text-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB]"
           />
         </div>

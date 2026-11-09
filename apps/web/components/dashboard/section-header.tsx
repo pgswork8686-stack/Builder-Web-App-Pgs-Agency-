@@ -33,9 +33,9 @@ export function SectionHeader({
     >
       <div className="space-y-1">
         <div className="flex items-center gap-2.5">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#161827] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#161827] tracking-tight">
             {title}
-          </h2>
+          </h1>
           {badge && (
             <Badge variant={badgeVariant} size="sm">
               {badge}

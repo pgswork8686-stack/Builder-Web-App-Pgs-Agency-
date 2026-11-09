@@ -583,6 +583,7 @@ export function ChatWorkspace() {
                 value={conversationSearch}
                 onChange={(e) => setConversationSearch(e.target.value)}
                 placeholder="Tìm cuộc trò chuyện..."
+                aria-label="Tìm cuộc trò chuyện"
                 className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
               />
             </div>
@@ -1017,6 +1018,7 @@ export function ChatWorkspace() {
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     placeholder="Tìm kiếm theo tên, email, chức danh..."
+                aria-label="Tìm kiếm theo tên, email, chức danh"
                     className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                   />
                 </div>
@@ -1103,6 +1105,7 @@ export function ChatWorkspace() {
                   value={projectSearchQuery}
                   onChange={(e) => setProjectSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm dự án theo tên hoặc mã..."
+                aria-label="Tìm kiếm dự án theo tên hoặc mã"
                   className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF] transition-all"
                 />
               </div>

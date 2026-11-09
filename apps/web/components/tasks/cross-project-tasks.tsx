@@ -121,7 +121,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm công việc theo tên, mã, người phụ trách…"
+            aria-label="Tìm công việc" placeholder="Tìm công việc theo tên, mã, người phụ trách…"
             className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm placeholder:text-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB]"
           />
         </div>

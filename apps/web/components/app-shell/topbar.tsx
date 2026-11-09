@@ -106,7 +106,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     if (pathname.includes("/approvals")) return "Phê duyệt & Nghiệm thu";
     if (pathname.includes("/support")) return "Yêu cầu Hỗ trợ";
 
-    return "PGS Hub Workspace";
+    return "PGS Hub";
   };
 
   const roleTitle = account.role ? ROLE_LABELS[account.role] : "Người dùng";
