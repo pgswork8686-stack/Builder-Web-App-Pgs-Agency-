@@ -229,7 +229,7 @@ export default function AdminWorkCalendarPage() {
   return (
     <div className="space-y-6 max-w-6xl pb-16">
       <SectionHeader
-        title="Lịch Làm Việc Công Ty (Company Work Calendar)"
+        title="Lịch Làm Việc Công Ty"
         description="Cấu hình ngày làm việc, thứ 7 cách tuần, ngày lễ và ngoại lệ lịch áp dụng toàn hệ thống."
       />
 
@@ -280,7 +280,7 @@ export default function AdminWorkCalendarPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#475569] mb-1.5">
-                  Múi giờ hệ thống (Timezone)
+                  Múi giờ hệ thống
                 </label>
                 <input
                   type="text"
@@ -321,7 +321,7 @@ export default function AdminWorkCalendarPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-[#161827]">
-                    Áp dụng thứ 7 cách tuần (Alternate Saturday)
+                    Áp dụng thứ 7 cách tuần
                   </h4>
                   <p className="text-[11px] text-[#64748B]">
                     Chu kỳ 14 ngày luân phiên 1 tuần nghỉ, 1 tuần làm việc.
@@ -344,7 +344,7 @@ export default function AdminWorkCalendarPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#F2EAD3]">
                   <div>
                     <label className="block text-[11px] font-semibold text-[#475569] mb-1">
-                      Ngày mốc (Anchor Date)
+                      Ngày mốc
                     </label>
                     <input
                       type="date"
@@ -371,9 +371,9 @@ export default function AdminWorkCalendarPage() {
                       }
                       className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#4F75FF]"
                     >
-                      <option value="off">Nghỉ thứ 7 (Anchor is OFF)</option>
+                      <option value="off">Nghỉ thứ 7</option>
                       <option value="working">
-                        Đi làm thứ 7 (Anchor is WORKING)
+                        Đi làm thứ 7
                       </option>
                     </select>
                   </div>
@@ -411,7 +411,7 @@ export default function AdminWorkCalendarPage() {
             <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-4">
               <div>
                 <h3 className="text-sm font-bold text-[#161827]">
-                  Tự Động Đồng Bộ Ngày Lễ (Holiday API Sync)
+                  Tự Động Đồng Bộ Ngày Lễ
                 </h3>
                 <p className="text-[11px] text-[#64748B]">
                   Tích hợp Calendarific API để tự động cập nhật ngày lễ Việt Nam
@@ -607,7 +607,7 @@ export default function AdminWorkCalendarPage() {
             ? "Sửa ngoại lệ lịch làm việc"
             : "Thêm ngoại lệ lịch làm việc"
         }
-        description="Ngoại lệ thủ công (Manual) do Admin thiết lập luôn được ưu tiên cao nhất."
+        description="Ngoại lệ thủ công do Admin thiết lập luôn được ưu tiên cao nhất."
       >
         <form onSubmit={handleSaveEvent} className="space-y-4 pt-2">
           <div>

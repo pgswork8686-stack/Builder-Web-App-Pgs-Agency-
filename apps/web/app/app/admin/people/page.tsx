@@ -296,7 +296,7 @@ export default function AdminPeopleDirectoryPage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Danh bạ Nhân sự (People Directory)"
+        title="Danh bạ Nhân sự"
         description="Quản lý hồ sơ nhân viên, chức danh, phân quyền vai trò, dự án và tình trạng công tác toàn doanh nghiệp."
         badge={`${total} Nhân sự`}
         action={
@@ -382,11 +382,11 @@ export default function AdminPeopleDirectoryPage() {
           className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Mọi vai trò --</option>
-          <option value="admin">Quản trị viên (Admin)</option>
-          <option value="team_leader">Trưởng nhóm (Team Leader)</option>
-          <option value="employee">Nhân viên (Employee)</option>
-          <option value="accountant">Kế toán (Accountant)</option>
-          <option value="client">Khách hàng (Client)</option>
+          <option value="admin">Quản trị viên</option>
+          <option value="team_leader">Trưởng nhóm</option>
+          <option value="employee">Nhân viên</option>
+          <option value="accountant">Kế toán</option>
+          <option value="client">Khách hàng</option>
         </select>
 
         <select
@@ -413,7 +413,7 @@ export default function AdminPeopleDirectoryPage() {
           }}
           className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
-          <option value="">-- Mọi nhóm (Team) --</option>
+          <option value="">-- Mọi nhóm --</option>
           {teams.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
@@ -430,10 +430,10 @@ export default function AdminPeopleDirectoryPage() {
           className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
         >
           <option value="">-- Tình trạng công tác --</option>
-          <option value="active">Đang làm việc (Active)</option>
-          <option value="probation">Thử việc (Probation)</option>
-          <option value="on_leave">Nghỉ phép (On Leave)</option>
-          <option value="terminated">Đã nghỉ việc (Terminated)</option>
+          <option value="active">Đang làm việc</option>
+          <option value="probation">Thử việc</option>
+          <option value="on_leave">Nghỉ phép</option>
+          <option value="terminated">Đã nghỉ việc</option>
         </select>
       </div>
 
@@ -665,7 +665,7 @@ export default function AdminPeopleDirectoryPage() {
             />
             <div className="flex-1 min-w-0">
               <label className="block text-xs font-bold text-[#24304A] mb-1">
-                Ảnh đại diện (Avatar URL)
+                Ảnh đại diện
               </label>
               <input
                 type="text"
@@ -716,15 +716,15 @@ export default function AdminPeopleDirectoryPage() {
                 onChange={(e) => setEditRole(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               >
-                <option value="admin">Quản trị viên (Admin)</option>
+                <option value="admin">Quản trị viên</option>
                 <option value="team_leader">
-                  Trưởng nhóm / Quản lý (Team Leader)
+                  Trưởng nhóm / Quản lý
                 </option>
-                <option value="employee">Nhân viên thực thi (Employee)</option>
+                <option value="employee">Nhân viên thực thi</option>
                 <option value="accountant">
-                  Kế toán & Tài chính (Accountant)
+                  Kế toán & Tài chính
                 </option>
-                <option value="client">Khách hàng đại diện (Client)</option>
+                <option value="client">Khách hàng đại diện</option>
               </select>
             </div>
 
@@ -737,13 +737,13 @@ export default function AdminPeopleDirectoryPage() {
                 onChange={(e) => setEditAccountStatus(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               >
-                <option value="active">Hoạt động bình thường (Active)</option>
-                <option value="pending">Chờ phê duyệt (Pending)</option>
+                <option value="active">Hoạt động bình thường</option>
+                <option value="pending">Chờ phê duyệt</option>
                 <option value="suspended">
-                  Tạm ngưng hoạt động (Suspended)
+                  Tạm ngưng hoạt động
                 </option>
                 <option value="terminated">
-                  Đã khóa / Thôi việc (Terminated)
+                  Đã khóa / Thôi việc
                 </option>
               </select>
             </div>
@@ -759,7 +759,7 @@ export default function AdminPeopleDirectoryPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
-                    Mã nhân viên (Employee Code)
+                    Mã nhân viên
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
                       <span className="text-[10px] text-[#475569] font-normal ml-1">
                         (Mã định danh bất biến)
@@ -820,7 +820,7 @@ export default function AdminPeopleDirectoryPage() {
 
                 <div>
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
-                    Đội nhóm (Team)
+                    Đội nhóm
                   </label>
                   <select
                     value={editTeamId}
@@ -846,13 +846,13 @@ export default function AdminPeopleDirectoryPage() {
                   onChange={(e) => setEditEmpStatus(e.target.value as any)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-white text-xs font-semibold text-[#24304A] focus:border-[#5D87FF] outline-none"
                 >
-                  <option value="active">Chính thức (Active)</option>
+                  <option value="active">Chính thức</option>
                   <option value="probation">
-                    Thử việc / Thực tập sinh (Probation / Intern)
+                    Thử việc / Thực tập sinh
                   </option>
-                  <option value="on_leave">Nghỉ phép dài hạn (On Leave)</option>
+                  <option value="on_leave">Nghỉ phép dài hạn</option>
                   <option value="terminated">
-                    Đã thôi việc / Chấm dứt hợp đồng (Terminated)
+                    Đã thôi việc / Chấm dứt hợp đồng
                   </option>
                 </select>
               </div>
@@ -911,9 +911,9 @@ export default function AdminPeopleDirectoryPage() {
                 onChange={(e) => setProjectRole(e.target.value as any)}
                 className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] outline-none focus:border-[#5D87FF]"
               >
-                <option value="member">Thành viên (Member)</option>
+                <option value="member">Thành viên</option>
                 <option value="project_manager">Quản lý dự án (PM)</option>
-                <option value="viewer">Người quan sát (Viewer)</option>
+                <option value="viewer">Người quan sát</option>
               </select>
             </div>
           </div>

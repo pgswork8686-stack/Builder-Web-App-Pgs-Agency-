@@ -344,7 +344,7 @@ export default function AdminPersonDetailPage() {
 
                     <div>
                       <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
-                        Chức danh (Job Title)
+                        Chức danh
                       </label>
                       <input
                         type="text"
@@ -399,7 +399,7 @@ export default function AdminPersonDetailPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
-                      Người quản lý trực tiếp (Reports To)
+                      Người quản lý trực tiếp
                     </label>
                     <select
                       value={reportsToUserId}

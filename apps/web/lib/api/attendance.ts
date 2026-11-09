@@ -85,7 +85,19 @@ export interface AttendanceQuery {
   pageSize?: number;
 }
 
+export interface AttendancePolicy {
+  timezone: string;
+  workdayStartTime: string;
+  workdayEndTime: string;
+  lateGraceMinutes: number;
+  earlyLeaveGraceMinutes: number;
+  locationRequired: boolean;
+  photoRequired: boolean;
+}
+
 export const attendanceApi = {
+  getPolicy: (): Promise<AttendancePolicy> => request("/attendance/policy"),
+
   getSettings: (): Promise<AttendanceSettings> => {
     return request("/attendance/settings");
   },

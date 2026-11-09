@@ -11,7 +11,7 @@ export default function AccountantVouchersPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản lý Chứng từ Kế toán (Vouchers & Receipts)"
+        title="Quản lý Chứng từ Kế toán"
         description="Lưu trữ hóa đơn điện tử, ủy nhiệm chi và chứng từ thanh toán thuế doanh nghiệp."
         badge="Chứng từ"
         action={

@@ -17,6 +17,7 @@ import {
   attendanceApi,
   AttendanceRecord,
   AttendanceSummary,
+  AttendancePolicy,
 } from "@/lib/api/attendance";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -62,12 +63,15 @@ export default function EmployeeAttendancePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
+  const [policy, setPolicy] = useState<AttendancePolicy | null>(null);
+
   const loadUserAndSummary = async () => {
     try {
       setLoading(true);
       const me = await getMe();
       setUser(me);
 
+      attendanceApi.getPolicy().then(setPolicy).catch(() => setPolicy(null));
       const sum = await attendanceApi.getSummary();
       setSummary(sum);
 
@@ -134,7 +138,7 @@ export default function EmployeeAttendancePage() {
 
       setFeedback({
         type: "success",
-        message: `Check-in thành công lúc ${
+        message: `Vào ca thành công lúc ${
           record.check_in_at
             ? new Date(record.check_in_at).toLocaleTimeString("vi-VN")
             : "bây giờ"
@@ -146,7 +150,7 @@ export default function EmployeeAttendancePage() {
     } catch (err: any) {
       setFeedback({
         type: "error",
-        message: err.message || "Check-in thất bại. Vui lòng thử lại.",
+        message: err.message || "Vào ca thất bại. Vui lòng thử lại.",
       });
     } finally {
       setActionLoading(false);
@@ -173,7 +177,7 @@ export default function EmployeeAttendancePage() {
 
       setFeedback({
         type: "success",
-        message: `Check-out thành công lúc ${
+        message: `Tan ca thành công lúc ${
           record.check_out_at
             ? new Date(record.check_out_at).toLocaleTimeString("vi-VN")
             : "bây giờ"
@@ -185,7 +189,7 @@ export default function EmployeeAttendancePage() {
     } catch (err: any) {
       setFeedback({
         type: "error",
-        message: err.message || "Check-out thất bại. Vui lòng thử lại.",
+        message: err.message || "Tan ca thất bại. Vui lòng thử lại.",
       });
     } finally {
       setActionLoading(false);
@@ -198,9 +202,9 @@ export default function EmployeeAttendancePage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Chấm công Cá nhân (Attendance Hub)"
+        title="Chấm công cá nhân"
         description="Ghi nhận ca làm việc, định vị GPS địa điểm và kiểm tra lịch sử công tháng."
-        badge="Live GPS Tracking"
+        badge="Định vị trực tiếp"
       />
 
       {feedback && (
@@ -251,7 +255,7 @@ export default function EmployeeAttendancePage() {
           variant="rose"
           title="Chưa hoàn tất ca"
           value={`${summary?.monthly?.incompleteCount ?? 0} lần`}
-          subtitle="Quên check-out"
+          subtitle="Quên chấm công tan ca"
           icon={<LogOut className="w-5 h-5 text-rose-500" />}
         />
       </div>
@@ -310,7 +314,7 @@ export default function EmployeeAttendancePage() {
               onClick={handleCheckIn}
               leftIcon={<LogIn className="w-5 h-5" />}
             >
-              VÀO CA (CHECK-IN)
+              VÀO CA
             </Button>
 
             <Button
@@ -322,34 +326,42 @@ export default function EmployeeAttendancePage() {
               onClick={handleCheckOut}
               leftIcon={<LogOut className="w-5 h-5" />}
             >
-              TAN CA (CHECK-OUT)
+              TAN CA
             </Button>
           </div>
         </Card>
 
-        {/* Shift Policy Card */}
+        {/* Quy định chấm công — lấy từ cấu hình thật của hệ thống */}
         <Card className="p-6 space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-[#4F75FF]">
-            Quy định ca làm việc
+          <h4 className="text-sm font-bold uppercase tracking-wider text-[#3B5BDB]">
+            Quy định chấm công
           </h4>
-          <div className="space-y-3 text-xs text-[#64748B]">
-            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
-              <span>Ca sáng:</span>
-              <span className="font-bold text-[#161827]">08:30 — 12:00</span>
+          {policy ? (
+            <div className="space-y-3 text-xs text-[#475569]">
+              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+                <span>Giờ bắt đầu làm việc:</span>
+                <span className="font-bold text-[#161827]">{policy.workdayStartTime.slice(0, 5)}</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+                <span>Giờ kết thúc làm việc:</span>
+                <span className="font-bold text-[#161827]">{policy.workdayEndTime.slice(0, 5)}</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+                <span>Chấp nhận đi muộn:</span>
+                <span className="font-bold text-[#161827]">{policy.lateGraceMinutes} phút</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+                <span>Định vị GPS:</span>
+                <span className="font-bold text-[#161827]">{policy.locationRequired ? "Bắt buộc, phải ở trong phạm vi văn phòng" : "Không bắt buộc"}</span>
+              </div>
+              <div className="flex justify-between py-1.5">
+                <span>Ảnh xác thực:</span>
+                <span className="font-bold text-[#161827]">{policy.photoRequired ? "Bắt buộc" : "Không bắt buộc"}</span>
+              </div>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
-              <span>Nghỉ trưa:</span>
-              <span className="font-bold text-[#161827]">12:00 — 13:30</span>
-            </div>
-            <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
-              <span>Ca chiều:</span>
-              <span className="font-bold text-[#161827]">13:30 — 18:00</span>
-            </div>
-            <div className="flex justify-between py-1.5">
-              <span>Bán kính GPS hợp lệ:</span>
-              <span className="font-bold text-[#00B788]">≤ 100 mét</span>
-            </div>
-          </div>
+          ) : (
+            <p className="text-xs text-[#475569]">Đang tải quy định…</p>
+          )}
         </Card>
       </div>
 
@@ -377,8 +389,8 @@ export default function EmployeeAttendancePage() {
               <TableHead>
                 <TableRow>
                   <TableHeaderCell>Ngày</TableHeaderCell>
-                  <TableHeaderCell>Giờ vào (Check-in)</TableHeaderCell>
-                  <TableHeaderCell>Giờ ra (Check-out)</TableHeaderCell>
+                  <TableHeaderCell>Giờ vào</TableHeaderCell>
+                  <TableHeaderCell>Giờ ra</TableHeaderCell>
                   <TableHeaderCell>Thời gian làm</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>
                   <TableHeaderCell>Ghi chú</TableHeaderCell>

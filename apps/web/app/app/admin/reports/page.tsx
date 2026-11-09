@@ -10,7 +10,7 @@ export default function AdminReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Báo cáo Tổng hợp (Executive Reports)"
+        title="Báo cáo Tổng hợp"
         description="Tổng quan hiệu suất công việc, chỉ số tài chính, chấm công và tình hình dự án."
         badge="Xem trước"
         action={
@@ -29,7 +29,7 @@ export default function AdminReportsPage() {
         <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
         <span>
           <strong>Thông tin tính năng:</strong> Chức năng kết xuất file tổng hợp
-          (Excel/PDF) và lọc thống kê động đang trong lộ trình phát triển. Dữ
+          và lọc thống kê động đang trong lộ trình phát triển. Dữ
           liệu chi tiết có thể tra cứu trực tiếp tại từng phân hệ Dự án, Tài
           chính và Chấm công.
         </span>

@@ -35,7 +35,7 @@ export default function AdminCompletedProjectsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Dự án Hoàn thành (Completed Projects)"
+        title="Dự án Hoàn thành"
         description="Lưu trữ và tra cứu hồ sơ các dự án đã nghiệm thu và bàn giao thành công."
         badge={`${projects.length} Dự án`}
         action={

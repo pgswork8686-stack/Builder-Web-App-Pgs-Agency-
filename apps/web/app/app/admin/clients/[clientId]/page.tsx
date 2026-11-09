@@ -553,8 +553,8 @@ export default function AdminClientDetailPage() {
                 }
                 className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
-                <option value="active">Đang hoạt động (Active)</option>
-                <option value="inactive">Tạm dừng (Inactive)</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="inactive">Tạm dừng</option>
               </select>
             </div>
           </div>

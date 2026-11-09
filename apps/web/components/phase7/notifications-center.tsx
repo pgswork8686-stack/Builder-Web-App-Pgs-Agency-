@@ -546,12 +546,12 @@ export function NotificationsCenter() {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
                 <option value="announcement">
-                  Thông báo chung (Announcement)
+                  Thông báo chung
                 </option>
-                <option value="urgent">Khẩn cấp (Urgent)</option>
-                <option value="event">Sự kiện công ty (Company Event)</option>
+                <option value="urgent">Khẩn cấp</option>
+                <option value="event">Sự kiện công ty</option>
                 <option value="system">
-                  Cập nhật hệ thống (System Update)
+                  Cập nhật hệ thống
                 </option>
               </select>
             </div>

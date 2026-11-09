@@ -324,11 +324,11 @@ export default function AdminAttendancePage() {
             className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
           >
             <option value="">Tất cả trạng thái</option>
-            <option value="present">Đúng giờ (Present)</option>
-            <option value="late">Đi muộn (Late)</option>
-            <option value="early_leave">Về sớm (Early leave)</option>
+            <option value="present">Đúng giờ</option>
+            <option value="late">Đi muộn</option>
+            <option value="early_leave">Về sớm</option>
             <option value="incomplete">Chưa check-out</option>
-            <option value="absent">Vắng mặt (Absent)</option>
+            <option value="absent">Vắng mặt</option>
           </select>
         </div>
       </div>
@@ -476,7 +476,7 @@ export default function AdminAttendancePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
-                  Giờ vào (Check-in)
+                  Giờ vào
                 </label>
                 <input
                   type="datetime-local"
@@ -487,7 +487,7 @@ export default function AdminAttendancePage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
-                  Giờ ra (Check-out)
+                  Giờ ra
                 </label>
                 <input
                   type="datetime-local"
@@ -507,11 +507,11 @@ export default function AdminAttendancePage() {
                 onChange={(e) => setAdjustStatus(e.target.value)}
                 className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               >
-                <option value="present">Đúng giờ (Present)</option>
-                <option value="late">Đi muộn (Late)</option>
-                <option value="early_leave">Về sớm (Early leave)</option>
-                <option value="incomplete">Chưa hoàn tất (Incomplete)</option>
-                <option value="absent">Vắng mặt (Absent)</option>
+                <option value="present">Đúng giờ</option>
+                <option value="late">Đi muộn</option>
+                <option value="early_leave">Về sớm</option>
+                <option value="incomplete">Chưa hoàn tất</option>
+                <option value="absent">Vắng mặt</option>
               </select>
             </div>
 

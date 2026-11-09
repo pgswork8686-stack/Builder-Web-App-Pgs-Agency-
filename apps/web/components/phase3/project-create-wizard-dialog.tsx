@@ -158,7 +158,7 @@ export function ProjectCreateWizardDialog({
           <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#5D87FF] flex items-center justify-center">
             <FolderPlus className="w-5 h-5" />
           </div>
-          <span>Tạo dự án mới (Project Wizard)</span>
+          <span>Tạo dự án mới</span>
         </div>
       }
       description="Quy trình khởi tạo dự án chuẩn 3 bước: Chọn khách hàng &rarr; Thông tin &rarr; Nhân sự kế hoạch."
@@ -304,7 +304,7 @@ export function ProjectCreateWizardDialog({
           <div className="space-y-4 animate-in fade-in duration-150">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
-                label="Quản lý dự án (Project Manager)"
+                label="Quản lý dự án"
                 value={form.projectManagerUserId}
                 onChange={(e) =>
                   setForm({ ...form, projectManagerUserId: e.target.value })
@@ -328,10 +328,10 @@ export function ProjectCreateWizardDialog({
                   })
                 }
               >
-                <option value="low">Thấp (Low)</option>
-                <option value="medium">Bình thường (Medium)</option>
+                <option value="low">Thấp</option>
+                <option value="medium">Bình thường</option>
                 <option value="high">Cao (High)</option>
-                <option value="urgent">Khẩn cấp (Urgent)</option>
+                <option value="urgent">Khẩn cấp</option>
               </Select>
             </div>
 
@@ -346,7 +346,7 @@ export function ProjectCreateWizardDialog({
               />
 
               <Input
-                label="Hạn chót dự kiến (Due Date) *"
+                label="Hạn chót dự kiến *"
                 type="date"
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
@@ -360,9 +360,9 @@ export function ProjectCreateWizardDialog({
                 setForm({ ...form, status: e.target.value as ProjectStatus })
               }
             >
-              <option value="draft">Bản nháp (Draft)</option>
-              <option value="active">Đang thực hiện (Active)</option>
-              <option value="on_hold">Tạm dừng (On Hold)</option>
+              <option value="draft">Bản nháp</option>
+              <option value="active">Đang thực hiện</option>
+              <option value="on_hold">Tạm dừng</option>
             </Select>
           </div>
         )}
@@ -435,7 +435,7 @@ export function ProjectCreateWizardDialog({
             <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#5D87FF]/20 text-[#5D87FF] text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>
-                Sau khi kích hoạt, bạn có thể tạo công việc (Tasks), phân công
+                Sau khi kích hoạt, bạn có thể tạo công việc, phân công
                 thành viên và thêm dịch vụ vào dự án.
               </span>
             </div>

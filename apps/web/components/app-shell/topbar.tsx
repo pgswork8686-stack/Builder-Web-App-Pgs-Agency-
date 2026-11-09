@@ -55,9 +55,9 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     // Dashboards
     if (pathname === "/app/admin") return "Tổng quan quản trị";
     if (pathname === "/app/team-leader") return "Tổng quan quản lý";
-    if (pathname === "/app/employee") return "Employee Dashboard";
-    if (pathname === "/app/accountant") return "Accounting Dashboard";
-    if (pathname === "/app/client") return "Client Dashboard";
+    if (pathname === "/app/employee") return "Tổng quan nhân viên";
+    if (pathname === "/app/accountant") return "Tổng quan kế toán";
+    if (pathname === "/app/client") return "Tổng quan khách hàng";
 
     // Task & Work Modules (Admin, Team Leader, Employee)
     if (

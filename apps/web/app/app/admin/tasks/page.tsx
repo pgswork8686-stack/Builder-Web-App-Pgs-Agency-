@@ -15,7 +15,7 @@ export default function AdminTasksPage() {
       <TaskModuleHeader
         role="admin"
         activeView="list"
-        title="Danh sách Công việc (Tasks Master)"
+        title="Danh sách Công việc"
         description="Quản lý và điều phối tất cả các đầu việc trong toàn bộ các dự án của agency."
         badge="Danh sách"
       />

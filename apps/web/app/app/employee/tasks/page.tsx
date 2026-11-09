@@ -100,7 +100,7 @@ export default function EmployeeTasksPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Nhiệm vụ của tôi (My Assigned Tasks)"
+        title="Nhiệm vụ của tôi"
         description="Danh sách các công việc cá nhân được phân công thực hiện theo từng dự án."
         badge={`${tasks.length} Nhiệm vụ`}
       />

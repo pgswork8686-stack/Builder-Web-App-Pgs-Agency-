@@ -274,7 +274,7 @@ export default function AccountantPayrollPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản Lý Lương & Chấm Công PGS (Enterprise Payroll)"
+        title="Quản Lý Lương & Chấm Công PGS"
         description="Tính toán lương tự động dựa trên lịch làm việc PGS, tuân thủ chấm công, phạt muộn và thưởng chuyên cần 250.000 đ."
         badge={currentMonthStr}
         action={
@@ -305,7 +305,7 @@ export default function AccountantPayrollPage() {
           onClick={() => setActiveTab("runs")}
         >
           <FileSpreadsheet className="w-4 h-4" />
-          Đợt lương (Payroll Runs)
+          Đợt lương
         </button>
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
@@ -879,7 +879,7 @@ export default function AccountantPayrollPage() {
                   htmlFor="payrollEligibleCheck"
                   className="text-xs font-medium"
                 >
-                  Áp dụng tính bảng lương (Payroll Eligible)
+                  Áp dụng tính bảng lương
                 </label>
               </div>
 

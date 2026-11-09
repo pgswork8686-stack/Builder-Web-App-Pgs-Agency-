@@ -12,7 +12,7 @@ export default function AccountantDebtsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản lý Công nợ (Accounts Receivable)"
+        title="Quản lý Công nợ"
         description="Kiểm soát công nợ khách hàng, thời hạn thanh toán và các khoản nợ quá hạn."
         badge="Công nợ"
         action={

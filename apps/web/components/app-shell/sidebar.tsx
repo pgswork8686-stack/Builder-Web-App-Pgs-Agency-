@@ -37,8 +37,8 @@ export function Sidebar({
   const pathname = usePathname();
   const navGroups = account.role ? getNavigationForRole(account.role) : [];
   const subtitle = account.role
-    ? ROLE_HEADER_SUBTITLE[account.role] || "Agency Workspace"
-    : "Agency Workspace";
+    ? ROLE_HEADER_SUBTITLE[account.role] || "Không gian Agency"
+    : "Không gian Agency";
   const roleLabel = account.role ? ROLE_LABELS[account.role] : "Người dùng";
 
   // Derive real display name from authenticated user payload

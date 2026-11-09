@@ -30,7 +30,7 @@ export default function EmployeeProjectsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Dự án tham gia (My Active Projects)"
+        title="Dự án tham gia"
         description="Các dự án mà bạn đang là thành viên thực hiện chuyên môn."
         badge={`${projects.length} Dự án`}
       />

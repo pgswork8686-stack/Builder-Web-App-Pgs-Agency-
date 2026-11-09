@@ -36,10 +36,10 @@ import {
 } from "@/components/ui/table";
 
 const ROLE_OPTIONS = [
-  { value: "team_leader", label: "Trưởng nhóm (Team Leader)" },
-  { value: "employee", label: "Nhân viên (Employee)" },
-  { value: "accountant", label: "Kế toán (Accountant)" },
-  { value: "client", label: "Khách hàng (Client)" },
+  { value: "team_leader", label: "Trưởng nhóm" },
+  { value: "employee", label: "Nhân viên" },
+  { value: "accountant", label: "Kế toán" },
+  { value: "client", label: "Khách hàng" },
 ];
 
 export default function AdminPendingAccountsPage() {

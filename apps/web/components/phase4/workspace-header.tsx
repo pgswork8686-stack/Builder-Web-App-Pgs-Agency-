@@ -32,7 +32,7 @@ export function WorkspaceHeader({
   const links = [
     {
       key: "board",
-      label: "Kanban Board",
+      label: "Bảng Kanban",
       href: `${base}/board`,
       icon: LayoutDashboard,
     },

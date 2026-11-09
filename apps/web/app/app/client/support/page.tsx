@@ -132,7 +132,7 @@ export default function ClientSupportPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Trung tâm Hỗ trợ Khách hàng (Help Desk)"
+        title="Trung tâm Hỗ trợ Khách hàng"
         description="Gửi yêu cầu hỗ trợ, theo dõi tiến độ giải quyết và trao đổi trực tiếp với Quản lý dự án PGS Agency."
         badge="Help Desk 24/7"
       />

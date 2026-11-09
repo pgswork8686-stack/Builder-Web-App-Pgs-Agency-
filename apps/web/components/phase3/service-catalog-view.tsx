@@ -776,7 +776,7 @@ export function ServiceCatalogView() {
 
             <div>
               <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
-                Nhóm dịch vụ (Category)
+                Nhóm dịch vụ
               </label>
               <select
                 value={serviceForm.categoryId}
@@ -886,7 +886,7 @@ export function ServiceCatalogView() {
           <form onSubmit={handleSaveCategory} className="space-y-4 pt-2">
             <div>
               <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
-                Mã nhóm (Code) *
+                Mã nhóm *
               </label>
               <input
                 type="text"

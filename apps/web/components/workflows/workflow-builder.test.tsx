@@ -252,7 +252,7 @@ describe("WorkflowBuilder", () => {
     render(<WorkflowBuilder />);
     await selectService();
     fireEvent.click(
-      screen.getByRole("button", { name: "Move Stage Second up" }),
+      screen.getByRole("button", { name: "Chuyển giai đoạn Second lên" }),
     );
 
     await waitFor(() =>
@@ -359,7 +359,7 @@ describe("WorkflowBuilder", () => {
 
     render(<WorkflowBuilder />);
     await selectService();
-    fireEvent.click(screen.getByRole("button", { name: "Edit Delivery Item" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sửa hạng mục bàn giao" }));
     fireEvent.change(screen.getByLabelText("Mapped Completion Mode mapped-1"), {
       target: { value: "tasks_done_and_approval" },
     });
@@ -375,7 +375,7 @@ describe("WorkflowBuilder", () => {
     expect(approvalScope.disabled).toBe(false);
     fireEvent.change(approvalScope, { target: { value: "client" } });
     fireEvent.click(
-      screen.getByRole("button", { name: /Save Delivery Item/i }),
+      screen.getByRole("button", { name: /Lưu hạng mục bàn giao/i }),
     );
 
     await waitFor(() =>

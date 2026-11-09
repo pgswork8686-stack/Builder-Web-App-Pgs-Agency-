@@ -391,7 +391,7 @@ export default function AccountantAttendancePage() {
 
               <div>
                 <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
-                  Đội nhóm (Team)
+                  Đội nhóm
                 </label>
                 <select
                   value={filterTeam}
@@ -453,8 +453,8 @@ export default function AccountantAttendancePage() {
                   <TableRow>
                     <TableHeaderCell>Nhân sự</TableHeaderCell>
                     <TableHeaderCell>Ngày chấm</TableHeaderCell>
-                    <TableHeaderCell>Giờ vào (Check-in)</TableHeaderCell>
-                    <TableHeaderCell>Giờ ra (Check-out)</TableHeaderCell>
+                    <TableHeaderCell>Giờ vào</TableHeaderCell>
+                    <TableHeaderCell>Giờ ra</TableHeaderCell>
                     <TableHeaderCell>Thời lượng</TableHeaderCell>
                     <TableHeaderCell>Trạng thái</TableHeaderCell>
                     <TableHeaderCell>Ghi chú</TableHeaderCell>
@@ -688,7 +688,7 @@ export default function AccountantAttendancePage() {
                   }
                   leftIcon={<LogIn className="w-4 h-4" />}
                 >
-                  Vào ca (Check-in)
+                  Vào ca
                 </Button>
 
                 <Button
@@ -704,7 +704,7 @@ export default function AccountantAttendancePage() {
                   }
                   leftIcon={<LogOut className="w-4 h-4" />}
                 >
-                  Kết thúc ca (Check-out)
+                  Kết thúc ca
                 </Button>
               </div>
             </Card>

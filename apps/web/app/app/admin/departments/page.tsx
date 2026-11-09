@@ -255,7 +255,7 @@ export default function AdminDepartmentsPage() {
                   <TableHeaderCell>Mã định danh</TableHeaderCell>
                   <TableHeaderCell>Tên phòng ban</TableHeaderCell>
                   <TableHeaderCell>
-                    Trưởng phòng (Department Head)
+                    Trưởng phòng
                   </TableHeaderCell>
                   <TableHeaderCell>Mô tả chức năng</TableHeaderCell>
                   <TableHeaderCell>Trạng thái</TableHeaderCell>

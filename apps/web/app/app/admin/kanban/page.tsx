@@ -9,17 +9,17 @@ export default function AdminKanbanPage() {
       <TaskModuleHeader
         role="admin"
         activeView="kanban"
-        title="Bảng Kanban Tổng hợp (Master Board)"
+        title="Bảng Kanban Tổng hợp"
         description="Theo dõi luồng xử lý công việc trực quan theo các cột trạng thái dự án."
         badge="Kanban"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 min-h-[450px]">
         {[
-          "Cần làm (To Do)",
-          "Đang thực hiện (In Progress)",
-          "Chờ nghiệm thu (Review)",
-          "Hoàn tất (Done)",
+          "Cần làm",
+          "Đang thực hiện",
+          "Chờ nghiệm thu",
+          "Hoàn tất",
         ].map((col) => (
           <div
             key={col}

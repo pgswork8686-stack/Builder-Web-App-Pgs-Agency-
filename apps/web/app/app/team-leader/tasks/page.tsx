@@ -14,7 +14,7 @@ export default function TeamLeaderTasksPage() {
       <TaskModuleHeader
         role="team_leader"
         activeView="list"
-        title="Danh sách Công việc của Nhóm (Team Tasks)"
+        title="Danh sách Công việc của Nhóm"
         description="Theo dõi toàn bộ các đầu việc được giao cho thành viên trong team."
         badge="Danh sách"
       />

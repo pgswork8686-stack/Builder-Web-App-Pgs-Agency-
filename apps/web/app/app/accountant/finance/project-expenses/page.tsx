@@ -30,7 +30,7 @@ const CATEGORY_MAP: Record<string, string> = {
   travel: "Công tác & Di chuyển",
   software_license: "Bản quyền phần mềm",
   equipment: "Thiết bị & Công cụ",
-  outsourcing: "Thuê ngoài (Outsourcing)",
+  outsourcing: "Thuê ngoài",
   meal_entertainment: "Tiếp khách & Ăn uống",
   general: "Chi phí chung",
 };
@@ -160,7 +160,7 @@ export default function AccountantProjectExpensesPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Đề nghị & Chi phí Dự án (Project Expenses)"
+        title="Đề nghị & Chi phí Dự án"
         description="Kiểm soát chi phí phát sinh, mua tài nguyên và các đề nghị hoàn ứng theo từng dự án."
         badge="Chi phí dự án"
         action={

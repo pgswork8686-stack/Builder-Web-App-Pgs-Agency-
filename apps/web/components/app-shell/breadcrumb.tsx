@@ -28,7 +28,7 @@ const ROUTE_NAME_MAP: Record<string, string> = {
   employee: "Nhân viên",
   accountant: "Kế toán",
   client: "Khách hàng",
-  board: "Kanban Board",
+  board: "Bảng Kanban",
   calendar: "Lịch biểu",
   files: "Tệp tin",
   tasks: "Công việc",

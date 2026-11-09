@@ -445,7 +445,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   size="sm"
                   leftIcon={<LayoutDashboard className="w-4 h-4" />}
                 >
-                  Mở Kanban Board
+                  Mở bảng Kanban
                 </Button>
               </Link>
             )}
@@ -534,7 +534,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
-                    Kanban Board
+                    Bảng Kanban
                   </h4>
                   <p className="text-xs text-[#64748B]">
                     Kéo thả & phân bổ task thời gian thực
@@ -1003,9 +1003,9 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               })
             }
           >
-            <option value="member">Thành viên (Member)</option>
-            <option value="lead">Trưởng nhóm kỹ thuật (Lead)</option>
-            <option value="viewer">Người quan sát (Viewer)</option>
+            <option value="member">Thành viên</option>
+            <option value="lead">Trưởng nhóm kỹ thuật</option>
+            <option value="viewer">Người quan sát</option>
           </Select>
 
           <div className="flex justify-end gap-3 pt-2">
@@ -1153,15 +1153,15 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 }
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               >
-                <option value="low">Thấp (Low)</option>
-                <option value="medium">Vừa (Medium)</option>
+                <option value="low">Thấp</option>
+                <option value="medium">Vừa</option>
                 <option value="high">Cao (High)</option>
-                <option value="urgent">Khẩn cấp (Urgent)</option>
+                <option value="urgent">Khẩn cấp</option>
               </select>
             </div>
           </div>
 
-          {/* Đường dẫn liên kết / Tài liệu (Link URL) */}
+          {/* Đường dẫn liên kết / Tài liệu */}
           <div>
             <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
               <LinkIcon className="w-3.5 h-3.5 text-[#4F75FF]" />
@@ -1178,11 +1178,11 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             />
           </div>
 
-          {/* Tải lên tệp đính kèm (Upload File) */}
+          {/* Tải lên tệp đính kèm */}
           <div>
             <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
               <Paperclip className="w-3.5 h-3.5 text-[#4F75FF]" />
-              Tệp tài liệu đính kèm (Upload File)
+              Tệp tài liệu đính kèm
             </label>
 
             {taskForm.file ? (

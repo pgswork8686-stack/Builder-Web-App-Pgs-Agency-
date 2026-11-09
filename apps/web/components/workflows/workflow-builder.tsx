@@ -508,13 +508,13 @@ export function WorkflowBuilder() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Errors</p>
+                    <p className="text-xs text-muted-foreground">Lỗi</p>
                     <p className="font-bold text-rose-600">
                       {validation.errors.length}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Warnings</p>
+                    <p className="text-xs text-muted-foreground">Cảnh báo</p>
                     <p className="font-bold text-amber-600">
                       {validation.warnings.length}
                     </p>
@@ -540,7 +540,7 @@ export function WorkflowBuilder() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Stages</CardTitle>
+                <CardTitle>Giai đoạn</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {editable && (
@@ -591,7 +591,7 @@ export function WorkflowBuilder() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Stage Dependencies</CardTitle>
+                <CardTitle>Phụ thuộc giữa các giai đoạn</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid gap-2 sm:grid-cols-[1fr_auto_1fr_auto]">
@@ -612,14 +612,14 @@ export function WorkflowBuilder() {
                   </Select>
                   <GitBranch className="m-auto h-4 w-4" />
                   <Select
-                    aria-label="Stage sau"
+                    aria-label="Giai đoạn sau"
                     value={successorStageId}
                     disabled={!editable}
                     onChange={(event) =>
                       setSuccessorStageId(event.target.value)
                     }
                   >
-                    <option value="">Stage sau</option>
+                    <option value="">Giai đoạn sau</option>
                     {stages.map((stage) => (
                       <option key={stage.id} value={stage.id}>
                         {stage.name}
@@ -781,8 +781,8 @@ function StageEditor({
         {editable && (
           <div className="flex gap-1">
             <Button
-              aria-label={`Move Stage ${stage.name} up`}
-              title="Move Stage up"
+              aria-label={`Chuyển giai đoạn ${stage.name} lên`}
+              title="Chuyển giai đoạn lên"
               variant="ghost"
               size="sm"
               disabled={busy || !canMoveUp}
@@ -791,8 +791,8 @@ function StageEditor({
               <ArrowUp className="h-4 w-4" />
             </Button>
             <Button
-              aria-label={`Move Stage ${stage.name} down`}
-              title="Move Stage down"
+              aria-label={`Chuyển giai đoạn ${stage.name} xuống`}
+              title="Chuyển giai đoạn xuống"
               variant="ghost"
               size="sm"
               disabled={busy || !canMoveDown}
@@ -862,12 +862,12 @@ function StageEditor({
       {editable && (
         <div className="mt-3 grid gap-2 md:grid-cols-3">
           <Select
-            aria-label={`Delivery Item ${stage.name}`}
+            aria-label={`Hạng mục bàn giao ${stage.name}`}
             value={deliveryItemId}
             disabled={busy}
             onChange={(event) => setDeliveryItemId(event.target.value)}
           >
-            <option value="">Delivery Item</option>
+            <option value="">Hạng mục bàn giao</option>
             {deliveryItems
               .filter((item) => !mappedIds.has(item.id))
               .map((item) => (
@@ -884,8 +884,8 @@ function StageEditor({
               setCompletionMode(event.target.value as WorkflowCompletionMode);
             }}
           >
-            <option value="manual">Manual</option>
-            <option value="tasks_done">Tasks Done</option>
+            <option value="manual">Thủ công</option>
+            <option value="tasks_done">Hoàn thành công việc</option>
             <option value="tasks_done_and_approval">Tasks + Approval</option>
           </Select>
           <Input
@@ -923,9 +923,9 @@ function StageEditor({
               setApprovalScope(event.target.value as WorkflowApprovalScope)
             }
           >
-            <option value="internal">Internal</option>
-            <option value="client">Client</option>
-            <option value="both">Both</option>
+            <option value="internal">Nội bộ</option>
+            <option value="client">Khách hàng</option>
+            <option value="both">Cả hai</option>
           </Select>
           <Button
             disabled={!deliveryItemId || busy}
@@ -945,7 +945,7 @@ function StageEditor({
               })
             }
           >
-            <Plus className="mr-2 h-4 w-4" /> Map Delivery Item
+            <Plus className="mr-2 h-4 w-4" /> Gắn hạng mục bàn giao
           </Button>
         </div>
       )}
@@ -1032,7 +1032,7 @@ function MappedItemEditor({
               disabled={busy}
               onClick={() => setEditing((current) => !current)}
             >
-              Edit Delivery Item
+              Sửa hạng mục bàn giao
             </Button>
             <Button
               variant="ghost"
@@ -1042,7 +1042,7 @@ function MappedItemEditor({
                 void onMutate(() => workflowsApi.removeMappedItem(item.id))
               }
             >
-              <Trash2 className="h-4 w-4 text-rose-600" /> Remove Delivery Item
+              <Trash2 className="h-4 w-4 text-rose-600" /> Gỡ hạng mục bàn giao
             </Button>
           </div>
         )}
@@ -1058,8 +1058,8 @@ function MappedItemEditor({
               setCompletionMode(event.target.value as WorkflowCompletionMode)
             }
           >
-            <option value="manual">Manual</option>
-            <option value="tasks_done">Tasks Done</option>
+            <option value="manual">Thủ công</option>
+            <option value="tasks_done">Hoàn thành công việc</option>
             <option value="tasks_done_and_approval">Tasks + Approval</option>
           </Select>
           <Input
@@ -1079,9 +1079,9 @@ function MappedItemEditor({
               setApprovalScope(event.target.value as WorkflowApprovalScope)
             }
           >
-            <option value="internal">Internal</option>
-            <option value="client">Client</option>
-            <option value="both">Both</option>
+            <option value="internal">Nội bộ</option>
+            <option value="client">Khách hàng</option>
+            <option value="both">Cả hai</option>
           </Select>
           <label className="flex items-center gap-2">
             <input
@@ -1105,7 +1105,7 @@ function MappedItemEditor({
           </label>
           <div className="flex gap-2">
             <Button size="sm" disabled={busy} onClick={() => void save()}>
-              <Save className="mr-1 h-3 w-3" /> Save Delivery Item
+              <Save className="mr-1 h-3 w-3" /> Lưu hạng mục bàn giao
             </Button>
             <Button
               variant="ghost"

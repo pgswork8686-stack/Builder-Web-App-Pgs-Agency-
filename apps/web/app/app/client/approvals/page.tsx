@@ -10,7 +10,7 @@ export default function ClientApprovalsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Sản phẩm Chờ duyệt (Deliverables Review)"
+        title="Sản phẩm Chờ duyệt"
         description="Kiểm tra chất lượng ấn phẩm, tài liệu demo và xác nhận nghiệm thu giai đoạn."
         badge="Nghiệm thu"
       />

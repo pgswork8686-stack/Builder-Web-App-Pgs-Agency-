@@ -38,7 +38,7 @@ export default function EmployeePayrollPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Phiếu Lương Cá nhân (My Payslips)"
+        title="Phiếu Lương Cá nhân"
         description="Tra cứu chi tiết phiếu lương hàng tháng, các khoản khấu trừ và bảo hiểm."
         badge="Phiếu lương"
       />

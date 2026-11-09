@@ -9,7 +9,7 @@ export default function TeamLeaderKanbanPage() {
       <TaskModuleHeader
         role="team_leader"
         activeView="kanban"
-        title="Bảng Kanban Quản lý Nhóm (Team Board)"
+        title="Bảng Kanban Quản lý Nhóm"
         description="Theo dõi luồng công việc của đội nhóm theo các trạng thái thực hiện."
         badge="Kanban"
       />

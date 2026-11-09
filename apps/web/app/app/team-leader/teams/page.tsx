@@ -29,7 +29,7 @@ export default function TeamLeaderTeamsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản lý Đội nhóm (Team Overview)"
+        title="Quản lý Đội nhóm"
         description="Theo dõi thành viên, phân công chuyên môn và vai trò trong nhóm."
         badge={`${teams.length} Team`}
       />

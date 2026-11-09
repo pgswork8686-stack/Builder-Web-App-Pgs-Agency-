@@ -45,16 +45,16 @@ export interface NavGroup {
 }
 
 export const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Quản trị viên (Admin)",
-  team_leader: "Trưởng nhóm (Team Leader)",
-  employee: "Nhân viên (Employee)",
-  accountant: "Kế toán (Accountant)",
-  client: "Khách hàng (Client)",
+  admin: "Quản trị viên",
+  team_leader: "Trưởng nhóm",
+  employee: "Nhân viên",
+  accountant: "Kế toán",
+  client: "Khách hàng",
 };
 
 export const ROLE_HEADER_SUBTITLE: Record<AppRole, string> = {
-  admin: "Agency Workspace",
-  team_leader: "Manager Workspace",
+  admin: "Không gian Agency",
+  team_leader: "Không gian quản lý",
   employee: "Nhân viên",
   accountant: "Kế toán",
   client: "Khách hàng",

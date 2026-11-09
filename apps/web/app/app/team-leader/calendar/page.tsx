@@ -10,7 +10,7 @@ export default function TeamLeaderCalendarPage() {
       <TaskModuleHeader
         role="team_leader"
         activeView="calendar"
-        title="Lịch Công tác & Deadline (Team Calendar)"
+        title="Lịch Công tác & Deadline"
         description="Lịch làm việc của đội nhóm, các mốc giao nộp sản phẩm và lịch họp dự án."
         badge="Lịch nhóm"
       />
