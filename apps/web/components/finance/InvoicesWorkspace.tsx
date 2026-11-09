@@ -424,7 +424,7 @@ export default function InvoicesWorkspace({
             placeholder="Tìm kiếm theo số hóa đơn..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
           />
         </div>
 
@@ -432,7 +432,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#3B5BDB]"
           >
             <option value="">-- Mọi trạng thái --</option>
             <option value="draft">Nháp</option>
@@ -446,7 +446,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
-            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
+            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#3B5BDB] max-w-[200px]"
           >
             <option value="">-- Mọi khách hàng --</option>
             {clients.map((c) => (
@@ -459,7 +459,7 @@ export default function InvoicesWorkspace({
           <select
             value={filterContract}
             onChange={(e) => setFilterContract(e.target.value)}
-            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
+            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#3B5BDB] max-w-[200px]"
           >
             <option value="">-- Mọi hợp đồng --</option>
             {contracts.map((c) => (
@@ -498,7 +498,7 @@ export default function InvoicesWorkspace({
           </div>
         ) : invoices.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3B5BDB]" />}
             title="Không tìm thấy hóa đơn"
             description="Chưa có hóa đơn nào phù hợp với bộ lọc tìm kiếm."
             actionLabel="Tạo hóa đơn mới"
@@ -523,7 +523,7 @@ export default function InvoicesWorkspace({
               <TableBody>
                 {invoices.map((inv) => (
                   <TableRow key={inv.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3B5BDB]">
                       {inv.invoice_number}
                     </TableCell>
                     <TableCell className="font-bold text-[#161827] max-w-[260px] truncate" title={inv.client_company?.name || undefined}>
@@ -583,7 +583,7 @@ export default function InvoicesWorkspace({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                            className="text-[#3B5BDB] hover:bg-[#EEF2FF]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -673,7 +673,7 @@ export default function InvoicesWorkspace({
                   placeholder="VD: INV-2026-001"
                   value={formInvoiceNumber}
                   onChange={(e) => setFormInvoiceNumber(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
 
@@ -692,7 +692,7 @@ export default function InvoicesWorkspace({
                     setFormProjectId("");
                     setFormContractId("");
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn công ty khách hàng</option>
                   {clients.map((c) => (
@@ -715,7 +715,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formContractId}
                   onChange={(e) => setFormContractId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn hợp đồng (Không bắt buộc)</option>
                   {filteredContracts.map((c) => (
@@ -736,7 +736,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formProjectId}
                   onChange={(e) => setFormProjectId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn dự án (Không bắt buộc)</option>
                   {filteredProjects.map((p) => (
@@ -761,7 +761,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formIssueDate}
                   onChange={(e) => setFormIssueDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
 
@@ -777,7 +777,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formDueDate}
                   onChange={(e) => setFormDueDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
             </div>
@@ -796,7 +796,7 @@ export default function InvoicesWorkspace({
                   placeholder="VD: 10000000"
                   value={formAmount}
                   onChange={(e) => setFormAmount(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
               <div>
@@ -810,7 +810,7 @@ export default function InvoicesWorkspace({
                   }
                   value={formCurrencyCode}
                   onChange={(e) => setFormCurrencyCode(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn</option>
                   <option value="VND">VND</option>
@@ -828,7 +828,7 @@ export default function InvoicesWorkspace({
                 placeholder="Ghi chú thanh toán, số tài khoản nhận tiền..."
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] resize-none"
               />
             </div>
 
@@ -838,7 +838,7 @@ export default function InvoicesWorkspace({
                 id="formClientVisible"
                 checked={formClientVisible}
                 onChange={(e) => setFormClientVisible(e.target.checked)}
-                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+                className="w-4 h-4 accent-[#3B5BDB] cursor-pointer"
               />
               <label
                 htmlFor="formClientVisible"

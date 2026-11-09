@@ -265,7 +265,7 @@ export default function AdminWorkCalendarPage() {
           {/* Card 1: Quy tắc chung */}
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-3 border-b border-[#F2EAD3] pb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center font-bold">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <div>
@@ -288,7 +288,7 @@ export default function AdminWorkCalendarPage() {
                   type="text"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
                 />
               </div>
 
@@ -306,7 +306,7 @@ export default function AdminWorkCalendarPage() {
                         onClick={() => toggleDayOfWeek(day)}
                         className={`w-9 h-8 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
                           isSelected
-                            ? "bg-[#4F75FF] text-white border-[#4F75FF]"
+                            ? "bg-[#3B5BDB] text-white border-[#3B5BDB]"
                             : "bg-[#FFFBF0] text-[#475569] border-[#F2EAD3] hover:border-[#CBD5E1]"
                         }`}
                       >
@@ -338,7 +338,7 @@ export default function AdminWorkCalendarPage() {
                     }
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#4F75FF]"></div>
+                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#3B5BDB]"></div>
                 </label>
               </div>
 
@@ -354,7 +354,7 @@ export default function AdminWorkCalendarPage() {
                       onChange={(e) =>
                         setAlternateSaturdayAnchorDate(e.target.value)
                       }
-                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#4F75FF]"
+                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#3B5BDB]"
                     />
                   </div>
 
@@ -371,7 +371,7 @@ export default function AdminWorkCalendarPage() {
                           e.target.value === "working",
                         )
                       }
-                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#4F75FF]"
+                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#3B5BDB]"
                     >
                       <option value="off">Nghỉ thứ 7</option>
                       <option value="working">
@@ -403,7 +403,7 @@ export default function AdminWorkCalendarPage() {
                   }
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#4F75FF]"></div>
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#3B5BDB]"></div>
               </label>
             </div>
           </Card>
@@ -562,7 +562,7 @@ export default function AdminWorkCalendarPage() {
                       <span
                         className={`text-xs font-semibold ${
                           ev.source_type === "manual"
-                            ? "text-[#4F75FF]"
+                            ? "text-[#3B5BDB]"
                             : ev.source_type === "api"
                               ? "text-amber-600"
                               : "text-[#475569]"
@@ -576,7 +576,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => openEditEventModal(ev)}
-                          className="p-1.5 text-[#475569] hover:text-[#4F75FF] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#475569] hover:text-[#3B5BDB] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
                           title="Sửa ngoại lệ"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -623,7 +623,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, eventDate: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
             />
           </div>
 
@@ -639,7 +639,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, title: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
             />
           </div>
 
@@ -656,7 +656,7 @@ export default function AdminWorkCalendarPage() {
                     eventType: e.target.value as any,
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
               >
                 <option value="company_holiday">
                   Nghỉ nội bộ (company_holiday)
@@ -685,7 +685,7 @@ export default function AdminWorkCalendarPage() {
                     isWorkingDay: e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
               >
                 <option value="false">
                   Nghỉ làm việc (is_working_day = false)
@@ -708,7 +708,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, notes: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#4F75FF]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
             />
           </div>
 

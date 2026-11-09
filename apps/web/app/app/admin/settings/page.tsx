@@ -209,10 +209,10 @@ export default function AdminSettingsPage() {
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           {/* Work Calendar Link Card */}
-          <Card className="p-6 space-y-4 border border-[#4F75FF]/30 bg-[#EEF2FF]/40 shadow-xs md:col-span-2">
+          <Card className="p-6 space-y-4 border border-[#3B5BDB]/30 bg-[#EEF2FF]/40 shadow-xs md:col-span-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#4F75FF] text-white flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-[#3B5BDB] text-white flex items-center justify-center font-bold">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
@@ -227,7 +227,7 @@ export default function AdminSettingsPage() {
               </div>
               <a
                 href="/app/admin/settings/work-calendar"
-                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#4F75FF] hover:bg-[#3D61E6] rounded-xl transition-colors shrink-0 shadow-xs"
+                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#3B5BDB] hover:bg-[#2F4AB8] rounded-xl transition-colors shrink-0 shadow-xs"
               >
                 Quản lý lịch làm việc →
               </a>
@@ -237,7 +237,7 @@ export default function AdminSettingsPage() {
           {/* Company Info */}
           <Card className="p-6 space-y-4 border border-[#F2EAD3] shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F75FF] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center">
                 <Globe className="w-5 h-5" />
               </div>
               <div>
@@ -259,7 +259,7 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={companyHotline}
                     onChange={(e) => setCompanyHotline(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -283,7 +283,7 @@ export default function AdminSettingsPage() {
                     type="email"
                     value={companyEmail}
                     onChange={(e) => setCompanyEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -296,7 +296,7 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                 />
               </div>
             </div>
@@ -328,7 +328,7 @@ export default function AdminSettingsPage() {
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                   aria-label="Múi giờ chấm công"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workStartTime}
                     onChange={(e) => setWorkStartTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export default function AdminSettingsPage() {
                     type="time"
                     value={workEndTime}
                     onChange={(e) => setWorkEndTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setLateGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -381,7 +381,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setEarlyLeaveGraceMinutes(e.target.value)}
                     min="0"
                     max="1440"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -397,7 +397,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setRadiusMeters(e.target.value)}
                     min="1"
                     max="100000"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -411,7 +411,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLatitude(e.target.value)}
                     min="-90"
                     max="90"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -425,7 +425,7 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setOfficeLongitude(e.target.value)}
                     min="-180"
                     max="180"
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -436,7 +436,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={locationRequired}
                     onChange={(e) => setLocationRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
                   />
                   Bắt buộc GPS khi chấm công
                 </label>
@@ -445,7 +445,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={photoRequired}
                     onChange={(e) => setPhotoRequired(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                    className="w-4 h-4 rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
                   />
                   Bắt buộc ảnh bằng chứng khi chấm công
                 </label>
@@ -480,7 +480,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setSessionTimeout(Number(e.target.value))}
                   min="1"
                   max="168"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                 />
               </div>
 
@@ -494,7 +494,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setRateLimitRpm(Number(e.target.value))}
                   min="30"
                   max="1000"
-                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
                 />
               </div>
             </div>

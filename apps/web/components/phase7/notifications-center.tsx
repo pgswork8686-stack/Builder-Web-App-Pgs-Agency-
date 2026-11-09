@@ -202,7 +202,7 @@ export function NotificationsCenter() {
                 size="sm"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
-                className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-semibold"
+                className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-semibold"
               >
                 Gửi thông báo toàn công ty
               </Button>
@@ -253,7 +253,7 @@ export function NotificationsCenter() {
         <Card className="p-6 space-y-4">
           <div className="flex flex-col gap-3 border-b border-[#F2EAD3] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3B5BDB]">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
@@ -288,12 +288,12 @@ export function NotificationsCenter() {
 
           {loading ? (
             <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#475569]">
-              <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
+              <Loader2 className="h-4 w-4 animate-spin text-[#3B5BDB]" />
               Đang tải thông báo...
             </div>
           ) : items.length === 0 ? (
             <EmptyState
-              icon={<Bell className="w-8 h-8 text-[#4F75FF]" />}
+              icon={<Bell className="w-8 h-8 text-[#3B5BDB]" />}
               title="Không có thông báo phù hợp"
               description="Khi có thay đổi liên quan đến bạn, thông báo sẽ xuất hiện tại đây."
             />
@@ -304,7 +304,7 @@ export function NotificationsCenter() {
                   <div className="flex items-start gap-3.5">
                     <span
                       className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#4F75FF]"
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#3B5BDB]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
@@ -354,7 +354,7 @@ export function NotificationsCenter() {
                             size="sm"
                             disabled={saving === item.id}
                             onClick={() => void markRead(item)}
-                            className="text-[#4F75FF]"
+                            className="text-[#3B5BDB]"
                           >
                             {saving === item.id ? "Đang lưu..." : "Đã đọc"}
                           </Button>
@@ -395,14 +395,14 @@ export function NotificationsCenter() {
           {isAdmin && (
             <Card className="p-6 space-y-3.5 border border-[#E0EAFF] bg-[#F8FAFF]">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F75FF] text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3B5BDB] text-white">
                   <Megaphone className="h-4 w-4" />
                 </div>
                 <div>
                   <h3 className="font-bold text-xs text-[#161827]">
                     Thông báo toàn thể nhân viên
                   </h3>
-                  <p className="text-xs text-[#4F75FF] font-semibold">
+                  <p className="text-xs text-[#3B5BDB] font-semibold">
                     Quyền hạn: Admin
                   </p>
                 </div>
@@ -414,7 +414,7 @@ export function NotificationsCenter() {
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+                className="w-full !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
                 onClick={() => setIsBroadcastOpen(true)}
                 leftIcon={<Megaphone className="h-3.5 w-3.5" />}
               >
@@ -425,7 +425,7 @@ export function NotificationsCenter() {
 
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F75FF]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3B5BDB]">
                 <Settings className="h-5 w-5" />
               </div>
               <div>
@@ -492,13 +492,13 @@ export function NotificationsCenter() {
             <div className="grid gap-2">
               <Link
                 href="/app/chat"
-                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#3B5BDB] hover:bg-[#EEF2FF] transition-colors"
               >
                 Mở chat nội bộ / project
               </Link>
               <Link
                 href="/app/projects"
-                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] transition-colors"
+                className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs font-bold text-[#3B5BDB] hover:bg-[#EEF2FF] transition-colors"
               >
                 Xem workspace dự án
               </Link>
@@ -513,7 +513,7 @@ export function NotificationsCenter() {
         onClose={() => !broadcasting && setIsBroadcastOpen(false)}
         title={
           <div className="flex items-center gap-2.5 text-lg font-black text-[#161827]">
-            <Megaphone className="w-5 h-5 text-[#4F75FF]" />
+            <Megaphone className="w-5 h-5 text-[#3B5BDB]" />
             Gửi thông báo đến toàn thể nhân viên
           </div>
         }
@@ -531,7 +531,7 @@ export function NotificationsCenter() {
               placeholder="VD: Thông báo nghỉ lễ Quốc Khánh / Họp toàn thể công ty"
               value={broadcastTitle}
               onChange={(e) => setBroadcastTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
@@ -543,7 +543,7 @@ export function NotificationsCenter() {
               <select
                 value={broadcastType}
                 onChange={(e) => setBroadcastType(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               >
                 <option value="announcement">
                   Thông báo chung
@@ -565,7 +565,7 @@ export function NotificationsCenter() {
                 placeholder="VD: /app/admin/documents hoặc /app/calendar"
                 value={broadcastActionUrl}
                 onChange={(e) => setBroadcastActionUrl(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               />
             </div>
           </div>
@@ -580,7 +580,7 @@ export function NotificationsCenter() {
               placeholder="Nhập nội dung thông báo gửi đến toàn thể nhân viên..."
               value={broadcastMessage}
               onChange={(e) => setBroadcastMessage(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
@@ -600,7 +600,7 @@ export function NotificationsCenter() {
               size="sm"
               isLoading={broadcasting}
               leftIcon={<Send className="w-3.5 h-3.5" />}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
             >
               Phát thông báo ngay
             </Button>

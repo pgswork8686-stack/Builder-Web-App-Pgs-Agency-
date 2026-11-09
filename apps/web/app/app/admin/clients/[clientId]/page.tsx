@@ -253,7 +253,7 @@ export default function AdminClientDetailPage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
@@ -280,7 +280,7 @@ export default function AdminClientDetailPage() {
                 <h3 className="text-lg font-extrabold text-[#161827]">
                   {company.name}
                 </h3>
-                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#F2EAD3] font-mono text-[#4F75FF] text-xs font-bold uppercase mt-1">
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#F2EAD3] font-mono text-[#3B5BDB] text-xs font-bold uppercase mt-1">
                   Mã: {company.code}
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function AdminClientDetailPage() {
                       href={company.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#4F75FF] hover:underline"
+                      className="text-[#3B5BDB] hover:underline"
                     >
                       {company.website}
                     </a>
@@ -352,7 +352,7 @@ export default function AdminClientDetailPage() {
             <Card className="p-6 space-y-4">
               <div className="flex justify-between items-center border-b border-[#F2EAD3] pb-3">
                 <h2 className="text-sm font-extrabold text-[#161827] flex items-center gap-2">
-                  <Key className="w-4 h-4 text-[#4F75FF]" />
+                  <Key className="w-4 h-4 text-[#3B5BDB]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
                 <Button
@@ -454,7 +454,7 @@ export default function AdminClientDetailPage() {
                 required
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
               >
                 <option value="">-- Chọn tài khoản client --</option>
                 {clientUsers.map((cu) => (
@@ -474,7 +474,7 @@ export default function AdminClientDetailPage() {
                 placeholder="Ví dụ: Đại diện pháp luật, Giám đốc IT..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
               />
             </div>
 
@@ -484,7 +484,7 @@ export default function AdminClientDetailPage() {
                 id="is_primary_company"
                 checked={isPrimary}
                 onChange={(e) => setIsPrimary(e.target.checked)}
-                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+                className="w-4 h-4 accent-[#3B5BDB] cursor-pointer"
               />
               <label
                 htmlFor="is_primary_company"
@@ -551,7 +551,7 @@ export default function AdminClientDetailPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Tạm dừng</option>
@@ -601,7 +601,7 @@ export default function AdminClientDetailPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}

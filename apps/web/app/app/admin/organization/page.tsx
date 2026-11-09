@@ -21,7 +21,7 @@ export default function AdminOrganizationDashboard() {
       desc: "Quản lý danh sách phòng ban, sơ đồ phòng ban và mã định danh.",
       icon: Building2,
       href: "/app/admin/departments",
-      color: "bg-[#EEF2FF] text-[#4F75FF]",
+      color: "bg-[#EEF2FF] text-[#3B5BDB]",
       border: "border-[#F2EAD3]",
     },
     {
@@ -75,7 +75,7 @@ export default function AdminOrganizationDashboard() {
           const Icon = item.icon;
           return (
             <Link key={item.href} href={item.href} className="group block">
-              <Card className="p-6 h-full flex flex-col justify-between hover:border-[#4F75FF]/40 hover:shadow-md transition-all">
+              <Card className="p-6 h-full flex flex-col justify-between hover:border-[#3B5BDB]/40 hover:shadow-md transition-all">
                 <div className="space-y-4">
                   <div
                     className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.color} shadow-xs`}
@@ -83,7 +83,7 @@ export default function AdminOrganizationDashboard() {
                     <Icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-base text-[#161827] group-hover:text-[#4F75FF] transition-colors">
+                    <h3 className="font-extrabold text-base text-[#161827] group-hover:text-[#3B5BDB] transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-xs text-[#475569] mt-1 leading-relaxed">
@@ -92,7 +92,7 @@ export default function AdminOrganizationDashboard() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-between text-xs font-bold text-[#4F75FF] group-hover:translate-x-0.5 transition-transform">
+                <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-between text-xs font-bold text-[#3B5BDB] group-hover:translate-x-0.5 transition-transform">
                   <span>Truy cập quản lý</span>
                   <ChevronRight className="w-4 h-4" />
                 </div>

@@ -64,7 +64,7 @@ export default function AdminCompletedProjectsPage() {
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                <span className="font-mono text-xs font-bold text-[#3B5BDB]">
                   {p.projectCode}
                 </span>
                 <Badge variant="success" size="sm">

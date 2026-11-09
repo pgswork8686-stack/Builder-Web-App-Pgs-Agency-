@@ -529,13 +529,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           <Link
             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/board`}
           >
-            <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <Card className="p-5 hover:border-[#3B5BDB]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3B5BDB] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <LayoutDashboard className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#3B5BDB] transition-colors">
                     Bảng Kanban
                   </h4>
                   <p className="text-xs text-[#475569]">
@@ -549,13 +549,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           <Link
             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/calendar`}
           >
-            <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <Card className="p-5 hover:border-[#3B5BDB]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3B5BDB] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#3B5BDB] transition-colors">
                     Lịch biểu dự án
                   </h4>
                   <p className="text-xs text-[#475569]">
@@ -569,13 +569,13 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           <Link
             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/files`}
           >
-            <Card className="p-5 hover:border-[#4F75FF]/40 transition-all flex items-center justify-between group">
+            <Card className="p-5 hover:border-[#3B5BDB]/40 transition-all flex items-center justify-between group">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3B5BDB] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <FolderOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
+                  <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#3B5BDB] transition-colors">
                     Tệp tin & Tài liệu
                   </h4>
                   <p className="text-xs text-[#475569]">
@@ -598,7 +598,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onClick={() => setTab(value)}
               className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer ${
                 isActive
-                  ? "border-[#4F75FF] text-[#4F75FF]"
+                  ? "border-[#3B5BDB] text-[#3B5BDB]"
                   : "border-transparent text-[#475569] hover:text-[#161827]"
               }`}
             >
@@ -810,7 +810,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 ) : (
                   projectServices.map((s) => (
                     <TableRow key={s.id}>
-                      <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                      <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
                         {s.service?.code || "—"}
                       </TableCell>
                       <TableCell className="font-bold text-[#161827]">
@@ -862,7 +862,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   onClick={() => setTaskView(value)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     taskView === value
-                      ? "bg-white text-[#4F75FF] shadow-sm border border-[#F2EAD3]"
+                      ? "bg-white text-[#3B5BDB] shadow-sm border border-[#F2EAD3]"
                       : "text-[#475569] hover:text-[#161827]"
                   }`}
                 >
@@ -912,7 +912,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                         <TableCell className="font-bold text-[#161827]">
                           <Link
                             href={`${mode === "admin" ? "/app/admin/projects" : "/app/projects"}/${projectId}/tasks/${t.id}`}
-                            className="hover:text-[#4F75FF] transition-colors"
+                            className="hover:text-[#3B5BDB] transition-colors"
                           >
                             {t.title}
                           </Link>
@@ -1082,7 +1082,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         maxWidth="md"
         title={
           <div className="flex items-center gap-2 text-base font-extrabold text-[#161827]">
-            <ListTodo className="w-5 h-5 text-[#4F75FF]" />
+            <ListTodo className="w-5 h-5 text-[#3B5BDB]" />
             Tạo công việc mới
           </div>
         }
@@ -1101,7 +1101,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, title: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
@@ -1116,7 +1116,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, description: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] leading-relaxed focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
@@ -1130,7 +1130,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 onChange={(e) =>
                   setTaskForm({ ...taskForm, assigneeUserId: e.target.value })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               >
                 <option value="">-- Chưa chỉ định --</option>
                 {people.map((p) => (
@@ -1153,7 +1153,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                     priority: e.target.value as TaskPriority,
                   })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               >
                 <option value="low">Thấp</option>
                 <option value="medium">Vừa</option>
@@ -1166,7 +1166,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
           {/* Đường dẫn liên kết / Tài liệu */}
           <div>
             <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
-              <LinkIcon className="w-3.5 h-3.5 text-[#4F75FF]" />
+              <LinkIcon className="w-3.5 h-3.5 text-[#3B5BDB]" />
               Đường dẫn liên kết / Tài liệu trực tuyến (Tùy chọn)
             </label>
             <input
@@ -1176,21 +1176,21 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               onChange={(e) =>
                 setTaskForm({ ...taskForm, linkUrl: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-mono text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-mono text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
           {/* Tải lên tệp đính kèm */}
           <div>
             <label className="block text-xs font-bold text-[#161827] mb-1.5 flex items-center gap-1.5">
-              <Paperclip className="w-3.5 h-3.5 text-[#4F75FF]" />
+              <Paperclip className="w-3.5 h-3.5 text-[#3B5BDB]" />
               Tệp tài liệu đính kèm
             </label>
 
             {taskForm.file ? (
-              <div className="flex items-center justify-between p-3 rounded-xl border border-[#4F75FF]/30 bg-[#EEF2FF] text-xs">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-[#3B5BDB]/30 bg-[#EEF2FF] text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className="w-4 h-4 text-[#4F75FF] shrink-0" />
+                  <FileText className="w-4 h-4 text-[#3B5BDB] shrink-0" />
                   <div className="min-w-0">
                     <p className="font-bold text-[#161827] truncate">
                       {taskForm.file.name}
@@ -1209,9 +1209,9 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#4F75FF] cursor-pointer transition-colors text-center">
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#3B5BDB] cursor-pointer transition-colors text-center">
                 <UploadCloud className="w-6 h-6 text-[#64748B] mb-1" />
-                <span className="text-xs font-bold text-[#4F75FF]">
+                <span className="text-xs font-bold text-[#3B5BDB]">
                   Chọn tệp từ máy tính để tải lên
                 </span>
                 <span className="text-xs text-[#64748B] mt-0.5">
@@ -1239,7 +1239,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               </div>
               <div className="h-1.5 w-full bg-[#F2EAD3] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#4F75FF] transition-all"
+                  className="h-full bg-[#3B5BDB] transition-all"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -1261,7 +1261,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
               variant="primary"
               size="sm"
               isLoading={creatingTask}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
             >
               Tạo task
             </Button>

@@ -166,11 +166,11 @@ export function FileManager({
             }}
             placeholder="Tìm theo tên tệp..."
             aria-label="Tìm tệp"
-            className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
           />
         )}
         {canUpload && (
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3B5BDB] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
             <Upload className="h-4 w-4" /> Chọn tệp tải lên
             <input
               ref={inputRef}
@@ -198,7 +198,7 @@ export function FileManager({
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-blue-100">
             <div
-              className="h-full bg-[#4F75FF] transition-all"
+              className="h-full bg-[#3B5BDB] transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -238,7 +238,7 @@ export function FileManager({
                 >
                   <td className="p-4">
                     <span className="inline-flex items-center gap-2 font-bold text-[#161827]">
-                      <FileText className="h-4 w-4 text-[#4F75FF]" />
+                      <FileText className="h-4 w-4 text-[#3B5BDB]" />
                       {file.originalName}
                     </span>
                     <p className="mt-0.5 text-xs text-[#64748B]">

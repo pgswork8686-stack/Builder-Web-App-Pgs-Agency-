@@ -58,7 +58,7 @@ export default function TeamLeaderCompletedProjectsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-2">
-              <span className="font-mono text-xs font-bold text-[#5D87FF]">
+              <span className="font-mono text-xs font-bold text-[#3B5BDB]">
                 {p.projectCode}
               </span>
               <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>

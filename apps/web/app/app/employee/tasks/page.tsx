@@ -112,7 +112,7 @@ export default function EmployeeTasksPage() {
           onClick={() => setStatusFilter("all")}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "all"
-              ? "bg-[#5D87FF] text-white shadow-xs"
+              ? "bg-[#3B5BDB] text-white shadow-xs"
               : "bg-white border border-[#F2EAD3] text-[#475569] hover:bg-[#FFFBF0]"
           }`}
         >
@@ -123,7 +123,7 @@ export default function EmployeeTasksPage() {
           onClick={() => setStatusFilter("in_progress")}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "in_progress"
-              ? "bg-[#5D87FF] text-white shadow-xs"
+              ? "bg-[#3B5BDB] text-white shadow-xs"
               : "bg-white border border-[#F2EAD3] text-[#475569] hover:bg-[#FFFBF0]"
           }`}
         >
@@ -134,7 +134,7 @@ export default function EmployeeTasksPage() {
           onClick={() => setStatusFilter("todo")}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "todo"
-              ? "bg-[#5D87FF] text-white shadow-xs"
+              ? "bg-[#3B5BDB] text-white shadow-xs"
               : "bg-white border border-[#F2EAD3] text-[#475569] hover:bg-[#FFFBF0]"
           }`}
         >
@@ -145,7 +145,7 @@ export default function EmployeeTasksPage() {
           onClick={() => setStatusFilter("done")}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             statusFilter === "done"
-              ? "bg-[#5D87FF] text-white shadow-xs"
+              ? "bg-[#3B5BDB] text-white shadow-xs"
               : "bg-white border border-[#F2EAD3] text-[#475569] hover:bg-[#FFFBF0]"
           }`}
         >
@@ -155,7 +155,7 @@ export default function EmployeeTasksPage() {
 
       {loading ? (
         <Card className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#5D87FF] mx-auto" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#3B5BDB] mx-auto" />
           <p className="mt-3 text-xs text-[#475569]">
             Đang tải danh sách nhiệm vụ...
           </p>
@@ -179,7 +179,7 @@ export default function EmployeeTasksPage() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-[#5D87FF] truncate">
+                    <span className="text-xs font-bold text-[#3B5BDB] truncate">
                       {t.projectName}
                     </span>
                     <Badge
@@ -208,7 +208,7 @@ export default function EmployeeTasksPage() {
                 <div className="pt-3 border-t border-[#F2EAD3] flex items-center justify-between gap-2">
                   <Link
                     href={`/app/projects/${t.project_id}/tasks/${t.id}`}
-                    className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+                    className="text-xs font-bold text-[#3B5BDB] hover:underline flex items-center gap-1"
                   >
                     Chi tiết <ArrowRight className="w-3 h-3" />
                   </Link>

@@ -35,10 +35,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       "inline-flex whitespace-nowrap items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7AE18] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
 
     const sizeStyles = {
-      sm: "h-9 px-3 text-xs gap-1.5",
-      md: "h-10 px-4 text-xs sm:text-sm gap-2",
+      sm: "h-11 sm:h-9 px-3 text-xs gap-1.5",
+      md: "h-11 sm:h-10 px-4 text-xs sm:text-sm gap-2",
       lg: "h-12 px-6 text-sm sm:text-base gap-2.5",
-      icon: "h-9 w-9 p-0 shrink-0",
+      icon: "h-11 w-11 sm:h-9 sm:w-9 p-0 shrink-0",
     };
 
     const variantStyles = {

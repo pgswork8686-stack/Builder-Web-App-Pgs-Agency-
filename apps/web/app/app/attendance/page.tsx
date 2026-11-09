@@ -303,7 +303,7 @@ export default function EmployeeAttendancePage() {
               placeholder="VD: Đi công tác tại cơ quan khách hàng, làm ngoài giờ..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
             />
           </div>
 
@@ -382,7 +382,7 @@ export default function EmployeeAttendancePage() {
           </div>
         ) : history.length === 0 ? (
           <EmptyState
-            icon={<History className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<History className="w-8 h-8 text-[#3B5BDB]" />}
             title="Chưa có dữ liệu chấm công"
             description="Lịch sử chấm công của bạn trong tháng này sẽ xuất hiện tại đây sau khi check-in."
           />
@@ -426,7 +426,7 @@ export default function EmployeeAttendancePage() {
                       <TableCell className="text-xs text-[#475569]">
                         {checkOutTime}
                       </TableCell>
-                      <TableCell className="text-xs font-mono font-bold text-[#4F75FF]">
+                      <TableCell className="text-xs font-mono font-bold text-[#3B5BDB]">
                         {rec.work_minutes
                           ? `${(rec.work_minutes / 60).toFixed(1)}h`
                           : "—"}

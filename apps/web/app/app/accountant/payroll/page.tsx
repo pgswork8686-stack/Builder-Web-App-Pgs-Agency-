@@ -299,7 +299,7 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "runs"
-              ? "border-[#5D87FF] text-[#5D87FF]"
+              ? "border-[#3B5BDB] text-[#3B5BDB]"
               : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("runs")}
@@ -310,7 +310,7 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "compensations"
-              ? "border-[#5D87FF] text-[#5D87FF]"
+              ? "border-[#3B5BDB] text-[#3B5BDB]"
               : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("compensations")}
@@ -321,7 +321,7 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "reviews"
-              ? "border-[#5D87FF] text-[#5D87FF]"
+              ? "border-[#3B5BDB] text-[#3B5BDB]"
               : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("reviews")}
@@ -383,7 +383,7 @@ export default function AccountantPayrollPage() {
                       key={r.id}
                       className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
                         {r.run_code || "BL"}
                       </td>
                       <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
@@ -495,7 +495,7 @@ export default function AccountantPayrollPage() {
                       key={emp.userId}
                       className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
                       <td className="px-4 py-3">
@@ -536,7 +536,7 @@ export default function AccountantPayrollPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
-                          className="inline-flex items-center gap-1 text-xs text-[#5D87FF] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-[#3B5BDB] hover:underline"
                           onClick={() => openHistoryModal(emp)}
                         >
                           <History className="w-3.5 h-3.5" />
@@ -623,7 +623,7 @@ export default function AccountantPayrollPage() {
                       key={emp.userId}
                       className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
                       <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
@@ -741,7 +741,7 @@ export default function AccountantPayrollPage() {
                       key={ps.id}
                       className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-3 py-2.5 font-mono text-[#5D87FF]">
+                      <td className="px-3 py-2.5 font-mono text-[#3B5BDB]">
                         {ps.payslip_code || "PL"}
                       </td>
                       <td className="px-3 py-2.5 font-medium text-[#2A3547] dark:text-white">
@@ -950,7 +950,7 @@ export default function AccountantPayrollPage() {
                   <tbody className="divide-y divide-[#EAEFF4] dark:divide-[#334155]">
                     {historyList.map((h) => (
                       <tr key={h.id}>
-                        <td className="px-3 py-2 font-mono font-medium text-[#5D87FF]">
+                        <td className="px-3 py-2 font-mono font-medium text-[#3B5BDB]">
                           {h.effectiveFrom}
                         </td>
                         <td className="px-3 py-2 text-right font-medium text-[#2A3547] dark:text-white">

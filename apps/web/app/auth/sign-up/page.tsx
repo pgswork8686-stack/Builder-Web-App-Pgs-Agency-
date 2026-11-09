@@ -114,7 +114,7 @@ export default function SignUpPage() {
           {/* Header Mobile Logo / Text */}
           <div>
             <div className="md:hidden flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-[#4F75FF] text-white font-bold flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#3B5BDB] text-white font-bold flex items-center justify-center">
                 P
               </div>
               <span className="font-bold text-lg text-[#161827]">PGS HUB</span>
@@ -149,7 +149,7 @@ export default function SignUpPage() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#4F75FF]/40 text-[#161827] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#3B5BDB]/40 text-[#161827] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -196,7 +196,7 @@ export default function SignUpPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nguyễn Văn A"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pgsagency.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#4F75FF] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
                 />
               </div>
             </div>

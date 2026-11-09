@@ -216,7 +216,7 @@ export default function AdminDocumentsPage() {
                 placeholder="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] placeholder:text-[#64748B] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] placeholder:text-[#64748B] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               />
             </div>
             <Button
@@ -233,7 +233,7 @@ export default function AdminDocumentsPage() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+          className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
         >
           <option value="">Tất cả danh mục</option>
           {Object.entries(CATEGORY_MAP).map(([k, v]) => (
@@ -247,7 +247,7 @@ export default function AdminDocumentsPage() {
       {/* Documents Grid / Table */}
       {loading ? (
         <div className="p-12 text-center text-[#64748B] bg-white rounded-2xl border border-[#F2EAD3]">
-          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4F75FF]" />
+          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#3B5BDB]" />
           Đang tải danh sách tài liệu...
         </div>
       ) : visible.length === 0 ? (
@@ -278,12 +278,12 @@ export default function AdminDocumentsPage() {
             <TableBody>
               {visible.map((doc) => (
                 <TableRow key={doc.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                  <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
                     {doc.document_code || "TL"}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F75FF] shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#3B5BDB] shrink-0">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div>
@@ -361,7 +361,7 @@ export default function AdminDocumentsPage() {
               onChange={(e) => setUploadTitle(e.target.value)}
               placeholder="Ví dụ: Quy chế thưởng & phạt năm 2026"
               required
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 
@@ -373,7 +373,7 @@ export default function AdminDocumentsPage() {
               <select
                 value={uploadCategory}
                 onChange={(e) => setUploadCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               >
                 {Object.entries(CATEGORY_MAP).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -389,7 +389,7 @@ export default function AdminDocumentsPage() {
               <select
                 value={uploadAccess}
                 onChange={(e) => setUploadAccess(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
               >
                 <option value="public_company">Toàn công ty & Khách</option>
                 <option value="internal_only">Nội bộ PGS</option>
@@ -406,7 +406,7 @@ export default function AdminDocumentsPage() {
               type="file"
               required
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-[#475569] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
+              className="w-full text-xs text-[#475569] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#3B5BDB] hover:file:bg-[#E0E7FF] cursor-pointer"
             />
           </div>
 
@@ -432,7 +432,7 @@ export default function AdminDocumentsPage() {
               onChange={(e) => setUploadDescription(e.target.value)}
               rows={3}
               placeholder="Ghi chú thêm về phiên bản hoặc hướng dẫn sử dụng..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
             />
           </div>
 

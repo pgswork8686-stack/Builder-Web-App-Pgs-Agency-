@@ -95,14 +95,14 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                 key={day}
                 className={`min-h-[60px] sm:min-h-[80px] p-1.5 sm:p-2 rounded-xl border flex flex-col gap-1 transition-colors cursor-default ${
                   todayCell
-                    ? "bg-[#EEF2FF] border-[#5D87FF]"
+                    ? "bg-[#EEF2FF] border-[#3B5BDB]"
                     : "bg-[#FFFBF0] border-[#F2EAD3] hover:bg-white hover:border-[#CBD5E1]"
                 }`}
               >
                 <span
                   className={`text-xs font-bold ${
                     todayCell
-                      ? "text-[#5D87FF]"
+                      ? "text-[#3B5BDB]"
                       : highlightSunday && isSunday
                         ? "text-[#7F1D1D]"
                         : "text-[#24304A]"
@@ -111,7 +111,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                   {day}
                 </span>
                 {todayCell && (
-                  <span className="text-xs sm:text-xs font-bold px-1.5 py-0.5 rounded bg-[#5D87FF] text-white w-fit truncate">
+                  <span className="text-xs sm:text-xs font-bold px-1.5 py-0.5 rounded bg-[#3B5BDB] text-white w-fit truncate">
                     Hôm nay
                   </span>
                 )}

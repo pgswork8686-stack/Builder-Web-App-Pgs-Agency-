@@ -191,14 +191,14 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             placeholder="Tìm mã hoặc tên dự án..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:border-[#4F75FF]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:border-[#3B5BDB]"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#3B5BDB]"
         >
           <option value="">-- Mọi trạng thái --</option>
           {Object.entries(statusConfig).map(([key, value]) => (
@@ -211,7 +211,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#3B5BDB]"
         >
           <option value="">-- Mọi mức ưu tiên --</option>
           {Object.entries(priorityConfig).map(([key, value]) => (
@@ -248,7 +248,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </div>
       ) : result.items.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<FolderOpen className="w-8 h-8 text-[#3B5BDB]" />}
           title="Không tìm thấy dự án nào"
           description="Chưa có dự án nào phù hợp với bộ lọc hiện tại hoặc bạn chưa được gán vào dự án."
           actionLabel={mode === "admin" ? "Tạo dự án đầu tiên" : undefined}
@@ -269,15 +269,15 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             return (
               <div key={project.id} className="relative group">
                 <Link href={`${detailBase}/${project.id}`}>
-                  <Card className="p-5 hover:border-[#4F75FF]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <Card className="p-5 hover:border-[#3B5BDB]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-start gap-4 min-w-0 pr-12 md:pr-0">
-                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#4F75FF] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3B5BDB] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <BriefcaseBusiness className="w-5 h-5" />
                       </div>
 
                       <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono text-xs font-bold text-[#4F75FF]">
+                          <span className="font-mono text-xs font-bold text-[#3B5BDB]">
                             {project.projectCode}
                           </span>
                           <Badge variant={sConf.variant} size="sm">
@@ -288,7 +288,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-extrabold text-[#161827] group-hover:text-[#4F75FF] transition-colors truncate">
+                        <h3 className="text-base font-extrabold text-[#161827] group-hover:text-[#3B5BDB] transition-colors truncate">
                           {project.name}
                         </h3>
 
@@ -325,7 +325,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                         </Button>
                       )}
 
-                      <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
+                      <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#3B5BDB] group-hover:translate-x-1 transition-all hidden md:block" />
                     </div>
                   </Card>
                 </Link>

@@ -177,7 +177,7 @@ export default function AccountantProjectExpensesPage() {
 
       {/* KPI Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#5D87FF]">
+        <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#3B5BDB]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#475569]">Tổng đã duyệt</p>
@@ -185,7 +185,7 @@ export default function AccountantProjectExpensesPage() {
                 {new Intl.NumberFormat("vi-VN").format(totalApproved)} đ
               </p>
             </div>
-            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#5D87FF]">
+            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#3B5BDB]">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
@@ -306,7 +306,7 @@ export default function AccountantProjectExpensesPage() {
                     key={exp.id}
                     className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
                       {exp.expense_code || "CP"}
                     </td>
                     <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">

@@ -60,7 +60,7 @@ export function SeeAll({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 text-xs font-bold text-[#8A6400] hover:text-[#161827]"
+      className="inline-flex items-center gap-1 min-h-11 sm:min-h-0 text-xs font-bold text-[#8A6400] hover:text-[#161827]"
     >
       {label}
       <ChevronRight className="w-3.5 h-3.5" />

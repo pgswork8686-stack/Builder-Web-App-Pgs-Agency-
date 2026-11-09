@@ -149,7 +149,7 @@ export default function FinanceDashboard({
       {/* Metrics Grid */}
       {currencies.length === 0 ? (
         <EmptyState
-          icon={<DollarSign className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<DollarSign className="w-8 h-8 text-[#3B5BDB]" />}
           title="Chưa có dữ liệu tài chính"
           description="Chưa có số liệu tài chính được ghi nhận trong hệ thống."
         />
@@ -174,7 +174,7 @@ export default function FinanceDashboard({
             return (
               <div key={currency} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4F75FF]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#3B5BDB]" />
                   <h3 className="text-sm font-bold text-[#161827]">
                     Đơn vị tiền tệ: {currency}
                   </h3>
@@ -238,7 +238,7 @@ export default function FinanceDashboard({
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
           <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
-            <History className="w-4 h-4 text-[#4F75FF]" />
+            <History className="w-4 h-4 text-[#3B5BDB]" />
             Nhật ký thay đổi tài chính
           </h3>
         </div>

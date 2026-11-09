@@ -47,9 +47,9 @@ export default function EmployeeProjectsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map((p) => (
             <Link key={p.id} href={`/app/projects/${p.id}`}>
-              <Card className="p-5 space-y-3 hover:border-[#5D87FF]/40 transition-all group">
+              <Card className="p-5 space-y-3 hover:border-[#3B5BDB]/40 transition-all group">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <span className="font-mono text-xs font-bold text-[#3B5BDB]">
                     {p.projectCode}
                   </span>
                   <Badge
@@ -59,7 +59,7 @@ export default function EmployeeProjectsPage() {
                     {p.status}
                   </Badge>
                 </div>
-                <h4 className="text-sm font-bold text-[#24304A] group-hover:text-[#5D87FF] transition-colors">
+                <h4 className="text-sm font-bold text-[#24304A] group-hover:text-[#3B5BDB] transition-colors">
                   {p.name}
                 </h4>
                 <p className="text-xs text-[#475569]">

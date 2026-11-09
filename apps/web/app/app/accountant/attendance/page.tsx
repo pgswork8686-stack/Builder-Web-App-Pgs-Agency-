@@ -313,7 +313,7 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("company")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "company"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
+                  ? "bg-white text-[#3B5BDB] shadow-xs"
                   : "text-[#475569] hover:text-[#24304A]"
               }`}
             >
@@ -323,7 +323,7 @@ export default function AccountantAttendancePage() {
               onClick={() => setActiveTab("personal")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "personal"
-                  ? "bg-white text-[#5D87FF] shadow-xs"
+                  ? "bg-white text-[#3B5BDB] shadow-xs"
                   : "text-[#475569] hover:text-[#24304A]"
               }`}
             >
@@ -349,7 +349,7 @@ export default function AccountantAttendancePage() {
                     setFilterFrom(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 />
               </div>
 
@@ -364,7 +364,7 @@ export default function AccountantAttendancePage() {
                     setFilterTo(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 />
               </div>
 
@@ -378,7 +378,7 @@ export default function AccountantAttendancePage() {
                     setFilterDept(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 >
                   <option value="">-- Mọi phòng ban --</option>
                   {departments.map((d) => (
@@ -399,7 +399,7 @@ export default function AccountantAttendancePage() {
                     setFilterTeam(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 >
                   <option value="">-- Mọi nhóm --</option>
                   {teams.map((t) => (
@@ -420,7 +420,7 @@ export default function AccountantAttendancePage() {
                     setFilterStatus(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 >
                   <option value="">-- Mọi trạng thái --</option>
                   <option value="present">Đúng giờ</option>
@@ -442,7 +442,7 @@ export default function AccountantAttendancePage() {
             </div>
           ) : records.length === 0 ? (
             <EmptyState
-              icon={<Clock className="w-8 h-8 text-[#5D87FF]" />}
+              icon={<Clock className="w-8 h-8 text-[#3B5BDB]" />}
               title="Không có dữ liệu chấm công"
               description="Không tìm thấy bản ghi chấm công nào phù hợp với bộ lọc đã chọn."
             />
@@ -471,7 +471,7 @@ export default function AccountantAttendancePage() {
                       <TableRow key={r.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#5D87FF] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
+                            <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
                               {(emp?.full_name || emp?.work_email || "U")
                                 .charAt(0)
                                 .toUpperCase()}
@@ -511,7 +511,7 @@ export default function AccountantAttendancePage() {
 
                         <TableCell className="text-xs">
                           {r.check_out_at ? (
-                            <span className="font-mono font-bold text-[#5D87FF]">
+                            <span className="font-mono font-bold text-[#3B5BDB]">
                               {new Date(r.check_out_at).toLocaleTimeString(
                                 "vi-VN",
                                 { hour: "2-digit", minute: "2-digit" },
@@ -671,7 +671,7 @@ export default function AccountantAttendancePage() {
                   placeholder="Ghi chú ca làm, làm bù hoặc công tác..."
                   value={personalNote}
                   onChange={(e) => setPersonalNote(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] placeholder-[#475569] outline-none focus:bg-white focus:border-[#5D87FF] transition-colors"
+                  className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] placeholder-[#475569] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
                 />
               </div>
 

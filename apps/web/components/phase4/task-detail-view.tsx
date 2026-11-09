@@ -164,7 +164,7 @@ function TaskDetailContent({
             <section className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#4F75FF]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#3B5BDB]">
                     Thông tin công việc
                   </p>
                   <h2 className="mt-2 text-2xl font-black text-[#161827]">
@@ -178,7 +178,7 @@ function TaskDetailContent({
                       void updateStatus(event.target.value as TaskStatus)
                     }
                     aria-label="Đổi trạng thái công việc"
-                    className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs font-bold text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs font-bold text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
                   >
                     {statuses.map((status) => (
                       <option key={status.value} value={status.value}>
@@ -187,7 +187,7 @@ function TaskDetailContent({
                     ))}
                   </select>
                 ) : (
-                  <span className="rounded-full bg-[#FBF3DC] px-3 py-1 text-xs font-bold text-[#4F75FF]">
+                  <span className="rounded-full bg-[#FBF3DC] px-3 py-1 text-xs font-bold text-[#3B5BDB]">
                     {task.status}
                   </span>
                 )}
@@ -298,7 +298,7 @@ function TaskDetailContent({
                             }
                             maxLength={10000}
                             aria-label="Nội dung chỉnh sửa"
-                            className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-white p-3 text-xs text-[#161827] outline-none focus:border-[#4F75FF]"
+                            className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-white p-3 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
                           />
                           <div className="flex justify-end gap-2">
                             <button
@@ -312,7 +312,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => void saveComment(comment.id)}
-                              className="rounded-lg bg-[#4F75FF] p-1.5 text-white hover:bg-[#3D62EE]"
+                              className="rounded-lg bg-[#3B5BDB] p-1.5 text-white hover:bg-[#3D62EE]"
                               aria-label="Lưu bình luận"
                             >
                               <Check className="h-4 w-4" />
@@ -360,10 +360,10 @@ function TaskDetailContent({
                     maxLength={10000}
                     placeholder="Viết bình luận…"
                     aria-label="Bình luận mới"
-                    className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                    className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
                   />
                   <div className="flex justify-end">
-                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#3B5BDB] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
                       <Send className="h-4 w-4" /> Gửi bình luận
                     </button>
                   </div>

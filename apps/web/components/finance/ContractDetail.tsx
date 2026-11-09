@@ -186,7 +186,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
       </div>
     );
   }
@@ -331,7 +331,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Giá trị hợp đồng
                 </span>
-                <p className="text-lg font-black text-[#4F75FF]">
+                <p className="text-lg font-black text-[#3B5BDB]">
                   {formatCurrency(
                     contract.contract_value,
                     contract.currency_code,
@@ -351,7 +351,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#F2EAD3] pt-6">
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#4F75FF]" />
+                <Calendar className="w-5 h-5 text-[#3B5BDB]" />
                 <div className="space-y-0.5">
                   <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                     Ngày bắt đầu
@@ -363,7 +363,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
               </div>
 
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#4F75FF]" />
+                <Calendar className="w-5 h-5 text-[#3B5BDB]" />
                 <div className="space-y-0.5">
                   <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                     Ngày kết thúc
@@ -426,7 +426,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
               </h4>
               <Link
                 href={`${roleBasePath}/finance/invoices?contractId=${contract.id}`}
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#4F75FF] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#3B5BDB] hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Thêm</span>
@@ -453,7 +453,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                       </p>
                     </div>
                     <div className="text-right space-y-0.5">
-                      <p className="font-extrabold text-[#4F75FF]">
+                      <p className="font-extrabold text-[#3B5BDB]">
                         {formatCurrency(inv.amount, inv.currency_code)}
                       </p>
                       <Link

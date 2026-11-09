@@ -183,7 +183,7 @@ export default function AdminLeavePage() {
       {/* Filter Tabs Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="flex items-center gap-2">
-          <ListFilter className="w-4 h-4 text-[#4F75FF]" />
+          <ListFilter className="w-4 h-4 text-[#3B5BDB]" />
           <span className="text-xs font-bold uppercase tracking-wider text-[#475569]">
             Lọc danh sách
           </span>
@@ -205,7 +205,7 @@ export default function AdminLeavePage() {
               }}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === item.id
-                  ? "bg-[#4F75FF] text-white shadow-xs"
+                  ? "bg-[#3B5BDB] text-white shadow-xs"
                   : "bg-[#FFFBF0] text-[#475569] hover:bg-[#FBF3DC] border border-[#F2EAD3]"
               }`}
             >
@@ -237,7 +237,7 @@ export default function AdminLeavePage() {
               </div>
             ) : requests.length === 0 ? (
               <EmptyState
-                icon={<Calendar className="w-8 h-8 text-[#4F75FF]" />}
+                icon={<Calendar className="w-8 h-8 text-[#3B5BDB]" />}
                 title="Không tìm thấy đơn nghỉ phép"
                 description="Tất cả các đơn theo bộ lọc hiện tại đã được xử lý xong."
               />
@@ -273,7 +273,7 @@ export default function AdminLeavePage() {
                         <TableCell className="text-xs text-[#161827]">
                           {req.start_date} ➔ {req.end_date}
                         </TableCell>
-                        <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
+                        <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
                           {Number(req.total_days).toFixed(1)}
                         </TableCell>
                         <TableCell>
@@ -350,7 +350,7 @@ export default function AdminLeavePage() {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
               <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#4F75FF]" />
+                <Calendar className="w-4 h-4 text-[#3B5BDB]" />
                 Lịch nghỉ phép được duyệt
               </h3>
             </div>
@@ -377,7 +377,7 @@ export default function AdminLeavePage() {
                     <div className="text-xs text-[#475569]">
                       {evt.leaveType}
                     </div>
-                    <div className="text-xs text-[#4F75FF] font-semibold">
+                    <div className="text-xs text-[#3B5BDB] font-semibold">
                       {evt.startDate} ➔ {evt.endDate}
                     </div>
                   </div>
@@ -407,7 +407,7 @@ export default function AdminLeavePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#475569]">Tổng ngày:</span>
-                <span className="font-bold text-[#4F75FF]">
+                <span className="font-bold text-[#3B5BDB]">
                   {Number(selectedRequest.total_days).toFixed(1)} ngày
                 </span>
               </div>
@@ -435,7 +435,7 @@ export default function AdminLeavePage() {
                 onChange={(e) => setReviewNote(e.target.value)}
                 placeholder="Nhập phản hồi nếu có..."
                 rows={3}
-                className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
               />
             </div>
 

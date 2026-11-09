@@ -305,7 +305,7 @@ export default function AdminClientsPage() {
               setQ(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
           />
         </div>
 
@@ -315,7 +315,7 @@ export default function AdminClientsPage() {
             setStatus(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#4F75FF]"
+          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
         >
           <option value="">-- Mọi trạng thái --</option>
           <option value="active">Đang hoạt động</option>
@@ -332,7 +332,7 @@ export default function AdminClientsPage() {
         </div>
       ) : companies.length === 0 ? (
         <EmptyState
-          icon={<Building2 className="w-8 h-8 text-[#4F75FF]" />}
+          icon={<Building2 className="w-8 h-8 text-[#3B5BDB]" />}
           title="Không tìm thấy khách hàng"
           description="Chưa có dữ liệu công ty đối tác nào phù hợp."
           actionLabel="Tạo khách hàng mới"
@@ -357,7 +357,7 @@ export default function AdminClientsPage() {
             <TableBody>
               {companies.map((comp) => (
                 <TableRow key={comp.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#5D87FF]">
+                  <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
                     {comp.clientCode || comp.code}
                   </TableCell>
 
@@ -373,7 +373,7 @@ export default function AdminClientsPage() {
                           }
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs text-[#475569] hover:text-[#4F75FF] flex items-center gap-1 mt-0.5"
+                          className="text-xs text-[#475569] hover:text-[#3B5BDB] flex items-center gap-1 mt-0.5"
                         >
                           <Globe className="w-3 h-3 text-blue-500" />
                           <span>
@@ -627,7 +627,7 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
               placeholder="Ghi chú về khách hàng, yêu cầu đặc thù..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -689,7 +689,7 @@ export default function AdminClientsPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Tạm dừng</option>
@@ -760,7 +760,7 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}

@@ -77,7 +77,7 @@ export default function EmployeePayrollPage() {
                     key={ps.id}
                     className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#5D87FF]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
                       {ps.payslip_code || "PL"}
                     </td>
                     <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">

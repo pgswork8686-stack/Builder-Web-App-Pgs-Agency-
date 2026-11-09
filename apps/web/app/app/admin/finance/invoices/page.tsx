@@ -9,7 +9,7 @@ export default function AdminInvoicesPage() {
     <Suspense
       fallback={
         <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
           <span className="text-xs text-[#475569]">
             Đang tải danh sách hóa đơn...
           </span>

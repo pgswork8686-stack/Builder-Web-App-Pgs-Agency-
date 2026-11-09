@@ -32,15 +32,15 @@ export function StatCard({
   const variantStyles = {
     default: {
       bg: "bg-white border-[#F2EAD3] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
-      iconBg: "bg-[#EEF2FF] text-[#4F75FF] border-[#E0EAFF]",
+      iconBg: "bg-[#EEF2FF] text-[#3B5BDB] border-[#E0EAFF]",
       titleColor: "text-[#475569]",
       valueColor: "text-[#161827]",
       borderColor: "border-[#F2EAD3]",
     },
     blue: {
       bg: "bg-[#EEF2FF] border-[#E0EAFF] shadow-xs",
-      iconBg: "bg-white text-[#4F75FF] shadow-xs",
-      titleColor: "text-[#4F75FF]",
+      iconBg: "bg-white text-[#3B5BDB] shadow-xs",
+      titleColor: "text-[#3B5BDB]",
       valueColor: "text-[#161827]",
       borderColor: "border-[#E0EAFF]",
     },

@@ -150,7 +150,7 @@ function ProjectCalendarContent({
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-[#475569]">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#4F75FF]" /> Công
+              <span className="h-2.5 w-2.5 rounded-full bg-[#3B5BDB]" /> Công
               việc
             </span>
             <span className="inline-flex items-center gap-1.5 text-[#475569]">
@@ -174,7 +174,7 @@ function ProjectCalendarContent({
                 type="checkbox"
                 checked={showTasks}
                 onChange={(e) => setShowTasks(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                className="rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
               />
               <span>Công việc</span>
             </label>
@@ -183,7 +183,7 @@ function ProjectCalendarContent({
                 type="checkbox"
                 checked={showWorkSchedule}
                 onChange={(e) => setShowWorkSchedule(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#4F75FF] focus:ring-[#4F75FF]"
+                className="rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
               />
               <span>Lịch làm việc</span>
             </label>
@@ -194,7 +194,7 @@ function ProjectCalendarContent({
           <button
             type="button"
             onClick={() => setCreateDate(dateKey(new Date()))}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#4F75FF] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3D61E6] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#3B5BDB] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#2F4AB8] cursor-pointer transition-colors"
           >
             <Plus className="h-4 w-4" />
             Tạo công việc
@@ -321,7 +321,7 @@ function ProjectCalendarContent({
                             key={task.taskId}
                             href={`${base}/${projectId}/tasks/${task.taskId}`}
                             onClick={(event) => event.stopPropagation()}
-                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-xs font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
+                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-xs font-semibold text-[#3B5BDB] hover:border-[#3B5BDB] transition-colors"
                             title={task.title}
                           >
                             <div className="flex items-center justify-between gap-1">

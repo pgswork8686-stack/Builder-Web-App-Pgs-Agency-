@@ -199,7 +199,7 @@ export default function AdminPendingAccountsPage() {
             placeholder="Tìm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
           />
         </div>
 
@@ -290,7 +290,7 @@ export default function AdminPendingAccountsPage() {
                         onChange={(e) =>
                           handleRoleChange(user.id, e.target.value)
                         }
-                        className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+                        className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
                       >
                         <option value="">-- Chọn vai trò --</option>
                         {ROLE_OPTIONS.map((opt) => (

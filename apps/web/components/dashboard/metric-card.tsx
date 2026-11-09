@@ -58,7 +58,7 @@ export function MetricCard({
               <div className="h-1.5 w-full rounded-full bg-[#FBF3DC] overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    item.color || "bg-gradient-to-r from-[#4F75FF] to-[#38BDF8]"
+                    item.color || "bg-gradient-to-r from-[#3B5BDB] to-[#38BDF8]"
                   }`}
                   style={{
                     width: `${Math.min(100, Math.max(0, item.percentage))}%`,

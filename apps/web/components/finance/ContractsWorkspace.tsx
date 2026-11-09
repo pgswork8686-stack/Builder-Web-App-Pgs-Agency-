@@ -379,7 +379,7 @@ export default function ContractsWorkspace({
             placeholder="Tìm kiếm theo số hợp đồng hoặc tiêu đề..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] transition-colors"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
           />
         </div>
 
@@ -387,7 +387,7 @@ export default function ContractsWorkspace({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF]"
+            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#3B5BDB]"
           >
             <option value="">-- Mọi trạng thái --</option>
             <option value="draft">Nháp</option>
@@ -399,7 +399,7 @@ export default function ContractsWorkspace({
           <select
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
-            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#4F75FF] max-w-[200px]"
+            className="bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs px-3 py-2 rounded-xl outline-none focus:bg-white focus:border-[#3B5BDB] max-w-[200px]"
           >
             <option value="">-- Mọi khách hàng --</option>
             {clients.map((c) => (
@@ -438,7 +438,7 @@ export default function ContractsWorkspace({
           </div>
         ) : contracts.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#4F75FF]" />}
+            icon={<FileText className="w-8 h-8 text-[#3B5BDB]" />}
             title="Không tìm thấy hợp đồng"
             description="Chưa có hợp đồng nào phù hợp với bộ lọc tìm kiếm."
             actionLabel="Tạo hợp đồng mới"
@@ -463,7 +463,7 @@ export default function ContractsWorkspace({
               <TableBody>
                 {contracts.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-mono font-bold text-[#4F75FF]">
+                    <TableCell className="font-mono font-bold text-[#3B5BDB]">
                       {c.contract_number}
                     </TableCell>
                     <TableCell className="font-bold text-[#161827]">
@@ -519,7 +519,7 @@ export default function ContractsWorkspace({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#4F75FF] hover:bg-[#EEF2FF]"
+                            className="text-[#3B5BDB] hover:bg-[#EEF2FF]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -608,7 +608,7 @@ export default function ContractsWorkspace({
                   placeholder="VD: HD-2026-001"
                   value={formContractNumber}
                   onChange={(e) => setFormContractNumber(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
 
@@ -626,7 +626,7 @@ export default function ContractsWorkspace({
                     setFormClientCompanyId(e.target.value);
                     setFormProjectId("");
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn công ty khách hàng</option>
                   {clients.map((c) => (
@@ -651,7 +651,7 @@ export default function ContractsWorkspace({
                 placeholder="VD: Hợp đồng cung cấp dịch vụ Digital Marketing"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
               />
             </div>
 
@@ -666,7 +666,7 @@ export default function ContractsWorkspace({
                   }
                   value={formProjectId}
                   onChange={(e) => setFormProjectId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 >
                   <option value="">Chọn dự án (Không bắt buộc)</option>
                   {filteredProjects.map((p) => (
@@ -693,7 +693,7 @@ export default function ContractsWorkspace({
                     placeholder="VD: 50000000"
                     value={formContractValue}
                     onChange={(e) => setFormContractValue(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                    className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -709,7 +709,7 @@ export default function ContractsWorkspace({
                     }
                     value={formCurrencyCode}
                     onChange={(e) => setFormCurrencyCode(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                    className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                   >
                     <option value="">Chọn</option>
                     <option value="VND">VND</option>
@@ -732,7 +732,7 @@ export default function ContractsWorkspace({
                   }
                   value={formStartDate}
                   onChange={(e) => setFormStartDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
 
@@ -747,7 +747,7 @@ export default function ContractsWorkspace({
                   }
                   value={formEndDate}
                   onChange={(e) => setFormEndDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] disabled:opacity-50"
                 />
               </div>
             </div>
@@ -761,7 +761,7 @@ export default function ContractsWorkspace({
                 placeholder="Nhập ghi chú hoặc điều khoản chính..."
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#4F75FF] resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#3B5BDB] resize-none"
               />
             </div>
 
@@ -771,7 +771,7 @@ export default function ContractsWorkspace({
                 id="formClientVisible"
                 checked={formClientVisible}
                 onChange={(e) => setFormClientVisible(e.target.checked)}
-                className="w-4 h-4 accent-[#4F75FF] cursor-pointer"
+                className="w-4 h-4 accent-[#3B5BDB] cursor-pointer"
               />
               <label
                 htmlFor="formClientVisible"
