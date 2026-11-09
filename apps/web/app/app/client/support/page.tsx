@@ -27,7 +27,7 @@ import {
 } from "@/lib/api/support";
 
 const CATEGORY_MAP: Record<string, string> = {
-  technical: "Kỹ thuật & Bug",
+  technical: "Kỹ thuật & lỗi phần mềm",
   billing: "Thanh toán & Hóa đơn",
   project_scope: "Yêu cầu phát sinh dự án",
   bug_report: "Báo lỗi hệ thống",
@@ -134,7 +134,7 @@ export default function ClientSupportPage() {
       <SectionHeader
         title="Trung tâm Hỗ trợ Khách hàng"
         description="Gửi yêu cầu hỗ trợ, theo dõi tiến độ giải quyết và trao đổi trực tiếp với Quản lý dự án PGS Agency."
-        badge="Help Desk 24/7"
+        badge="Hỗ trợ 24/7"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">

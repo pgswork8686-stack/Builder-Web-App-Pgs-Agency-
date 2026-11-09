@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Giao diện Figma chỉ có bản sáng: biến thể dark: chỉ chạy khi có class .dark, không theo hệ điều hành. */
+@custom-variant dark (&:where(.dark, .dark *));
+:root { color-scheme: light; }
 
 @layer base {
   :root {
