@@ -3,378 +3,259 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  FolderKanban,
-  Clock,
-  CalendarDays,
-  CheckCircle2,
-  AlertTriangle,
-  ArrowRight,
-  TrendingUp,
-  ListTodo,
-  UserCheck,
-  Users,
+  Bell,
+  CalendarCheck,
   ChevronRight,
+  CircleAlert,
+  FolderKanban,
+  ListChecks,
+  Users,
+  UserCheck,
+  Layers,
 } from "lucide-react";
-import { projectsApi, type Project } from "@/lib/api/projects";
 import { getMe, type UserPayload } from "@/lib/api/auth";
-import { attendanceApi } from "@/lib/api/attendance";
-import { leaveApi } from "@/lib/api/leave";
-import { organizationApi } from "@/lib/api/organization";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  teamLeaderDashboardApi,
+  type TeamLeaderDashboardData,
+} from "@/lib/api/team-leader-dashboard";
+import {
+  Empty,
+  Kpi,
+  SeeAll,
+  Widget,
+  initials,
+  shortDate,
+} from "@/components/dashboard/figma-widgets";
+
+const STATE_DOT: Record<string, string> = {
+  present: "bg-[#00D09C]",
+  late: "bg-[#FF9F24]",
+  leave: "bg-[#3B5BDB]",
+  none: "bg-[#FF785A]",
+};
 
 export default function TeamLeaderDashboardPage() {
   const [user, setUser] = useState<UserPayload | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [stats, setStats] = useState({
-    projectCount: 0,
-    openTasks: 0,
-    pendingApprovals: 0,
-    teamMembers: 0,
-    nearDeadlines: 0,
-  });
-  const [checkedInToday, setCheckedInToday] = useState(false);
+  const [data, setData] = useState<TeamLeaderDashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [meRes, projRes, attSum, leaveRes, teamsRes] =
-          await Promise.allSettled([
-            getMe(),
-            projectsApi.getInternalProjects(1, 6),
-            attendanceApi.getSummary(),
-            leaveApi.getDirectory({ status: "pending" }),
-            organizationApi.getTeams(),
-          ]);
-
-        if (meRes.status === "fulfilled") setUser(meRes.value.user);
-        if (projRes.status === "fulfilled") {
-          setProjects(projRes.value.items || []);
-          setStats((prev) => ({
-            ...prev,
-            projectCount: projRes.value.total || 0,
-          }));
-        }
-        if (attSum.status === "fulfilled" && attSum.value?.today?.checkInAt) {
-          setCheckedInToday(true);
-        }
-        if (leaveRes.status === "fulfilled") {
-          setStats((prev) => ({
-            ...prev,
-            pendingApprovals:
-              leaveRes.value.total || leaveRes.value.items?.length || 0,
-          }));
-        }
-        if (teamsRes.status === "fulfilled" && Array.isArray(teamsRes.value)) {
-          setStats((prev) => ({
-            ...prev,
-            teamMembers: teamsRes.value.length,
-          }));
-        }
-      } catch {
-        // Safe load
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
+    let alive = true;
+    (async () => {
+      const [me, dash] = await Promise.allSettled([
+        getMe(),
+        teamLeaderDashboardApi.get(),
+      ]);
+      if (!alive) return;
+      if (me.status === "fulfilled") setUser(me.value.user);
+      if (dash.status === "fulfilled") setData(dash.value);
+      else setError("Không tải được số liệu của đội. Vui lòng thử lại.");
+      setLoading(false);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const userName =
-    user?.fullName || user?.email?.split("@")[0] || "Trưởng nhóm";
+  const name = user?.fullName || user?.email?.split("@")[0] || "Trưởng nhóm";
+  const k = data?.kpi;
+  const t = data?.teamToday;
+  const members = k?.members ?? 0;
+  const maxOpen = Math.max(1, ...(data?.workload.map((w) => w.open) ?? [1]));
+  const num = (v?: number) => (loading ? "…" : String(v ?? 0));
 
   return (
     <div className="space-y-6">
-      {/* Top Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#F2EAD3]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
-            Chào {userName}
+          <h1 className="text-2xl sm:text-[26px] font-bold text-[#161827] tracking-tight">
+            Chào {name}
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
+          <p className="text-sm text-[#475569] mt-1">
             Theo dõi tiến độ dự án, đội nhóm và các nội dung đang chờ duyệt hôm
             nay.
           </p>
         </div>
-
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#7C879D] px-3.5 py-1.5 rounded-full bg-white border border-[#F2EAD3] shadow-2xs">
-            Tuần này
-          </span>
-          <Link href="/app/team-leader/projects">
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<FolderKanban className="w-4 h-4" />}
-            >
-              Dự án của tôi
-            </Button>
+          <Link
+            href="/app/team-leader/kanban"
+            className="px-4 py-2 rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+          >
+            Mở Kanban
+          </Link>
+          <Link
+            href="/app/team-leader/tasks"
+            className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
+          >
+            Giao việc mới
           </Link>
         </div>
       </div>
 
-      {/* Main Banner + 2 KPI Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Banner: X dự án đang được quản lý */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
-          <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
-              {stats.projectCount} dự án đang được quản lý
-            </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
-              Kiểm soát tiến độ bàn giao và các nội dung đang chờ phê duyệt hôm
-              nay.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 pt-6">
-            <Link href="/app/team-leader/tasks">
-              <Button variant="primary" size="sm">
-                Xem việc ưu tiên
-              </Button>
-            </Link>
-            <Link href="/app/team-leader/attendance">
-              <span
-                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-2xs ${
-                  checkedInToday
-                    ? "bg-[#E6FBF5] border-[#A7F3D0] text-[#13DEB9]"
-                    : "bg-white border-[#F2EAD3] text-[#7C879D]"
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                {checkedInToday
-                  ? "Đã check-in hôm nay"
-                  : "Chưa chấm công hôm nay"}
-              </span>
-            </Link>
-          </div>
+      {error && (
+        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
+          {error}
         </div>
-
-        {/* Team Performance Metric */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
-          <div>
-            <span className="text-xs font-bold text-[#7C879D]">
-              Hiệu suất nhóm
-            </span>
-            <div className="flex items-baseline justify-between mt-2">
-              <span className="text-3xl font-black text-[#24304A]">
-                {stats.projectCount > 0 ? "100%" : "—"}
-              </span>
-              <div className="w-10 h-10 rounded-full bg-[#E6FBF5] text-[#13DEB9] font-bold text-xs flex items-center justify-center border border-[#A7F3D0]">
-                {stats.projectCount > 0 ? "OK" : "0"}
-              </div>
-            </div>
-          </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
-            <TrendingUp className="w-3.5 h-3.5" />
-            Vận hành ổn định
-          </span>
+      )}
+      {data && !data.departmentId && (
+        <div className="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-sm px-4 py-3">
+          Tài khoản của bạn chưa được gán vào phòng ban nên chưa có số liệu đội. Liên hệ Admin để được gán.
         </div>
+      )}
 
-        {/* Overdue Tasks Metric */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
-          <div>
-            <span className="text-xs font-bold text-[#7C879D]">
-              Task quá hạn
-            </span>
-            <div className="text-3xl font-black text-[#24304A] mt-2">
-              {stats.nearDeadlines.toString().padStart(2, "0")}
-            </div>
-          </div>
-          <span className="text-xs font-bold text-[#FA896B] mt-4">
-            {stats.nearDeadlines > 0
-              ? "Cần điều phối nhân lực"
-              : "Không có task quá hạn"}
-          </span>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        <Kpi label="Dự án phụ trách" value={num(k?.projects)} sub={`${k?.projectsAtRisk ?? 0} dự án rủi ro`} icon={<FolderKanban className="w-4 h-4" />} bg="#FFFFFF" border="#F2EAD3" />
+        <Kpi label="Task đang mở" value={num(k?.openTasks)} sub="Công việc chưa hoàn thành" icon={<ListChecks className="w-4 h-4" />} bg="#EEF2FF" border="#E0EAFF" />
+        <Kpi label="Quá hạn" value={num(k?.overdueTasks)} sub={`${k?.overdueAssignees ?? 0} người bị ảnh hưởng`} icon={<CircleAlert className="w-4 h-4" />} bg="#FEE2E2" border="#FECACA" />
+        <Kpi label="Cần duyệt" value={num(k?.pendingReview)} sub={`${k?.pendingLeave ?? 0} đơn nghỉ phép`} icon={<UserCheck className="w-4 h-4" />} bg="#FEF9C3" border="#FEF08A" />
+        <Kpi label="Thành viên" value={num(members)} sub={`${k?.presentToday ?? 0} có mặt hôm nay`} icon={<Users className="w-4 h-4" />} bg="#E6FBF5" border="#A7F3D0" />
       </div>
 
-      {/* 5 Pastel KPI Counters Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <Link href="/app/team-leader/projects">
-          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#9A7000]">
-                DA
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <Widget
+          className="lg:col-span-3"
+          title="Cần xử lý hôm nay"
+          icon={<Bell className="w-4 h-4" />}
+          action={
+            data && (
+              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+                {data.attention.length} mục
               </span>
-            </div>
-            <p className="text-2xl font-black text-[#161827] mt-2">
-              {stats.projectCount}
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/team-leader/tasks">
-          <Card className="p-4 hover:border-[#E7AE18]/50 transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Task mở</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF8E5] text-[#E7AE18]">
-                CV
-              </span>
-            </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo dự án
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/team-leader/approvals">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">
-                Chờ duyệt
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#13DEB9]">
-                DU
-              </span>
-            </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.pendingApprovals}
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/team-leader/teams">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">
-                Thành viên
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#A855F7]">
-                TV
-              </span>
-            </div>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {stats.teamMembers}
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/team-leader/calendar">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#7C879D]">Deadline</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#FA896B]">
-                DL
-              </span>
-            </div>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo lịch
-            </p>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Dual Section: Khối lượng công việc & Cần phê duyệt */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Khối lượng công việc
-            </h3>
-            <Link
-              href="/app/team-leader/tasks"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
-            >
-              Xem chi tiết <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {projects.length === 0 ? (
-            <Card className="p-6 text-center">
-              <EmptyState
-                icon={<ListTodo className="w-8 h-8 text-[#7C879D]" />}
-                title="Chưa có dự án nào được giao"
-                description="Các dự án phụ trách sẽ hiển thị tại đây khi được phân công."
-              />
-            </Card>
-          ) : (
-            <Card className="divide-y divide-[#F2EAD3]">
-              {projects.slice(0, 3).map((p) => (
-                <div
-                  key={p.id}
-                  className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
-                >
-                  <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
-                      {p.projectCode}
+            )
+          }
+        >
+          {data && data.attention.length > 0 ? (
+            <ul className="divide-y divide-[#F2EAD3]">
+              {data.attention.map((a) => (
+                <li key={a.key}>
+                  <Link href={a.href} className="flex items-center gap-3 py-3 hover:bg-[#FFFBF0] rounded-xl px-1 -mx-1">
+                    <span className="w-9 h-9 rounded-xl bg-[#F3E8FF] text-[#7356F1] grid place-items-center">
+                      <ListChecks className="w-4 h-4" />
                     </span>
-                    <h4 className="text-xs font-bold text-[#24304A]">
-                      {p.name}
-                    </h4>
-                  </div>
-                  <Badge variant="blue" size="sm">
-                    {p.status}
-                  </Badge>
-                </div>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-[#161827] truncate">{a.title}</span>
+                      <span className="block text-xs text-[#475569] truncate">{a.detail}</span>
+                    </span>
+                    <span className="min-w-7 h-6 px-2 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold grid place-items-center">
+                      {a.count}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-[#94A3B8]" />
+                  </Link>
+                </li>
               ))}
-            </Card>
+            </ul>
+          ) : (
+            <Empty text="Hiện không có mục nào cần xử lý" />
           )}
-        </div>
+        </Widget>
 
-        <div className="lg:col-span-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Cần phê duyệt
-            </h3>
-            <Badge
-              variant={stats.pendingApprovals > 0 ? "gold" : "default"}
-              size="sm"
-            >
-              {stats.pendingApprovals} yêu cầu
-            </Badge>
-          </div>
-
-          <Card className="p-4">
-            {stats.pendingApprovals > 0 ? (
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-[#24304A]">
-                  Có {stats.pendingApprovals} đơn xin nghỉ phép/giải trình đang
-                  chờ bạn xem xét.
-                </p>
-                <Link href="/app/team-leader/approvals">
-                  <Button variant="primary" size="sm">
-                    Mở trang duyệt đơn
-                  </Button>
-                </Link>
+        <Widget
+          className="lg:col-span-2"
+          title="Đội nhóm hôm nay"
+          icon={<Users className="w-4 h-4" />}
+          action={
+            t && members > 0 ? (
+              <span className="px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#047857] text-[10px] font-bold">
+                {t.present}/{members} có mặt
+              </span>
+            ) : undefined
+          }
+        >
+          {t && members > 0 ? (
+            <>
+              <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
+                <span style={{ width: `${((t.present - t.late) / members) * 100}%` }} className="bg-[#00D09C]" />
+                <span style={{ width: `${(t.late / members) * 100}%` }} className="bg-[#E7AE18]" />
+                <span style={{ width: `${(t.onLeave / members) * 100}%` }} className="bg-[#3B5BDB]" />
               </div>
-            ) : (
-              <p className="text-xs text-[#7C879D]">
-                Hiện tại không có đề xuất duyệt nào cần xử lý.
-              </p>
-            )}
-          </Card>
-        </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#475569]">
+                <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#00D09C]" />{t.present} có mặt</span>
+                <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#E7AE18]" />{t.late} đi muộn</span>
+                <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#3B5BDB]" />{t.onLeave} nghỉ phép</span>
+              </div>
+              <ul className="space-y-2.5 mt-1">
+                {t.members.map((m) => (
+                  <li key={m.id} className="flex items-center gap-3 pb-2.5 border-b border-[#F2EAD3] last:border-0">
+                    <span className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center">{initials(m.name)}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-[#161827] truncate">{m.name}</span>
+                      <span className="block text-[11px] text-[#475569] truncate">{m.note}</span>
+                    </span>
+                    <i className={`w-2 h-2 rounded-full ${STATE_DOT[m.state]}`} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <Empty text="Chưa có thành viên trong phòng ban" />
+          )}
+        </Widget>
       </div>
 
-      {/* Dual Section: Dự án cần chú ý & Deadline gần nhất */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-6 space-y-3">
-          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-            Dự án cần chú ý
-          </h3>
-          <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
-              Tất cả các dự án đang trong tiến độ kế hoạch.
-            </p>
-          </Card>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <Widget className="lg:col-span-2" title="Khối lượng theo thành viên" icon={<Layers className="w-4 h-4" />}>
+          {data && data.workload.length > 0 ? (
+            <ul className="space-y-3.5">
+              {data.workload.map((w) => (
+                <li key={w.userId}>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-[#161827]">{w.name}</span>
+                    <span className="text-[#475569]">
+                      {w.open}
+                      {w.overdue > 0 && <b className="text-[#B91C1C]"> · {w.overdue} quá hạn</b>}
+                    </span>
+                  </div>
+                  <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
+                    <span style={{ width: `${((w.open - w.overdue) / maxOpen) * 100}%` }} className="bg-[#E7AE18]" />
+                    <span style={{ width: `${(w.overdue / maxOpen) * 100}%` }} className="bg-[#FF785A]" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="Chưa có công việc được giao" />
+          )}
+        </Widget>
 
-        <div className="lg:col-span-6 space-y-3">
-          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-            Deadline gần nhất
-          </h3>
-          <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
-              Không có deadline gấp trong 24 giờ tới.
-            </p>
-          </Card>
-        </div>
+        <Widget
+          className="lg:col-span-3"
+          title="Dự án của tôi"
+          icon={<CalendarCheck className="w-4 h-4" />}
+          action={<SeeAll href="/app/team-leader/projects" label="Xem tất cả" />}
+        >
+          {data && data.projects.length > 0 ? (
+            <ul className="divide-y divide-[#F2EAD3]">
+              {data.projects.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/app/projects/${p.id}`} className="flex items-center gap-4 py-3 group">
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
+                        <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.code}</span>
+                        {p.name}
+                      </span>
+                      <span className="block text-[11px] text-[#475569]">Khách: {p.client ?? "—"}</span>
+                    </span>
+                    <span className="w-40 shrink-0">
+                      <span className="flex justify-between text-[11px] mb-1">
+                        <b className="text-[#161827]">{p.progress}%</b>
+                        <span className={p.late ? "text-[#B91C1C] font-bold" : "text-[#64748B]"}>Hạn {shortDate(p.dueDate)}</span>
+                      </span>
+                      <span className="block h-2 rounded-full bg-[#FBF3DC] overflow-hidden">
+                        <span style={{ width: `${p.progress}%` }} className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#E7AE18]"}`} />
+                      </span>
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${p.late ? "bg-[#FEE2E2] text-[#B91C1C]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
+                      {p.late ? "Trễ hạn" : "Đang chạy"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="Chưa có dự án đang chạy" />
+          )}
+        </Widget>
       </div>
     </div>
   );
