@@ -78,3 +78,62 @@
     background: #94a3b8;
   }
 }
+
+/* ---------- Hiệu ứng (thay cho thư viện animate chưa được cài) ---------- */
+@keyframes pgs-enter {
+  from {
+    opacity: 0;
+    transform: translate(var(--pgs-enter-x, 0), var(--pgs-enter-y, 0))
+      scale(var(--pgs-enter-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-in {
+  animation: pgs-enter var(--tw-duration, 180ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.zoom-in-95 { --pgs-enter-scale: 0.95; }
+.slide-in-from-top-2 { --pgs-enter-y: -0.5rem; }
+.slide-in-from-bottom-2 { --pgs-enter-y: 0.5rem; }
+.slide-in-from-left { --pgs-enter-x: -100%; }
+
+@keyframes pgs-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.pgs-skeleton {
+  background: linear-gradient(90deg, #fbf3dc 25%, #fff8e5 50%, #fbf3dc 75%);
+  background-size: 200% 100%;
+  animation: pgs-shimmer 1.4s ease-in-out infinite;
+  border-radius: 0.75rem;
+}
+
+@layer base {
+  /* Chuyển động mượt cho mọi phần tử tương tác (trạng thái hover/focus/active theo Figma) */
+  a, button, [role="button"], [role="tab"], input, select, textarea, summary {
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+      color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+  button:not(:disabled):active, [role="button"]:active, [role="tab"]:active {
+    transform: scale(0.98);
+  }
+  button:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 2px solid #e7ae18; outline-offset: 2px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #3b5bdb;
+    outline-offset: 0;
+  }
+  html { scroll-behavior: smooth; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

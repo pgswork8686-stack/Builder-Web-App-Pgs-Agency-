@@ -46,7 +46,7 @@ export function Widget({
 }) {
   return (
     <section
-      className={`bg-white rounded-2xl border border-[#F2EAD3] p-5 flex flex-col gap-3 ${className}`}
+      className={`bg-white rounded-2xl border border-[#F2EAD3] p-5 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(231,174,24,0.10)] ${className}`}
     >
       <header className="flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#161827]">
@@ -97,7 +97,7 @@ export function Kpi({
 }) {
   return (
     <div
-      className="rounded-2xl p-5 flex flex-col gap-3 border"
+      className="rounded-2xl p-5 flex flex-col gap-3 border transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(22,24,39,0.08)]"
       style={{ background: bg, borderColor: border }}
     >
       <div className="flex items-start justify-between gap-2">

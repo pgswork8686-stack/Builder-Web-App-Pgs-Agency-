@@ -154,7 +154,7 @@ export function ProjectTaskCreateDialog({
     }
 
     if (form.startDate && form.dueDate && form.dueDate < form.startDate) {
-      setError("Deadline không được trước ngày bắt đầu.");
+      setError("Hạn hoàn thành không được trước ngày bắt đầu.");
       return;
     }
 
@@ -191,7 +191,7 @@ export function ProjectTaskCreateDialog({
       }}
       maxWidth="lg"
       title="Tạo công việc"
-      description="Task được tạo trực tiếp trong workspace nhưng luôn bị khóa theo dự án hiện tại."
+      description="Công việc được tạo trong dự án đã chọn bên dưới."
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
         <div className="rounded-xl border border-[#E0EAFF] bg-[#F8FAFF] px-3 py-2.5">
@@ -202,7 +202,7 @@ export function ProjectTaskCreateDialog({
             {projectCode ?? "PROJECT"} · {projectName ?? "Dự án hiện tại"}
           </div>
           <div className="mt-1 text-[11px] text-[#64748B]">
-            Project ID được lấy từ URL workspace và không thể đổi trong form
+            Dự án này đã được chọn, không thể đổi trong biểu mẫu
             này.
           </div>
         </div>
@@ -338,7 +338,7 @@ export function ProjectTaskCreateDialog({
 
           <div>
             <label className="mb-1 block text-xs font-semibold text-[#64748B]">
-              Deadline
+              Hạn hoàn thành
             </label>
             <input
               type="date"
