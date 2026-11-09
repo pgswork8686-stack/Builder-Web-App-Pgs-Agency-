@@ -58,9 +58,9 @@ export function Sidebar({
       }`}
     >
       {/* Brand Header - Fixed Top (78px height) with Real PGS Agency Logo */}
-      <div className="h-[78px] flex items-center justify-between px-3.5 border-b border-[#F2EAD3] shrink-0 bg-white">
+      <div className={`h-[78px] flex border-b border-[#F2EAD3] shrink-0 bg-white ${collapsed ? "flex-col items-center justify-center gap-1" : "items-center justify-between px-3.5"}`}>
         <Link href="/app" className="flex items-center gap-2.5 min-w-0">
-          <div className="relative w-[52px] h-[38px] rounded-xl bg-[#FFF8E5] p-1 flex items-center justify-center shrink-0 overflow-hidden border border-[#FDE68A]">
+          <div className={`relative ${collapsed ? "w-10 h-[30px]" : "w-[52px] h-[38px]"} rounded-xl bg-[#FFF8E5] p-1 flex items-center justify-center shrink-0 overflow-hidden border border-[#FDE68A]`}>
             <Image
               src="/brand/pgs-agency-logo-transparent.png"
               alt="PGS Agency"

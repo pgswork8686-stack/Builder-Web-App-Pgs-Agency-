@@ -36,6 +36,7 @@ import {
   deleteDocument,
   CompanyDocument,
 } from "@/lib/api/documents";
+import { organizationApi, type Department } from "@/lib/api/organization";
 
 const CATEGORY_MAP: Record<string, string> = {
   policy_procedure: "Quy trình & Chính sách",
@@ -60,6 +61,9 @@ export default function AdminDocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [selectedDept, setSelectedDept] = useState("");
+  const [uploadDept, setUploadDept] = useState("");
 
   // Modal Upload
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -73,10 +77,7 @@ export default function AdminDocumentsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await fetchDocuments({
-        category: selectedCategory || undefined,
-        search: searchTerm.trim() || undefined,
-      });
+      const res = await fetchDocuments({ pageSize: 200 });
       setDocuments(res.items);
     } catch (err) {
       console.error("Failed to load documents", err);
@@ -87,11 +88,21 @@ export default function AdminDocumentsPage() {
 
   useEffect(() => {
     loadData();
-  }, [selectedCategory]);
+    organizationApi.getDepartments().then(setDepartments).catch(() => setDepartments([]));
+  }, []);
+
+  const q = searchTerm.trim().toLowerCase();
+  const visible = documents.filter(
+    (d) =>
+      (!selectedCategory || d.category === selectedCategory) &&
+      (!selectedDept || d.department_id === selectedDept) &&
+      (!q || `${d.title} ${d.document_code ?? ""}`.toLowerCase().includes(q)),
+  );
+  const countByDept = (id: string) => documents.filter((d) => d.department_id === id).length;
+  const deptLabel = (d: CompanyDocument) => d.department?.name || d.department_code || "Toàn công ty";
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    loadData();
   };
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -105,6 +116,7 @@ export default function AdminDocumentsPage() {
         description: uploadDescription.trim() || null,
         category: uploadCategory,
         accessLevel: uploadAccess,
+        departmentId: uploadDept || null,
         fileName: selectedFile.name,
         mimeType: selectedFile.type || "application/octet-stream",
         sizeBytes: selectedFile.size,
@@ -115,6 +127,7 @@ export default function AdminDocumentsPage() {
         description: uploadDescription.trim() || null,
         category: uploadCategory,
         accessLevel: uploadAccess,
+        departmentId: uploadDept || null,
         storagePath: session.storagePath,
         fileName: selectedFile.name,
         mimeType: selectedFile.type || "application/octet-stream",
@@ -155,22 +168,43 @@ export default function AdminDocumentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Thư viện Tài liệu PGS (Documents & Templates)"
-        description="Kho tài liệu biểu mẫu, hợp đồng mẫu, quy trình nội bộ và hướng dẫn vận hành chuẩn."
-        badge="PGS Library"
+        title="Thư viện Tài liệu PGS"
+        description="Kho tài liệu biểu mẫu, hợp đồng mẫu, quy trình nội bộ và hướng dẫn vận hành — phân loại theo phòng ban."
+        badge="Thư viện PGS"
         action={
           <Button
             variant="primary"
             size="sm"
             leftIcon={<Upload className="w-4 h-4" />}
             onClick={() => setShowUploadModal(true)}
-            className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+            className="bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] font-bold"
           >
-            Tải lên tài liệu
+            Tải lên tài liệu mới
           </Button>
         }
       />
 
+      <div className="grid lg:grid-cols-[270px_1fr] gap-6 items-start">
+        <aside className="bg-white rounded-2xl border border-[#F2EAD3] p-5">
+          <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#161827] mb-3">
+            <FolderOpen className="w-4 h-4 text-[#8A6400]" /> Phòng ban
+          </h2>
+          <ul className="space-y-1">
+            {[{ id: "", name: "Tất cả phòng ban", n: documents.length }, ...departments.map((d) => ({ id: d.id, name: `${d.departmentCode ?? d.code ?? ""} · ${d.name}`.replace(/^ · /, ""), n: countByDept(d.id) }))].map((d) => (
+              <li key={d.id || "all"}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDept(d.id)}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-left text-[13px] transition-colors ${selectedDept === d.id ? "bg-[#FDF1C7] text-[#8A6400] font-bold border-l-[3px] border-[#E7AE18]" : "text-[#475569] hover:bg-[#FFF8E5]"}`}
+                >
+                  <span className="truncate">{d.name}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[10px] font-bold text-[#475569]">{d.n}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <div className="space-y-4 min-w-0">
       {/* Search & Categories Filter Bar */}
       <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs flex flex-wrap items-center justify-between gap-3">
         <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
@@ -189,7 +223,7 @@ export default function AdminDocumentsPage() {
               type="submit"
               variant="primary"
               size="sm"
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] font-bold"
             >
               Tìm
             </Button>
@@ -216,7 +250,7 @@ export default function AdminDocumentsPage() {
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4F75FF]" />
           Đang tải danh sách tài liệu...
         </div>
-      ) : documents.length === 0 ? (
+      ) : visible.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
             icon={<FolderOpen className="w-10 h-10 text-[#94A3B8]" />}
@@ -232,6 +266,7 @@ export default function AdminDocumentsPage() {
                 <TableHeaderCell>Mã tài liệu</TableHeaderCell>
                 <TableHeaderCell>Tên tài liệu</TableHeaderCell>
                 <TableHeaderCell>Danh mục</TableHeaderCell>
+                <TableHeaderCell>Phòng ban</TableHeaderCell>
                 <TableHeaderCell>Phân quyền</TableHeaderCell>
                 <TableHeaderCell>Kích thước</TableHeaderCell>
                 <TableHeaderCell>Người tải lên</TableHeaderCell>
@@ -241,7 +276,7 @@ export default function AdminDocumentsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {documents.map((doc) => (
+              {visible.map((doc) => (
                 <TableRow key={doc.id}>
                   <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
                     {doc.document_code || "TL"}
@@ -264,6 +299,7 @@ export default function AdminDocumentsPage() {
                   <TableCell className="text-xs text-[#64748B] font-medium">
                     {CATEGORY_MAP[doc.category] || doc.category}
                   </TableCell>
+                  <TableCell className="text-xs text-[#475569] font-medium">{deptLabel(doc)}</TableCell>
                   <TableCell>
                     <Badge
                       variant={ACCESS_MAP[doc.access_level]?.variant || "blue"}
@@ -302,6 +338,9 @@ export default function AdminDocumentsPage() {
           </Table>
         </TableContainer>
       )}
+
+        </div>
+      </div>
 
       {/* Upload Modal */}
       <Dialog
@@ -372,6 +411,19 @@ export default function AdminDocumentsPage() {
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-[#475569] mb-1.5">Phòng ban</label>
+            <select
+              value={uploadDept}
+              onChange={(e) => setUploadDept(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E8DDB8] bg-[#FFFBF0] text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none"
+            >
+              <option value="">Toàn công ty (không thuộc phòng ban)</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className="block text-xs font-bold text-[#161827] mb-1.5">
               Mô tả tài liệu (Tùy chọn)
             </label>
@@ -399,7 +451,7 @@ export default function AdminDocumentsPage() {
               variant="primary"
               size="sm"
               isLoading={uploading}
-              className="bg-[#4F75FF] hover:bg-[#3D61E6] text-white font-bold"
+              className="bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] font-bold"
             >
               Tải lên
             </Button>
