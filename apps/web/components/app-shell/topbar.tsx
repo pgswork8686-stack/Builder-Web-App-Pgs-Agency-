@@ -160,7 +160,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
-            <Avatar name={displayName} size="sm" />
+            <Avatar src={user?.avatarUrl} name={displayName} size="sm" />
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-bold text-[#161827] tracking-tight truncate max-w-[130px]">
                 {displayName}

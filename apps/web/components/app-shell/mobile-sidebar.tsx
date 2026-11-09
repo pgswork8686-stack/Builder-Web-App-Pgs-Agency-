@@ -196,7 +196,7 @@ export function MobileSidebar({
             onClick={onClose}
             className="flex items-center gap-3 p-1 rounded-xl"
           >
-            <Avatar name={displayName} size="sm" />
+            <Avatar src={user?.avatarUrl} name={displayName} size="sm" />
             <div className="flex flex-col min-w-0">
               <p className="text-xs font-bold text-[#161827] truncate">
                 {displayName}

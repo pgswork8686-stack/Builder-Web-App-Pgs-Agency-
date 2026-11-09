@@ -26,10 +26,10 @@ export function Avatar({
   };
 
   const statusStyles = {
-    online: "bg-emerald-500",
-    offline: "bg-slate-400",
-    busy: "bg-rose-500",
-    away: "bg-amber-500",
+    online: "bg-[#00D09C]",
+    offline: "bg-[#94A3B8]",
+    busy: "bg-[#FF785A]",
+    away: "bg-[#FF9F24]",
   };
 
   const getInitials = (text?: string | null) => {
@@ -42,7 +42,7 @@ export function Avatar({
   return (
     <div className={`relative inline-block shrink-0 ${className}`} {...props}>
       <div
-        className={`relative flex items-center justify-center rounded-full overflow-hidden border border-[#F2EAD3] bg-[#EEF2FF] font-bold text-[#4F75FF] select-none ${sizeStyles[size]}`}
+        className={`relative flex items-center justify-center rounded-full overflow-hidden border border-[#F2EAD3] bg-[#EEF2FF] font-bold text-[#3B5BDB] select-none ${sizeStyles[size]}`}
       >
         {src && !imageError ? (
           // eslint-disable-next-line @next/next/no-img-element

@@ -222,7 +222,7 @@ export function Sidebar({
             href="/app/profile"
             className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#FFF8E5] transition-colors group"
           >
-            <Avatar name={displayName} size="sm" />
+            <Avatar src={user?.avatarUrl} name={displayName} size="sm" />
             <div className="flex flex-col min-w-0 flex-1">
               <p className="text-xs font-bold text-[#161827] truncate transition-colors">
                 {displayName}
