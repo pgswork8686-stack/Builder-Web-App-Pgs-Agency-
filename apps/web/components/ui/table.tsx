@@ -78,7 +78,7 @@ export function TableHeaderCell({
   ...props
 }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <th className={`px-4 sm:px-6 py-3.5 select-none ${className}`} {...props}>
+    <th className={`px-4 sm:px-6 py-3.5 select-none whitespace-nowrap ${className}`} {...props}>
       {children}
     </th>
   );
@@ -89,8 +89,10 @@ export function TableCell({
   children,
   ...props
 }: React.TdHTMLAttributes<HTMLTableCellElement>) {
+  // Giá trị ngắn (tiền, ngày, mã) giữ một dòng; văn bản dài vẫn tự xuống dòng.
+  const short = typeof children === "string" && children.length <= 28 ? "whitespace-nowrap" : "";
   return (
-    <td className={`px-4 sm:px-6 py-4 align-middle ${className}`} {...props}>
+    <td className={`px-4 sm:px-6 py-4 align-middle ${short} ${className}`} {...props}>
       {children}
     </td>
   );

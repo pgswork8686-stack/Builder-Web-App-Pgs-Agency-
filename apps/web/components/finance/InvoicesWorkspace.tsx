@@ -531,7 +531,7 @@ export default function InvoicesWorkspace({
                     <TableCell className="font-mono font-bold text-[#4F75FF]">
                       {inv.invoice_number}
                     </TableCell>
-                    <TableCell className="font-bold text-[#161827]">
+                    <TableCell className="font-bold text-[#161827] max-w-[260px] truncate" title={inv.client_company?.name || undefined}>
                       {inv.client_company?.name || "—"}
                     </TableCell>
                     <TableCell className="text-xs text-[#64748B] max-w-[180px] truncate">
