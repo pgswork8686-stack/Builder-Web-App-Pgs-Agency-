@@ -3,307 +3,183 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  FolderKanban,
-  CreditCard,
-  FileText,
-  MessageSquare,
   Bell,
-  ShieldCheck,
-  ArrowRight,
-  Sparkles,
+  CircleCheck,
+  CircleHelp,
+  FolderKanban,
+  ReceiptText,
+  RefreshCw,
   UserCheck,
-  Calendar,
-  HelpCircle,
-  FolderOpen,
-  ChevronRight,
-  Clock,
-  Receipt,
 } from "lucide-react";
 import { getMe, type UserPayload } from "@/lib/api/auth";
-import { projectsApi, type Project } from "@/lib/api/projects";
-import { financeApi } from "@/lib/api/finance";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  clientDashboardApi,
+  type ClientDashboardData,
+} from "@/lib/api/client-dashboard";
+import {
+  Empty,
+  Kpi,
+  SeeAll,
+  Widget,
+  compactVND,
+  shortDate,
+} from "@/components/dashboard/figma-widgets";
+
+const KIND_ICON = {
+  approval: <UserCheck className="w-4 h-4" />,
+  invoice: <ReceiptText className="w-4 h-4" />,
+  ticket: <CircleHelp className="w-4 h-4" />,
+};
+const KIND_TONE = {
+  approval: "bg-[#FFF8E5] text-[#8A6400]",
+  invoice: "bg-[#FEE2E2] text-[#B91C1C]",
+  ticket: "bg-[#EEF2FF] text-[#3B5BDB]",
+};
+
+function dm(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", timeZone: "Asia/Ho_Chi_Minh" });
+}
 
 export default function ClientDashboardPage() {
   const [user, setUser] = useState<UserPayload | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [contracts, setContracts] = useState<any[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [data, setData] = useState<ClientDashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [meRes, projRes, contRes, invRes] = await Promise.allSettled([
-          getMe(),
-          projectsApi.getClientProjects(1, 10),
-          financeApi.getContracts(),
-          financeApi.getInvoices(),
-        ]);
-
-        if (meRes.status === "fulfilled") setUser(meRes.value.user);
-        if (projRes.status === "fulfilled")
-          setProjects(projRes.value.items || []);
-        if (contRes.status === "fulfilled")
-          setContracts(contRes.value?.items || []);
-        if (invRes.status === "fulfilled")
-          setInvoices(invRes.value?.items || []);
-      } catch {
-        // Safe load
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
+    let alive = true;
+    (async () => {
+      const [me, dash] = await Promise.allSettled([getMe(), clientDashboardApi.get()]);
+      if (!alive) return;
+      if (me.status === "fulfilled") setUser(me.value.user);
+      if (dash.status === "fulfilled") setData(dash.value);
+      else setError("Không tải được dữ liệu dự án. Vui lòng thử lại.");
+      setLoading(false);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const companyName = user?.fullName || "Quý Khách hàng";
-  const activeProjectsCount = projects.length;
+  const name = user?.fullName || user?.email?.split("@")[0] || "quý khách";
+  const k = data?.kpi;
+  const n = (v?: number) => (loading ? "…" : String(v ?? 0));
 
   return (
     <div className="space-y-6">
-      {/* Top Greeting Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#F2EAD3]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#24304A] tracking-tight">
-            Chào {companyName}
-          </h1>
-          <p className="text-xs sm:text-sm text-[#7C879D] mt-1">
-            Cổng thông tin khách hàng, theo dõi tiến độ thực hiện và bàn giao
-            sản phẩm từ PGS Agency.
+          <h1 className="text-2xl sm:text-[26px] font-bold text-[#161827] tracking-tight">Xin chào, {name}</h1>
+          <p className="text-sm text-[#475569] mt-1">
+            {data?.company ? `${data.company} · ` : ""}Theo dõi dự án hợp tác với PGS Agency.
           </p>
         </div>
-
         <div className="flex items-center gap-2">
-          <Link href="/app/client/support">
-            <Button
-              variant="secondary"
-              size="sm"
-              leftIcon={<HelpCircle className="w-4 h-4" />}
-            >
-              Yêu cầu hỗ trợ
-            </Button>
+          <Link href="/app/client/support" className="px-4 py-2 rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]">
+            Gửi yêu cầu hỗ trợ
+          </Link>
+          <Link href="/app/client/approvals" className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]">
+            Xem sản phẩm chờ duyệt
           </Link>
         </div>
       </div>
 
-      {/* Main Hero + 2 Mini KPI Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Banner */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#FFF8E5] border border-[#FDE68A] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
-          <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
-              {activeProjectsCount > 0
-                ? `Dự án đang triển khai (${activeProjectsCount})`
-                : "Chưa có dự án nào đang triển khai"}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#9A7000] leading-relaxed font-medium">
-              Theo dõi các mốc hoàn thành, kiểm duyệt tài liệu nghiệm thu và hóa
-              đơn thanh toán trực tiếp.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 pt-6">
-            <Link href="/app/client/projects">
-              <Button variant="primary" size="sm">
-                Xem chi tiết dự án
-              </Button>
-            </Link>
-            <Link href="/app/client/invoices">
-              <Button
-                variant="secondary"
-                size="sm"
-                leftIcon={<Receipt className="w-4 h-4" />}
-              >
-                Xem hóa đơn
-              </Button>
-            </Link>
-          </div>
+      {error && (
+        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>
+      )}
+      {data && !data.company && (
+        <div className="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-sm px-4 py-3">
+          Tài khoản của bạn chưa được liên kết với doanh nghiệp nào. Vui lòng liên hệ PGS Agency.
         </div>
+      )}
 
-        {/* Tiến độ tổng */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
-          <div>
-            <span className="text-xs font-bold text-[#7C879D]">
-              Tiến độ tổng
-            </span>
-            <div className="text-3xl font-black text-[#24304A] mt-2">
-              {activeProjectsCount > 0 ? "100%" : "—"}
-            </div>
-          </div>
-          <span className="text-xs font-semibold text-[#13DEB9] flex items-center gap-1 mt-4">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Đúng tiến độ cam kết
-          </span>
-        </div>
-
-        {/* Công nợ còn lại */}
-        <div className="lg:col-span-3 rounded-3xl bg-white border border-[#F2EAD3] p-6 flex flex-col justify-between shadow-xs">
-          <div>
-            <span className="text-xs font-bold text-[#7C879D]">
-              Công nợ còn lại
-            </span>
-            <div className="text-2xl font-black text-[#24304A] mt-2">0 ₫</div>
-          </div>
-          <span className="text-xs font-bold text-[#13DEB9] mt-4">
-            Đã hoàn thành nghĩa vụ
-          </span>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        <Kpi label="Dự án đang chạy" value={n(k?.activeProjects)} sub={`trên tổng ${k?.totalProjects ?? 0} dự án`} icon={<FolderKanban className="w-4 h-4" />} bg="#EEF2FF" border="#E0EAFF" />
+        <Kpi label="Chờ bạn phê duyệt" value={n(k?.pendingApprovals)} sub="sản phẩm / hạng mục" icon={<UserCheck className="w-4 h-4" />} bg="#FEF9C3" border="#FEF08A" />
+        <Kpi label="Chưa thanh toán" value={loading ? "…" : compactVND(k?.unpaidAmount ?? 0)} sub={`${k?.unpaidInvoices ?? 0} hóa đơn${k?.nextDue ? ` · hạn ${shortDate(k.nextDue)}` : ""}`} icon={<ReceiptText className="w-4 h-4" />} bg="#FEE2E2" border="#FECACA" />
+        <Kpi label="Phiếu hỗ trợ mở" value={n(k?.openTickets)} sub="đang được xử lý" icon={<CircleHelp className="w-4 h-4" />} bg="#F3E8FF" border="#E9D5FF" />
+        <Kpi label="Dự án hoàn thành" value={loading ? "…" : `${k?.completedProjects ?? 0}/${k?.totalProjects ?? 0}`} sub="tính từ trạng thái thật" icon={<CircleCheck className="w-4 h-4" />} bg="#E6FBF5" border="#A7F3D0" />
       </div>
 
-      {/* 5-Metric Row: Dự án, Chờ duyệt, Tài liệu, Cuộc họp, Ticket */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <Link href="/app/client/projects">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Dự án</span>
-            <p className="text-2xl font-black text-[#24304A] mt-2">
-              {activeProjectsCount}
-            </p>
-          </Card>
-        </Link>
+      <Widget
+        title="Việc cần bạn xử lý"
+        icon={<Bell className="w-4 h-4" />}
+        action={data && <span className="px-2 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-[10px] font-bold">{data.attention.length} mục</span>}
+      >
+        {data && data.attention.length > 0 ? (
+          <ul className="divide-y divide-[#F2EAD3]">
+            {data.attention.map((a) => (
+              <li key={a.key}>
+                <Link href={a.href} className="flex items-center gap-3 py-3 hover:bg-[#FFFBF0] rounded-xl px-1 -mx-1">
+                  <span className={`w-9 h-9 rounded-xl grid place-items-center ${KIND_TONE[a.kind]}`}>{KIND_ICON[a.kind]}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-[#161827] truncate">{a.title}</span>
+                    <span className="block text-xs text-[#475569] truncate">{a.detail}</span>
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-[10px] font-bold">{a.badge}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty text="Hiện không có việc nào cần bạn xử lý" />
+        )}
+      </Widget>
 
-        <Link href="/app/client/approvals">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Chờ duyệt</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo dự án
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/client/documents">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Tài liệu</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo dự án
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/client/meetings">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group">
-            <span className="text-xs font-bold text-[#7C879D]">Cuộc họp</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Theo lịch
-            </p>
-          </Card>
-        </Link>
-
-        <Link href="/app/client/support">
-          <Card className="p-4 hover:border-[#5D87FF]/40 transition-all group col-span-2 sm:col-span-1">
-            <span className="text-xs font-bold text-[#7C879D]">Hỗ trợ</span>
-            <p className="text-xs font-semibold text-[#7C879D] mt-3">
-              Chat nội bộ
-            </p>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Dual Section: Tiến độ dự án & Sản phẩm chờ duyệt */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Tiến độ dự án
-            </h3>
-            <Link
-              href="/app/client/projects"
-              className="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
-            >
-              Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {projects.length === 0 ? (
-            <Card className="p-6 text-center">
-              <EmptyState
-                icon={<FolderKanban className="w-8 h-8 text-[#7C879D]" />}
-                title="Chưa có dự án hợp tác"
-                description="Các dự án triển khai giữa doanh nghiệp và PGS Agency sẽ hiển thị tại đây."
-              />
-            </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <Widget className="lg:col-span-3" title="Dự án của bạn" icon={<FolderKanban className="w-4 h-4" />} action={<SeeAll href="/app/client/projects" label="Xem tất cả" />}>
+          {data && data.projects.length > 0 ? (
+            <ul className="divide-y divide-[#F2EAD3]">
+              {data.projects.map((p) => {
+                const done = p.status === "completed";
+                return (
+                  <li key={p.id}>
+                    <Link href={`/app/client/projects/${p.id}`} className="flex items-center gap-4 py-3 group">
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
+                          <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.code}</span>
+                          {p.name}
+                        </span>
+                        <span className="block text-[11px] text-[#475569]">{done ? "Đã nghiệm thu" : `${p.itemsDone}/${p.itemsTotal} hạng mục hoàn thành`}</span>
+                      </span>
+                      <span className="w-36 shrink-0">
+                        <span className="flex justify-between text-[11px] mb-1">
+                          <b className="text-[#161827]">{p.progress}%</b>
+                          <span className="text-[#64748B]">{done ? "Hoàn thành" : `Hạn ${shortDate(p.dueDate)}`}</span>
+                        </span>
+                        <span className="block h-2 rounded-full bg-[#FBF3DC] overflow-hidden">
+                          <span style={{ width: `${p.progress}%` }} className={`block h-full ${done ? "bg-[#00D09C]" : "bg-[#E7AE18]"}`} />
+                        </span>
+                      </span>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${done ? "bg-[#E6FBF5] text-[#047857]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
+                        {done ? "Hoàn thành" : "Đang thực hiện"}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
-            <Card className="divide-y divide-[#F2EAD3]">
-              {projects.map((p) => (
-                <div
-                  key={p.id}
-                  className="p-4 flex items-center justify-between gap-4 hover:bg-[#F6F8FC] transition-colors"
-                >
-                  <div>
-                    <span className="font-mono text-xs font-bold text-[#5D87FF]">
-                      {p.projectCode}
-                    </span>
-                    <h4 className="text-xs font-bold text-[#24304A]">
-                      {p.name}
-                    </h4>
-                  </div>
-                  <Badge variant="blue" size="sm">
-                    {p.status}
-                  </Badge>
-                </div>
-              ))}
-            </Card>
+            <Empty text="Chưa có dự án nào" />
           )}
-        </div>
+        </Widget>
 
-        <div className="lg:col-span-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-              Sản phẩm chờ duyệt
-            </h3>
-            <Badge variant="gold" size="sm">
-              0 ấn phẩm
-            </Badge>
-          </div>
-
-          <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
-              Hiện tại không có ấn phẩm hoặc tài liệu nào đang chờ quý khách
-              nghiệm thu.
-            </p>
-          </Card>
-        </div>
-      </div>
-
-      {/* Dual Section: Tài liệu bàn giao & Hỗ trợ và thanh toán */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-6 space-y-3">
-          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-            Tài liệu bàn giao
-          </h3>
-          <Card className="p-4">
-            <p className="text-xs text-[#7C879D]">
-              Chưa có tài liệu đính kèm nào được tải lên.
-            </p>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-6 space-y-3">
-          <h3 className="text-base font-extrabold text-[#24304A] tracking-tight">
-            Hỗ trợ và thanh toán
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link
-              href="/app/client/invoices"
-              className="p-3 rounded-2xl bg-[#EEF2FF] border border-[#E0EAFF] text-center block"
-            >
-              <span className="text-xs font-bold text-[#5D87FF]">
-                Tra cứu hóa đơn
-              </span>
-            </Link>
-            <Link
-              href="/app/client/support"
-              className="p-3 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] text-center block"
-            >
-              <span className="text-xs font-bold text-[#24304A]">
-                Gửi Ticket hỗ trợ
-              </span>
-            </Link>
-          </div>
-        </div>
+        <Widget className="lg:col-span-2" title="Cập nhật mới nhất" icon={<RefreshCw className="w-4 h-4" />}>
+          {data && data.updates.length > 0 ? (
+            <ul className="space-y-3">
+              {data.updates.map((u, i) => (
+                <li key={i} className="flex gap-3 text-xs">
+                  <i className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${i === 0 ? "bg-[#E7AE18]" : "bg-[#FDE68A]"}`} />
+                  <span className="text-[#64748B] font-mono w-10 shrink-0">{dm(u.at)}</span>
+                  <span className="text-[#161827] leading-snug">{u.text}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="Chưa có cập nhật" />
+          )}
+        </Widget>
       </div>
     </div>
   );
