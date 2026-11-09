@@ -77,8 +77,8 @@ export class LeaveService {
       const admins = await this.usersByRole('admin');
       await this.notifications?.createForUsers(admins, {
         type: 'leave.submitted',
-        title: 'Don nghi phep moi',
-        message: `${user.fullName ?? user.email ?? 'Nhan su'} da gui don nghi phep.`,
+        title: 'Đơn nghỉ phép mới',
+        message: `${user.fullName ?? user.email ?? 'Nhân sự'} đã gửi đơn nghỉ phép.`,
         entityType: 'leave_request',
         entityId: request?.id ?? null,
         actionUrl: '/app/admin/leave',
@@ -99,8 +99,8 @@ export class LeaveService {
         },
         actorUserId: user.profileId,
         defaultRecipients: admins,
-        title: 'Don nghi phep moi',
-        message: 'Co don nghi phep moi can xem xet.',
+        title: 'Đơn nghỉ phép mới',
+        message: 'Có đơn nghỉ phép mới cần xem xét.',
         entityType: 'leave_request',
         entityId: request?.id ?? null,
         actionUrl: '/app/admin/leave',
@@ -124,12 +124,12 @@ export class LeaveService {
         type: status === 'approved' ? 'leave.approved' : 'leave.rejected',
         title:
           status === 'approved'
-            ? 'Don nghi phep da duoc duyet'
-            : 'Don nghi phep bi tu choi',
+            ? 'Đơn nghỉ phép đã được duyệt'
+            : 'Đơn nghỉ phép bị từ chối',
         message:
           status === 'approved'
-            ? 'Don nghi phep cua ban da duoc duyet.'
-            : 'Don nghi phep cua ban da bi tu choi.',
+            ? 'Đơn nghỉ phép của bạn đã được duyệt.'
+            : 'Đơn nghỉ phép của bạn đã bị từ chối.',
         entityType: 'leave_request',
         entityId: request?.id ?? null,
         actionUrl: '/app/leave',
@@ -151,9 +151,9 @@ export class LeaveService {
         defaultRecipients: [requesterUserId],
         title:
           status === 'approved'
-            ? 'Don nghi phep da duoc duyet'
-            : 'Don nghi phep bi tu choi',
-        message: 'Trang thai don nghi phep cua ban da thay doi.',
+            ? 'Đơn nghỉ phép đã được duyệt'
+            : 'Đơn nghỉ phép bị từ chối',
+        message: 'Trạng thái đơn nghỉ phép của bạn đã thay đổi.',
         entityType: 'leave_request',
         entityId: request?.id ?? null,
         actionUrl: '/app/leave',

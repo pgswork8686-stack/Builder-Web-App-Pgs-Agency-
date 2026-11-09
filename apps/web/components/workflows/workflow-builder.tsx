@@ -329,7 +329,7 @@ export function WorkflowBuilder() {
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <Card>
           <CardHeader>
-            <CardTitle>Phiên bản Workflow</CardTitle>
+            <CardTitle>Phiên bản quy trình</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {(loadingService || loadingTemplate) && (
@@ -603,7 +603,7 @@ export function WorkflowBuilder() {
                       setPredecessorStageId(event.target.value)
                     }
                   >
-                    <option value="">Stage trước</option>
+                    <option value="">Giai đoạn trước</option>
                     {stages.map((stage) => (
                       <option key={stage.id} value={stage.id}>
                         {stage.name}

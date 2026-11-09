@@ -36,7 +36,7 @@ export class ChatAccessService {
     this.logger.error(`${code}: ${detail}`);
     throw new InternalServerErrorException({
       code,
-      message: 'Khong the kiem tra quyen chat.',
+      message: 'Không thể kiểm tra quyền trò chuyện.',
     });
   }
 
@@ -45,7 +45,7 @@ export class ChatAccessService {
     // callers cannot use this endpoint to enumerate chat history.
     throw new NotFoundException({
       code: 'CHAT_CONVERSATION_NOT_FOUND',
-      message: 'Khong tim thay cuoc tro chuyen.',
+      message: 'Không tìm thấy cuộc trò chuyện.',
     });
   }
 

@@ -97,8 +97,8 @@ export class TasksService {
         await this.notifications?.createForUser({
           recipientUserId: task.assignee_user_id,
           type: 'task.assigned',
-          title: 'Cong viec moi',
-          message: `Ban duoc giao cong viec: ${task.title}.`,
+          title: 'Công việc mới',
+          message: `Bạn được giao công việc: ${task.title}.`,
           entityType: 'task',
           entityId: task.id,
           actionUrl: `/app/projects/${task.project_id}/tasks/${task.id}`,
@@ -124,9 +124,9 @@ export class TasksService {
         defaultRecipients: task.assignee_user_id ? [task.assignee_user_id] : [],
         title:
           triggerType === 'task.assigned'
-            ? 'Cong viec moi'
-            : 'Cap nhat cong viec',
-        message: `Cong viec ${task.title} da duoc cap nhat.`,
+            ? 'Công việc mới'
+            : 'Cập nhật công việc',
+        message: `Công việc ${task.title} đã được cập nhật.`,
         entityType: 'task',
         entityId: task.id,
         actionUrl: `/app/projects/${task.project_id}/tasks/${task.id}`,

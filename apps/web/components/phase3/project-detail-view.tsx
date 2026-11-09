@@ -662,7 +662,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[#F2EAD3]">
-                <span className="text-[#475569]">Project Manager:</span>
+                <span className="text-[#475569]">Quản lý dự án:</span>
                 <span className="font-bold text-[#161827]">
                   {project.projectManager?.full_name ||
                     project.projectManager?.email ||

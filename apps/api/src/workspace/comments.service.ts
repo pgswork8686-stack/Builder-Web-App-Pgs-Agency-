@@ -104,8 +104,8 @@ export class CommentsService {
 
       await this.notifications?.createForUsers(recipients, {
         type: 'task.comment',
-        title: 'Binh luan moi',
-        message: `${user.fullName ?? user.email ?? 'Thanh vien'} da binh luan trong cong viec ${task.title}.`,
+        title: 'Bình luận mới',
+        message: `${user.fullName ?? user.email ?? 'Thành viên'} đã bình luận trong công việc ${task.title}.`,
         entityType: 'task_comment',
         entityId: commentId,
         actionUrl: `/app/projects/${projectId}/tasks/${taskId}`,
@@ -125,8 +125,8 @@ export class CommentsService {
         },
         actorUserId: user.profileId,
         defaultRecipients: recipients,
-        title: 'Binh luan moi',
-        message: `Cong viec ${task.title} co binh luan moi.`,
+        title: 'Bình luận mới',
+        message: `Công việc ${task.title} có bình luận mới.`,
         entityType: 'task_comment',
         entityId: commentId,
         actionUrl: `/app/projects/${projectId}/tasks/${taskId}`,

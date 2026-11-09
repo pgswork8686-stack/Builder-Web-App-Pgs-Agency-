@@ -47,7 +47,7 @@ export class AutomationService {
     if (user.role !== 'admin') {
       throw new ForbiddenException({
         code: 'AUTOMATION_ADMIN_REQUIRED',
-        message: 'Chi quan tri vien moi duoc quan ly automation.',
+        message: 'Chỉ quản trị viên mới được quản lý tự động hóa.',
       });
     }
   }
@@ -192,7 +192,7 @@ export class AutomationService {
     if (!data) {
       throw new BadRequestException({
         code: 'AUTOMATION_RULE_NOT_FOUND',
-        message: 'Khong tim thay automation rule.',
+        message: 'Không tìm thấy quy tắc tự động hóa.',
       });
     }
     return this.mapRule(data);
@@ -506,8 +506,8 @@ export class AutomationService {
           status: invoice.status,
         },
         actorUserId: user.profileId,
-        title: 'Hoa don qua han',
-        message: `Hoa don ${invoice.invoice_number} da qua han thanh toan.`,
+        title: 'Hóa đơn quá hạn',
+        message: `Hóa đơn ${invoice.invoice_number} đã quá hạn thanh toán.`,
         entityType: 'invoice',
         entityId: invoice.id,
         actionUrl: `/app/client/invoices`,

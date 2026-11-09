@@ -92,19 +92,19 @@ export class ChatService {
     ) {
       throw new BadRequestException({
         code: 'DIRECT_CHAT_INVALID_PARTICIPANTS',
-        message: 'Direct chat chi danh cho nguoi dung noi bo dang hoat dong.',
+        message: 'Tin nhắn trực tiếp chỉ dành cho nhân sự nội bộ đang hoạt động.',
       });
     }
     if (message.includes('PROJECT_CHAT_ACCESS_DENIED')) {
       throw new NotFoundException({
         code: 'PROJECT_CHAT_NOT_FOUND',
-        message: 'Khong tim thay project chat hoac khong co quyen xem.',
+        message: 'Không tìm thấy phòng chat dự án hoặc bạn không có quyền xem.',
       });
     }
     if (message.includes('PROJECT_NOT_FOUND')) {
       throw new NotFoundException({
         code: 'PROJECT_NOT_FOUND',
-        message: 'Khong tim thay du an.',
+        message: 'Không tìm thấy dự án.',
       });
     }
     this.databaseFailure(
@@ -163,7 +163,7 @@ export class ChatService {
     if (user.role === 'client') {
       throw new ForbiddenException({
         code: 'DIRECT_CHAT_ACCESS_DENIED',
-        message: 'Khach hang chi co the tham gia project chat duoc uy quyen.',
+        message: 'Khách hàng chỉ tham gia được phòng chat dự án đã được ủy quyền.',
       });
     }
 
@@ -216,7 +216,7 @@ export class ChatService {
     if (!data) {
       throw new NotFoundException({
         code: 'CHAT_CONVERSATION_NOT_FOUND',
-        message: 'Khong tim thay cuoc tro chuyen.',
+        message: 'Không tìm thấy cuộc trò chuyện.',
       });
     }
     return this.mapConversation(data as Record<string, any>, user);
@@ -327,7 +327,7 @@ export class ChatService {
       await this.notificationsService.createForUsers(recipients, {
         type: 'chat.message',
         title: 'Tin nhắn mới',
-        message: `${user.fullName ?? user.email ?? 'Thanh vien'} da gui tin nhan moi.`,
+        message: `${user.fullName ?? user.email ?? 'Thành viên'} đã gửi tin nhắn mới.`,
         entityType: 'chat_conversation',
         entityId: conversationId,
         actionUrl: `/app/chat?conversationId=${conversationId}`,
@@ -349,8 +349,8 @@ export class ChatService {
         },
         actorUserId: user.profileId,
         defaultRecipients: recipients,
-        title: 'Tin nhan moi',
-        message: `${user.fullName ?? user.email ?? 'Thanh vien'} da gui tin nhan moi.`,
+        title: 'Tin nhắn mới',
+        message: `${user.fullName ?? user.email ?? 'Thành viên'} đã gửi tin nhắn mới.`,
         entityType: 'chat_message',
         entityId: message.id,
         actionUrl: `/app/chat?conversationId=${conversationId}`,

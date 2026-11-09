@@ -357,20 +357,20 @@ export class FinanceService {
           : '/app/client/invoices';
       const title =
         triggerType === 'invoice.payment_recorded'
-          ? 'Da ghi nhan thanh toan'
+          ? 'Đã ghi nhận thanh toán'
           : triggerType === 'invoice.overdue'
-            ? 'Hoa don qua han'
+            ? 'Hóa đơn quá hạn'
             : triggerType === 'invoice.issued'
-              ? 'Hoa don da phat hanh'
-              : 'Hop dong da cap nhat';
+              ? 'Hóa đơn đã phát hành'
+              : 'Hợp đồng đã cập nhật';
       const message =
         triggerType === 'invoice.payment_recorded'
-          ? `Hoa don ${entity.invoice_number} da ghi nhan thanh toan.`
+          ? `Hóa đơn ${entity.invoice_number} đã ghi nhận thanh toán.`
           : triggerType === 'invoice.overdue'
-            ? `Hoa don ${entity.invoice_number} da qua han thanh toan.`
+            ? `Hóa đơn ${entity.invoice_number} đã quá hạn thanh toán.`
             : triggerType === 'invoice.issued'
-              ? `Hoa don ${entity.invoice_number} da duoc phat hanh.`
-              : `Hop dong ${entity.contract_number} da doi trang thai.`;
+              ? `Hóa đơn ${entity.invoice_number} đã được phát hành.`
+              : `Hợp đồng ${entity.contract_number} đã đổi trạng thái.`;
 
       await this.notifications?.createForUsers(recipients, {
         type: triggerType,

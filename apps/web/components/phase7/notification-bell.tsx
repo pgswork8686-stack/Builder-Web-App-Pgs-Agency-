@@ -40,10 +40,10 @@ export function NotificationBell() {
 
   const realtimeLabel = useMemo(() => {
     const labels: Record<ConnectionState, string> = {
-      connecting: "Đang kết nối realtime",
-      connected: "Realtime đã kết nối",
+      connecting: "Đang kết nối trực tuyến",
+      connected: "Đã kết nối trực tuyến",
       reconnecting: "Đang kết nối lại",
-      denied: "Không có quyền realtime",
+      denied: "Không có quyền trực tuyến",
     };
     return labels[connectionState];
   }, [connectionState]);
@@ -185,7 +185,7 @@ export function NotificationBell() {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#F2EAD3] bg-white shadow-xl">
+        <div className="fixed inset-x-4 top-[72px] z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[22rem] overflow-hidden rounded-2xl border border-[#F2EAD3] bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-[#F2EAD3] px-4 py-3 bg-[#FFFBF0]">
             <div>
               <div className="text-sm font-bold text-[#161827]">Thông báo</div>
@@ -219,7 +219,7 @@ export function NotificationBell() {
             </button>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
             {error ? (
               <div
                 role="alert"

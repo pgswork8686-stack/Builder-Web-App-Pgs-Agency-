@@ -168,7 +168,7 @@ export class NotificationsService {
     if (!existing) {
       throw new NotFoundException({
         code: 'NOTIFICATION_NOT_FOUND',
-        message: 'Khong tim thay thong bao.',
+        message: 'Không tìm thấy thông báo.',
       });
     }
 

@@ -329,7 +329,7 @@ function ProjectCalendarContent({
                               {isDeadlineDay && isDueOnNonWorking && (
                                 <span
                                   className="inline-flex items-center text-amber-600 shrink-0"
-                                  title="⚠ Deadline rơi vào ngày nghỉ"
+                                  title="⚠ Hạn chót rơi vào ngày nghỉ"
                                 >
                                   <AlertTriangle className="h-3 w-3" />
                                 </span>
