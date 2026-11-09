@@ -350,7 +350,7 @@ export class LeaveService {
     let dbQuery = this.client
       .from('leave_requests')
       .select(
-        '*, leave_type:leave_types(*), profile:profiles!inner(id, full_name, email, employee_profile:employee_profiles!inner(team_id, department_id))',
+        '*, leave_type:leave_types(*), profile:profiles!leave_requests_user_id_fkey!inner(id, full_name, email, employee_profile:employee_profiles!employee_profiles_user_id_fkey!inner(team_id, department_id))',
         { count: 'exact' },
       );
 
@@ -365,7 +365,10 @@ export class LeaveService {
     }
 
     // Scoped filtering at DB layer
-    if (isLeader) {
+    if (isLeader && teamIdConstraint === '00000000-0000-0000-0000-000000000000' && user.departmentId) {
+      // Chưa có đội nào: Trưởng nhóm xem đơn của cả phòng ban mình.
+      dbQuery = dbQuery.eq('profile.employee_profile.department_id', user.departmentId);
+    } else if (isLeader) {
       dbQuery = dbQuery.eq(
         'profile.employee_profile.team_id',
         teamIdConstraint,
@@ -439,7 +442,7 @@ export class LeaveService {
       const { data: requestUserTeam, error: teamQueryError } = await this.client
         .from('leave_requests')
         .select(
-          'user_id, profile:profiles(employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id))',
+          'user_id, profile:profiles!leave_requests_user_id_fkey(employee_profile:employee_profiles!employee_profiles_user_id_fkey(team_id, department_id))',
         )
         .eq('id', requestId)
         .maybeSingle();
@@ -463,7 +466,9 @@ export class LeaveService {
         .eq('id', empProfile?.team_id || '')
         .maybeSingle();
 
-      if (!leadingTeam) {
+      const sameDepartment =
+        !!user.departmentId && empProfile?.department_id === user.departmentId;
+      if (!leadingTeam && !sameDepartment) {
         throw new ForbiddenException({
           code: 'LEAVE_ACCESS_DENIED',
           message:
