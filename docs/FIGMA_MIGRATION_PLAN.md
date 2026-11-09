@@ -16,8 +16,8 @@ Cập nhật: 06/11/2026. Nhánh làm việc: `figma-update` (không đụng `ma
 | 1a | Đồng bộ nền/viền (`#FFFBF0`, `#F2EAD3`) toàn app + tên mục menu admin theo Figma | Xong (nhánh này) |
 | 1c | **Khung chung đổi sang thanh bên TRẮNG** (Figma: nền `#fff`, viền `#f2ead3`, mục đang chọn `#fdf1c7` viền `#e7ae18`; bản chạy: navy tối) + header trắng 78px | Xong (thanh bên desktop + di động, tên tiêu đề topbar) |
 | 1b | Endpoint `GET /api/v1/admin/dashboard` + dựng lại Admin Dashboard theo Figma | Xong (đã triển khai; kiểm tra endpoint với dữ liệu thật OK, chưa xem trực quan bằng tài khoản admin) |
-| 2 | Trang công khai `/about` (13 khối, token `PGS Tokens`) | Chưa làm |
-| 3 | Tài liệu theo phòng ban: Admin + Nhân viên + modal tải lên | Chưa làm |
+| 2 | Trang công khai `/about` (13 khối, token `PGS Tokens`) | Xong (đã triển khai; ảnh là khung gradient tạm vì Figma chỉ có tên file ảnh) |
+| 3 | Tài liệu theo phòng ban: Admin + Nhân viên + modal tải lên | Admin xong (cột phòng ban, lọc theo phòng, chọn phòng khi tải lên). Nhân viên/Trưởng nhóm chưa |
 | 4 | Dashboard các vai trò: Trưởng nhóm, Nhân viên, Kế toán, Khách hàng | Xong 4/4 màn tổng quan (endpoint + giao diện, đã triển khai). Còn lại ~42 màn con của 4 vai trò |
 | 5 | Màn Admin còn lại (~39) và nhóm Dùng chung (9) | Chưa làm |
 | 6 | Modal phản hồi nghiệm thu của khách (2) | Chưa làm |
