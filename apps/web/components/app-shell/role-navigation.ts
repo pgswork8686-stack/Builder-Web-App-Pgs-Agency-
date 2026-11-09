@@ -301,7 +301,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "11",
-              title: "Tin nhắn (Chat)",
+              title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },
@@ -389,7 +389,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "11",
-              title: "Tin nhắn (Chat)",
+              title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },
@@ -488,7 +488,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "13",
-              title: "Tin nhắn (Chat)",
+              title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },
@@ -576,7 +576,7 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           items: [
             {
               index: "11",
-              title: "Tin nhắn (Chat)",
+              title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },

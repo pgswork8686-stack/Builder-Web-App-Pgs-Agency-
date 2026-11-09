@@ -54,7 +54,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
   const getCenterTitle = () => {
     // Dashboards
     if (pathname === "/app/admin") return "Tổng quan quản trị";
-    if (pathname === "/app/team-leader") return "Manager Dashboard";
+    if (pathname === "/app/team-leader") return "Tổng quan quản lý";
     if (pathname === "/app/employee") return "Employee Dashboard";
     if (pathname === "/app/accountant") return "Accounting Dashboard";
     if (pathname === "/app/client") return "Client Dashboard";
