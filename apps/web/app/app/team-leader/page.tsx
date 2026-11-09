@@ -106,7 +106,7 @@ export default function TeamLeaderDashboardPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
         <Kpi label="Dự án phụ trách" value={num(k?.projects)} sub={`${k?.projectsAtRisk ?? 0} dự án rủi ro`} icon={<FolderKanban className="w-4 h-4" />} bg="#FFFFFF" border="#F2EAD3" />
-        <Kpi label="Task đang mở" value={num(k?.openTasks)} sub="Công việc chưa hoàn thành" icon={<ListChecks className="w-4 h-4" />} bg="#EEF2FF" border="#E0EAFF" />
+        <Kpi label="Việc đang mở" value={num(k?.openTasks)} sub="Công việc chưa hoàn thành" icon={<ListChecks className="w-4 h-4" />} bg="#EEF2FF" border="#E0EAFF" />
         <Kpi label="Quá hạn" value={num(k?.overdueTasks)} sub={`${k?.overdueAssignees ?? 0} người bị ảnh hưởng`} icon={<CircleAlert className="w-4 h-4" />} bg="#FEE2E2" border="#FECACA" />
         <Kpi label="Cần duyệt" value={num(k?.pendingReview)} sub={`${k?.pendingLeave ?? 0} đơn nghỉ phép`} icon={<UserCheck className="w-4 h-4" />} bg="#FEF9C3" border="#FEF08A" />
         <Kpi label="Thành viên" value={num(members)} sub={`${k?.presentToday ?? 0} có mặt hôm nay`} icon={<Users className="w-4 h-4" />} bg="#E6FBF5" border="#A7F3D0" />

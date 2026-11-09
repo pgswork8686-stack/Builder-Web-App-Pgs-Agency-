@@ -886,7 +886,7 @@ function StageEditor({
           >
             <option value="manual">Thủ công</option>
             <option value="tasks_done">Hoàn thành công việc</option>
-            <option value="tasks_done_and_approval">Tasks + Approval</option>
+            <option value="tasks_done_and_approval">Công việc + Phê duyệt</option>
           </Select>
           <Input
             aria-label="SLA Hours"
@@ -1060,7 +1060,7 @@ function MappedItemEditor({
           >
             <option value="manual">Thủ công</option>
             <option value="tasks_done">Hoàn thành công việc</option>
-            <option value="tasks_done_and_approval">Tasks + Approval</option>
+            <option value="tasks_done_and_approval">Công việc + Phê duyệt</option>
           </Select>
           <Input
             aria-label={`Mapped SLA Hours ${item.id}`}

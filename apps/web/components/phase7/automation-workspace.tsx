@@ -56,10 +56,10 @@ const recipientModes: Array<{ value: RecipientMode; label: string }> = [
 ];
 
 const triggerLabels: Record<AutomationTrigger, string> = {
-  "task.created": "Task được tạo",
-  "task.assigned": "Task được giao",
-  "task.updated": "Task cập nhật",
-  "task.due_soon": "Task sắp đến hạn",
+  "task.created": "Công việc được tạo",
+  "task.assigned": "Công việc được giao",
+  "task.updated": "Công việc cập nhật",
+  "task.due_soon": "Công việc sắp đến hạn",
   "project.updated": "Dự án cập nhật",
   "leave.submitted": "Nghỉ phép được gửi",
   "leave.approved": "Nghỉ phép được duyệt",

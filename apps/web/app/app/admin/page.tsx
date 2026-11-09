@@ -264,7 +264,7 @@ export default function AdminDashboardPage() {
           border="#F2EAD3"
         />
         <Kpi
-          label="Task quá hạn"
+          label="Việc quá hạn"
           value={loading ? "…" : String(k?.overdueTasks ?? 0)}
           sub="Công việc đang mở đã qua hạn"
           icon={<TriangleAlert className="w-4 h-4" />}
