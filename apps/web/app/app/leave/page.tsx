@@ -260,7 +260,7 @@ export default function EmployeeLeavePage() {
                         }
                         size="sm"
                       >
-                        {r.status ? r.status.toUpperCase() : "—"}
+                        {({ pending: "Chờ duyệt", approved: "Đã duyệt", rejected: "Từ chối", cancelled: "Đã hủy" } as Record<string, string>)[r.status] ?? "—"}
                       </Badge>
                     </TableCell>
 
