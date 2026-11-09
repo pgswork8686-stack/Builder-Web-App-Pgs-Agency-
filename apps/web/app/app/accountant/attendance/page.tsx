@@ -308,13 +308,13 @@ export default function AccountantAttendancePage() {
         description="Đối soát dữ liệu vào ca, thời gian làm việc toàn công ty phục vụ hạch toán bảng lương."
         badge={`${total} Bản ghi chấm công`}
         action={
-          <div className="flex items-center gap-1 bg-[#F6F8FC] p-1 rounded-xl border border-[#F2EAD3]">
+          <div className="flex items-center gap-1 bg-[#FFFBF0] p-1 rounded-xl border border-[#F2EAD3]">
             <button
               onClick={() => setActiveTab("company")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "company"
                   ? "bg-white text-[#5D87FF] shadow-xs"
-                  : "text-[#7C879D] hover:text-[#24304A]"
+                  : "text-[#475569] hover:text-[#24304A]"
               }`}
             >
               Toàn công ty
@@ -324,7 +324,7 @@ export default function AccountantAttendancePage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "personal"
                   ? "bg-white text-[#5D87FF] shadow-xs"
-                  : "text-[#7C879D] hover:text-[#24304A]"
+                  : "text-[#475569] hover:text-[#24304A]"
               }`}
             >
               Chấm công của tôi
@@ -339,7 +339,7 @@ export default function AccountantAttendancePage() {
           <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
                   Từ ngày
                 </label>
                 <input
@@ -349,12 +349,12 @@ export default function AccountantAttendancePage() {
                     setFilterFrom(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
                   Đến ngày
                 </label>
                 <input
@@ -364,12 +364,12 @@ export default function AccountantAttendancePage() {
                     setFilterTo(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
                   Phòng ban
                 </label>
                 <select
@@ -378,7 +378,7 @@ export default function AccountantAttendancePage() {
                     setFilterDept(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi phòng ban --</option>
                   {departments.map((d) => (
@@ -390,7 +390,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
                   Đội nhóm (Team)
                 </label>
                 <select
@@ -399,7 +399,7 @@ export default function AccountantAttendancePage() {
                     setFilterTeam(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi nhóm --</option>
                   {teams.map((t) => (
@@ -411,7 +411,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#7C879D] mb-1">
+                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
                   Trạng thái
                 </label>
                 <select
@@ -420,7 +420,7 @@ export default function AccountantAttendancePage() {
                     setFilterStatus(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] outline-none focus:bg-white focus:border-[#5D87FF]"
                 >
                   <option value="">-- Mọi trạng thái --</option>
                   <option value="present">Đúng giờ</option>
@@ -480,7 +480,7 @@ export default function AccountantAttendancePage() {
                               <span className="block font-bold text-xs text-[#24304A]">
                                 {emp?.full_name || "Chưa có tên"}
                               </span>
-                              <span className="block text-[11px] text-[#7C879D] font-mono">
+                              <span className="block text-[11px] text-[#475569] font-mono">
                                 {emp?.work_email || emp?.employee_code || "—"}
                               </span>
                             </div>
@@ -500,7 +500,7 @@ export default function AccountantAttendancePage() {
                               )}
                             </span>
                           ) : (
-                            <span className="text-[#7C879D]">—</span>
+                            <span className="text-[#475569]">—</span>
                           )}
                           {r.late_minutes ? (
                             <span className="block text-[10px] text-amber-600 font-medium">
@@ -518,7 +518,7 @@ export default function AccountantAttendancePage() {
                               )}
                             </span>
                           ) : (
-                            <span className="text-[#7C879D]">—</span>
+                            <span className="text-[#475569]">—</span>
                           )}
                           {r.early_leave_minutes ? (
                             <span className="block text-[10px] text-amber-600 font-medium">
@@ -533,7 +533,7 @@ export default function AccountantAttendancePage() {
 
                         <TableCell>{getStatusBadge(r.status)}</TableCell>
 
-                        <TableCell className="text-xs text-[#7C879D] max-w-[200px] truncate">
+                        <TableCell className="text-xs text-[#475569] max-w-[200px] truncate">
                           {r.check_in_note || r.check_out_note || "—"}
                         </TableCell>
                       </TableRow>
@@ -546,7 +546,7 @@ export default function AccountantAttendancePage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#7C879D]">
+            <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
               <span>
                 Trang {page} / {totalPages} ({total} bản ghi)
               </span>
@@ -637,7 +637,7 @@ export default function AccountantAttendancePage() {
                   <h3 className="text-lg font-bold text-[#24304A] tracking-tight">
                     Điểm danh ca làm việc cá nhân
                   </h3>
-                  <p className="text-xs text-[#7C879D]">
+                  <p className="text-xs text-[#475569]">
                     Văn phòng:{" "}
                     <span className="font-medium text-[#24304A]">
                       Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
@@ -646,7 +646,7 @@ export default function AccountantAttendancePage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] self-start sm:self-auto">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] self-start sm:self-auto">
                   <MapPin
                     className={`w-4 h-4 ${
                       geoCoords
@@ -671,7 +671,7 @@ export default function AccountantAttendancePage() {
                   placeholder="Ghi chú ca làm, làm bù hoặc công tác..."
                   value={personalNote}
                   onChange={(e) => setPersonalNote(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] placeholder-[#7C879D] outline-none focus:bg-white focus:border-[#5D87FF] transition-colors"
+                  className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] placeholder-[#475569] outline-none focus:bg-white focus:border-[#5D87FF] transition-colors"
                 />
               </div>
 
@@ -715,7 +715,7 @@ export default function AccountantAttendancePage() {
               </h4>
               <div className="space-y-3 text-xs border-t border-[#F2EAD3] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Trạng thái:</span>
+                  <span className="text-[#475569]">Trạng thái:</span>
                   <span>
                     {personalSummary?.today?.status
                       ? getStatusBadge(personalSummary.today.status)
@@ -723,7 +723,7 @@ export default function AccountantAttendancePage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Check-in:</span>
+                  <span className="text-[#475569]">Check-in:</span>
                   <span className="font-mono font-bold text-[#24304A]">
                     {personalSummary?.today?.checkInAt
                       ? new Date(
@@ -733,7 +733,7 @@ export default function AccountantAttendancePage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#7C879D]">Check-out:</span>
+                  <span className="text-[#475569]">Check-out:</span>
                   <span className="font-mono font-bold text-[#24304A]">
                     {personalSummary?.today?.checkOutAt
                       ? new Date(

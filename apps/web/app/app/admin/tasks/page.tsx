@@ -24,13 +24,13 @@ export default function AdminTasksPage() {
       <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-2 flex-1 min-w-[240px]">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#7C879D] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#475569] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Tìm kiếm công việc, người thực hiện..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] focus:outline-none focus:border-[#E7AE18]"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] focus:outline-none focus:border-[#E7AE18]"
             />
           </div>
         </div>
@@ -39,7 +39,7 @@ export default function AdminTasksPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs px-3 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#161827] focus:outline-none focus:border-[#E7AE18]"
+            className="text-xs px-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] focus:outline-none focus:border-[#E7AE18]"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="todo">Cần làm</option>
@@ -52,7 +52,7 @@ export default function AdminTasksPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<ListTodo className="w-10 h-10 text-[#7C879D]" />}
+          icon={<ListTodo className="w-10 h-10 text-[#475569]" />}
           title="Chưa có công việc nào trong danh sách"
           description="Các đầu việc được tạo trong từng dự án sẽ hiển thị tập trung tại đây."
         />

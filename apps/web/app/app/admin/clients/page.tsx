@@ -627,7 +627,7 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
               placeholder="Ghi chú về khách hàng, yêu cầu đặc thù..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -689,7 +689,7 @@ export default function AdminClientsPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
+                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#5D87FF]"
               >
                 <option value="active">Đang hoạt động (Active)</option>
                 <option value="inactive">Tạm dừng (Inactive)</option>
@@ -760,7 +760,7 @@ export default function AdminClientsPage() {
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
+              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#5D87FF] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}

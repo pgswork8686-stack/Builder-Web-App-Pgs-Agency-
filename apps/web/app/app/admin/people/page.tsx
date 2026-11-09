@@ -656,7 +656,7 @@ export default function AdminPeopleDirectoryPage() {
       >
         <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
           {/* Ảnh đại diện & Preview */}
-          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3]">
+          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3]">
             <Avatar
               src={editAvatarUrl.trim() || undefined}
               name={editFullName || editingPerson?.email || "Avatar"}
@@ -688,7 +688,7 @@ export default function AdminPeopleDirectoryPage() {
                 value={editFullName}
                 onChange={(e) => setEditFullName(e.target.value)}
                 placeholder="Nhập họ và tên đầy đủ"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               />
             </div>
 
@@ -701,7 +701,7 @@ export default function AdminPeopleDirectoryPage() {
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
                 placeholder="0988xxxxxx"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               />
             </div>
           </div>
@@ -714,7 +714,7 @@ export default function AdminPeopleDirectoryPage() {
               <select
                 value={editRole}
                 onChange={(e) => setEditRole(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               >
                 <option value="admin">Quản trị viên (Admin)</option>
                 <option value="team_leader">
@@ -735,7 +735,7 @@ export default function AdminPeopleDirectoryPage() {
               <select
                 value={editAccountStatus}
                 onChange={(e) => setEditAccountStatus(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               >
                 <option value="active">Hoạt động bình thường (Active)</option>
                 <option value="pending">Chờ phê duyệt (Pending)</option>
@@ -750,7 +750,7 @@ export default function AdminPeopleDirectoryPage() {
           </div>
 
           {editRole !== "client" && (
-            <div className="p-4 rounded-2xl bg-[#F6F8FC] border border-[#F2EAD3] space-y-4">
+            <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] space-y-4">
               <h4 className="text-xs font-extrabold text-[#24304A] uppercase tracking-wider flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-[#5D87FF]" />
                 Thông tin hồ sơ nhân sự doanh nghiệp
@@ -761,7 +761,7 @@ export default function AdminPeopleDirectoryPage() {
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
                     Mã nhân viên (Employee Code)
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
-                      <span className="text-[10px] text-[#7C879D] font-normal ml-1">
+                      <span className="text-[10px] text-[#475569] font-normal ml-1">
                         (Mã định danh bất biến)
                       </span>
                     )}
@@ -898,18 +898,18 @@ export default function AdminPeopleDirectoryPage() {
                 placeholder="Tìm kiếm dự án theo tên hoặc mã..."
                 value={projectSearch}
                 onChange={(e) => setProjectSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#F6F8FC] border border-[#F2EAD3] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] focus:bg-white focus:border-[#5D87FF] outline-none"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#7C879D] shrink-0">
+              <span className="text-xs text-[#475569] shrink-0">
                 Vai trò trong dự án:
               </span>
               <select
                 value={projectRole}
                 onChange={(e) => setProjectRole(e.target.value as any)}
-                className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#F6F8FC] text-xs font-semibold text-[#24304A] outline-none focus:border-[#5D87FF]"
+                className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] outline-none focus:border-[#5D87FF]"
               >
                 <option value="member">Thành viên (Member)</option>
                 <option value="project_manager">Quản lý dự án (PM)</option>
@@ -920,7 +920,7 @@ export default function AdminPeopleDirectoryPage() {
 
           <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#F2EAD3] divide-y divide-[#F2EAD3] p-1">
             {filteredProjects.length === 0 ? (
-              <p className="p-6 text-center text-xs text-[#7C879D]">
+              <p className="p-6 text-center text-xs text-[#475569]">
                 Không có dự án nào khớp với tìm kiếm.
               </p>
             ) : (
@@ -932,7 +932,7 @@ export default function AdminPeopleDirectoryPage() {
                     className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
                       isSelected
                         ? "bg-[#EEF2FF] border border-[#5D87FF]/20"
-                        : "hover:bg-[#F6F8FC]"
+                        : "hover:bg-[#FFFBF0]"
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -951,7 +951,7 @@ export default function AdminPeopleDirectoryPage() {
                             {p.name}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#7C879D] truncate">
+                        <p className="text-[11px] text-[#475569] truncate">
                           Khách hàng:{" "}
                           {p.clientCompany?.name || "Doanh nghiệp đối tác"}
                         </p>

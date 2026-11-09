@@ -70,7 +70,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
               className={`text-xs font-bold ${
                 highlightSunday && d === "CN"
                   ? "text-[#7F1D1D]"
-                  : "text-[#7C879D]"
+                  : "text-[#475569]"
               }`}
             >
               {d}
@@ -96,7 +96,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                 className={`min-h-[60px] sm:min-h-[80px] p-1.5 sm:p-2 rounded-xl border flex flex-col gap-1 transition-colors cursor-default ${
                   todayCell
                     ? "bg-[#EEF2FF] border-[#5D87FF]"
-                    : "bg-[#F6F8FC] border-[#F2EAD3] hover:bg-white hover:border-[#CBD5E1]"
+                    : "bg-[#FFFBF0] border-[#F2EAD3] hover:bg-white hover:border-[#CBD5E1]"
                 }`}
               >
                 <span

@@ -26,7 +26,7 @@ export default function AccountantPaymentsPage() {
 
       <Card className="p-10 text-center">
         <EmptyState
-          icon={<DollarSign className="w-10 h-10 text-[#7C879D]" />}
+          icon={<DollarSign className="w-10 h-10 text-[#475569]" />}
           title="Chưa có giao dịch thanh toán nào"
           description="Các khoản thanh toán được ghi nhận sẽ hiển thị chi tiết tại đây."
         />

@@ -88,7 +88,7 @@ export function TaskViewTabs({
               className={`w-4 h-4 shrink-0 transition-colors ${
                 isActive
                   ? "text-[#161827]"
-                  : "text-[#7C879D] group-hover:text-[#161827]"
+                  : "text-[#475569] group-hover:text-[#161827]"
               }`}
             />
             <span>{tab.label}</span>

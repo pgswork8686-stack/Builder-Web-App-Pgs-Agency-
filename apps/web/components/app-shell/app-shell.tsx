@@ -41,7 +41,7 @@ export function AppShell({ children, account, user }: AppShellProps) {
   };
 
   return (
-    <div className="h-screen bg-[#F6F8FC] text-[#161827] flex flex-row overflow-hidden font-sans">
+    <div className="h-screen bg-[#FFFBF0] text-[#161827] flex flex-row overflow-hidden font-sans">
       {/* Desktop Persistent / Collapsible Sidebar - exact 250px width in Figma */}
       <Sidebar
         account={account}
