@@ -32,7 +32,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7AE18] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
+      "inline-flex whitespace-nowrap items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7AE18] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
 
     const sizeStyles = {
       sm: "h-9 px-3 text-xs gap-1.5",
