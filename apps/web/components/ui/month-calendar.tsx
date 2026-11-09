@@ -69,7 +69,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
               key={d}
               className={`text-xs font-bold ${
                 highlightSunday && d === "CN"
-                  ? "text-rose-400"
+                  ? "text-[#7F1D1D]"
                   : "text-[#7C879D]"
               }`}
             >
@@ -104,7 +104,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                     todayCell
                       ? "text-[#5D87FF]"
                       : highlightSunday && isSunday
-                        ? "text-rose-400"
+                        ? "text-[#7F1D1D]"
                         : "text-[#24304A]"
                   }`}
                 >

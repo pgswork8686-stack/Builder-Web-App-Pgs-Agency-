@@ -26,24 +26,24 @@ export function StateBanner({
 }: StateBannerProps) {
   const config = {
     info: {
-      bg: "bg-sky-950/40 border-sky-500/30 text-sky-200",
-      icon: <Info className="w-5 h-5 text-sky-400 shrink-0" />,
-      titleColor: "text-sky-300",
+      bg: "bg-[#F0F9FF] border-[#BAE6FD] text-[#0C4A6E]",
+      icon: <Info className="w-5 h-5 text-[#0369A1] shrink-0" />,
+      titleColor: "text-[#0C4A6E]",
     },
     success: {
-      bg: "bg-emerald-950/40 border-emerald-500/30 text-emerald-200",
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />,
-      titleColor: "text-emerald-300",
+      bg: "bg-[#ECFDF5] border-[#A7F3D0] text-[#064E3B]",
+      icon: <CheckCircle2 className="w-5 h-5 text-[#047857] shrink-0" />,
+      titleColor: "text-[#064E3B]",
     },
     warning: {
-      bg: "bg-amber-950/40 border-amber-500/30 text-amber-200",
-      icon: <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />,
-      titleColor: "text-amber-300",
+      bg: "bg-[#FFFBEB] border-[#FDE68A] text-[#78350F]",
+      icon: <AlertTriangle className="w-5 h-5 text-[#92400E] shrink-0" />,
+      titleColor: "text-[#78350F]",
     },
     error: {
-      bg: "bg-rose-950/40 border-rose-500/30 text-rose-200",
-      icon: <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />,
-      titleColor: "text-rose-300",
+      bg: "bg-[#FEF2F2] border-[#FECACA] text-[#7F1D1D]",
+      icon: <AlertCircle className="w-5 h-5 text-[#B91C1C] shrink-0" />,
+      titleColor: "text-[#7F1D1D]",
     },
   };
 
@@ -52,7 +52,7 @@ export function StateBanner({
   return (
     <div
       role="alert"
-      className={`relative flex items-start gap-3.5 p-4 rounded-2xl border backdrop-blur-sm ${selected.bg} ${className}`}
+      className={`relative flex items-start gap-3.5 p-4 rounded-2xl border ${selected.bg} ${className}`}
     >
       <div className="mt-0.5">{selected.icon}</div>
       <div className="flex-1 min-w-0 space-y-1">

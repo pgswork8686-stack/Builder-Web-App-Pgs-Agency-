@@ -416,7 +416,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
   if (!project) {
     return (
       <EmptyState
-        icon={<AlertCircle className="w-8 h-8 text-rose-400" />}
+        icon={<AlertCircle className="w-8 h-8 text-[#7F1D1D]" />}
         title="Không tìm thấy dự án"
         description={
           error ?? "Dự án không tồn tại hoặc bạn không có quyền truy cập."
@@ -487,7 +487,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
       />
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
+        <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#7F1D1D] text-xs">
           {error}
         </div>
       )}

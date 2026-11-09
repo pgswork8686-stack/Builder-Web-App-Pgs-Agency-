@@ -75,15 +75,15 @@ export function ProjectLifecycleDialogs({
         description="Xác nhận dự án đã hoàn tất tất cả hạng mục công việc và sẵn sàng bàn giao."
       >
         <div className="space-y-4 pt-2">
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#064E3B] text-xs">
+            <CheckCircle2 className="w-5 h-5 text-[#064E3B] shrink-0" />
             <div>
               <p className="font-bold">{project.name}</p>
               <p className="opacity-80">Mã: {project.projectCode}</p>
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && <p className="text-xs text-[#7F1D1D]">{error}</p>}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button
@@ -117,15 +117,15 @@ export function ProjectLifecycleDialogs({
         description="Dự án sẽ được chuyển vào kho lưu trữ và giới hạn các hoạt động chỉnh sửa."
       >
         <div className="space-y-4 pt-2">
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs">
-            <Archive className="w-5 h-5 text-amber-400 shrink-0" />
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-[#78350F] text-xs">
+            <Archive className="w-5 h-5 text-[#78350F] shrink-0" />
             <div>
               <p className="font-bold">{project.name}</p>
               <p className="opacity-80">Mã: {project.projectCode}</p>
             </div>
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && <p className="text-xs text-[#7F1D1D]">{error}</p>}
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Button

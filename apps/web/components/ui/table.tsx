@@ -7,7 +7,7 @@ export function TableContainer({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`w-full overflow-x-auto rounded-2xl border border-[#F2EAD3] bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] ${className}`}
+      className={`w-full overflow-x-auto rounded-2xl border border-[#F2EAD3] bg-white ${className}`}
       {...props}
     >
       {children}
@@ -37,7 +37,7 @@ export function TableHead({
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={`border-b border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold uppercase tracking-wider text-[#64748B] ${className}`}
+      className={`border-b border-[#F2EAD3] bg-[#FBF3DC] text-[11px] font-bold uppercase tracking-wide text-[#475569] ${className}`}
       {...props}
     >
       {children}

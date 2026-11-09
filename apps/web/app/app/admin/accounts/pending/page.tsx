@@ -168,14 +168,14 @@ export default function AdminPendingAccountsPage() {
         <div
           className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 animate-in fade-in duration-150 ${
             notification.type === "success"
-              ? "bg-emerald-950/40 border border-emerald-500/30 text-emerald-300"
-              : "bg-rose-950/40 border border-rose-500/30 text-rose-300"
+              ? "bg-[#ECFDF5] border border-[#A7F3D0] text-[#064E3B]"
+              : "bg-[#FEF2F2] border border-[#FECACA] text-[#7F1D1D]"
           }`}
         >
           {notification.type === "success" ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#064E3B] shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-[#7F1D1D] shrink-0" />
           )}
           <span>{notification.message}</span>
         </div>

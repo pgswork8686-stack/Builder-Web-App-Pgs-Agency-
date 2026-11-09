@@ -33,7 +33,7 @@ export function SectionHeader({
     >
       <div className="space-y-1">
         <div className="flex items-center gap-2.5">
-          <h2 className="text-xl sm:text-2xl font-black text-[#161827] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#161827] tracking-tight">
             {title}
           </h2>
           {badge && (
@@ -43,7 +43,7 @@ export function SectionHeader({
           )}
         </div>
         {description && (
-          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+          <p className="text-sm text-[#475569] leading-relaxed">
             {description}
           </p>
         )}
