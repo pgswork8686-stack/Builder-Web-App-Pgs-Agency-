@@ -1,5 +1,7 @@
 "use client";
 
+import { compactVND, formatDate } from "@/lib/format";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -284,7 +286,7 @@ export default function InvoicesWorkspace({
   const getStatusBadge = (status: string, dueDate: string) => {
     if (isInvoiceOverdue(status, dueDate)) {
       return (
-        <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-[10px] font-bold">
+        <span className="px-2 py-0.5 rounded bg-[#FF1744]/10 text-[#FF1744] text-xs font-bold">
           {status === "partially_paid"
             ? "Quá hạn · Thanh toán một phần"
             : "Quá hạn"}
@@ -353,14 +355,7 @@ export default function InvoicesWorkspace({
     0,
   );
 
-  const formatShortCurrency = (amount: number) => {
-    if (amount === 0) return "0 đ";
-    if (amount >= 1_000_000_000)
-      return `${(amount / 1_000_000_000).toFixed(1)}B`;
-    if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(0)}M`;
-    if (amount >= 1_000) return `${(amount / 1_000).toFixed(0)}K`;
-    return `${amount.toLocaleString("vi-VN")} đ`;
-  };
+  const formatShortCurrency = compactVND;
 
   return (
     <div className="space-y-6">
@@ -423,7 +418,7 @@ export default function InvoicesWorkspace({
       {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#F2EAD3] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
           <input
             type="text"
             placeholder="Tìm kiếm theo số hóa đơn..."
@@ -482,7 +477,7 @@ export default function InvoicesWorkspace({
           <h3 className="text-base font-extrabold text-[#161827]">
             Danh sách hóa đơn ({total})
           </h3>
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#475569]">
             Trang {page} / {totalPages || 1}
           </span>
         </div>
@@ -496,7 +491,7 @@ export default function InvoicesWorkspace({
         ) : error ? (
           <div className="text-center p-8 space-y-3">
             <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-            <p className="text-xs text-[#64748B]">{error}</p>
+            <p className="text-xs text-[#475569]">{error}</p>
             <Button variant="secondary" size="sm" onClick={loadInvoices}>
               Thử lại
             </Button>
@@ -534,14 +529,14 @@ export default function InvoicesWorkspace({
                     <TableCell className="font-bold text-[#161827] max-w-[260px] truncate" title={inv.client_company?.name || undefined}>
                       {inv.client_company?.name || "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B] max-w-[180px] truncate">
+                    <TableCell className="text-xs text-[#475569] max-w-[180px] truncate">
                       {inv.project?.name || "—"}
                     </TableCell>
                     <TableCell className="font-extrabold text-[#161827] text-xs">
                       {formatCurrency(inv.amount, inv.currency_code)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[#64748B]">
-                      {inv.due_date}
+                    <TableCell className="font-mono text-xs text-[#475569]">
+                      {formatDate(inv.due_date)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -577,7 +572,7 @@ export default function InvoicesWorkspace({
                             size="sm"
                             onClick={() => openEditModal(inv)}
                             title="Sửa hóa đơn"
-                            className="text-[#64748B] hover:text-[#161827]"
+                            className="text-[#475569] hover:text-[#161827]"
                           >
                             <Edit2 className="w-4 h-4" />
                           </Button>
@@ -604,7 +599,7 @@ export default function InvoicesWorkspace({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
             <span>
               Hiển thị{" "}
               <span className="font-bold text-[#161827]">
@@ -666,7 +661,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Số hóa đơn *
                 </label>
                 <input
@@ -683,7 +678,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Khách hàng (Công ty) *
                 </label>
                 <select
@@ -711,7 +706,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Hợp đồng liên kết
                 </label>
                 <select
@@ -732,7 +727,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Dự án liên kết
                 </label>
                 <select
@@ -755,7 +750,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Ngày phát hành *
                 </label>
                 <input
@@ -771,7 +766,7 @@ export default function InvoicesWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Hạn thanh toán *
                 </label>
                 <input
@@ -789,7 +784,7 @@ export default function InvoicesWorkspace({
 
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Tổng số tiền *
                 </label>
                 <input
@@ -805,7 +800,7 @@ export default function InvoicesWorkspace({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Loại tiền *
                 </label>
                 <select
@@ -825,7 +820,7 @@ export default function InvoicesWorkspace({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Ghi chú hóa đơn
               </label>
               <textarea
@@ -847,7 +842,7 @@ export default function InvoicesWorkspace({
               />
               <label
                 htmlFor="formClientVisible"
-                className="text-xs text-[#64748B] cursor-pointer select-none"
+                className="text-xs text-[#475569] cursor-pointer select-none"
               >
                 Cho phép khách hàng nhìn thấy hóa đơn này trên cổng thông tin
               </label>

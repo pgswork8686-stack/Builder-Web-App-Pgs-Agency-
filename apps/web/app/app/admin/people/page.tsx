@@ -362,7 +362,7 @@ export default function AdminPeopleDirectoryPage() {
       {/* 5-Dimension Filter Grid */}
       <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
         <div className="relative sm:col-span-2 lg:col-span-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên, email, mã NV..."
@@ -501,7 +501,7 @@ export default function AdminPeopleDirectoryPage() {
                           <p className="font-bold text-[#161827]">
                             {person.fullName || "Chưa cập nhật"}
                           </p>
-                          <p className="text-xs text-[#64748B]">
+                          <p className="text-xs text-[#475569]">
                             {person.email}
                           </p>
                         </div>
@@ -531,12 +531,12 @@ export default function AdminPeopleDirectoryPage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       <p className="text-[#161827] font-medium">
                         {ep?.departmentName || "Chưa gán PB"}
                       </p>
                       {ep?.teamName && (
-                        <p className="text-[11px] text-[#4F75FF]">
+                        <p className="text-xs text-[#4F75FF]">
                           Team: {ep.teamName}
                         </p>
                       )}
@@ -548,7 +548,7 @@ export default function AdminPeopleDirectoryPage() {
                           {ep.jobTitle}
                         </span>
                       ) : (
-                        <span className="text-[#94A3B8]">—</span>
+                        <span className="text-[#64748B]">—</span>
                       )}
                     </TableCell>
 
@@ -623,7 +623,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
           <span>
             Trang {page} / {totalPages} ({total} nhân sự)
           </span>
@@ -763,7 +763,7 @@ export default function AdminPeopleDirectoryPage() {
                   <label className="block text-xs font-bold text-[#24304A] mb-1.5">
                     Mã nhân viên
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
-                      <span className="text-[10px] text-[#475569] font-normal ml-1">
+                      <span className="text-xs text-[#475569] font-normal ml-1">
                         (Mã định danh bất biến)
                       </span>
                     )}
@@ -778,7 +778,7 @@ export default function AdminPeopleDirectoryPage() {
                     placeholder="VD: NV-001"
                     className={`w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] text-xs font-mono font-bold outline-none ${
                       editingPerson?.employeeProfile?.employeeCode
-                        ? "bg-[#F2EAD3] text-[#64748B] cursor-not-allowed"
+                        ? "bg-[#F2EAD3] text-[#475569] cursor-not-allowed"
                         : "bg-white text-[#5D87FF] focus:border-[#5D87FF]"
                     }`}
                   />
@@ -894,7 +894,7 @@ export default function AdminPeopleDirectoryPage() {
         <div className="space-y-4 pt-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
               <input
                 type="text"
                 placeholder="Tìm kiếm dự án theo tên hoặc mã..."
@@ -953,7 +953,7 @@ export default function AdminPeopleDirectoryPage() {
                             {p.name}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#475569] truncate">
+                        <p className="text-xs text-[#475569] truncate">
                           Khách hàng:{" "}
                           {p.clientCompany?.name || "Doanh nghiệp đối tác"}
                         </p>

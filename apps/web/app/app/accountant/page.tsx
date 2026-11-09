@@ -78,10 +78,10 @@ export default function AccountantDashboardPage() {
           <p className="text-sm text-[#475569] mt-1">Dòng tiền, công nợ và các việc kế toán cần xử lý hôm nay.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/app/accountant/finance/payments" className="px-4 py-2 rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]">
+          <Link href="/app/accountant/finance/payments" className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]">
             Ghi nhận thanh toán
           </Link>
-          <Link href="/app/accountant/finance/invoices" className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]">
+          <Link href="/app/accountant/finance/invoices" className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]">
             Tạo hóa đơn
           </Link>
         </div>
@@ -109,22 +109,22 @@ export default function AccountantDashboardPage() {
                   return (
                     <div key={m.key} className="flex-1 flex flex-col items-center justify-end h-full gap-1.5" title={`Thu ${fullVND(m.income)} · Chi ${fullVND(m.expense)}`}>
                       <span className={`w-full max-w-9 rounded-t-lg ${last ? "bg-[#E7AE18]" : "bg-[#FDE68A]"}`} style={{ height: `${Math.max(m.income ? 6 : 2, (m.income / maxFlow) * 100)}%` }} />
-                      <span className="text-[11px] text-[#475569]">{m.label}</span>
+                      <span className="text-xs text-[#475569]">{m.label}</span>
                     </div>
                   );
                 })}
               </div>
               <div className="grid grid-cols-3 gap-3 mt-2">
                 <div className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3">
-                  <p className="text-[10px] text-[#475569]">Thu</p>
+                  <p className="text-xs text-[#475569]">Thu</p>
                   <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.cashflow.income)}</p>
                 </div>
                 <div className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3">
-                  <p className="text-[10px] text-[#475569]">Chi</p>
+                  <p className="text-xs text-[#475569]">Chi</p>
                   <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.cashflow.expense)}</p>
                 </div>
                 <div className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3">
-                  <p className="text-[10px] text-[#475569]">Chênh lệch</p>
+                  <p className="text-xs text-[#475569]">Chênh lệch</p>
                   <p className={`text-sm font-bold mt-1 ${diff >= 0 ? "text-[#047857]" : "text-[#B91C1C]"}`}>{diff >= 0 ? "+" : ""}{fullVND(diff)}</p>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function AccountantDashboardPage() {
           className="lg:col-span-2"
           title="Cần xử lý hôm nay"
           icon={<Bell className="w-4 h-4" />}
-          action={data && <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-[10px] font-bold">{data.attention.total} mục</span>}
+          action={data && <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-xs font-bold">{data.attention.total} mục</span>}
         >
           {data && data.attention.items.length > 0 ? (
             <ul className="divide-y divide-[#F2EAD3]">
@@ -153,7 +153,7 @@ export default function AccountantDashboardPage() {
                       <span className="block text-xs text-[#475569] truncate">{a.detail}</span>
                     </span>
                     <span className="min-w-7 h-6 px-2 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-xs font-bold grid place-items-center">{a.count}</span>
-                    <ChevronRight className="w-4 h-4 text-[#94A3B8]" />
+                    <ChevronRight className="w-4 h-4 text-[#64748B]" />
                   </Link>
                 </li>
               ))}
@@ -169,7 +169,7 @@ export default function AccountantDashboardPage() {
           {data && data.recentInvoices.length > 0 ? (
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#FBF3DC] text-left text-[11px] uppercase tracking-wide text-[#475569]">
+                <tr className="bg-[#FBF3DC] text-left text-xs uppercase tracking-wide text-[#475569]">
                   <th className="px-5 py-3 font-bold">Hóa đơn</th>
                   <th className="px-3 py-3 font-bold">Khách hàng</th>
                   <th className="px-3 py-3 font-bold">Giá trị</th>
@@ -184,7 +184,7 @@ export default function AccountantDashboardPage() {
                       <td className="px-5 py-3.5"><Link href={`/app/accountant/finance/invoices/${i.id}`} className="font-bold text-[#3B5BDB]">{i.number}</Link></td>
                       <td className="px-3 py-3.5 font-bold text-[#161827]">{i.client}</td>
                       <td className="px-3 py-3.5 text-[#475569]">{fullVND(i.amount)}</td>
-                      <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${st.cls}`}>{st.label}</span></td>
+                      <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full border text-xs font-bold ${st.cls}`}>{st.label}</span></td>
                     </tr>
                   );
                 })}

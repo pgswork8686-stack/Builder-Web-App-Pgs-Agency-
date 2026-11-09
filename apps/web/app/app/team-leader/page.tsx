@@ -80,13 +80,13 @@ export default function TeamLeaderDashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/app/team-leader/kanban"
-            className="px-4 py-2 rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
           >
             Mở Kanban
           </Link>
           <Link
             href="/app/team-leader/tasks?new=1"
-            className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
           >
             Giao việc mới
           </Link>
@@ -119,7 +119,7 @@ export default function TeamLeaderDashboardPage() {
           icon={<Bell className="w-4 h-4" />}
           action={
             data && (
-              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold">
                 {data.attention.length} mục
               </span>
             )
@@ -140,7 +140,7 @@ export default function TeamLeaderDashboardPage() {
                     <span className="min-w-7 h-6 px-2 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold grid place-items-center">
                       {a.count}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-[#94A3B8]" />
+                    <ChevronRight className="w-4 h-4 text-[#64748B]" />
                   </Link>
                 </li>
               ))}
@@ -156,7 +156,7 @@ export default function TeamLeaderDashboardPage() {
           icon={<Users className="w-4 h-4" />}
           action={
             t && members > 0 ? (
-              <span className="px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#047857] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#E6FBF5] text-[#047857] text-xs font-bold">
                 {t.present}/{members} có mặt
               </span>
             ) : undefined
@@ -169,7 +169,7 @@ export default function TeamLeaderDashboardPage() {
                 <span style={{ width: `${(t.late / members) * 100}%` }} className="bg-[#E7AE18]" />
                 <span style={{ width: `${(t.onLeave / members) * 100}%` }} className="bg-[#3B5BDB]" />
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#475569]">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#475569]">
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#00D09C]" />{t.present} có mặt</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#E7AE18]" />{t.late} đi muộn</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#3B5BDB]" />{t.onLeave} nghỉ phép</span>
@@ -180,7 +180,7 @@ export default function TeamLeaderDashboardPage() {
                     <span className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center">{initials(m.name)}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold text-[#161827] truncate">{m.name}</span>
-                      <span className="block text-[11px] text-[#475569] truncate">{m.note}</span>
+                      <span className="block text-xs text-[#475569] truncate">{m.note}</span>
                     </span>
                     <i className={`w-2 h-2 rounded-full ${STATE_DOT[m.state]}`} />
                   </li>
@@ -231,21 +231,21 @@ export default function TeamLeaderDashboardPage() {
                   <Link href={`/app/projects/${p.id}`} className="flex items-center gap-4 py-3 group">
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
-                        <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.code}</span>
+                        <span className="font-mono text-xs text-[#8A6400] mr-2">{p.code}</span>
                         {p.name}
                       </span>
-                      <span className="block text-[11px] text-[#475569]">Khách: {p.client ?? "—"}</span>
+                      <span className="block text-xs text-[#475569]">Khách: {p.client ?? "—"}</span>
                     </span>
                     <span className="w-40 shrink-0">
-                      <span className="flex justify-between text-[11px] mb-1">
+                      <span className="flex justify-between text-xs mb-1">
                         <b className="text-[#161827]">{p.progress}%</b>
-                        <span className={p.late ? "text-[#B91C1C] font-bold" : "text-[#64748B]"}>Hạn {shortDate(p.dueDate)}</span>
+                        <span className={p.late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}>Hạn {shortDate(p.dueDate)}</span>
                       </span>
                       <span className="block h-2 rounded-full bg-[#FBF3DC] overflow-hidden">
                         <span style={{ width: `${p.progress}%` }} className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#E7AE18]"}`} />
                       </span>
                     </span>
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${p.late ? "bg-[#FEE2E2] text-[#B91C1C]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.late ? "bg-[#FEE2E2] text-[#B91C1C]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
                       {p.late ? "Trễ hạn" : "Đang chạy"}
                     </span>
                   </Link>

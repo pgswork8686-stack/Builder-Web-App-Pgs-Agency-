@@ -37,14 +37,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="absolute left-3.5 text-[#94A3B8] pointer-events-none">
+            <div className="absolute left-3.5 text-[#64748B] pointer-events-none">
               {leftIcon}
             </div>
           )}
           <input
             id={inputId}
             ref={ref}
-            className={`w-full rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all duration-150 focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 disabled:bg-[#FBF3DC] disabled:text-[#94A3B8] disabled:cursor-not-allowed ${
+            className={`w-full rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all duration-150 focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 disabled:bg-[#FBF3DC] disabled:text-[#64748B] disabled:cursor-not-allowed ${
               leftIcon ? "pl-10" : "pl-4"
             } ${rightIcon ? "pr-10" : "pr-4"} py-2.5 sm:py-3 ${
               error
@@ -54,13 +54,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3.5 text-[#94A3B8]">{rightIcon}</div>
+            <div className="absolute right-3.5 text-[#64748B]">{rightIcon}</div>
           )}
         </div>
         {error ? (
           <p className="text-xs text-[#B91C1C]">{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-[#64748B]">{helperText}</p>
+          <p className="text-xs text-[#475569]">{helperText}</p>
         ) : null}
       </div>
     );

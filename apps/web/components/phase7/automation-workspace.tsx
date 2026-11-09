@@ -142,7 +142,7 @@ function statusClasses(status: AutomationExecutionStatus) {
     running: "bg-amber-400 text-black",
     success: "bg-emerald-400 text-black",
     failed: "bg-red-500 text-white",
-    skipped: "bg-[#FBF3DC] text-[#64748B]",
+    skipped: "bg-[#FBF3DC] text-[#475569]",
   };
   return classes[status];
 }
@@ -314,7 +314,7 @@ export function AutomationWorkspace() {
                 <h2 className="font-bold text-[#161827] text-sm">
                   Tạo quy tắc mới
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Hành động chuẩn hóa: `create_notification`.
                 </p>
               </div>
@@ -322,7 +322,7 @@ export function AutomationWorkspace() {
 
             <div className="space-y-3 pt-2">
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Tên quy tắc *
                 </span>
                 <input
@@ -334,7 +334,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Trigger sự kiện *
                 </span>
                 <select
@@ -353,21 +353,21 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Điều kiện so khớp JSON
                 </span>
                 <textarea
                   value={conditionsText}
                   onChange={(event) => setConditionsText(event.target.value)}
-                  className="mt-1 min-h-20 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-[11px] text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                  className="mt-1 min-h-20 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
                 />
-                <span className="mt-0.5 block text-[10px] text-[#94A3B8]">
+                <span className="mt-0.5 block text-xs text-[#64748B]">
                   So khớp payload key/value an toàn.
                 </span>
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Đối tượng nhận thông báo *
                 </span>
                 <select
@@ -386,7 +386,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Tiêu đề thông báo
                 </span>
                 <input
@@ -398,7 +398,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Nội dung thông báo
                 </span>
                 <textarea
@@ -410,7 +410,7 @@ export function AutomationWorkspace() {
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold text-[#64748B]">
+                <span className="text-xs font-semibold text-[#475569]">
                   Internal Action URL
                 </span>
                 <input
@@ -464,7 +464,7 @@ export function AutomationWorkspace() {
               <textarea
                 value={manualPayloadText}
                 onChange={(event) => setManualPayloadText(event.target.value)}
-                className="min-h-16 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-[11px] text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
+                className="min-h-16 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-xs text-[#161827] outline-none focus:bg-white focus:border-[#4F75FF]"
               />
               <Button
                 variant="outline"
@@ -526,14 +526,14 @@ export function AutomationWorkspace() {
                 <h2 className="font-extrabold text-[#161827] text-sm">
                   Danh sách quy tắc
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Đảm bảo Idempotency và cách ly lỗi an toàn.
                 </p>
               </div>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#64748B]">
+              <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#475569]">
                 <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                 Đang tải danh sách quy tắc...
               </div>
@@ -566,7 +566,7 @@ export function AutomationWorkspace() {
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
                           </Badge>
                         </div>
-                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] p-3 text-[11px] font-mono text-[#64748B]">
+                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] p-3 text-xs font-mono text-[#475569]">
                           {JSON.stringify(
                             {
                               conditions: rule.conditions,
@@ -601,13 +601,13 @@ export function AutomationWorkspace() {
               <h2 className="font-extrabold text-[#161827] text-sm">
                 Lịch sử thực thi
               </h2>
-              <p className="text-[11px] text-[#64748B]">
+              <p className="text-xs text-[#475569]">
                 Ghi nhận chi tiết kết quả chạy tự động.
               </p>
             </div>
             <div className="divide-y divide-[#F2EAD3]">
               {executions.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#94A3B8]">
+                <div className="p-8 text-center text-xs text-[#64748B]">
                   Chưa có lượt thực thi nào được ghi nhận.
                 </div>
               ) : (
@@ -621,7 +621,7 @@ export function AutomationWorkspace() {
                         <div className="font-bold text-xs text-[#161827]">
                           {execution.rule?.name ?? execution.triggerType}
                         </div>
-                        <div className="text-[11px] text-[#94A3B8] font-mono">
+                        <div className="text-xs text-[#64748B] font-mono">
                           {execution.eventKey}
                         </div>
                       </div>
@@ -638,7 +638,7 @@ export function AutomationWorkspace() {
                         >
                           {execution.status}
                         </Badge>
-                        <span className="text-[11px] text-[#94A3B8] font-mono">
+                        <span className="text-xs text-[#64748B] font-mono">
                           {formatDateTime(execution.createdAt)}
                         </span>
                       </div>

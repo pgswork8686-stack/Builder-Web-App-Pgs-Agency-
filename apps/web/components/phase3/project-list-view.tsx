@@ -185,7 +185,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       {/* Filter / Search Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
           <input
             type="text"
             placeholder="Tìm mã hoặc tên dự án..."
@@ -292,7 +292,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           {project.name}
                         </h3>
 
-                        <p className="text-xs text-[#64748B] truncate">
+                        <p className="text-xs text-[#475569] truncate">
                           Khách hàng:{" "}
                           <span className="text-[#161827] font-medium">
                             {project.clientCompany?.name ?? "Chưa liên kết"}
@@ -301,9 +301,9 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#F2EAD3] text-xs text-[#64748B] shrink-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#F2EAD3] text-xs text-[#475569] shrink-0">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        <Calendar className="w-3.5 h-3.5 text-[#64748B]" />
                         <span>
                           {project.startDate || "—"} ➔ {project.dueDate || "—"}
                         </span>
@@ -325,7 +325,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                         </Button>
                       )}
 
-                      <ChevronRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
+                      <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#4F75FF] group-hover:translate-x-1 transition-all hidden md:block" />
                     </div>
                   </Card>
                 </Link>
@@ -337,7 +337,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
       {/* Pagination Footer */}
       {result.totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
           <span>
             Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
             dự án)
@@ -393,7 +393,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#475569] leading-relaxed">
             Dữ liệu dịch vụ, công việc, tệp và tài chính vẫn được giữ nguyên để
             tra cứu và kiểm toán.
           </p>

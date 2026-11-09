@@ -187,7 +187,7 @@ export default function ClientSupportPage() {
                         : "bg-white dark:bg-[#1E293B] text-[#2A3547] dark:text-white mr-6 border border-[#EAEFF4] dark:border-[#334155]"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1 font-semibold text-[11px]">
+                    <div className="flex items-center justify-between mb-1 font-semibold text-xs">
                       <span>{msg.sender?.full_name || "Thành viên"}</span>
                       <span className="text-[#475569] font-normal">
                         {new Date(msg.created_at).toLocaleTimeString("vi-VN", {
@@ -357,7 +357,7 @@ export default function ClientSupportPage() {
                     <p className="text-xs font-semibold text-[#2A3547] dark:text-white truncate">
                       {t.title}
                     </p>
-                    <p className="text-[11px] text-[#475569] mt-1">
+                    <p className="text-xs text-[#475569] mt-1">
                       {new Date(t.created_at).toLocaleDateString("vi-VN")}
                     </p>
                   </div>

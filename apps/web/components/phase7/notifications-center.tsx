@@ -260,7 +260,7 @@ export function NotificationsCenter() {
                 <h2 className="text-base font-extrabold text-[#161827]">
                   Luồng thông báo của bạn
                 </h2>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Dữ liệu được phân trang từ database, scope theo tài khoản hiện
                   tại.
                 </p>
@@ -287,7 +287,7 @@ export function NotificationsCenter() {
           ) : null}
 
           {loading ? (
-            <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#64748B]">
+            <div className="flex items-center justify-center gap-2 p-12 text-xs text-[#475569]">
               <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
               Đang tải thông báo...
             </div>
@@ -321,11 +321,11 @@ export function NotificationsCenter() {
                                 </Badge>
                               )}
                           </div>
-                          <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">
+                          <p className="mt-0.5 text-xs leading-relaxed text-[#475569]">
                             {item.message}
                           </p>
                         </div>
-                        <span className="shrink-0 text-[11px] text-[#94A3B8] font-mono">
+                        <span className="shrink-0 text-xs text-[#64748B] font-mono">
                           {formatDateTime(item.createdAt)}
                         </span>
                       </div>
@@ -376,7 +376,7 @@ export function NotificationsCenter() {
             >
               Trang trước
             </Button>
-            <span className="text-xs text-[#64748B]">
+            <span className="text-xs text-[#475569]">
               Trang {page}/{totalPages || 1}
             </span>
             <Button
@@ -402,12 +402,12 @@ export function NotificationsCenter() {
                   <h3 className="font-bold text-xs text-[#161827]">
                     Thông báo toàn thể nhân viên
                   </h3>
-                  <p className="text-[10px] text-[#4F75FF] font-semibold">
+                  <p className="text-xs text-[#4F75FF] font-semibold">
                     Quyền hạn: Admin
                   </p>
                 </div>
               </div>
-              <p className="text-xs text-[#64748B] leading-relaxed">
+              <p className="text-xs text-[#475569] leading-relaxed">
                 Gửi thông báo & tin tức quan trọng đến toàn bộ nhân sự đang hoạt
                 động trong doanh nghiệp.
               </p>
@@ -432,7 +432,7 @@ export function NotificationsCenter() {
                 <h2 className="font-bold text-[#161827] text-sm">
                   Tùy chọn nhận tin
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Preferences quản lý thông qua Nest API.
                 </p>
               </div>
@@ -449,7 +449,7 @@ export function NotificationsCenter() {
                   <span className="block text-xs font-bold text-[#161827]">
                     Thông báo trong app
                   </span>
-                  <span className="text-[11px] text-[#64748B]">
+                  <span className="text-xs text-[#475569]">
                     Áp dụng cho bell, center và realtime.
                   </span>
                 </span>
@@ -471,7 +471,7 @@ export function NotificationsCenter() {
                   <span className="block text-xs font-bold text-[#161827]">
                     Email notification
                   </span>
-                  <span className="text-[11px] text-[#64748B]">
+                  <span className="text-xs text-[#475569]">
                     Placeholder preference cho email.
                   </span>
                 </span>

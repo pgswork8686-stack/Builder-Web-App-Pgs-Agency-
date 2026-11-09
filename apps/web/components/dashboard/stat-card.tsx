@@ -33,7 +33,7 @@ export function StatCard({
     default: {
       bg: "bg-white border-[#F2EAD3] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
       iconBg: "bg-[#EEF2FF] text-[#4F75FF] border-[#E0EAFF]",
-      titleColor: "text-[#64748B]",
+      titleColor: "text-[#475569]",
       valueColor: "text-[#161827]",
       borderColor: "border-[#F2EAD3]",
     },
@@ -109,7 +109,7 @@ export function StatCard({
         <div className="space-y-1 min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span
-              className={`text-[11px] font-bold uppercase tracking-wider ${selected.titleColor} truncate`}
+              className={`text-xs font-bold uppercase tracking-wider ${selected.titleColor} truncate`}
             >
               {title}
             </span>
@@ -153,17 +153,17 @@ export function StatCard({
                   {trend.value}
                 </span>
               ) : (
-                <span className="flex items-center text-[#64748B] font-semibold gap-0.5 shrink-0">
+                <span className="flex items-center text-[#475569] font-semibold gap-0.5 shrink-0">
                   <Minus className="w-3.5 h-3.5" />
                   {trend.value}
                 </span>
               )}
               {trend.label && (
-                <span className="text-[#94A3B8] truncate">{trend.label}</span>
+                <span className="text-[#64748B] truncate">{trend.label}</span>
               )}
             </div>
           ) : (
-            <span className="text-[#64748B] text-[11px] font-medium truncate">
+            <span className="text-[#475569] text-xs font-medium truncate">
               {subtitle}
             </span>
           )}

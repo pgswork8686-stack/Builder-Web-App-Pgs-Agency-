@@ -44,7 +44,7 @@ export function QuickActionGrid({
                   {item.icon}
                 </div>
                 {item.badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F75FF] text-[10px] font-bold border border-[#E0EAFF]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F75FF] text-xs font-bold border border-[#E0EAFF]">
                     {item.badge}
                   </span>
                 )}
@@ -54,7 +54,7 @@ export function QuickActionGrid({
                 <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#4F75FF] transition-colors">
                   {item.title}
                 </h4>
-                <p className="mt-1 text-xs text-[#64748B] leading-relaxed">
+                <p className="mt-1 text-xs text-[#475569] leading-relaxed">
                   {item.description}
                 </p>
               </div>

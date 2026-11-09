@@ -179,7 +179,7 @@ export default function EmployeeTasksPage() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold text-[#5D87FF] truncate">
+                    <span className="text-xs font-bold text-[#5D87FF] truncate">
                       {t.projectName}
                     </span>
                     <Badge

@@ -267,10 +267,10 @@ export default function EmployeeAttendancePage() {
         <Card className="p-6 lg:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F2EAD3] pb-4 gap-2">
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-[#161827] tracking-tight">
+              <h2 className="text-lg font-bold text-[#161827] tracking-tight">
                 Điểm danh ca làm việc
-              </h3>
-              <p className="text-xs text-[#64748B]">
+              </h2>
+              <p className="text-xs text-[#475569]">
                 Văn phòng:{" "}
                 <span className="font-medium text-[#161827]">
                   Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
@@ -336,9 +336,9 @@ export default function EmployeeAttendancePage() {
 
         {/* Quy định chấm công — lấy từ cấu hình thật của hệ thống */}
         <Card className="p-6 space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-[#3B5BDB]">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-[#3B5BDB]">
             Quy định chấm công
-          </h4>
+          </h3>
           {policy ? (
             <div className="space-y-3 text-xs text-[#475569]">
               <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
@@ -370,9 +370,9 @@ export default function EmployeeAttendancePage() {
 
       {/* History Table */}
       <div className="space-y-3">
-        <h3 className="text-base font-bold text-[#161827]">
+        <h2 className="text-base font-bold text-[#161827]">
           Lịch sử chấm công gần đây ({historyTotal} lượt)
-        </h3>
+        </h2>
 
         {historyLoading ? (
           <div className="space-y-3">
@@ -420,10 +420,10 @@ export default function EmployeeAttendancePage() {
                       <TableCell className="font-bold text-[#161827]">
                         {rec.attendance_date}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#475569]">
                         {checkInTime}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#475569]">
                         {checkOutTime}
                       </TableCell>
                       <TableCell className="text-xs font-mono font-bold text-[#4F75FF]">
@@ -445,7 +445,7 @@ export default function EmployeeAttendancePage() {
                           {statusLabel(rec.status)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#475569]">
                         {rec.check_in_note || rec.check_out_note || "—"}
                       </TableCell>
                     </TableRow>

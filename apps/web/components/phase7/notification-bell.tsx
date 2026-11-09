@@ -173,12 +173,12 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#F2EAD3] bg-white text-[#64748B] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#FFFBF0] shadow-2xs"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#F2EAD3] bg-white text-[#475569] transition hover:border-[#4F75FF]/30 hover:text-[#4F75FF] hover:bg-[#FFFBF0] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#4F75FF] px-1.5 py-0.5 text-[10px] font-black text-white shadow-xs">
+          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#4F75FF] px-1.5 py-0.5 text-xs font-black text-white shadow-xs">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
@@ -189,7 +189,7 @@ export function NotificationBell() {
           <div className="flex items-center justify-between border-b border-[#F2EAD3] px-4 py-3 bg-[#FFFBF0]">
             <div>
               <div className="text-sm font-bold text-[#161827]">Thông báo</div>
-              <div className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-[#64748B]">
+              <div className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-[#475569]">
                 {connectionState === "denied" ? (
                   <WifiOff className="h-3 w-3 text-red-500" />
                 ) : (
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#4F75FF] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -235,12 +235,12 @@ export function NotificationBell() {
                 </button>
               </div>
             ) : loading ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#64748B]">
+              <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#475569]">
                 <Loader2 className="h-4 w-4 animate-spin text-[#4F75FF]" />
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
-              <div className="px-4 py-8 text-center text-xs text-[#94A3B8]">
+              <div className="px-4 py-8 text-center text-xs text-[#64748B]">
                 Chưa có thông báo mới.
               </div>
             ) : (
@@ -259,17 +259,17 @@ export function NotificationBell() {
                       <div className="line-clamp-1 text-xs font-bold text-[#161827]">
                         {item.title}
                       </div>
-                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#64748B]">
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#475569]">
                         {item.message}
                       </p>
-                      <div className="mt-2 text-[10px] font-mono text-[#94A3B8]">
+                      <div className="mt-2 text-xs font-mono text-[#64748B]">
                         {formatDateTime(item.createdAt)}
                       </div>
                       <div className="mt-2.5 flex flex-wrap gap-2">
                         <Link
                           href={safeActionUrl(item.actionUrl)}
                           onClick={() => void markRead(item)}
-                          className="rounded-lg bg-[#4F75FF] px-2.5 py-1 text-[11px] font-bold text-white hover:bg-[#3D62EE] transition-colors"
+                          className="rounded-lg bg-[#4F75FF] px-2.5 py-1 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors"
                         >
                           Mở
                         </Link>
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#64748B] hover:text-[#161827] hover:bg-[#FBF3DC] disabled:opacity-50 transition-colors"
+                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-xs font-semibold text-[#475569] hover:text-[#161827] hover:bg-[#FBF3DC] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>

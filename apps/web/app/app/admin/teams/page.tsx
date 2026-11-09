@@ -257,7 +257,7 @@ export default function AdminTeamsPage() {
       {/* Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#F2EAD3] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <input
             type="text"
             value={searchQuery}
@@ -308,7 +308,7 @@ export default function AdminTeamsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-            <span className="text-xs text-[#64748B]">
+            <span className="text-xs text-[#475569]">
               Đang tải danh sách đội nhóm...
             </span>
           </div>
@@ -353,7 +353,7 @@ export default function AdminTeamsPage() {
                           {team.name}
                         </div>
                         {team.description && (
-                          <div className="text-[11px] text-[#64748B] line-clamp-1">
+                          <div className="text-xs text-[#475569] line-clamp-1">
                             {team.description}
                           </div>
                         )}
@@ -361,9 +361,9 @@ export default function AdminTeamsPage() {
                       <TableCell className="text-xs text-[#161827] font-medium">
                         {dept?.name || team.department?.name || "—"}
                       </TableCell>
-                      <TableCell className="text-xs text-[#64748B]">
+                      <TableCell className="text-xs text-[#475569]">
                         {leader?.fullName || (
-                          <span className="text-[#94A3B8] italic">
+                          <span className="text-[#64748B] italic">
                             Chưa chỉ định
                           </span>
                         )}
@@ -418,7 +418,7 @@ export default function AdminTeamsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Phòng ban trực thuộc *
               </label>
               <select
@@ -437,7 +437,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mã đội nhóm *
               </label>
               <input
@@ -451,7 +451,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Tên đội nhóm *
               </label>
               <input
@@ -465,7 +465,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Trưởng nhóm quản lý
               </label>
               <select
@@ -483,7 +483,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mô tả nhiệm vụ
               </label>
               <textarea
@@ -536,7 +536,7 @@ export default function AdminTeamsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Phòng ban trực thuộc *
               </label>
               <select
@@ -559,19 +559,19 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mã đội nhóm (Cố định)
               </label>
               <input
                 type="text"
                 disabled
                 value={editingTeam.code}
-                className="w-full bg-[#FBF3DC] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#64748B] cursor-not-allowed"
+                className="w-full bg-[#FBF3DC] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#475569] cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Tên đội nhóm *
               </label>
               <input
@@ -586,7 +586,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Trưởng nhóm quản lý
               </label>
               <select
@@ -609,7 +609,7 @@ export default function AdminTeamsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mô tả nhiệm vụ
               </label>
               <textarea

@@ -198,7 +198,7 @@ export default function AdminDocumentsPage() {
                   className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-left text-[13px] transition-colors ${selectedDept === d.id ? "bg-[#FDF1C7] text-[#8A6400] font-bold border-l-[3px] border-[#E7AE18]" : "text-[#475569] hover:bg-[#FFF8E5]"}`}
                 >
                   <span className="truncate">{d.name}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[10px] font-bold text-[#475569]">{d.n}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#FBF3DC] text-xs font-bold text-[#475569]">{d.n}</span>
                 </button>
               </li>
             ))}
@@ -210,13 +210,13 @@ export default function AdminDocumentsPage() {
         <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Tìm kiếm tài liệu, quy trình, biểu mẫu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] placeholder:text-[#64748B] focus:bg-white focus:border-[#4F75FF] outline-none transition-all"
               />
             </div>
             <Button
@@ -246,14 +246,14 @@ export default function AdminDocumentsPage() {
 
       {/* Documents Grid / Table */}
       {loading ? (
-        <div className="p-12 text-center text-[#94A3B8] bg-white rounded-2xl border border-[#F2EAD3]">
+        <div className="p-12 text-center text-[#64748B] bg-white rounded-2xl border border-[#F2EAD3]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4F75FF]" />
           Đang tải danh sách tài liệu...
         </div>
       ) : visible.length === 0 ? (
         <Card className="p-10 text-center">
           <EmptyState
-            icon={<FolderOpen className="w-10 h-10 text-[#94A3B8]" />}
+            icon={<FolderOpen className="w-10 h-10 text-[#64748B]" />}
             title="Thư viện chưa có tài liệu"
             description="Tải lên tài liệu đầu tiên để chia sẻ trong nội bộ PGS Agency."
           />
@@ -289,14 +289,14 @@ export default function AdminDocumentsPage() {
                       <div>
                         <p className="font-bold text-[#161827]">{doc.title}</p>
                         {doc.description && (
-                          <p className="text-[11px] text-[#64748B] line-clamp-1">
+                          <p className="text-xs text-[#475569] line-clamp-1">
                             {doc.description}
                           </p>
                         )}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs text-[#64748B] font-medium">
+                  <TableCell className="text-xs text-[#475569] font-medium">
                     {CATEGORY_MAP[doc.category] || doc.category}
                   </TableCell>
                   <TableCell className="text-xs text-[#475569] font-medium">{deptLabel(doc)}</TableCell>
@@ -308,10 +308,10 @@ export default function AdminDocumentsPage() {
                       {ACCESS_MAP[doc.access_level]?.label || doc.access_level}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs font-mono text-[#64748B]">
+                  <TableCell className="text-xs font-mono text-[#475569]">
                     {Math.round(doc.size_bytes / 1024)} KB
                   </TableCell>
-                  <TableCell className="text-xs text-[#64748B]">
+                  <TableCell className="text-xs text-[#475569]">
                     {doc.uploaded_by?.full_name || "Quản trị viên"}
                   </TableCell>
                   <TableCell className="text-right space-x-1.5">
@@ -406,7 +406,7 @@ export default function AdminDocumentsPage() {
               type="file"
               required
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-[#64748B] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
+              className="w-full text-xs text-[#475569] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#EEF2FF] file:text-[#4F75FF] hover:file:bg-[#E0E7FF] cursor-pointer"
             />
           </div>
 

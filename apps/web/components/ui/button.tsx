@@ -52,7 +52,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       "gold-outline":
         "bg-[#FFF8E5] text-[#8A6400] border border-[#FDE68A] hover:bg-[#FEF08A] active:scale-[0.98]",
       ghost:
-        "bg-transparent text-[#64748B] hover:text-[#161827] hover:bg-[#FBF3DC] active:scale-[0.98]",
+        "bg-transparent text-[#475569] hover:text-[#161827] hover:bg-[#FBF3DC] active:scale-[0.98]",
       danger:
         "bg-[#FF785A] text-white hover:brightness-110 shadow-xs active:scale-[0.98]",
     };

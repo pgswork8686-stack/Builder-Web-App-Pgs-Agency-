@@ -74,7 +74,7 @@ export function MobileSidebar({
               <span className="font-black text-sm tracking-tight text-[#161827]">
                 PGS Hub
               </span>
-              <span className="text-[10px] font-semibold text-[#475569] tracking-tight truncate">
+              <span className="text-xs font-semibold text-[#475569] tracking-tight truncate">
                 {subtitle}
               </span>
             </div>
@@ -83,7 +83,7 @@ export function MobileSidebar({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-[#64748B] hover:text-[#161827] hover:bg-[#FFF8E5] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-colors cursor-pointer"
             aria-label="Đóng sidebar"
           >
             <X className="w-5 h-5" />
@@ -121,7 +121,7 @@ export function MobileSidebar({
                   Chấm công bắt buộc
                 </span>
               </div>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
                 GPS
               </span>
             </Link>
@@ -130,7 +130,7 @@ export function MobileSidebar({
           {navGroups.map((group, groupIdx) => (
             <div key={group.groupTitle || groupIdx} className="space-y-0.5">
               {group.groupTitle && (
-                <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                <div className="px-3 pb-1 text-xs font-bold uppercase tracking-wider text-[#475569]">
                   {group.groupTitle}
                 </div>
               )}
@@ -152,8 +152,8 @@ export function MobileSidebar({
                     }`}
                   >
                     <span
-                      className={`text-[10px] font-mono font-medium ${
-                        active ? "text-[#8A6400]" : "text-[#64748B]"
+                      className={`text-xs font-mono font-medium ${
+                        active ? "text-[#8A6400]" : "text-[#475569]"
                       }`}
                     >
                       {itemNum}
@@ -165,7 +165,7 @@ export function MobileSidebar({
                     />
                     <span className="truncate flex-1">{item.title}</span>
                     {item.badge && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#E7AE18]/20 text-[#F3BA2F] text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded-full bg-[#E7AE18]/20 text-[#F3BA2F] text-xs font-bold">
                         {item.badge}
                       </span>
                     )}
@@ -201,7 +201,7 @@ export function MobileSidebar({
               <p className="text-xs font-bold text-[#161827] truncate">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#475569] truncate">{roleLabel}</p>
+              <p className="text-xs text-[#475569] truncate">{roleLabel}</p>
             </div>
           </Link>
         </div>

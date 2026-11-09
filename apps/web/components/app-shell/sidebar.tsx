@@ -75,7 +75,7 @@ export function Sidebar({
               <span className="font-bold text-sm tracking-tight text-[#161827] leading-tight">
                 PGS Hub
               </span>
-              <span className="text-[10px] font-bold text-[#475569] tracking-tight truncate">
+              <span className="text-xs font-bold text-[#475569] tracking-tight truncate">
                 {subtitle}
               </span>
             </div>
@@ -86,7 +86,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-[#64748B] hover:text-[#161827] hover:bg-[#FFF8E5] transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-colors cursor-pointer"
           title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
         >
@@ -132,7 +132,7 @@ export function Sidebar({
                 Chấm công bắt buộc
               </span>
             </div>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
+            <span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
               GPS
             </span>
           </Link>
@@ -141,7 +141,7 @@ export function Sidebar({
         {navGroups.map((group, groupIdx) => (
           <div key={group.groupTitle || groupIdx} className="space-y-0.5">
             {!collapsed && group.groupTitle && (
-              <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+              <div className="px-2.5 pb-1 text-xs font-bold uppercase tracking-wider text-[#475569]">
                 {group.groupTitle}
               </div>
             )}
@@ -164,8 +164,8 @@ export function Sidebar({
                 >
                   {!collapsed && (
                     <span
-                      className={`text-[10px] font-mono font-medium ${
-                        active ? "text-[#8A6400]" : "text-[#64748B]"
+                      className={`text-xs font-mono font-medium ${
+                        active ? "text-[#8A6400]" : "text-[#475569]"
                       }`}
                     >
                       {itemNum}
@@ -183,7 +183,7 @@ export function Sidebar({
                     <span className="truncate flex-1">{item.title}</span>
                   )}
                   {!collapsed && item.badge && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-[#FDE68A] text-[#8A6400] text-[9px] font-bold">
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#FDE68A] text-[#8A6400] text-xs font-bold">
                       {item.badge}
                     </span>
                   )}
@@ -204,7 +204,7 @@ export function Sidebar({
             </div>
             <Link
               href={supportHref}
-              className="w-full py-1.5 px-2 rounded-lg bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] text-[10px] font-black transition-colors block text-center shadow-xs"
+              className="w-full py-1.5 px-2 rounded-lg bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] text-xs font-black transition-colors block text-center shadow-xs"
             >
               {account.role === "client"
                 ? "Mở trung tâm hỗ trợ"
@@ -222,7 +222,7 @@ export function Sidebar({
               <p className="text-xs font-bold text-[#161827] truncate transition-colors">
                 {displayName}
               </p>
-              <p className="text-[10px] text-[#475569] truncate">{roleLabel}</p>
+              <p className="text-xs text-[#475569] truncate">{roleLabel}</p>
             </div>
           </Link>
         </div>

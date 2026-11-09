@@ -296,7 +296,7 @@ export default function AdminClientsPage() {
       {/* Filter Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
         <div className="relative sm:col-span-2">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên, mã khách hàng, MST, email, số điện thoại..."
@@ -373,7 +373,7 @@ export default function AdminClientsPage() {
                           }
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-[#64748B] hover:text-[#4F75FF] flex items-center gap-1 mt-0.5"
+                          className="text-xs text-[#475569] hover:text-[#4F75FF] flex items-center gap-1 mt-0.5"
                         >
                           <Globe className="w-3 h-3 text-blue-500" />
                           <span>
@@ -384,16 +384,16 @@ export default function AdminClientsPage() {
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-xs text-[#64748B]">
+                  <TableCell className="text-xs text-[#475569]">
                     {comp.email && (
                       <div className="flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-[#94A3B8]" />
+                        <Mail className="w-3 h-3 text-[#64748B]" />
                         <span>{comp.email}</span>
                       </div>
                     )}
                     {comp.phone && (
                       <div className="flex items-center gap-1 mt-0.5">
-                        <Phone className="w-3 h-3 text-[#94A3B8]" />
+                        <Phone className="w-3 h-3 text-[#64748B]" />
                         <span>{comp.phone}</span>
                       </div>
                     )}
@@ -407,10 +407,10 @@ export default function AdminClientsPage() {
                           href={formatZaloUrl(comp.zalo)}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 text-[11px] font-semibold transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold transition-colors"
                           title={`Zalo: ${comp.zalo}`}
                         >
-                          <span className="font-bold text-[10px]">Zalo</span>
+                          <span className="font-bold text-xs">Zalo</span>
                         </a>
                       )}
                       {comp.messenger && (
@@ -418,7 +418,7 @@ export default function AdminClientsPage() {
                           href={formatMessengerUrl(comp.messenger)}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-[11px] font-semibold transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold transition-colors"
                           title={`Messenger: ${comp.messenger}`}
                         >
                           <MessageCircle className="w-3 h-3 text-indigo-600" />
@@ -430,7 +430,7 @@ export default function AdminClientsPage() {
                           href={formatFacebookUrl(comp.facebook)}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100 text-[11px] font-semibold transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs font-semibold transition-colors"
                           title={`Facebook: ${comp.facebook}`}
                         >
                           <Share2 className="w-3 h-3 text-sky-600" />
@@ -438,12 +438,12 @@ export default function AdminClientsPage() {
                         </a>
                       )}
                       {!comp.zalo && !comp.messenger && !comp.facebook && (
-                        <span className="text-xs text-[#94A3B8]">—</span>
+                        <span className="text-xs text-[#64748B]">—</span>
                       )}
                     </div>
                   </TableCell>
 
-                  <TableCell className="font-mono text-xs text-[#64748B]">
+                  <TableCell className="font-mono text-xs text-[#475569]">
                     {comp.taxCode || "—"}
                   </TableCell>
 
@@ -471,7 +471,7 @@ export default function AdminClientsPage() {
                         size="sm"
                         onClick={() => handleEdit(comp)}
                         title="Chỉnh sửa thông tin"
-                        className="text-[#64748B] hover:text-[#161827]"
+                        className="text-[#475569] hover:text-[#161827]"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -804,7 +804,7 @@ export default function AdminClientsPage() {
             </div>
           )}
 
-          <p className="text-xs text-[#64748B] leading-relaxed">
+          <p className="text-xs text-[#475569] leading-relaxed">
             Hồ sơ doanh nghiệp, tài khoản liên kết và toàn bộ dự án vẫn được giữ
             nguyên để bảo toàn lịch sử vận hành.
           </p>

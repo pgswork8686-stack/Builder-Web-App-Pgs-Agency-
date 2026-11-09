@@ -257,7 +257,7 @@ export default function AdminWorkCalendarPage() {
       )}
 
       {loading ? (
-        <Card className="p-8 text-center text-xs text-[#64748B]">
+        <Card className="p-8 text-center text-xs text-[#475569]">
           Đang tải dữ liệu cấu hình lịch làm việc...
         </Card>
       ) : (
@@ -272,7 +272,7 @@ export default function AdminWorkCalendarPage() {
                 <h3 className="text-sm font-bold text-[#161827]">
                   Quy Tắc Tuần & Thứ 7 Cách Tuần
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Xác định các ngày làm việc tiêu chuẩn và chu kỳ 14 ngày làm
                   việc thứ 7.
                 </p>
@@ -307,7 +307,7 @@ export default function AdminWorkCalendarPage() {
                         className={`w-9 h-8 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
                           isSelected
                             ? "bg-[#4F75FF] text-white border-[#4F75FF]"
-                            : "bg-[#FFFBF0] text-[#64748B] border-[#F2EAD3] hover:border-[#CBD5E1]"
+                            : "bg-[#FFFBF0] text-[#475569] border-[#F2EAD3] hover:border-[#CBD5E1]"
                         }`}
                       >
                         {label}
@@ -325,7 +325,7 @@ export default function AdminWorkCalendarPage() {
                   <h4 className="text-xs font-bold text-[#161827]">
                     Áp dụng thứ 7 cách tuần
                   </h4>
-                  <p className="text-[11px] text-[#64748B]">
+                  <p className="text-xs text-[#475569]">
                     Chu kỳ 14 ngày luân phiên 1 tuần nghỉ, 1 tuần làm việc.
                   </p>
                 </div>
@@ -345,7 +345,7 @@ export default function AdminWorkCalendarPage() {
               {alternateSaturdayEnabled && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#F2EAD3]">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#475569] mb-1">
+                    <label className="block text-xs font-semibold text-[#475569] mb-1">
                       Ngày mốc
                     </label>
                     <input
@@ -359,7 +359,7 @@ export default function AdminWorkCalendarPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#475569] mb-1">
+                    <label className="block text-xs font-semibold text-[#475569] mb-1">
                       Trạng thái ngày mốc
                     </label>
                     <select
@@ -389,7 +389,7 @@ export default function AdminWorkCalendarPage() {
                 <h4 className="text-xs font-bold text-[#161827]">
                   Tự động áp dụng lịch làm bù / hoán đổi của Nhà nước
                 </h4>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Mặc định TẮT. Chỉ bật khi công ty quyết định tuân thủ toàn bộ
                   lịch hoán đổi công chức.
                 </p>
@@ -415,7 +415,7 @@ export default function AdminWorkCalendarPage() {
                 <h3 className="text-sm font-bold text-[#161827]">
                   Tự Động Đồng Bộ Ngày Lễ
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Tích hợp Calendarific API để tự động cập nhật ngày lễ Việt Nam
                   ({holidayCountryCode}).
                 </p>
@@ -436,7 +436,7 @@ export default function AdminWorkCalendarPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
               <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#475569] block text-xs uppercase font-bold">
                   Nhà cung cấp
                 </span>
                 <span className="font-semibold text-[#161827]">
@@ -444,7 +444,7 @@ export default function AdminWorkCalendarPage() {
                 </span>
               </div>
               <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#475569] block text-xs uppercase font-bold">
                   Mã quốc gia
                 </span>
                 <span className="font-semibold text-[#161827]">
@@ -452,7 +452,7 @@ export default function AdminWorkCalendarPage() {
                 </span>
               </div>
               <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
-                <span className="text-[#64748B] block text-[10px] uppercase font-bold">
+                <span className="text-[#475569] block text-xs uppercase font-bold">
                   Lần đồng bộ gần nhất
                 </span>
                 <span className="font-semibold text-[#161827]">
@@ -489,7 +489,7 @@ export default function AdminWorkCalendarPage() {
             <h3 className="text-sm font-bold text-[#161827]">
               Ngoại Lệ Lịch Làm Việc & Ngày Lễ
             </h3>
-            <p className="text-[11px] text-[#64748B]">
+            <p className="text-xs text-[#475569]">
               Danh sách ngày nghỉ lễ, ngày làm bù, nghỉ nội bộ do Admin tạo hoặc
               đồng bộ từ API.
             </p>
@@ -508,7 +508,7 @@ export default function AdminWorkCalendarPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#F2EAD3] text-[#64748B] font-bold bg-[#FFFBF0]">
+              <tr className="border-b border-[#F2EAD3] text-[#475569] font-bold bg-[#FFFBF0]">
                 <th className="p-3">Ngày</th>
                 <th className="p-3">Tên sự kiện / Ngày lễ</th>
                 <th className="p-3">Loại</th>
@@ -520,7 +520,7 @@ export default function AdminWorkCalendarPage() {
             <tbody className="divide-y divide-[#F2EAD3]">
               {events.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-[#94A3B8]">
+                  <td colSpan={6} className="p-6 text-center text-[#64748B]">
                     Chưa có ngoại lệ lịch nào. Bấm &quot;Thêm ngoại lệ&quot; để
                     tạo ngày nghỉ/làm bù mới.
                   </td>
@@ -537,35 +537,35 @@ export default function AdminWorkCalendarPage() {
                     <td className="p-3 font-semibold text-[#161827]">
                       {ev.title}
                       {ev.notes && (
-                        <span className="block text-[11px] font-normal text-[#64748B]">
+                        <span className="block text-xs font-normal text-[#475569]">
                           {ev.notes}
                         </span>
                       )}
                     </td>
                     <td className="p-3">
-                      <span className="inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-gray-100 text-gray-700">
+                      <span className="inline-block rounded px-2 py-0.5 text-xs font-bold uppercase bg-gray-100 text-gray-700">
                         {ev.event_type}
                       </span>
                     </td>
                     <td className="p-3">
                       {ev.is_working_day ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-xs font-bold">
                           Đi làm
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full text-xs font-bold">
                           Nghỉ
                         </span>
                       )}
                     </td>
                     <td className="p-3">
                       <span
-                        className={`text-[11px] font-semibold ${
+                        className={`text-xs font-semibold ${
                           ev.source_type === "manual"
                             ? "text-[#4F75FF]"
                             : ev.source_type === "api"
                               ? "text-amber-600"
-                              : "text-[#64748B]"
+                              : "text-[#475569]"
                         }`}
                       >
                         {statusLabel(ev.source_type)}
@@ -576,7 +576,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => openEditEventModal(ev)}
-                          className="p-1.5 text-[#64748B] hover:text-[#4F75FF] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#475569] hover:text-[#4F75FF] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
                           title="Sửa ngoại lệ"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -584,7 +584,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteEvent(ev.id)}
-                          className="p-1.5 text-[#64748B] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#475569] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                           title="Xóa ngoại lệ"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

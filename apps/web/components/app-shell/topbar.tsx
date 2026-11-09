@@ -124,7 +124,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         <button
           type="button"
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-2 rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFFBF0] transition-colors cursor-pointer"
+          className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFFBF0] transition-colors cursor-pointer"
           aria-label="Mở menu điều hướng"
         >
           <Menu className="w-5 h-5" />
@@ -143,7 +143,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         {/* Quick Chat Link */}
         <Link
           href="/app/chat"
-          className="relative p-2 rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
+          className="relative min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
           title="Tin nhắn nội bộ"
           aria-label="Tin nhắn nội bộ"
         >
@@ -158,7 +158,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#F2EAD3] transition-all cursor-pointer select-none"
+            className="flex items-center gap-2.5 p-1 min-h-11 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#F2EAD3] transition-all cursor-pointer select-none"
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
@@ -167,7 +167,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
               <span className="text-xs font-bold text-[#161827] tracking-tight truncate max-w-[130px]">
                 {displayName}
               </span>
-              <span className="text-[10px] text-[#475569] font-medium truncate max-w-[130px]">
+              <span className="text-xs text-[#475569] font-medium truncate max-w-[130px]">
                 {account.role
                   ? ROLE_LABELS[account.role].split("(")[0].trim()
                   : "Người dùng"}

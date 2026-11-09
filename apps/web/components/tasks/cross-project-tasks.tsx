@@ -108,7 +108,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
 
   const Pill = ({ s }: { s: string }) => {
     const st = STATUS[s] ?? STATUS.todo;
-    return <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold ${st.cls}`}>{st.label}</span>;
+    return <span className={`px-2.5 py-0.5 rounded-full border text-xs font-bold ${st.cls}`}>{st.label}</span>;
   };
 
   return (
@@ -117,12 +117,12 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
 
       <div className="bg-white rounded-2xl border border-[#F2EAD3] p-4 grid gap-3 md:grid-cols-[1fr_200px_220px]">
         <div className="relative">
-          <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Tìm công việc" placeholder="Tìm công việc theo tên, mã, người phụ trách…"
-            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm placeholder:text-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#3B5BDB]"
           />
         </div>
         <Select aria-label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)} className="!py-2.5">
@@ -155,7 +155,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
           <div className="bg-white rounded-2xl border border-[#F2EAD3] overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#FBF3DC] text-left text-[11px] uppercase tracking-wide text-[#475569]">
+                <tr className="bg-[#FBF3DC] text-left text-xs uppercase tracking-wide text-[#475569]">
                   <th className="px-5 py-3 font-bold">Công việc</th>
                   <th className="px-3 py-3 font-bold">Dự án</th>
                   <th className="px-3 py-3 font-bold">Người thực hiện</th>
@@ -171,13 +171,13 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
                     <tr key={r.id} className="hover:bg-[#FFFBF0]">
                       <td className="px-5 py-3.5">
                         <Link href={taskHref(r)} className="font-bold text-[#161827] hover:text-[#8A6400]">{r.title}</Link>
-                        {r.task_code && <span className="ml-2 font-mono text-[11px] text-[#8A6400]">{r.task_code}</span>}
+                        {r.task_code && <span className="ml-2 font-mono text-xs text-[#8A6400]">{r.task_code}</span>}
                       </td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{r.project.projectCode}</td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{r.assignee?.full_name || "Chưa giao"}</td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{PRIORITY[r.priority] ?? r.priority}</td>
                       <td className={`px-3 py-3.5 text-xs ${late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}`}>{r.due_date ? shortDate(r.due_date.slice(0, 10)) : "—"}</td>
-                      <td className="px-5 py-3.5"><Pill s={late ? "todo" : r.status} />{late && <span className="ml-1 px-2 py-0.5 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-[10px] font-bold">Quá hạn</span>}</td>
+                      <td className="px-5 py-3.5"><Pill s={late ? "todo" : r.status} />{late && <span className="ml-1 px-2 py-0.5 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold">Quá hạn</span>}</td>
                     </tr>
                   );
                 })}
@@ -193,18 +193,18 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
               <section key={col} className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-col gap-3">
                 <header className="flex items-center justify-between pb-2 border-b border-[#F2EAD3]">
                   <span className="text-xs font-bold text-[#161827]">{STATUS[col].label}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[#475569]">{items.length}</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[#475569]">{items.length}</span>
                 </header>
                 {items.length === 0 ? (
-                  <p className="flex-1 grid place-items-center text-xs text-[#94A3B8] border border-dashed border-[#E8DDB8] rounded-xl p-4">Trống</p>
+                  <p className="flex-1 grid place-items-center text-xs text-[#64748B] border border-dashed border-[#E8DDB8] rounded-xl p-4">Trống</p>
                 ) : (
                   <ul className="space-y-2.5">
                     {items.map((r) => (
                       <li key={r.id}>
                         <Link href={taskHref(r)} className="block rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 hover:border-[#E7AE18]">
-                          <p className="text-[11px] font-mono text-[#8A6400]">{r.project.projectCode}{r.task_code ? ` · ${r.task_code}` : ""}</p>
+                          <p className="text-xs font-mono text-[#8A6400]">{r.project.projectCode}{r.task_code ? ` · ${r.task_code}` : ""}</p>
                           <p className="text-sm font-bold text-[#161827] mt-0.5">{r.title}</p>
-                          <p className="text-[11px] text-[#475569] mt-1.5 flex justify-between gap-2">
+                          <p className="text-xs text-[#475569] mt-1.5 flex justify-between gap-2">
                             <span className="truncate">{r.assignee?.full_name || "Chưa giao"}</span>
                             <span>{r.due_date ? `Hạn ${shortDate(r.due_date.slice(0, 10))}` : ""}</span>
                           </p>
@@ -232,7 +232,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
                     onClick={() => { setPick(false); setCreateFor(p); }}
                     className="w-full text-left px-4 py-3 rounded-xl border border-[#E8DDB8] hover:bg-[#FFF8E5] hover:border-[#E7AE18]"
                   >
-                    <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.projectCode}</span>
+                    <span className="font-mono text-xs text-[#8A6400] mr-2">{p.projectCode}</span>
                     <span className="text-sm font-bold text-[#161827]">{p.name}</span>
                   </button>
                 </li>

@@ -25,7 +25,7 @@ export default function Home() {
           <h1 className="text-3xl font-extrabold tracking-tight text-[#161827]">
             PGS HUB
           </h1>
-          <p className="text-sm text-[#64748B] mt-1 font-medium">
+          <p className="text-sm text-[#475569] mt-1 font-medium">
             Hệ thống quản trị vận hành PGS Agency Enterprise
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex items-center justify-center gap-1.5 text-xs text-[#94A3B8]">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#64748B]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#E7AE18]" />
           <span>Bảo mật dữ liệu doanh nghiệp</span>
         </div>

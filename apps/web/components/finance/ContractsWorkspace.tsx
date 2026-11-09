@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/format";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -371,7 +373,7 @@ export default function ContractsWorkspace({
       {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 rounded-2xl border border-[#F2EAD3] shadow-xs">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
           <input
             type="text"
             placeholder="Tìm kiếm theo số hợp đồng hoặc tiêu đề..."
@@ -415,7 +417,7 @@ export default function ContractsWorkspace({
           <h3 className="text-base font-extrabold text-[#161827]">
             Danh sách hợp đồng ({total})
           </h3>
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#475569]">
             Trang {page} / {totalPages || 1}
           </span>
         </div>
@@ -429,7 +431,7 @@ export default function ContractsWorkspace({
         ) : error ? (
           <div className="text-center p-8 space-y-3">
             <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
-            <p className="text-xs text-[#64748B]">{error}</p>
+            <p className="text-xs text-[#475569]">{error}</p>
             <Button variant="secondary" size="sm" onClick={loadContracts}>
               Thử lại
             </Button>
@@ -467,14 +469,14 @@ export default function ContractsWorkspace({
                     <TableCell className="font-bold text-[#161827]">
                       {c.client_company?.name || "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B] max-w-[200px] truncate">
+                    <TableCell className="text-xs text-[#475569] max-w-[200px] truncate">
                       {c.title}
                     </TableCell>
                     <TableCell className="font-extrabold text-[#161827] text-xs">
                       {formatCurrency(c.contract_value, c.currency_code)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[#64748B]">
-                      {c.start_date} {c.end_date ? `➔ ${c.end_date}` : ""}
+                    <TableCell className="font-mono text-xs text-[#475569]">
+                      {formatDate(c.start_date)} {c.end_date ? `➔ ${formatDate(c.end_date)}` : ""}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -506,7 +508,7 @@ export default function ContractsWorkspace({
                             size="sm"
                             onClick={() => openEditModal(c)}
                             title="Sửa hợp đồng"
-                            className="text-[#64748B] hover:text-[#161827]"
+                            className="text-[#475569] hover:text-[#161827]"
                           >
                             <Edit2 className="w-4 h-4" />
                           </Button>
@@ -532,7 +534,7 @@ export default function ContractsWorkspace({
         )}
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
             <span>
               Hiển thị{" "}
               <span className="font-bold text-[#161827]">
@@ -594,7 +596,7 @@ export default function ContractsWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Mã số hợp đồng *
                 </label>
                 <input
@@ -611,7 +613,7 @@ export default function ContractsWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Khách hàng (Công ty) *
                 </label>
                 <select
@@ -637,7 +639,7 @@ export default function ContractsWorkspace({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Tiêu đề hợp đồng *
               </label>
               <input
@@ -655,7 +657,7 @@ export default function ContractsWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Dự án liên kết
                 </label>
                 <select
@@ -677,7 +679,7 @@ export default function ContractsWorkspace({
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                     Giá trị hợp đồng *
                   </label>
                   <input
@@ -695,7 +697,7 @@ export default function ContractsWorkspace({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                     Tiền tệ *
                   </label>
                   <select
@@ -719,7 +721,7 @@ export default function ContractsWorkspace({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Ngày bắt đầu hiệu lực *
                 </label>
                 <input
@@ -735,7 +737,7 @@ export default function ContractsWorkspace({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Ngày kết thúc hiệu lực
                 </label>
                 <input
@@ -751,7 +753,7 @@ export default function ContractsWorkspace({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Điều khoản & Ghi chú
               </label>
               <textarea
@@ -773,7 +775,7 @@ export default function ContractsWorkspace({
               />
               <label
                 htmlFor="formClientVisible"
-                className="text-xs text-[#64748B] cursor-pointer select-none"
+                className="text-xs text-[#475569] cursor-pointer select-none"
               >
                 Cho phép khách hàng nhìn thấy hợp đồng này trên cổng thông tin
               </label>

@@ -111,7 +111,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                   {day}
                 </span>
                 {todayCell && (
-                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#5D87FF] text-white w-fit truncate">
+                  <span className="text-xs sm:text-xs font-bold px-1.5 py-0.5 rounded bg-[#5D87FF] text-white w-fit truncate">
                     Hôm nay
                   </span>
                 )}

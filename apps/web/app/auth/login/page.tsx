@@ -152,7 +152,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative flex items-center justify-center my-4">
             <div className="w-full border-t border-[#F2EAD3]" />
-            <span className="absolute px-3 bg-white text-[11px] text-[#94A3B8]">
+            <span className="absolute px-3 bg-white text-xs text-[#64748B]">
               Hoặc
             </span>
           </div>

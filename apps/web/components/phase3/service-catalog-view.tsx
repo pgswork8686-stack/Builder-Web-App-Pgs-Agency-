@@ -460,7 +460,7 @@ export function ServiceCatalogView() {
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "services"
               ? "border-[#4F75FF] text-[#4F75FF]"
-              : "border-transparent text-[#64748B] hover:text-[#161827]"
+              : "border-transparent text-[#475569] hover:text-[#161827]"
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -471,7 +471,7 @@ export function ServiceCatalogView() {
           className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "categories"
               ? "border-[#4F75FF] text-[#4F75FF]"
-              : "border-transparent text-[#64748B] hover:text-[#161827]"
+              : "border-transparent text-[#475569] hover:text-[#161827]"
           }`}
         >
           <FolderKanban className="w-4 h-4" />
@@ -499,7 +499,7 @@ export function ServiceCatalogView() {
           <Card className="p-3 bg-white border border-[#F2EAD3] shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[240px]">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
                 <input
                   type="text"
                   value={q}
@@ -537,7 +537,7 @@ export function ServiceCatalogView() {
           {/* Services Table */}
           <Card className="p-0 overflow-hidden">
             {loading ? (
-              <div className="py-20 text-center text-xs text-[#64748B]">
+              <div className="py-20 text-center text-xs text-[#475569]">
                 Đang tải danh mục dịch vụ...
               </div>
             ) : services.length === 0 ? (
@@ -579,7 +579,7 @@ export function ServiceCatalogView() {
                             {svc.name}
                           </div>
                           {svc.description && (
-                            <div className="text-xs text-[#64748B] line-clamp-1 max-w-sm">
+                            <div className="text-xs text-[#475569] line-clamp-1 max-w-sm">
                               {svc.description}
                             </div>
                           )}
@@ -592,7 +592,7 @@ export function ServiceCatalogView() {
                               : {svc.category.name}
                             </Badge>
                           ) : (
-                            <span className="text-xs text-[#94A3B8]">
+                            <span className="text-xs text-[#64748B]">
                               Chưa gán
                             </span>
                           )}
@@ -607,7 +607,7 @@ export function ServiceCatalogView() {
                                 {owner.department_code || "Đã gán"}
                               </Badge>
                             ) : (
-                              <span className="text-xs text-[#94A3B8]">
+                              <span className="text-xs text-[#64748B]">
                                 Chưa gán
                               </span>
                             );
@@ -709,7 +709,7 @@ export function ServiceCatalogView() {
                         {cat.servicesCount ?? 0} dịch vụ
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs font-mono text-[#64748B]">
+                    <TableCell className="text-xs font-mono text-[#475569]">
                       {cat.sortOrder}
                     </TableCell>
                     <TableCell>
@@ -759,7 +759,7 @@ export function ServiceCatalogView() {
         >
           <form onSubmit={handleSaveService} className="space-y-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Tên dịch vụ *
               </label>
               <input
@@ -775,7 +775,7 @@ export function ServiceCatalogView() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Nhóm dịch vụ
               </label>
               <select
@@ -795,7 +795,7 @@ export function ServiceCatalogView() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mã kỹ thuật (Tùy chọn)
               </label>
               <input
@@ -813,7 +813,7 @@ export function ServiceCatalogView() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mô tả dịch vụ
               </label>
               <textarea
@@ -885,7 +885,7 @@ export function ServiceCatalogView() {
         >
           <form onSubmit={handleSaveCategory} className="space-y-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mã nhóm *
               </label>
               <input
@@ -905,7 +905,7 @@ export function ServiceCatalogView() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Tên nhóm dịch vụ *
               </label>
               <input
@@ -921,7 +921,7 @@ export function ServiceCatalogView() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Mô tả nhóm
               </label>
               <textarea
@@ -971,7 +971,7 @@ export function ServiceCatalogView() {
           description="Thiết lập phòng ban/Team chủ quản và các đơn vị phối hợp. Team chủ quản bắt buộc phải thuộc phòng ban chủ quản."
         >
           {loadingResponsibility ? (
-            <div className="py-10 text-center text-xs text-[#64748B]">
+            <div className="py-10 text-center text-xs text-[#475569]">
               Đang tải thông tin phụ trách...
             </div>
           ) : (
@@ -981,7 +981,7 @@ export function ServiceCatalogView() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                     Owner Department *
                   </label>
                   <select
@@ -1029,7 +1029,7 @@ export function ServiceCatalogView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                     Owner Team
                   </label>
                   <select
@@ -1153,7 +1153,7 @@ export function ServiceCatalogView() {
                       ].includes(departmentId)
                     );
                   }).length === 0 ? (
-                    <div className="text-xs text-[#94A3B8]">
+                    <div className="text-xs text-[#64748B]">
                       Chưa có Team phù hợp. Có thể lưu Owner Department trước và
                       gán Team sau.
                     </div>
@@ -1245,7 +1245,7 @@ export function ServiceCatalogView() {
         >
           <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#64748B]">
+              <span className="text-xs font-semibold text-[#475569]">
                 Danh sách hạng mục ({deliveryItems.length})
               </span>
               {!showItemForm && (
@@ -1274,7 +1274,7 @@ export function ServiceCatalogView() {
                       : "Thêm hạng mục triển khai mẫu"}
                   </div>
                   <div>
-                    <label className="block text-xs text-[#64748B] mb-1">
+                    <label className="block text-xs text-[#475569] mb-1">
                       Tên hạng mục *
                     </label>
                     <input
@@ -1289,7 +1289,7 @@ export function ServiceCatalogView() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#64748B] mb-1">
+                    <label className="block text-xs text-[#475569] mb-1">
                       Mô tả / Hướng dẫn triển khai
                     </label>
                     <textarea
@@ -1360,11 +1360,11 @@ export function ServiceCatalogView() {
 
             {/* Delivery Items List */}
             {loadingItems ? (
-              <div className="py-8 text-center text-xs text-[#64748B]">
+              <div className="py-8 text-center text-xs text-[#475569]">
                 Đang tải hạng mục...
               </div>
             ) : deliveryItems.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[#64748B] bg-[#FFFBF0] rounded-xl border border-dashed border-[#CBD5E1]">
+              <div className="py-8 text-center text-xs text-[#475569] bg-[#FFFBF0] rounded-xl border border-dashed border-[#CBD5E1]">
                 Chưa có hạng mục mẫu nào cho dịch vụ này.
               </div>
             ) : (
@@ -1383,7 +1383,7 @@ export function ServiceCatalogView() {
                           <span className="font-bold text-xs text-[#161827]">
                             {item.name}
                           </span>
-                          <span className="font-mono text-[10px] text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">
+                          <span className="font-mono text-xs text-[#4F75FF] bg-blue-50 px-1.5 py-0.5 rounded">
                             {item.delivery_item_code}
                           </span>
                           <Badge
@@ -1394,7 +1394,7 @@ export function ServiceCatalogView() {
                           </Badge>
                         </div>
                         {item.description && (
-                          <div className="text-xs text-[#64748B] mt-0.5">
+                          <div className="text-xs text-[#475569] mt-0.5">
                             {item.description}
                           </div>
                         )}
@@ -1418,7 +1418,7 @@ export function ServiceCatalogView() {
                           setShowItemForm(true);
                         }}
                       >
-                        <Pencil className="w-3.5 h-3.5 text-[#64748B]" />
+                        <Pencil className="w-3.5 h-3.5 text-[#475569]" />
                       </Button>
                       <Button
                         variant="ghost"

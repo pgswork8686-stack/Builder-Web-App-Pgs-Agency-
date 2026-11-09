@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/format";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Loader2, FileText } from "lucide-react";
@@ -113,11 +115,11 @@ export default function ClientInvoicesPage() {
                       <TableCell className="font-mono font-bold text-[#4F75FF]">
                         {i.invoice_number}
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-[#64748B]">
-                        {i.issue_date}
+                      <TableCell className="font-mono text-xs text-[#475569]">
+                        {formatDate(i.issue_date)}
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-[#64748B]">
-                        {i.due_date}
+                      <TableCell className="font-mono text-xs text-[#475569]">
+                        {formatDate(i.due_date)}
                       </TableCell>
                       <TableCell className="font-extrabold text-[#161827] text-xs">
                         {formatCurrency(i.amount, i.currency_code)}
@@ -157,7 +159,7 @@ export default function ClientInvoicesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between text-xs text-[#64748B] pt-4 border-t border-[#F2EAD3]">
+              <div className="flex items-center justify-between text-xs text-[#475569] pt-4 border-t border-[#F2EAD3]">
                 <span>
                   Hiển thị{" "}
                   <span className="font-bold text-[#161827]">

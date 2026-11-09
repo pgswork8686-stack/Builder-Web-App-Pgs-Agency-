@@ -193,7 +193,7 @@ export default function AdminPendingAccountsPage() {
       {/* Search & Filter Bar */}
       <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="relative w-full sm:w-80 flex items-center">
-          <Search className="absolute left-3.5 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+          <Search className="absolute left-3.5 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên hoặc email..."
@@ -203,7 +203,7 @@ export default function AdminPendingAccountsPage() {
           />
         </div>
 
-        <div className="text-xs text-[#64748B] hidden sm:block">
+        <div className="text-xs text-[#475569] hidden sm:block">
           Hiển thị:{" "}
           <span className="font-bold text-[#161827]">
             {filteredUsers.length}
@@ -261,7 +261,7 @@ export default function AdminPendingAccountsPage() {
                           <p className="font-bold text-[#161827]">
                             {user.fullName || "Chưa đặt tên"}
                           </p>
-                          <p className="text-xs text-[#64748B]">{user.email}</p>
+                          <p className="text-xs text-[#475569]">{user.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -274,7 +274,7 @@ export default function AdminPendingAccountsPage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       {new Date(user.createdAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",
                         month: "2-digit",
@@ -343,7 +343,7 @@ export default function AdminPendingAccountsPage() {
       >
         <div className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
               Lý do từ chối *
             </label>
             <textarea

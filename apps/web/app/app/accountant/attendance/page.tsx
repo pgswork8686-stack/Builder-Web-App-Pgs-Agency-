@@ -339,7 +339,7 @@ export default function AccountantAttendancePage() {
           <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
+                <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
                   Từ ngày
                 </label>
                 <input
@@ -354,7 +354,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
+                <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
                   Đến ngày
                 </label>
                 <input
@@ -369,7 +369,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
+                <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
                   Phòng ban
                 </label>
                 <select
@@ -390,7 +390,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
+                <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
                   Đội nhóm
                 </label>
                 <select
@@ -411,7 +411,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-[#475569] mb-1">
+                <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
                   Trạng thái
                 </label>
                 <select
@@ -480,7 +480,7 @@ export default function AccountantAttendancePage() {
                               <span className="block font-bold text-xs text-[#24304A]">
                                 {emp?.full_name || "Chưa có tên"}
                               </span>
-                              <span className="block text-[11px] text-[#475569] font-mono">
+                              <span className="block text-xs text-[#475569] font-mono">
                                 {emp?.work_email || emp?.employee_code || "—"}
                               </span>
                             </div>
@@ -503,7 +503,7 @@ export default function AccountantAttendancePage() {
                             <span className="text-[#475569]">—</span>
                           )}
                           {r.late_minutes ? (
-                            <span className="block text-[10px] text-amber-600 font-medium">
+                            <span className="block text-xs text-amber-600 font-medium">
                               (Muộn {r.late_minutes}p)
                             </span>
                           ) : null}
@@ -521,7 +521,7 @@ export default function AccountantAttendancePage() {
                             <span className="text-[#475569]">—</span>
                           )}
                           {r.early_leave_minutes ? (
-                            <span className="block text-[10px] text-amber-600 font-medium">
+                            <span className="block text-xs text-amber-600 font-medium">
                               (Sớm {r.early_leave_minutes}p)
                             </span>
                           ) : null}

@@ -152,7 +152,7 @@ function TaskDetailContent({
           </div>
         )}
         {loading && !task ? (
-          <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#64748B]">
+          <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
             Đang tải chi tiết công việc…
           </div>
         ) : !task ? (
@@ -209,7 +209,7 @@ function TaskDetailContent({
             <section className="grid gap-5 md:grid-cols-2">
               <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#161827] text-sm">Mô tả</h3>
-                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#64748B]">
+                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#475569]">
                   {task.description || "Chưa có mô tả."}
                 </p>
               </div>
@@ -241,7 +241,7 @@ function TaskDetailContent({
             <section className="space-y-4 rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
               <h3 className="font-bold text-[#161827] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
-                <p className="text-xs text-[#94A3B8]">Chưa có bình luận.</p>
+                <p className="text-xs text-[#64748B]">Chưa có bình luận.</p>
               ) : (
                 <div className="space-y-4">
                   {comments.map((comment) => (
@@ -256,7 +256,7 @@ function TaskDetailContent({
                               comment.author?.email ||
                               "Thành viên"}
                           </p>
-                          <p className="text-[11px] text-[#94A3B8] font-mono">
+                          <p className="text-xs text-[#64748B] font-mono">
                             {new Date(comment.createdAt).toLocaleString(
                               "vi-VN",
                             )}
@@ -272,7 +272,7 @@ function TaskDetailContent({
                                 setEditingContent(comment.content);
                               }}
                               aria-label="Sửa bình luận"
-                              className="text-[#64748B] hover:text-[#161827]"
+                              className="text-[#475569] hover:text-[#161827]"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
@@ -304,7 +304,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => setEditingId(null)}
-                              className="rounded-lg border border-[#F2EAD3] bg-white p-1.5 text-[#64748B] hover:text-[#161827]"
+                              className="rounded-lg border border-[#F2EAD3] bg-white p-1.5 text-[#475569] hover:text-[#161827]"
                               aria-label="Hủy sửa"
                             >
                               <X className="h-4 w-4" />
@@ -338,7 +338,7 @@ function TaskDetailContent({
                   >
                     Trước
                   </button>
-                  <span className="py-1.5 text-[#64748B]">
+                  <span className="py-1.5 text-[#475569]">
                     {commentPage}/{commentPages}
                   </span>
                   <button
@@ -391,7 +391,7 @@ function TaskDetailContent({
 function Info({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex justify-between gap-4 border-b border-[#F2EAD3] pb-2">
-      <dt className="text-[#64748B]">{label}</dt>
+      <dt className="text-[#475569]">{label}</dt>
       <dd className="break-all text-right font-semibold text-[#161827]">
         {value || "—"}
       </dd>

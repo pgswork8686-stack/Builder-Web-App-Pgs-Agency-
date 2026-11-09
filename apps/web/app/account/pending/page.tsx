@@ -74,7 +74,7 @@ export default function AccountPendingPage() {
           </Button>
         </div>
 
-        <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-center gap-2 text-xs text-[#94A3B8]">
+        <div className="pt-4 border-t border-[#F2EAD3] flex items-center justify-center gap-2 text-xs text-[#64748B]">
           <ShieldAlert className="w-3.5 h-3.5 text-[#3B5BDB]" />
           <span>PGS Agency Enterprise Operating System</span>
         </div>

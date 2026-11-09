@@ -237,7 +237,7 @@ export default function EmployeeLeavePage() {
                       {r.leave_type?.name || "Nghỉ phép"}
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       {r.start_date} ➔ {r.end_date}
                     </TableCell>
 
@@ -245,7 +245,7 @@ export default function EmployeeLeavePage() {
                       {r.total_days} ngày
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B] max-w-xs truncate">
+                    <TableCell className="text-xs text-[#475569] max-w-xs truncate">
                       {r.reason || "—"}
                     </TableCell>
 
@@ -264,7 +264,7 @@ export default function EmployeeLeavePage() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       {new Date(r.created_at).toLocaleDateString("vi-VN")}
                     </TableCell>
                   </TableRow>
@@ -276,7 +276,7 @@ export default function EmployeeLeavePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
             <span>
               Trang {page} / {totalPages}
             </span>
@@ -343,7 +343,7 @@ export default function EmployeeLeavePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
               Lý do xin nghỉ *
             </label>
             <textarea

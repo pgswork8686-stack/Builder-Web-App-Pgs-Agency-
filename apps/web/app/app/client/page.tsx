@@ -76,10 +76,10 @@ export default function ClientDashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/app/client/support" className="px-4 py-2 rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]">
+          <Link href="/app/client/support" className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]">
             Gửi yêu cầu hỗ trợ
           </Link>
-          <Link href="/app/client/approvals" className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]">
+          <Link href="/app/client/approvals" className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]">
             Xem sản phẩm chờ duyệt
           </Link>
         </div>
@@ -105,7 +105,7 @@ export default function ClientDashboardPage() {
       <Widget
         title="Việc cần bạn xử lý"
         icon={<Bell className="w-4 h-4" />}
-        action={data && <span className="px-2 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-[10px] font-bold">{data.attention.length} mục</span>}
+        action={data && <span className="px-2 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-xs font-bold">{data.attention.length} mục</span>}
       >
         {data && data.attention.length > 0 ? (
           <ul className="divide-y divide-[#F2EAD3]">
@@ -117,7 +117,7 @@ export default function ClientDashboardPage() {
                     <span className="block text-sm font-bold text-[#161827] truncate">{a.title}</span>
                     <span className="block text-xs text-[#475569] truncate">{a.detail}</span>
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-[10px] font-bold">{a.badge}</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FFF8E5] border border-[#FDE68A] text-[#8A6400] text-xs font-bold">{a.badge}</span>
                 </Link>
               </li>
             ))}
@@ -138,21 +138,21 @@ export default function ClientDashboardPage() {
                     <Link href={`/app/client/projects/${p.id}`} className="flex items-center gap-4 py-3 group">
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
-                          <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.code}</span>
+                          <span className="font-mono text-xs text-[#8A6400] mr-2">{p.code}</span>
                           {p.name}
                         </span>
-                        <span className="block text-[11px] text-[#475569]">{done ? "Đã nghiệm thu" : `${p.itemsDone}/${p.itemsTotal} hạng mục hoàn thành`}</span>
+                        <span className="block text-xs text-[#475569]">{done ? "Đã nghiệm thu" : `${p.itemsDone}/${p.itemsTotal} hạng mục hoàn thành`}</span>
                       </span>
                       <span className="w-36 shrink-0">
-                        <span className="flex justify-between text-[11px] mb-1">
+                        <span className="flex justify-between text-xs mb-1">
                           <b className="text-[#161827]">{p.progress}%</b>
-                          <span className="text-[#64748B]">{done ? "Hoàn thành" : `Hạn ${shortDate(p.dueDate)}`}</span>
+                          <span className="text-[#475569]">{done ? "Hoàn thành" : `Hạn ${shortDate(p.dueDate)}`}</span>
                         </span>
                         <span className="block h-2 rounded-full bg-[#FBF3DC] overflow-hidden">
                           <span style={{ width: `${p.progress}%` }} className={`block h-full ${done ? "bg-[#00D09C]" : "bg-[#E7AE18]"}`} />
                         </span>
                       </span>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${done ? "bg-[#E6FBF5] text-[#047857]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${done ? "bg-[#E6FBF5] text-[#047857]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
                         {done ? "Hoàn thành" : "Đang thực hiện"}
                       </span>
                     </Link>
@@ -171,7 +171,7 @@ export default function ClientDashboardPage() {
               {data.updates.map((u, i) => (
                 <li key={i} className="flex gap-3 text-xs">
                   <i className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${i === 0 ? "bg-[#E7AE18]" : "bg-[#FDE68A]"}`} />
-                  <span className="text-[#64748B] font-mono w-10 shrink-0">{dm(u.at)}</span>
+                  <span className="text-[#475569] font-mono w-10 shrink-0">{dm(u.at)}</span>
                   <span className="text-[#161827] leading-snug">{u.text}</span>
                 </li>
               ))}

@@ -245,7 +245,7 @@ function ProjectBoardContent({
     <div className="space-y-4">
       <section className="grid gap-3 rounded-2xl border border-[#F2EAD3] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
         <label className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <input
             value={filters.q}
             onChange={(event) =>
@@ -323,14 +323,14 @@ function ProjectBoardContent({
         </div>
       )}
       {!board?.canReorder && board && (
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-[#475569]">
           Bạn có thể đổi trạng thái công việc được giao bằng hộp chọn; kéo thả
           chỉ dành cho Admin và quản lý dự án.
         </p>
       )}
 
       {loading && !board ? (
-        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#64748B]">
+        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
           Đang tải Kanban…
         </div>
       ) : (
@@ -433,7 +433,7 @@ function BoardColumn({
           <button
             type="button"
             onClick={onCreate}
-            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-[11px] font-bold text-[#4F75FF] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-xs font-bold text-[#4F75FF] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
           >
             <Plus className="h-3 w-3" />
             Tạo
@@ -456,7 +456,7 @@ function BoardColumn({
             />
           ))}
           {tasks.length === 0 && (
-            <p className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-xs text-[#94A3B8]">
+            <p className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-xs text-[#64748B]">
               Chưa có công việc
             </p>
           )}
@@ -504,7 +504,7 @@ function BoardCard({
           <button
             type="button"
             aria-label={`Kéo để sắp xếp ${task.title}`}
-            className="mt-0.5 cursor-grab text-[#94A3B8] active:cursor-grabbing hover:text-[#161827]"
+            className="mt-0.5 cursor-grab text-[#64748B] active:cursor-grabbing hover:text-[#161827]"
             {...attributes}
             {...listeners}
           >
@@ -518,16 +518,16 @@ function BoardCard({
           >
             {task.title}
           </Link>
-          <p className="mt-1 truncate text-xs text-[#64748B]">
+          <p className="mt-1 truncate text-xs text-[#475569]">
             {task.assignee?.full_name || task.assignee?.email || "Chưa giao"}
           </p>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        <span className="rounded-full bg-[#FBF3DC] px-2 py-0.5 text-[11px] font-bold text-[#4F75FF]">
+        <span className="rounded-full bg-[#FBF3DC] px-2 py-0.5 text-xs font-bold text-[#4F75FF]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
-        <span className="text-[#94A3B8] text-[11px] font-mono">
+        <span className="text-[#64748B] text-xs font-mono">
           {task.due_date || "Chưa có hạn"}
         </span>
       </div>

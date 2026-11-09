@@ -254,7 +254,7 @@ export default function AdminClientDetailPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
           <Loader2 className="w-8 h-8 text-[#4F75FF] animate-spin mb-3" />
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#475569]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
         </div>
@@ -287,7 +287,7 @@ export default function AdminClientDetailPage() {
 
               <div className="space-y-3 text-xs border-t border-[#F2EAD3] pt-4">
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Mã số thuế
                   </span>
                   <span className="font-mono text-[#161827] font-medium">
@@ -295,13 +295,13 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Điện thoại
                   </span>
                   <span className="text-[#161827]">{company.phone || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
                   <span className="text-[#161827] font-mono">
@@ -309,7 +309,7 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Website
                   </span>
                   {company.website ? (
@@ -326,7 +326,7 @@ export default function AdminClientDetailPage() {
                   )}
                 </div>
                 <div>
-                  <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Địa chỉ trụ sở
                   </span>
                   <span className="text-[#161827]">
@@ -335,10 +335,10 @@ export default function AdminClientDetailPage() {
                 </div>
                 {company.notes && (
                   <div>
-                    <span className="block text-[#64748B] text-[10px] font-bold uppercase tracking-wider">
+                    <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                       Ghi chú
                     </span>
-                    <span className="text-xs text-[#64748B]">
+                    <span className="text-xs text-[#475569]">
                       {company.notes}
                     </span>
                   </div>
@@ -366,7 +366,7 @@ export default function AdminClientDetailPage() {
               </div>
 
               {memberships.length === 0 ? (
-                <div className="py-8 text-center text-xs text-[#94A3B8]">
+                <div className="py-8 text-center text-xs text-[#64748B]">
                   Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
@@ -387,11 +387,11 @@ export default function AdminClientDetailPage() {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-[11px] font-mono text-[#64748B] mt-0.5">
+                        <div className="text-xs font-mono text-[#475569] mt-0.5">
                           {m.email}
                         </div>
                         {m.title && (
-                          <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                          <div className="text-xs text-[#64748B] mt-0.5">
                             Chức danh: {m.title}
                           </div>
                         )}
@@ -407,7 +407,7 @@ export default function AdminClientDetailPage() {
                           }
                         >
                           <Star
-                            className={`w-4 h-4 ${m.isPrimary ? "text-[#CA8A04] fill-[#CA8A04]" : "text-[#94A3B8]"}`}
+                            className={`w-4 h-4 ${m.isPrimary ? "text-[#CA8A04] fill-[#CA8A04]" : "text-[#64748B]"}`}
                           />
                         </Button>
                         <Button
@@ -447,7 +447,7 @@ export default function AdminClientDetailPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Chọn tài khoản khách hàng *
               </label>
               <select
@@ -466,7 +466,7 @@ export default function AdminClientDetailPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#64748B] uppercase mb-1">
+              <label className="block text-xs font-semibold text-[#475569] uppercase mb-1">
                 Chức danh / Vai trò đại diện
               </label>
               <input

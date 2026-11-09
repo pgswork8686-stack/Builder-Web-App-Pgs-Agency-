@@ -249,7 +249,7 @@ export function ProjectCreateWizardDialog({
                   </option>
                 ))}
               </Select>
-              <p className="text-[11px] text-[#475569]">
+              <p className="text-xs text-[#475569]">
                 Dự án sẽ được gán trực tiếp cho hồ sơ khách hàng đã chọn để quản
                 lý hợp đồng và nghiệm thu.
               </p>

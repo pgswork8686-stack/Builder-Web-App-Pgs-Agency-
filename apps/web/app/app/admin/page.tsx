@@ -138,19 +138,19 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/app/admin/tasks"
-            className="px-4 py-2 rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
           >
             Giao việc
           </Link>
           <Link
             href="/app/admin/projects"
-            className="px-4 py-2 rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
           >
             Tạo dự án
           </Link>
           <Link
             href="/app/admin/accounts/pending"
-            className="px-4 py-2 rounded-xl bg-[#F3BA2F] hover:bg-[#E7AE18] text-xs font-bold text-[#161827]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#F3BA2F] hover:bg-[#E7AE18] text-xs font-bold text-[#161827]"
           >
             Duyệt tài khoản ({pendingAcc})
           </Link>
@@ -313,7 +313,7 @@ export default function AdminDashboardPage() {
           icon={<TriangleAlert className="w-4 h-4" />}
           action={
             data && (
-              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold">
                 {data.attention.items.length} mục
               </span>
             )
@@ -338,13 +338,13 @@ export default function AdminDashboardPage() {
                         {i.detail}
                       </span>
                     </span>
-                    <span className="hidden sm:block text-[11px] text-[#64748B]">
+                    <span className="hidden sm:block text-xs text-[#475569]">
                       {i.owner}
                     </span>
                     <span className="min-w-7 h-6 px-2 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold grid place-items-center">
                       {i.count}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-[#94A3B8]" />
+                    <ChevronRight className="w-4 h-4 text-[#64748B]" />
                   </Link>
                 </li>
               ))}
@@ -367,7 +367,7 @@ export default function AdminDashboardPage() {
                 <span style={{ width: `${(staff.late / staff.total) * 100}%` }} className="bg-[#FF9F24]" />
                 <span style={{ width: `${(staff.onLeave / staff.total) * 100}%` }} className="bg-[#3B5BDB]" />
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#475569]">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#475569]">
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#00D09C]" />{staff.present} có mặt</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#FF9F24]" />{staff.late} đi muộn</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#3B5BDB]" />{staff.onLeave} nghỉ phép</span>
@@ -381,7 +381,7 @@ export default function AdminDashboardPage() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold text-[#161827] truncate">{s.name}</span>
-                      <span className="block text-[11px] text-[#475569] truncate">{s.note}</span>
+                      <span className="block text-xs text-[#475569] truncate">{s.note}</span>
                     </span>
                     <i className={`w-2 h-2 rounded-full ${STATE_DOT[s.state]}`} />
                   </li>
@@ -432,7 +432,7 @@ export default function AdminDashboardPage() {
           icon={<ListChecks className="w-4 h-4" />}
           action={
             data && (
-              <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold">
                 {data.newTasks.last24h} công việc trong 24 giờ
               </span>
             )
@@ -449,14 +449,14 @@ export default function AdminDashboardPage() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold text-[#161827] truncate">{t.title}</span>
-                      <span className="block text-[11px] text-[#475569] truncate">
+                      <span className="block text-xs text-[#475569] truncate">
                         {t.project ?? "—"} · giao cho {t.assignee}
                       </span>
                     </span>
-                    <span className={`text-[11px] ${t.overdue ? "text-[#DC2626] font-bold" : "text-[#64748B]"}`}>
+                    <span className={`text-xs ${t.overdue ? "text-[#DC2626] font-bold" : "text-[#475569]"}`}>
                       Hạn {shortDate(t.dueDate)}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${t.overdue ? "bg-[#FEE2E2] text-[#B91C1C]" : st.cls}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${t.overdue ? "bg-[#FEE2E2] text-[#B91C1C]" : st.cls}`}>
                       {t.overdue ? "Quá hạn" : st.label}
                     </span>
                   </li>
@@ -485,16 +485,16 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
-                          <span className="font-mono text-[11px] text-[#64748B] mr-2">{p.code}</span>
+                          <span className="font-mono text-xs text-[#475569] mr-2">{p.code}</span>
                           {p.name}
                         </p>
-                        <p className="text-[11px] text-[#475569] truncate">
+                        <p className="text-xs text-[#475569] truncate">
                           Khách: {p.client ?? "—"} · PM: {p.manager}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-bold text-[#161827]">{p.progress}%</p>
-                        <p className={`text-[11px] ${p.late ? "text-[#DC2626] font-bold" : "text-[#64748B]"}`}>
+                        <p className={`text-xs ${p.late ? "text-[#DC2626] font-bold" : "text-[#475569]"}`}>
                           Hạn {shortDate(p.dueDate)}
                         </p>
                       </div>
@@ -523,7 +523,7 @@ export default function AdminDashboardPage() {
             <ul className="space-y-3">
               {data.activity.map((a, i) => (
                 <li key={i} className="flex gap-3 text-xs">
-                  <span className="text-[#64748B] font-mono w-10 shrink-0 pt-0.5">{timeOf(a.at)}</span>
+                  <span className="text-[#475569] font-mono w-10 shrink-0 pt-0.5">{timeOf(a.at)}</span>
                   <span className="text-[#161827] leading-snug">{a.text}</span>
                 </li>
               ))}
@@ -549,27 +549,27 @@ export default function AdminDashboardPage() {
                   const last = i === data.revenue.months.length - 1;
                   return (
                     <div key={m.key} className="flex-1 flex flex-col items-center justify-end h-full gap-1.5" title={fullVND(m.amount)}>
-                      <span className="text-[10px] text-[#475569]">{m.amount ? compactVND(m.amount) : ""}</span>
+                      <span className="text-xs text-[#475569]">{m.amount ? compactVND(m.amount) : ""}</span>
                       <span
                         className={`w-full rounded-t-lg ${last ? "bg-[#E7AE18]" : "bg-[#FDE68A]"}`}
                         style={{ height: `${Math.max(m.amount ? 6 : 2, (m.amount / maxRev) * 100)}%` }}
                       />
-                      <span className="text-[11px] text-[#475569]">{m.label}</span>
+                      <span className="text-xs text-[#475569]">{m.label}</span>
                     </div>
                   );
                 })}
               </div>
               <div className="grid grid-cols-3 gap-3 mt-2">
                 <div className="rounded-xl border border-[#F2EAD3] p-3">
-                  <p className="text-[10px] text-[#475569]">Doanh thu lũy kế</p>
+                  <p className="text-xs text-[#475569]">Doanh thu lũy kế</p>
                   <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.revenue.ytd)}</p>
                 </div>
                 <div className="rounded-xl border border-[#F2EAD3] p-3">
-                  <p className="text-[10px] text-[#475569]">Phải thu</p>
+                  <p className="text-xs text-[#475569]">Phải thu</p>
                   <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.revenue.receivable)}</p>
                 </div>
                 <div className="rounded-xl border border-[#F2EAD3] p-3">
-                  <p className="text-[10px] text-[#475569]">Quá hạn</p>
+                  <p className="text-xs text-[#475569]">Quá hạn</p>
                   <p className="text-sm font-bold text-[#DC2626] mt-1">{fullVND(data.revenue.overdue)}</p>
                 </div>
               </div>

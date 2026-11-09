@@ -219,7 +219,7 @@ export default function AdminSettingsPage() {
                   <h4 className="text-sm font-bold text-[#161827]">
                     Lịch Làm Việc Công Ty & Đồng Bộ Ngày Lễ
                   </h4>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-[#475569]">
                     Cấu hình thứ 7 cách tuần, ngày lễ quốc gia, ngày làm bù và
                     ngoại lệ lịch áp dụng toàn hệ thống.
                   </p>
@@ -244,7 +244,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#161827]">
                   Thông tin Tổ chức
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Tên và thông tin nhận diện doanh nghiệp
                 </p>
               </div>
@@ -312,7 +312,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#161827]">
                   Quy chuẩn Chấm công & Ca làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Cấu hình bán kính định vị GPS và khung giờ chuẩn
                 </p>
               </div>
@@ -463,7 +463,7 @@ export default function AdminSettingsPage() {
                 <h4 className="text-sm font-bold text-[#161827]">
                   Bảo mật & Phiên làm việc
                 </h4>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-[#475569]">
                   Chính sách hết hạn phiên và giới hạn yêu cầu
                 </p>
               </div>

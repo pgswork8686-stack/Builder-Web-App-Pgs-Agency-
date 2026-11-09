@@ -43,11 +43,11 @@ export function MetricCard({
         {items.map((item, idx) => (
           <div key={item.label + idx} className="space-y-1.5">
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="text-[#64748B] font-medium">{item.label}</span>
+              <span className="text-[#475569] font-medium">{item.label}</span>
               <div className="flex items-center gap-2">
                 <span className="text-[#161827] font-bold">{item.value}</span>
                 {item.subValue && (
-                  <span className="text-[10px] text-[#94A3B8] font-mono">
+                  <span className="text-xs text-[#64748B] font-mono">
                     {item.subValue}
                   </span>
                 )}

@@ -75,7 +75,7 @@ export function ActivityCard({
                       {item.description}
                     </p>
                   )}
-                  <span className="text-[10px] text-[#606060] block">
+                  <span className="text-xs text-[#606060] block">
                     {item.timestamp}
                   </span>
                 </div>

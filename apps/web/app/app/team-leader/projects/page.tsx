@@ -56,12 +56,12 @@ export default function TeamLeaderProjectsPage() {
 
       <div className="bg-white rounded-2xl border border-[#F2EAD3] p-4 grid gap-3 md:grid-cols-[1fr_200px_200px]">
         <div className="relative">
-          <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Tìm dự án" placeholder="Tìm mã hoặc tên dự án…"
-            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm text-[#161827] placeholder:text-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm text-[#161827] placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#3B5BDB]"
           />
         </div>
         <Select aria-label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)} className="!py-2.5">
@@ -102,17 +102,17 @@ export default function TeamLeaderProjectsPage() {
                         <span className="font-mono text-[12px] text-[#8A6400] mr-2">{p.projectCode}</span>
                         {p.name}
                       </span>
-                      <span className="block text-[11px] text-[#475569] mt-0.5">
+                      <span className="block text-xs text-[#475569] mt-0.5">
                         Khách: {p.clientCompany?.name || "Chưa liên kết"}
                         {Array.isArray(p.members) ? ` · ${p.members.length} thành viên` : ""}
                       </span>
                     </span>
-                    <span className="w-44 shrink-0 text-right text-[11px]">
-                      <span className={late ? "text-[#B91C1C] font-bold" : "text-[#64748B]"}>
+                    <span className="w-44 shrink-0 text-right text-xs">
+                      <span className={late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}>
                         Hạn {shortDate(p.dueDate ? p.dueDate.slice(0, 10) : null)}
                       </span>
                     </span>
-                    <span className={`px-3 py-1 rounded-full border text-[10px] font-bold ${st.cls}`}>{st.label}</span>
+                    <span className={`px-3 py-1 rounded-full border text-xs font-bold ${st.cls}`}>{st.label}</span>
                   </Link>
                 </li>
               );

@@ -37,7 +37,7 @@ export function TableHead({
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={`border-b border-[#F2EAD3] bg-[#FBF3DC] text-[11px] font-bold uppercase tracking-wide text-[#475569] ${className}`}
+      className={`border-b border-[#F2EAD3] bg-[#FBF3DC] text-xs font-bold uppercase tracking-wide text-[#475569] ${className}`}
       {...props}
     >
       {children}

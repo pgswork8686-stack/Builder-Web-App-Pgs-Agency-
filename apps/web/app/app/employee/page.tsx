@@ -75,13 +75,13 @@ export default function EmployeeDashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/app/leave"
-            className="px-4 py-2 rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E8DDB8] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
           >
             Xin nghỉ phép
           </Link>
           <Link
             href="/app/attendance"
-            className="px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
           >
             Chấm công
           </Link>
@@ -137,7 +137,7 @@ export default function EmployeeDashboardPage() {
                     <span className={`text-xs ${t.overdue ? "text-[#B91C1C]" : "text-[#475569]"}`}>
                       {t.overdue ? "Quá hạn" : `Hạn ${shortDate(t.dueDate)}`}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${t.overdue ? "bg-[#FEE2E2] border-[#FECACA] text-[#B91C1C]" : `${st.cls} border-transparent`}`}>
+                    <span className={`px-2 py-0.5 rounded-full border text-xs font-bold ${t.overdue ? "bg-[#FEE2E2] border-[#FECACA] text-[#B91C1C]" : `${st.cls} border-transparent`}`}>
                       {t.overdue ? "Quá hạn" : st.label}
                     </span>
                   </li>
@@ -155,7 +155,7 @@ export default function EmployeeDashboardPage() {
           icon={<Bell className="w-4 h-4" />}
           action={
             data && data.notifications.unread > 0 ? (
-              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-xs font-bold">
                 {data.notifications.unread}
               </span>
             ) : undefined
@@ -197,21 +197,21 @@ export default function EmployeeDashboardPage() {
                   <Link href={`/app/projects/${p.id}`} className="flex items-center gap-4 py-3 group">
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
-                        <span className="font-mono text-[11px] text-[#8A6400] mr-2">{p.code}</span>
+                        <span className="font-mono text-xs text-[#8A6400] mr-2">{p.code}</span>
                         {p.name}
                       </span>
-                      <span className="block text-[11px] text-[#475569]">Vai trò: {p.role === "project_manager" ? "quản lý dự án" : "thành viên"}</span>
+                      <span className="block text-xs text-[#475569]">Vai trò: {p.role === "project_manager" ? "quản lý dự án" : "thành viên"}</span>
                     </span>
                     <span className="w-36 shrink-0">
-                      <span className="flex justify-between text-[11px] mb-1">
+                      <span className="flex justify-between text-xs mb-1">
                         <b className="text-[#161827]">{p.progress}%</b>
-                        <span className={p.late ? "text-[#B91C1C] font-bold" : "text-[#64748B]"}>Hạn {shortDate(p.dueDate)}</span>
+                        <span className={p.late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}>Hạn {shortDate(p.dueDate)}</span>
                       </span>
                       <span className="block h-2 rounded-full bg-[#FBF3DC] overflow-hidden">
                         <span style={{ width: `${p.progress}%` }} className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#E7AE18]"}`} />
                       </span>
                     </span>
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${p.late ? "bg-[#FEE2E2] text-[#B91C1C]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.late ? "bg-[#FEE2E2] text-[#B91C1C]" : "bg-[#EEF2FF] text-[#3B5BDB]"}`}>
                       {p.late ? "Trễ hạn" : "Đang chạy"}
                     </span>
                   </Link>

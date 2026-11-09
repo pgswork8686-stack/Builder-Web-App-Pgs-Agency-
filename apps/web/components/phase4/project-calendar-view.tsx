@@ -149,19 +149,19 @@ function ProjectCalendarContent({
         {/* Legend and Toggles */}
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#475569]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#4F75FF]" /> Công
               việc
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#475569]">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Ngày
               làm việc
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#475569]">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-300" /> Ngày
               nghỉ
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[#64748B]">
+            <span className="inline-flex items-center gap-1.5 text-[#475569]">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Ngày lễ
             </span>
           </div>
@@ -207,7 +207,7 @@ function ProjectCalendarContent({
           type="button"
           onClick={() => changeMonth(-1)}
           aria-label="Tháng trước"
-          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#64748B] hover:text-[#161827] transition-colors"
+          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#475569] hover:text-[#161827] transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -218,7 +218,7 @@ function ProjectCalendarContent({
           type="button"
           onClick={() => changeMonth(1)}
           aria-label="Tháng sau"
-          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#64748B] hover:text-[#161827] transition-colors"
+          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#475569] hover:text-[#161827] transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -230,7 +230,7 @@ function ProjectCalendarContent({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#64748B]">
+        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
           Đang tải lịch công việc…
         </div>
       ) : (
@@ -239,7 +239,7 @@ function ProjectCalendarContent({
             {weekdayLabels.map((label) => (
               <div
                 key={label}
-                className="p-3 text-center text-xs font-bold text-[#64748B]"
+                className="p-3 text-center text-xs font-bold text-[#475569]"
               >
                 {label}
               </div>
@@ -292,7 +292,7 @@ function ProjectCalendarContent({
 
                     {showWorkSchedule && workDay && (
                       <span
-                        className={`inline-block truncate max-w-[85px] rounded px-1.5 py-0.5 text-[9px] font-semibold ${
+                        className={`inline-block truncate max-w-[85px] rounded px-1.5 py-0.5 text-xs font-semibold ${
                           !workDay.isWorkingDay
                             ? isHoliday
                               ? "bg-amber-100 text-amber-800"
@@ -321,7 +321,7 @@ function ProjectCalendarContent({
                             key={task.taskId}
                             href={`${base}/${projectId}/tasks/${task.taskId}`}
                             onClick={(event) => event.stopPropagation()}
-                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-[11px] font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
+                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-xs font-semibold text-[#4F75FF] hover:border-[#4F75FF] transition-colors"
                             title={task.title}
                           >
                             <div className="flex items-center justify-between gap-1">
@@ -347,7 +347,7 @@ function ProjectCalendarContent({
         </section>
       )}
       {!loading && tasks.length === 0 && (
-        <p className="text-center text-xs text-[#94A3B8]">
+        <p className="text-center text-xs text-[#64748B]">
           Không có công việc có ngày bắt đầu hoặc đến hạn trong khoảng này.
         </p>
       )}

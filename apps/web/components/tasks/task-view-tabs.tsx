@@ -81,7 +81,7 @@ export function TaskViewTabs({
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 select-none shrink-0 cursor-pointer ${
               isActive
                 ? "bg-[#E7AE18] text-[#161827] shadow-xs"
-                : "text-[#64748B] hover:text-[#161827] hover:bg-[#FFF8E5]"
+                : "text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5]"
             }`}
           >
             <Icon

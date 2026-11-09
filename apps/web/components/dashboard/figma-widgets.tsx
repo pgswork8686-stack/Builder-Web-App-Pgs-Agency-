@@ -12,19 +12,7 @@ export function shortDate(iso: string | null) {
   return `${d}/${m}`;
 }
 
-export /** 1.250.000.000 → "1,25 tỷ"; 85.500.000 → "85,5tr". */
-function compactVND(n: number) {
-  if (!n) return "0 ₫";
-  const f = (v: number) =>
-    v.toLocaleString("vi-VN", { maximumFractionDigits: 2 });
-  if (Math.abs(n) >= 1e9) return `${f(n / 1e9)} tỷ`;
-  if (Math.abs(n) >= 1e6) return `${f(n / 1e6)}tr`;
-  return `${n.toLocaleString("vi-VN")} ₫`;
-}
-
-export function fullVND(n: number) {
-  return `${(n || 0).toLocaleString("vi-VN")} ₫`;
-}
+export { compactVND, fullVND } from "@/lib/format";
 
 export function initials(name: string) {
   const p = name.trim().split(/\s+/);
@@ -62,7 +50,7 @@ export function Widget({
 
 export function Empty({ text = "Chưa có dữ liệu" }: { text?: string }) {
   return (
-    <div className="flex-1 grid place-items-center py-8 text-sm text-[#94A3B8]">
+    <div className="flex-1 grid place-items-center py-8 text-sm text-[#64748B]">
       {text}
     </div>
   );
@@ -95,13 +83,15 @@ export function Kpi({
   bg: string;
   border: string;
 }) {
+  // Chỉ tô màu khi có nghĩa (quá hạn, cần duyệt); các ô còn lại trung tính.
+  const meaningful = ["#FEE2E2", "#FEF9C3"].includes(bg.toUpperCase());
   return (
     <div
       className="rounded-2xl p-5 flex flex-col gap-3 border transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(22,24,39,0.08)]"
-      style={{ background: bg, borderColor: border }}
+      style={{ background: meaningful ? bg : "#FFFFFF", borderColor: meaningful ? border : "#F2EAD3" }}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-wide text-[#475569] leading-tight">
+        <span className="text-xs font-bold uppercase tracking-wide text-[#475569] leading-tight">
           {label}
         </span>
         <span className="w-9 h-9 rounded-xl bg-white/80 grid place-items-center text-[#161827] shrink-0">

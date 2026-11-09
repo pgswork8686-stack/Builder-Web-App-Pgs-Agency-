@@ -246,7 +246,7 @@ export default function AdminAttendancePage() {
       {/* Filter Toolbar */}
       <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
-          <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
+          <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Từ ngày
           </label>
           <input
@@ -260,7 +260,7 @@ export default function AdminAttendancePage() {
           />
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
+          <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Đến ngày
           </label>
           <input
@@ -274,7 +274,7 @@ export default function AdminAttendancePage() {
           />
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
+          <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Phòng ban
           </label>
           <select
@@ -294,7 +294,7 @@ export default function AdminAttendancePage() {
           </select>
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
+          <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Đội nhóm
           </label>
           <select
@@ -314,7 +314,7 @@ export default function AdminAttendancePage() {
           </select>
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-[#64748B] uppercase mb-1">
+          <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Trạng thái
           </label>
           <select
@@ -341,7 +341,7 @@ export default function AdminAttendancePage() {
           <h3 className="text-base font-extrabold text-[#161827]">
             Kiểm tra bảng công ({total} lượt)
           </h3>
-          <span className="text-xs text-[#64748B]">
+          <span className="text-xs text-[#475569]">
             Trang {page} / {totalPages || 1}
           </span>
         </div>
@@ -381,17 +381,17 @@ export default function AdminAttendancePage() {
                       <div className="font-bold text-[#161827]">
                         {rec.employee?.full_name || "Nhân viên"}
                       </div>
-                      <div className="text-[11px] text-[#64748B]">
+                      <div className="text-xs text-[#475569]">
                         {rec.employee?.work_email}
                       </div>
                     </TableCell>
                     <TableCell className="font-bold text-[#161827]">
                       {rec.attendance_date}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       {formatVietnamTime(rec.check_in_at)}
                     </TableCell>
-                    <TableCell className="text-xs text-[#64748B]">
+                    <TableCell className="text-xs text-[#475569]">
                       {formatVietnamTime(rec.check_out_at)}
                     </TableCell>
                     <TableCell className="font-mono text-xs font-bold text-[#4F75FF]">
@@ -434,7 +434,7 @@ export default function AdminAttendancePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#64748B]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
             <span>Tổng số {total} bản ghi</span>
             <div className="flex gap-2">
               <Button
@@ -477,7 +477,7 @@ export default function AdminAttendancePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Giờ vào
                 </label>
                 <input
@@ -488,7 +488,7 @@ export default function AdminAttendancePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                   Giờ ra
                 </label>
                 <input
@@ -501,7 +501,7 @@ export default function AdminAttendancePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Trạng thái chấm công
               </label>
               <select
@@ -518,7 +518,7 @@ export default function AdminAttendancePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
                 Lý do hiệu chỉnh *
               </label>
               <textarea

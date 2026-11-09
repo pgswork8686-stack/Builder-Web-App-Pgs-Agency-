@@ -122,7 +122,7 @@ export default function TeamLeaderApprovalsPage() {
               {t.icon}
               {t.label}
               {counts[t.key] > 0 && (
-                <span className="px-1.5 rounded-full bg-[#FFF8E5] text-[#8A6400] text-[10px] font-bold">{counts[t.key]}</span>
+                <span className="px-1.5 rounded-full bg-[#FFF8E5] text-[#8A6400] text-xs font-bold">{counts[t.key]}</span>
               )}
             </button>
           );
@@ -158,7 +158,7 @@ export default function TeamLeaderApprovalsPage() {
                     <TableRow key={r.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-[11px] font-bold grid place-items-center">{initials(name)}</span>
+                          <span className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center">{initials(name)}</span>
                           <span className="font-bold text-xs text-[#161827]">{name}</span>
                         </div>
                       </TableCell>
@@ -174,7 +174,7 @@ export default function TeamLeaderApprovalsPage() {
                             type="button"
                             disabled={busy}
                             onClick={() => handleReview(r.id, "approved")}
-                            className="px-3 py-1 rounded-full border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-[10px] font-bold hover:brightness-95 disabled:opacity-50"
+                            className="px-3 py-1 rounded-full border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-xs font-bold hover:brightness-95 disabled:opacity-50"
                           >
                             {busy ? "Đang xử lý…" : "Duyệt"}
                           </button>
@@ -182,7 +182,7 @@ export default function TeamLeaderApprovalsPage() {
                             type="button"
                             disabled={busy}
                             onClick={() => handleReview(r.id, "rejected")}
-                            className="px-3 py-1 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-[10px] font-bold hover:brightness-95 disabled:opacity-50"
+                            className="px-3 py-1 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold hover:brightness-95 disabled:opacity-50"
                           >
                             Từ chối
                           </button>
