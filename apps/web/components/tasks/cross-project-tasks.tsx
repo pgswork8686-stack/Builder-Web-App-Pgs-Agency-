@@ -17,11 +17,11 @@ type Role = "admin" | "team_leader";
 type Row = ProjectTask & { project: Project };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  todo: { label: "Cần làm", cls: "bg-[#EEF2FF] border-[#E0EAFF] text-[#3B5BDB]" },
+  todo: { label: "Cần làm", cls: "bg-[#F2EEFF] border-[#E7E0FF] text-[#6044E8]" },
   in_progress: { label: "Đang làm", cls: "bg-[#FEF3C7] border-[#FDE68A] text-[#92400E]" },
-  review: { label: "Chờ duyệt", cls: "bg-[#F3E8FF] border-[#E9D5FF] text-[#7356F1]" },
+  review: { label: "Chờ duyệt", cls: "bg-[#F2EEFF] border-[#E9D5FF] text-[#7257F5]" },
   done: { label: "Hoàn thành", cls: "bg-[#E6FBF5] border-[#A7F3D0] text-[#047857]" },
-  cancelled: { label: "Đã hủy", cls: "bg-[#FBF3DC] border-[#E8DDB8] text-[#475569]" },
+  cancelled: { label: "Đã hủy", cls: "bg-[#F4F2FD] border-[#DDDFEA] text-[#475569]" },
 };
 const PRIORITY: Record<string, string> = { low: "Thấp", medium: "Trung bình", high: "Cao", urgent: "Khẩn cấp" };
 const COLUMNS: TaskStatus[] = ["todo", "in_progress", "review", "done"];
@@ -100,7 +100,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
     <button
       type="button"
       onClick={() => setPick(true)}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-xs font-bold text-[#161827]"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7257F5] hover:bg-[#6044E8] text-xs font-bold text-white"
     >
       <Plus className="w-4 h-4" /> Giao việc mới
     </button>
@@ -115,14 +115,14 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
     <div className="space-y-6">
       <TaskModuleHeader role={role} activeView={view} title={copy.title} description={copy.description} badge={copy.badge} actions={newButton} />
 
-      <div className="bg-white rounded-2xl border border-[#F2EAD3] p-4 grid gap-3 md:grid-cols-[1fr_200px_220px]">
+      <div className="bg-white rounded-2xl border border-[#E7E9F0] p-4 grid gap-3 md:grid-cols-[1fr_200px_220px]">
         <div className="relative">
           <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Tìm công việc" placeholder="Tìm công việc theo tên, mã, người phụ trách…"
-            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-sm placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] text-sm placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#6044E8]"
           />
         </div>
         <Select aria-label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)} className="!py-2.5">
@@ -142,8 +142,8 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
       {error && <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>}
 
       {loading ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-7 h-7 animate-spin text-[#3B5BDB] mx-auto" />
+        <div className="p-12 text-center bg-white rounded-2xl border border-[#E7E9F0]">
+          <Loader2 className="w-7 h-7 animate-spin text-[#6044E8] mx-auto" />
           <p className="mt-3 text-xs text-[#475569]">Đang tải công việc…</p>
         </div>
       ) : projects.length === 0 ? (
@@ -152,10 +152,10 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
         visible.length === 0 ? (
           <EmptyState title="Chưa có công việc nào" description="Bấm “Giao việc mới” để tạo công việc đầu tiên cho một dự án." actionLabel="Giao việc mới" onAction={() => setPick(true)} />
         ) : (
-          <div className="bg-white rounded-2xl border border-[#F2EAD3] overflow-x-auto">
+          <div className="bg-white rounded-2xl border border-[#E7E9F0] overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#FBF3DC] text-left text-xs uppercase tracking-wide text-[#475569]">
+                <tr className="bg-[#F4F2FD] text-left text-xs uppercase tracking-wide text-[#475569]">
                   <th className="px-5 py-3 font-bold">Công việc</th>
                   <th className="px-3 py-3 font-bold">Dự án</th>
                   <th className="px-3 py-3 font-bold">Người thực hiện</th>
@@ -164,14 +164,14 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
                   <th className="px-5 py-3 font-bold">Trạng thái</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F2EAD3]">
+              <tbody className="divide-y divide-[#E7E9F0]">
                 {visible.map((r) => {
                   const late = !!(r.due_date && r.due_date.slice(0, 10) < today && ["todo", "in_progress", "review"].includes(r.status));
                   return (
-                    <tr key={r.id} className="hover:bg-[#FFFBF0]">
+                    <tr key={r.id} className="hover:bg-[#F8F9FC]">
                       <td className="px-5 py-3.5">
-                        <Link href={taskHref(r)} className="font-bold text-[#161827] hover:text-[#8A6400]">{r.title}</Link>
-                        {r.task_code && <span className="ml-2 font-mono text-xs text-[#8A6400]">{r.task_code}</span>}
+                        <Link href={taskHref(r)} className="font-bold text-[#202333] hover:text-[#5B3FD6]">{r.title}</Link>
+                        {r.task_code && <span className="ml-2 font-mono text-xs text-[#5B3FD6]">{r.task_code}</span>}
                       </td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{r.project.projectCode}</td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{r.assignee?.full_name || "Chưa giao"}</td>
@@ -190,20 +190,20 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
           {COLUMNS.map((col) => {
             const items = visible.filter((r) => r.status === col);
             return (
-              <section key={col} className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-col gap-3">
-                <header className="flex items-center justify-between pb-2 border-b border-[#F2EAD3]">
-                  <span className="text-xs font-bold text-[#161827]">{STATUS[col].label}</span>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[#475569]">{items.length}</span>
+              <section key={col} className="p-4 rounded-2xl bg-white border border-[#E7E9F0] flex flex-col gap-3">
+                <header className="flex items-center justify-between pb-2 border-b border-[#E7E9F0]">
+                  <span className="text-xs font-bold text-[#202333]">{STATUS[col].label}</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#F4F2FD] text-[#475569]">{items.length}</span>
                 </header>
                 {items.length === 0 ? (
-                  <p className="flex-1 grid place-items-center text-xs text-[#64748B] border border-dashed border-[#E8DDB8] rounded-xl p-4">Trống</p>
+                  <p className="flex-1 grid place-items-center text-xs text-[#64748B] border border-dashed border-[#DDDFEA] rounded-xl p-4">Trống</p>
                 ) : (
                   <ul className="space-y-2.5">
                     {items.map((r) => (
                       <li key={r.id}>
-                        <Link href={taskHref(r)} className="block rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 hover:border-[#E7AE18]">
-                          <p className="text-xs font-mono text-[#8A6400]">{r.project.projectCode}{r.task_code ? ` · ${r.task_code}` : ""}</p>
-                          <p className="text-sm font-bold text-[#161827] mt-0.5">{r.title}</p>
+                        <Link href={taskHref(r)} className="block rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] p-3 hover:border-[#7257F5]">
+                          <p className="text-xs font-mono text-[#5B3FD6]">{r.project.projectCode}{r.task_code ? ` · ${r.task_code}` : ""}</p>
+                          <p className="text-sm font-bold text-[#202333] mt-0.5">{r.title}</p>
                           <p className="text-xs text-[#475569] mt-1.5 flex justify-between gap-2">
                             <span className="truncate">{r.assignee?.full_name || "Chưa giao"}</span>
                             <span>{r.due_date ? `Hạn ${shortDate(r.due_date.slice(0, 10))}` : ""}</span>
@@ -230,10 +230,10 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
                   <button
                     type="button"
                     onClick={() => { setPick(false); setCreateFor(p); }}
-                    className="w-full text-left px-4 py-3 rounded-xl border border-[#E8DDB8] hover:bg-[#FFF8E5] hover:border-[#E7AE18]"
+                    className="w-full text-left px-4 py-3 rounded-xl border border-[#DDDFEA] hover:bg-[#F2EEFF] hover:border-[#7257F5]"
                   >
-                    <span className="font-mono text-xs text-[#8A6400] mr-2">{p.projectCode}</span>
-                    <span className="text-sm font-bold text-[#161827]">{p.name}</span>
+                    <span className="font-mono text-xs text-[#5B3FD6] mr-2">{p.projectCode}</span>
+                    <span className="text-sm font-bold text-[#202333]">{p.name}</span>
                   </button>
                 </li>
               ))}

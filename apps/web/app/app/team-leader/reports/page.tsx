@@ -39,7 +39,7 @@ export default function TeamLeaderReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Hiệu suất Công việc
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Tỷ lệ hoàn thành công việc
           </h4>
           <p className="text-xs text-[#475569]">
@@ -51,7 +51,7 @@ export default function TeamLeaderReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Chấm công Đội ngũ
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Chuyên cần Thành viên
           </h4>
           <p className="text-xs text-[#475569]">

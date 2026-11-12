@@ -67,7 +67,7 @@ export function TaskViewTabs({
   return (
     <nav
       aria-label="Chế độ xem công việc"
-      className={`inline-flex items-center gap-1 p-1 bg-white border border-[#F2EAD3] rounded-xl shadow-2xs overflow-x-auto scrollbar-none max-w-full ${className}`}
+      className={`inline-flex items-center gap-1 p-1 bg-white border border-[#E7E9F0] rounded-xl shadow-2xs overflow-x-auto scrollbar-none max-w-full ${className}`}
     >
       {tabs.map((tab) => {
         const isActive = active === tab.key;
@@ -80,15 +80,15 @@ export function TaskViewTabs({
             aria-current={isActive ? "page" : undefined}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 min-h-11 sm:min-h-9 rounded-lg text-xs font-bold transition-all duration-150 select-none shrink-0 cursor-pointer ${
               isActive
-                ? "bg-[#E7AE18] text-[#161827] shadow-xs"
-                : "text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5]"
+                ? "bg-[#7257F5] text-white shadow-xs"
+                : "text-[#475569] hover:text-white hover:bg-[#F2EEFF]"
             }`}
           >
             <Icon
               className={`w-4 h-4 shrink-0 transition-colors ${
                 isActive
-                  ? "text-[#161827]"
-                  : "text-[#475569] group-hover:text-[#161827]"
+                  ? "text-[#202333]"
+                  : "text-[#475569] group-hover:text-[#202333]"
               }`}
             />
             <span>{tab.label}</span>

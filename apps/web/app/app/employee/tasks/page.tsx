@@ -22,9 +22,9 @@ import { formatDate } from "@/lib/format";
 type Row = ProjectTask & { projectName: string };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  todo: { label: "Cần làm", cls: "bg-[#FBF3DC] border-[#E8DDB8] text-[#475569]" },
-  in_progress: { label: "Đang làm", cls: "bg-[#EEF2FF] border-[#E0EAFF] text-[#3B5BDB]" },
-  review: { label: "Chờ nghiệm thu", cls: "bg-[#F3E8FF] border-[#E9D5FF] text-[#6D28D9]" },
+  todo: { label: "Cần làm", cls: "bg-[#F4F2FD] border-[#DDDFEA] text-[#475569]" },
+  in_progress: { label: "Đang làm", cls: "bg-[#F2EEFF] border-[#E7E0FF] text-[#6044E8]" },
+  review: { label: "Chờ nghiệm thu", cls: "bg-[#F2EEFF] border-[#E9D5FF] text-[#6D28D9]" },
   done: { label: "Hoàn thành", cls: "bg-[#E6FBF5] border-[#A7F3D0] text-[#047857]" },
   cancelled: { label: "Đã hủy", cls: "bg-[#FEE2E2] border-[#FECACA] text-[#B91C1C]" },
 };
@@ -192,8 +192,8 @@ export default function EmployeeTasksPage() {
             onClick={() => setFilter(f.key)}
             className={`shrink-0 min-h-11 sm:min-h-9 px-3.5 rounded-xl text-xs font-bold border transition-colors ${
               filter === f.key
-                ? "bg-[#161827] border-[#161827] text-white"
-                : "bg-white border-[#F2EAD3] text-[#475569] hover:bg-[#FFF8E5]"
+                ? "bg-[#202333] border-[#202333] text-white"
+                : "bg-white border-[#E7E9F0] text-[#475569] hover:bg-[#F2EEFF]"
             }`}
           >
             {f.label} <span className="opacity-70">({count(f.key)})</span>
@@ -206,7 +206,7 @@ export default function EmployeeTasksPage() {
           <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Đang tải công việc…
         </p>
       ) : visible.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#F2EAD3] p-6">
+        <div className="bg-white rounded-2xl border border-[#E7E9F0] p-6">
           <EmptyState
             icon={<ListTodo className="w-8 h-8" />}
             title="Không có công việc nào"
@@ -225,14 +225,14 @@ export default function EmployeeTasksPage() {
             const next = !approval ? NEXT[t.status] : undefined;
             const late = !!(t.due_date && t.due_date.slice(0, 10) < new Date().toISOString().slice(0, 10) && t.status !== "done");
             return (
-              <li key={t.id} className="bg-white rounded-2xl border border-[#F2EAD3] p-5 flex flex-col gap-3">
+              <li key={t.id} className="bg-white rounded-2xl border border-[#E7E9F0] p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-xs font-bold text-[#8A6400] truncate">{t.projectName}</span>
+                  <span className="text-xs font-bold text-[#5B3FD6] truncate">{t.projectName}</span>
                   <span className={`px-2.5 py-0.5 rounded-full border text-xs font-bold ${approval ? approval.cls : st.cls}`}>
                     {approval ? approval.label : st.label}
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-[#161827] leading-snug">{t.title}</h3>
+                <h3 className="text-sm font-bold text-[#202333] leading-snug">{t.title}</h3>
                 {t.description && <p className="text-xs text-[#475569] line-clamp-2">{t.description}</p>}
                 {t.approval_status === "rejected" && t.approval_note && (
                   <p className="text-xs text-[#B91C1C]">Lý do: {t.approval_note}</p>
@@ -240,10 +240,10 @@ export default function EmployeeTasksPage() {
                 <p className={`text-xs ${late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}`}>
                   Hạn: {formatDate(t.due_date)}
                 </p>
-                <div className="mt-auto pt-3 border-t border-[#F2EAD3] flex items-center justify-between gap-2">
+                <div className="mt-auto pt-3 border-t border-[#E7E9F0] flex items-center justify-between gap-2">
                   <Link
                     href={`/app/projects/${t.project_id}/tasks/${t.id}`}
-                    className="inline-flex items-center gap-1 min-h-11 sm:min-h-0 text-xs font-bold text-[#3B5BDB] hover:underline"
+                    className="inline-flex items-center gap-1 min-h-11 sm:min-h-0 text-xs font-bold text-[#6044E8] hover:underline"
                   >
                     Chi tiết <ArrowRight className="w-3 h-3" />
                   </Link>
@@ -272,7 +272,7 @@ export default function EmployeeTasksPage() {
       >
         <form onSubmit={submitPropose} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="propose-project" className="text-xs font-bold text-[#161827]">Dự án *</label>
+            <label htmlFor="propose-project" className="text-xs font-bold text-[#202333]">Dự án *</label>
             <Select
               id="propose-project"
               value={form.projectId}
@@ -293,19 +293,19 @@ export default function EmployeeTasksPage() {
             placeholder="Ví dụ: Viết bài chuẩn SEO cho trang dịch vụ"
           />
           <div className="space-y-1.5">
-            <label htmlFor="propose-desc" className="text-xs font-bold text-[#161827]">Mô tả</label>
+            <label htmlFor="propose-desc" className="text-xs font-bold text-[#202333]">Mô tả</label>
             <textarea
               id="propose-desc"
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Nội dung, lý do đề xuất, đường dẫn tài liệu…"
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] px-4 py-3 text-sm text-[#161827] placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#3B5BDB]"
+              className="w-full rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] px-4 py-3 text-sm text-[#202333] placeholder:text-[#64748B] outline-none focus:bg-white focus:border-[#6044E8]"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label htmlFor="propose-priority" className="text-xs font-bold text-[#161827]">Ưu tiên</label>
+              <label htmlFor="propose-priority" className="text-xs font-bold text-[#202333]">Ưu tiên</label>
               <Select
                 id="propose-priority"
                 value={form.priority}

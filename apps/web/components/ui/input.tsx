@@ -44,7 +44,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             id={inputId}
             ref={ref}
-            className={`w-full rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all duration-150 focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 disabled:bg-[#FBF3DC] disabled:text-[#64748B] disabled:cursor-not-allowed ${
+            className={`w-full rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] text-[#202333] text-sm placeholder-[#94A3B8] outline-none transition-all duration-150 focus:bg-white focus:border-[#6044E8] focus:ring-2 focus:ring-[#6044E8]/20 disabled:bg-[#F4F2FD] disabled:text-[#64748B] disabled:cursor-not-allowed ${
               leftIcon ? "pl-10" : "pl-4"
             } ${rightIcon ? "pr-10" : "pr-4"} py-2.5 sm:py-3 min-h-11 ${
               error

@@ -118,13 +118,13 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     roleTitle.split("(")[0].trim();
 
   return (
-    <header className="h-[78px] border-b border-[#F2EAD3] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <header className="h-[78px] border-b border-[#E7E9F0] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
       {/* Left side: Hamburger (mobile/tablet) */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
           onClick={onOpenMobileSidebar}
-          className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFFBF0] transition-colors cursor-pointer"
+          className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#202333] hover:bg-[#F8F9FC] transition-colors cursor-pointer"
           aria-label="Mở menu điều hướng"
         >
           <Menu className="w-5 h-5" />
@@ -133,7 +133,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
       {/* Center: Current Dashboard / Page Name */}
       <div className="flex items-center justify-center">
-        <span className="font-bold text-sm text-[#161827] tracking-tight">
+        <span className="font-bold text-sm text-[#202333] tracking-tight">
           {getCenterTitle()}
         </span>
       </div>
@@ -143,7 +143,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         {/* Quick Chat Link */}
         <Link
           href="/app/chat"
-          className="relative min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-all cursor-pointer"
+          className="relative min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-[#475569] hover:text-[#202333] hover:bg-[#F2EEFF] transition-all cursor-pointer"
           title="Tin nhắn nội bộ"
           aria-label="Tin nhắn nội bộ"
         >
@@ -158,13 +158,13 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 p-1 min-h-11 rounded-full hover:bg-[#FFFBF0] border border-transparent hover:border-[#F2EAD3] transition-all cursor-pointer select-none"
+            className="flex items-center gap-2.5 p-1 min-h-11 rounded-full hover:bg-[#F8F9FC] border border-transparent hover:border-[#E7E9F0] transition-all cursor-pointer select-none"
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
           >
             <Avatar src={user?.avatarUrl} name={displayName} size="sm" />
             <div className="hidden xl:flex flex-col text-left">
-              <span className="text-xs font-bold text-[#161827] tracking-tight truncate max-w-[130px]">
+              <span className="text-xs font-bold text-[#202333] tracking-tight truncate max-w-[130px]">
                 {displayName}
               </span>
               <span className="text-xs text-[#475569] font-medium truncate max-w-[130px]">
@@ -178,9 +178,9 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#F2EAD3] p-2 text-[#161827] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="p-3 border-b border-[#F2EAD3]">
-                <p className="text-xs font-bold text-[#161827] tracking-tight truncate">
+            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#E7E9F0] p-2 text-[#202333] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="p-3 border-b border-[#E7E9F0]">
+                <p className="text-xs font-bold text-[#202333] tracking-tight truncate">
                   {displayName}
                 </p>
                 <div className="mt-1.5 flex items-center gap-1.5">
@@ -196,7 +196,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <Link
                   href="/app/profile"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#202333] hover:bg-[#F2EEFF] transition-colors"
                 >
                   <User className="w-4 h-4 text-[#475569]" />
                   <span>Hồ sơ cá nhân</span>
@@ -206,9 +206,9 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                   <Link
                     href="/app/admin"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#202333] hover:bg-[#F2EEFF] transition-colors"
                   >
-                    <Shield className="w-4 h-4 text-[#E7AE18]" />
+                    <Shield className="w-4 h-4 text-[#7257F5]" />
                     <span>Bảng điều khiển Admin</span>
                   </Link>
                 )}
@@ -216,14 +216,14 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
                 <Link
                   href="/auth/update-password"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#161827] hover:bg-[#FFF8E5] transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#202333] hover:bg-[#F2EEFF] transition-colors"
                 >
                   <ExternalLink className="w-4 h-4 text-[#475569]" />
                   <span>Đổi mật khẩu</span>
                 </Link>
               </div>
 
-              <div className="pt-1 border-t border-[#F2EAD3]">
+              <div className="pt-1 border-t border-[#E7E9F0]">
                 <button
                   type="button"
                   onClick={handleLogout}

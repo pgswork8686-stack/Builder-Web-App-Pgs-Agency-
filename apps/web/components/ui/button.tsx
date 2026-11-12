@@ -32,7 +32,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      "inline-flex whitespace-nowrap items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7AE18] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
+      "inline-flex whitespace-nowrap items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7257F5] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
 
     const sizeStyles = {
       sm: "h-11 sm:h-9 px-3 text-xs gap-1.5",
@@ -43,16 +43,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-[#E7AE18] text-[#161827] hover:bg-[#CC9410] shadow-xs active:scale-[0.98]",
+        "bg-[#7257F5] text-white hover:bg-[#6044E8] shadow-xs active:scale-[0.98]",
       secondary:
-        "bg-white text-[#161827] hover:bg-[#FFFBF0] border border-[#E8DDB8] active:scale-[0.98]",
+        "bg-white text-[#202333] hover:bg-[#F8F9FC] border border-[#DDDFEA] active:scale-[0.98]",
       outline:
-        "bg-white text-[#161827] border border-[#E8DDB8] hover:bg-[#FFF8E5] hover:border-[#E7AE18] active:scale-[0.98]",
-      gold: "bg-[#E7AE18] text-[#161827] hover:bg-[#CC9410] shadow-xs active:scale-[0.98]",
+        "bg-white text-[#202333] border border-[#DDDFEA] hover:bg-[#F2EEFF] hover:border-[#7257F5] active:scale-[0.98]",
+      gold: "bg-[#7257F5] text-white hover:bg-[#6044E8] shadow-xs active:scale-[0.98]",
       "gold-outline":
-        "bg-[#FFF8E5] text-[#8A6400] border border-[#FDE68A] hover:bg-[#FEF08A] active:scale-[0.98]",
+        "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF] hover:bg-[#FEF08A] active:scale-[0.98]",
       ghost:
-        "bg-transparent text-[#475569] hover:text-[#161827] hover:bg-[#FBF3DC] active:scale-[0.98]",
+        "bg-transparent text-[#475569] hover:text-[#202333] hover:bg-[#F4F2FD] active:scale-[0.98]",
       danger:
         "bg-[#FF785A] text-white hover:brightness-110 shadow-xs active:scale-[0.98]",
     };

@@ -144,10 +144,10 @@ export default function ClientSupportPage() {
             <Card className="p-6 space-y-4 border border-[#EAEFF4] dark:border-[#334155]">
               <div className="flex items-center justify-between pb-3 border-b border-[#EAEFF4] dark:border-[#334155]">
                 <div>
-                  <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                  <span className="font-mono text-xs font-bold text-[#6044E8]">
                     {selectedTicket.ticket_code || "YC"}
                   </span>
-                  <h3 className="text-base font-bold text-[#2A3547] dark:text-white mt-0.5">
+                  <h3 className="text-base font-bold text-[#2E3248] dark:text-white mt-0.5">
                     {selectedTicket.title}
                   </h3>
                 </div>
@@ -172,7 +172,7 @@ export default function ClientSupportPage() {
                 </div>
               </div>
 
-              <div className="p-3.5 bg-[#FFFBF0] dark:bg-[#161827] rounded-xl text-xs text-[#2A3547] dark:text-white leading-relaxed">
+              <div className="p-3.5 bg-[#F8F9FC] dark:bg-[#202333] rounded-xl text-xs text-[#2E3248] dark:text-white leading-relaxed">
                 {selectedTicket.description}
               </div>
 
@@ -183,8 +183,8 @@ export default function ClientSupportPage() {
                     key={msg.id}
                     className={`p-3 rounded-xl text-xs ${
                       msg.sender?.role === "client"
-                        ? "bg-[#ECF2FF] text-[#2A3547] ml-6 border border-[#3B5BDB]/20"
-                        : "bg-white dark:bg-[#1E293B] text-[#2A3547] dark:text-white mr-6 border border-[#EAEFF4] dark:border-[#334155]"
+                        ? "bg-[#ECF2FF] text-[#2E3248] ml-6 border border-[#6044E8]/20"
+                        : "bg-white dark:bg-[#1E293B] text-[#2E3248] dark:text-white mr-6 border border-[#EAEFF4] dark:border-[#334155]"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1 font-semibold text-xs">
@@ -210,7 +210,7 @@ export default function ClientSupportPage() {
                   placeholder="Nhập nội dung phản hồi..."
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
-                  className="flex-1 px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                  className="flex-1 px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                 />
                 <Button
                   type="submit"
@@ -225,7 +225,7 @@ export default function ClientSupportPage() {
             </Card>
           ) : (
             <Card className="p-6 space-y-4 border border-[#EAEFF4] dark:border-[#334155]">
-              <h4 className="text-sm font-bold text-[#2A3547] dark:text-white">
+              <h4 className="text-sm font-bold text-[#2E3248] dark:text-white">
                 Gửi yêu cầu hỗ trợ mới
               </h4>
 
@@ -240,7 +240,7 @@ export default function ClientSupportPage() {
                     placeholder="VD: Cần chỉnh sửa thiết kế banner trang chủ..."
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                   />
                 </div>
 
@@ -252,7 +252,7 @@ export default function ClientSupportPage() {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                     >
                       {Object.entries(CATEGORY_MAP).map(([k, v]) => (
                         <option key={k} value={k}>
@@ -268,7 +268,7 @@ export default function ClientSupportPage() {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                     >
                       <option value="low">Thấp</option>
                       <option value="medium">Bình thường</option>
@@ -288,7 +288,7 @@ export default function ClientSupportPage() {
                     placeholder="Mô tả cụ thể nội dung cần hỗ trợ hoặc đính kèm link..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                   />
                 </div>
 
@@ -337,12 +337,12 @@ export default function ClientSupportPage() {
                     onClick={() => handleSelectTicket(t.id)}
                     className={`p-3 rounded-xl border transition-all cursor-pointer ${
                       selectedTicket?.id === t.id
-                        ? "border-[#3B5BDB] bg-[#ECF2FF]/40"
-                        : "border-[#EAEFF4] dark:border-[#334155] hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
+                        ? "border-[#6044E8] bg-[#ECF2FF]/40"
+                        : "border-[#EAEFF4] dark:border-[#334155] hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                      <span className="font-mono text-xs font-bold text-[#6044E8]">
                         {t.ticket_code || "YC"}
                       </span>
                       <Badge
@@ -354,7 +354,7 @@ export default function ClientSupportPage() {
                         {STATUS_MAP[t.status]?.label || t.status}
                       </Badge>
                     </div>
-                    <p className="text-xs font-semibold text-[#2A3547] dark:text-white truncate">
+                    <p className="text-xs font-semibold text-[#2E3248] dark:text-white truncate">
                       {t.title}
                     </p>
                     <p className="text-xs text-[#475569] mt-1">
@@ -367,23 +367,23 @@ export default function ClientSupportPage() {
           </Card>
 
           {/* Contact Box */}
-          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#FFFBF0] dark:bg-[#161827]">
+          <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#F8F9FC] dark:bg-[#202333]">
             <h4 className="text-xs font-bold text-[#475569] uppercase tracking-wider">
               Kênh liên hệ khẩn cấp
             </h4>
-            <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">
-              <Phone className="w-4 h-4 text-[#3B5BDB]" />
+            <div className="flex items-center gap-3 text-xs text-[#2E3248] dark:text-white">
+              <Phone className="w-4 h-4 text-[#6044E8]" />
               <span>
                 Hotline CSKH: <strong>1900 8686</strong>
               </span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">
+            <div className="flex items-center gap-3 text-xs text-[#2E3248] dark:text-white">
               <Mail className="w-4 h-4 text-[#13DEB9]" />
               <span>
                 Email: <strong>contact@pgsagency.vn</strong>
               </span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-[#2A3547] dark:text-white">
+            <div className="flex items-center gap-3 text-xs text-[#2E3248] dark:text-white">
               <Clock className="w-4 h-4 text-[#FFAE1F]" />
               <span>Giờ làm việc: 08:30 - 17:30 (Thứ 2 - Thứ 6)</span>
             </div>

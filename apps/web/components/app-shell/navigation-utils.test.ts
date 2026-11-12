@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { isNavItemActive } from "./navigation-utils";
-import { getNavigationForRole, type NavItem } from "./role-navigation";
+import { getNavigationForRole, getActiveModuleTabs, getActiveTabHref, ROLE_LABELS, type NavItem } from "./role-navigation";
 import { ListTodo, Calendar, LayoutDashboard } from "lucide-react";
 
 describe("Navigation Utils - isNavItemActive", () => {
@@ -71,66 +71,55 @@ describe("Navigation Utils - isNavItemActive", () => {
   });
 });
 
-describe("Role Navigation Structure & Indexing", () => {
-  it("Admin navigation has continuous numbering and unified task module", () => {
-    const groups = getNavigationForRole("admin");
-    const allItems = groups.flatMap((g) => g.items);
+describe("Điều hướng V2 — sidebar là module, tab là view", () => {
+  const roles = ["admin", "team_leader", "employee", "accountant", "client"] as const;
 
-    // Verify task item
-    const taskItem = allItems.find((i) => i.title === "Công việc");
-    expect(taskItem).toBeDefined();
-    expect(taskItem?.href).toBe("/app/admin/tasks");
-    expect(taskItem?.activePaths).toEqual([
-      "/app/admin/tasks",
-      "/app/admin/kanban",
-      "/app/admin/calendar",
-    ]);
-
-    // Verify no separate Kanban or Calendar items in Admin sidebar
-    const kanbanItem = allItems.find(
-      (i) => i.title === "Kanban" && i.href === "/app/admin/kanban",
-    );
-    expect(kanbanItem).toBeUndefined();
-    const calendarItem = allItems.find(
-      (i) => i.title === "Lịch" && i.href === "/app/admin/calendar",
-    );
-    expect(calendarItem).toBeUndefined();
-
-    // Verify numbering is continuous 01 to 19
-    const indexes = allItems.map((i) => i.index);
-    expect(indexes).toHaveLength(19);
-    for (let i = 1; i <= 19; i++) {
-      const expected = i.toString().padStart(2, "0");
-      expect(indexes[i - 1]).toBe(expected);
+  it("mỗi vai trò có tối đa 9 mục sidebar và không đánh số", () => {
+    for (const r of roles) {
+      const items = getNavigationForRole(r).flatMap((g) => g.items);
+      expect(items.length).toBeGreaterThan(0);
+      expect(items.length).toBeLessThanOrEqual(9);
+      expect(items.every((i) => !i.index)).toBe(true);
     }
   });
 
-  it("Team Leader navigation has continuous numbering and unified task module", () => {
-    const groups = getNavigationForRole("team_leader");
-    const allItems = groups.flatMap((g) => g.items);
-
-    const taskItem = allItems.find((i) => i.title === "Công việc");
-    expect(taskItem).toBeDefined();
-    expect(taskItem?.activePaths).toEqual([
+  it("Kanban và Lịch là tab của Công việc, không phải mục sidebar riêng", () => {
+    const items = getNavigationForRole("team_leader").flatMap((g) => g.items);
+    expect(items.some((i) => i.title === "Kanban" || i.title === "Lịch")).toBe(false);
+    const work = items.find((i) => i.title === "Công việc")!;
+    expect(work.tabs?.map((t) => t.href)).toEqual([
       "/app/team-leader/tasks",
       "/app/team-leader/kanban",
       "/app/team-leader/calendar",
     ]);
+    expect(isNavItemActive("/app/team-leader/kanban", work)).toBe(true);
+  });
 
-    const indexes = allItems.map((i) => i.index);
-    expect(indexes).toHaveLength(13);
-    for (let i = 1; i <= 13; i++) {
-      const expected = i.toString().padStart(2, "0");
-      expect(indexes[i - 1]).toBe(expected);
+  it("tab module được tìm đúng theo đường dẫn, khớp dài nhất", () => {
+    const m = getActiveModuleTabs("team_leader", "/app/team-leader/projects/completed");
+    expect(m?.module).toBe("Dự án");
+    expect(getActiveTabHref(m!.tabs, "/app/team-leader/projects/completed")).toBe("/app/team-leader/projects/completed");
+    expect(getActiveTabHref(m!.tabs, "/app/team-leader/projects")).toBe("/app/team-leader/projects");
+    // trang chi tiết dự án: không chọn tab nào
+    expect(getActiveTabHref(m!.tabs, "/app/team-leader/projects/abc")).toBeNull();
+  });
+
+  it("Quản trị viên và Khách hàng không có mục chấm công cá nhân", () => {
+    for (const r of ["admin", "client"] as const) {
+      const hrefs = getNavigationForRole(r).flatMap((g) => g.items.flatMap((i) => [i.href, ...(i.tabs || []).map((t) => t.href)]));
+      expect(hrefs).not.toContain("/app/attendance");
     }
   });
 
-  it("Employee navigation preserves independent 'Lịch' schedule menu", () => {
-    const groups = getNavigationForRole("employee");
-    const allItems = groups.flatMap((g) => g.items);
+  it("Trưởng phòng, Nhân viên, Kế toán có chấm công và nghỉ phép cá nhân", () => {
+    for (const r of ["team_leader", "employee", "accountant"] as const) {
+      const hrefs = getNavigationForRole(r).flatMap((g) => g.items.flatMap((i) => [i.href, ...(i.tabs || []).map((t) => t.href)]));
+      expect(hrefs).toContain("/app/attendance");
+      expect(hrefs).toContain("/app/leave");
+    }
+  });
 
-    const calendarItem = allItems.find((i) => i.title === "Lịch");
-    expect(calendarItem).toBeDefined();
-    expect(calendarItem?.href).toBe("/app/employee/calendar");
+  it("nhãn vai trò là Trưởng phòng", () => {
+    expect(ROLE_LABELS.team_leader).toBe("Trưởng phòng");
   });
 });

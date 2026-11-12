@@ -299,8 +299,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "runs"
-              ? "border-[#3B5BDB] text-[#3B5BDB]"
-              : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#6044E8] text-[#6044E8]"
+              : "border-transparent text-[#475569] hover:text-[#2E3248] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("runs")}
         >
@@ -310,8 +310,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "compensations"
-              ? "border-[#3B5BDB] text-[#3B5BDB]"
-              : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#6044E8] text-[#6044E8]"
+              : "border-transparent text-[#475569] hover:text-[#2E3248] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("compensations")}
         >
@@ -321,8 +321,8 @@ export default function AccountantPayrollPage() {
         <button
           className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "reviews"
-              ? "border-[#3B5BDB] text-[#3B5BDB]"
-              : "border-transparent text-[#475569] hover:text-[#2A3547] dark:hover:text-white"
+              ? "border-[#6044E8] text-[#6044E8]"
+              : "border-transparent text-[#475569] hover:text-[#2E3248] dark:hover:text-white"
           }`}
           onClick={() => setActiveTab("reviews")}
         >
@@ -335,7 +335,7 @@ export default function AccountantPayrollPage() {
       {activeTab === "runs" && (
         <Card className="overflow-hidden border border-[#EAEFF4] dark:border-[#334155]">
           <div className="p-4 border-b border-[#EAEFF4] dark:border-[#334155] flex items-center justify-between">
-            <h3 className="font-semibold text-[#2A3547] dark:text-white">
+            <h3 className="font-semibold text-[#2E3248] dark:text-white">
               Danh sách đợt chi trả lương
             </h3>
             <Button
@@ -364,7 +364,7 @@ export default function AccountantPayrollPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã đợt lương</th>
                     <th className="px-4 py-3">Kỳ lương</th>
@@ -381,16 +381,16 @@ export default function AccountantPayrollPage() {
                   {runs.map((r) => (
                     <tr
                       key={r.id}
-                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
+                      className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50 transition-colors"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#6044E8]">
                         {r.run_code || "BL"}
                       </td>
-                      <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
+                      <td className="px-4 py-3 font-medium text-[#2E3248] dark:text-white">
                         {r.period_month}
                       </td>
                       <td className="px-4 py-3 text-[#475569]">{r.title}</td>
-                      <td className="px-4 py-3 text-center font-semibold text-[#2A3547] dark:text-white">
+                      <td className="px-4 py-3 text-center font-semibold text-[#2E3248] dark:text-white">
                         {r.total_employees_count}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-[#13DEB9]">
@@ -451,7 +451,7 @@ export default function AccountantPayrollPage() {
         <Card className="overflow-hidden border border-[#EAEFF4] dark:border-[#334155]">
           <div className="p-4 border-b border-[#EAEFF4] dark:border-[#334155] flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-[#2A3547] dark:text-white">
+              <h3 className="font-semibold text-[#2E3248] dark:text-white">
                 Cấu hình & Lịch sử mức lương nhân sự
               </h3>
               <p className="text-xs text-[#475569] mt-0.5">
@@ -477,7 +477,7 @@ export default function AccountantPayrollPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
                   <tr>
                     <th className="px-4 py-3">Mã NV</th>
                     <th className="px-4 py-3">Họ tên & Vị trí</th>
@@ -493,13 +493,13 @@ export default function AccountantPayrollPage() {
                   {compensations.map((emp) => (
                     <tr
                       key={emp.userId}
-                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#6044E8]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-[#2A3547] dark:text-white">
+                        <div className="font-medium text-[#2E3248] dark:text-white">
                           {emp.fullName || "Nhân sự"}
                         </div>
                         <div className="text-xs text-[#475569]">
@@ -521,7 +521,7 @@ export default function AccountantPayrollPage() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-[#2A3547] dark:text-white">
+                      <td className="px-4 py-3 text-right font-medium text-[#2E3248] dark:text-white">
                         {emp.baseSalary
                           ? `${new Intl.NumberFormat("vi-VN").format(emp.baseSalary)} đ`
                           : "—"}
@@ -536,7 +536,7 @@ export default function AccountantPayrollPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
-                          className="inline-flex items-center gap-1 text-xs text-[#3B5BDB] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-[#6044E8] hover:underline"
                           onClick={() => openHistoryModal(emp)}
                         >
                           <History className="w-3.5 h-3.5" />
@@ -566,7 +566,7 @@ export default function AccountantPayrollPage() {
         <Card className="overflow-hidden border border-[#EAEFF4] dark:border-[#334155]">
           <div className="p-4 border-b border-[#EAEFF4] dark:border-[#334155] flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-[#2A3547] dark:text-white">
+              <h3 className="font-semibold text-[#2E3248] dark:text-white">
                 Đánh giá kỷ luật & Thưởng chuyên cần tháng {selectedMonth}
               </h3>
               <p className="text-xs text-[#475569] mt-0.5">
@@ -595,7 +595,7 @@ export default function AccountantPayrollPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã NV</th>
                   <th className="px-4 py-3">Nhân sự</th>
@@ -621,12 +621,12 @@ export default function AccountantPayrollPage() {
                   return (
                     <tr
                       key={emp.userId}
-                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
+                      <td className="px-4 py-3 font-mono font-medium text-[#6044E8]">
                         {emp.employeeCode || emp.accountCode || "NV"}
                       </td>
-                      <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
+                      <td className="px-4 py-3 font-medium text-[#2E3248] dark:text-white">
                         {emp.fullName}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -700,7 +700,7 @@ export default function AccountantPayrollPage() {
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-5xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-[#EAEFF4] dark:border-[#334155]">
               <div>
-                <h3 className="text-lg font-bold text-[#2A3547] dark:text-white">
+                <h3 className="text-lg font-bold text-[#2E3248] dark:text-white">
                   Chi tiết đợt lương: {selectedRun.title} (
                   {selectedRun.run_code || "BL"})
                 </h3>
@@ -719,7 +719,7 @@ export default function AccountantPayrollPage() {
 
             <div className="overflow-y-auto my-4 flex-1">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#475569] uppercase">
+                <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#475569] uppercase">
                   <tr>
                     <th className="px-3 py-2">Mã phiếu</th>
                     <th className="px-3 py-2">Nhân viên</th>
@@ -739,12 +739,12 @@ export default function AccountantPayrollPage() {
                   {selectedRun.payslips?.map((ps) => (
                     <tr
                       key={ps.id}
-                      className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50"
+                      className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50"
                     >
-                      <td className="px-3 py-2.5 font-mono text-[#3B5BDB]">
+                      <td className="px-3 py-2.5 font-mono text-[#6044E8]">
                         {ps.payslip_code || "PL"}
                       </td>
-                      <td className="px-3 py-2.5 font-medium text-[#2A3547] dark:text-white">
+                      <td className="px-3 py-2.5 font-medium text-[#2E3248] dark:text-white">
                         {ps.user?.full_name || "Nhân sự"}
                       </td>
                       <td className="px-3 py-2.5 text-center">
@@ -799,7 +799,7 @@ export default function AccountantPayrollPage() {
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-[#EAEFF4] dark:border-[#334155]">
-              <div className="text-sm font-semibold text-[#2A3547] dark:text-white">
+              <div className="text-sm font-semibold text-[#2E3248] dark:text-white">
                 Tổng thực chi:{" "}
                 <span className="text-[#13DEB9]">
                   {new Intl.NumberFormat("vi-VN").format(
@@ -826,7 +826,7 @@ export default function AccountantPayrollPage() {
       {revisionModalUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
-            <h3 className="text-base font-bold text-[#2A3547] dark:text-white">
+            <h3 className="text-base font-bold text-[#2E3248] dark:text-white">
               Cập nhật mức lương: {revisionModalUser.fullName}
             </h3>
             <div className="space-y-3 text-sm">
@@ -836,7 +836,7 @@ export default function AccountantPayrollPage() {
                 </label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2E3248] dark:text-white"
                   placeholder="Ví dụ: 15000000"
                   value={revBaseSalary}
                   onChange={(e) => setRevBaseSalary(e.target.value)}
@@ -849,7 +849,7 @@ export default function AccountantPayrollPage() {
                 </label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2E3248] dark:text-white"
                   placeholder="Ví dụ: 1000000"
                   value={revAllowances}
                   onChange={(e) => setRevAllowances(e.target.value)}
@@ -862,7 +862,7 @@ export default function AccountantPayrollPage() {
                 </label>
                 <input
                   type="date"
-                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2E3248] dark:text-white"
                   value={revEffectiveFrom}
                   onChange={(e) => setRevEffectiveFrom(e.target.value)}
                 />
@@ -888,7 +888,7 @@ export default function AccountantPayrollPage() {
                   Ghi chú điều chỉnh
                 </label>
                 <textarea
-                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2A3547] dark:text-white text-xs"
+                  className="w-full px-3 py-2 border border-[#EAEFF4] dark:border-[#334155] rounded-lg bg-transparent text-[#2E3248] dark:text-white text-xs"
                   rows={2}
                   placeholder="Lý do điều chỉnh lương..."
                   value={revNotes}
@@ -922,7 +922,7 @@ export default function AccountantPayrollPage() {
       {historyUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
-            <h3 className="text-base font-bold text-[#2A3547] dark:text-white">
+            <h3 className="text-base font-bold text-[#2E3248] dark:text-white">
               Lịch sử điều chỉnh lương: {historyUser.fullName}
             </h3>
 
@@ -938,7 +938,7 @@ export default function AccountantPayrollPage() {
             ) : (
               <div className="overflow-y-auto max-h-72">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#475569] uppercase">
+                  <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] font-semibold text-[#475569] uppercase">
                     <tr>
                       <th className="px-3 py-2">Hiệu lực từ</th>
                       <th className="px-3 py-2 text-right">Lương cơ bản</th>
@@ -950,10 +950,10 @@ export default function AccountantPayrollPage() {
                   <tbody className="divide-y divide-[#EAEFF4] dark:divide-[#334155]">
                     {historyList.map((h) => (
                       <tr key={h.id}>
-                        <td className="px-3 py-2 font-mono font-medium text-[#3B5BDB]">
+                        <td className="px-3 py-2 font-mono font-medium text-[#6044E8]">
                           {h.effectiveFrom}
                         </td>
-                        <td className="px-3 py-2 text-right font-medium text-[#2A3547] dark:text-white">
+                        <td className="px-3 py-2 text-right font-medium text-[#2E3248] dark:text-white">
                           {new Intl.NumberFormat("vi-VN").format(
                             Number(h.baseSalary),
                           )}{" "}

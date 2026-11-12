@@ -40,7 +40,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Dự án
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Tiến độ & Hiệu suất
           </h4>
           <p className="text-xs text-[#475569]">
@@ -52,7 +52,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Tài chính
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Dòng tiền & Công nợ
           </h4>
           <p className="text-xs text-[#475569]">
@@ -64,7 +64,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Nhân sự
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Chấm công & Phép
           </h4>
           <p className="text-xs text-[#475569]">
@@ -74,17 +74,17 @@ export default function AdminReportsPage() {
       </div>
 
       <Card className="p-6 space-y-4">
-        <h4 className="text-sm font-bold text-[#24304A]">
+        <h4 className="text-sm font-bold text-[#2E3248]">
           Bộ lọc khoảng thời gian
         </h4>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#EEF2FF] text-[#3B5BDB] border border-[#3B5BDB]/20">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#F2EEFF] text-[#6044E8] border border-[#6044E8]/20">
             Tháng hiện tại
           </span>
-          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#475569] border border-[#F2EAD3] opacity-60 cursor-not-allowed">
+          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#475569] border border-[#E7E9F0] opacity-60 cursor-not-allowed">
             Quý này
           </span>
-          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#475569] border border-[#F2EAD3] opacity-60 cursor-not-allowed">
+          <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-white text-[#475569] border border-[#E7E9F0] opacity-60 cursor-not-allowed">
             Năm nay
           </span>
         </div>

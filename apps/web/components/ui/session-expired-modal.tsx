@@ -30,7 +30,7 @@ export function SessionExpiredModal({
         </div>
 
         <div className="space-y-1.5">
-          <h3 className="text-lg font-bold text-[#161827] tracking-tight">
+          <h3 className="text-lg font-bold text-[#202333] tracking-tight">
             Phiên đăng nhập hết hạn
           </h3>
           <p className="text-xs text-[#475569] leading-relaxed max-w-xs mx-auto">
@@ -39,7 +39,7 @@ export function SessionExpiredModal({
           </p>
         </div>
 
-        <div className="w-full pt-3 border-t border-[#F2EAD3]">
+        <div className="w-full pt-3 border-t border-[#E7E9F0]">
           <Button
             type="button"
             variant="primary"

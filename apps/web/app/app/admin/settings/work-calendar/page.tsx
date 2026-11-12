@@ -264,12 +264,12 @@ export default function AdminWorkCalendarPage() {
         <form onSubmit={handleSaveSettings} className="space-y-6">
           {/* Card 1: Quy tắc chung */}
           <Card className="p-6 space-y-5">
-            <div className="flex items-center gap-3 border-b border-[#F2EAD3] pb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center font-bold">
+            <div className="flex items-center gap-3 border-b border-[#E7E9F0] pb-4">
+              <div className="w-8 h-8 rounded-lg bg-[#F2EEFF] text-[#6044E8] flex items-center justify-center font-bold">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#161827]">
+                <h3 className="text-sm font-bold text-[#202333]">
                   Quy Tắc Tuần & Thứ 7 Cách Tuần
                 </h3>
                 <p className="text-xs text-[#475569]">
@@ -288,7 +288,7 @@ export default function AdminWorkCalendarPage() {
                   type="text"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
                 />
               </div>
 
@@ -306,8 +306,8 @@ export default function AdminWorkCalendarPage() {
                         onClick={() => toggleDayOfWeek(day)}
                         className={`w-9 h-8 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
                           isSelected
-                            ? "bg-[#3B5BDB] text-white border-[#3B5BDB]"
-                            : "bg-[#FFFBF0] text-[#475569] border-[#F2EAD3] hover:border-[#CBD5E1]"
+                            ? "bg-[#6044E8] text-white border-[#6044E8]"
+                            : "bg-[#F8F9FC] text-[#475569] border-[#E7E9F0] hover:border-[#CBD5E1]"
                         }`}
                       >
                         {label}
@@ -319,10 +319,10 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Thứ 7 cách tuần */}
-            <div className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4 space-y-3">
+            <div className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-[#161827]">
+                  <h4 className="text-xs font-bold text-[#202333]">
                     Áp dụng thứ 7 cách tuần
                   </h4>
                   <p className="text-xs text-[#475569]">
@@ -338,12 +338,12 @@ export default function AdminWorkCalendarPage() {
                     }
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#3B5BDB]"></div>
+                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6044E8]"></div>
                 </label>
               </div>
 
               {alternateSaturdayEnabled && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#F2EAD3]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#E7E9F0]">
                   <div>
                     <label className="block text-xs font-semibold text-[#475569] mb-1">
                       Ngày mốc
@@ -354,7 +354,7 @@ export default function AdminWorkCalendarPage() {
                       onChange={(e) =>
                         setAlternateSaturdayAnchorDate(e.target.value)
                       }
-                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#3B5BDB]"
+                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#E7E9F0] bg-white text-[#202333] outline-none focus:border-[#6044E8]"
                     />
                   </div>
 
@@ -371,7 +371,7 @@ export default function AdminWorkCalendarPage() {
                           e.target.value === "working",
                         )
                       }
-                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#F2EAD3] bg-white text-[#161827] outline-none focus:border-[#3B5BDB]"
+                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#E7E9F0] bg-white text-[#202333] outline-none focus:border-[#6044E8]"
                     >
                       <option value="off">Nghỉ thứ 7</option>
                       <option value="working">
@@ -384,9 +384,9 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             {/* Hoán đổi lịch nhà nước */}
-            <div className="flex items-center justify-between rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4">
+            <div className="flex items-center justify-between rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] p-4">
               <div>
-                <h4 className="text-xs font-bold text-[#161827]">
+                <h4 className="text-xs font-bold text-[#202333]">
                   Tự động áp dụng lịch làm bù / hoán đổi của Nhà nước
                 </h4>
                 <p className="text-xs text-[#475569]">
@@ -403,16 +403,16 @@ export default function AdminWorkCalendarPage() {
                   }
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#3B5BDB]"></div>
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6044E8]"></div>
               </label>
             </div>
           </Card>
 
           {/* Card 2: Holiday Sync */}
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-4">
+            <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-4">
               <div>
-                <h3 className="text-sm font-bold text-[#161827]">
+                <h3 className="text-sm font-bold text-[#202333]">
                   Tự Động Đồng Bộ Ngày Lễ
                 </h3>
                 <p className="text-xs text-[#475569]">
@@ -435,27 +435,27 @@ export default function AdminWorkCalendarPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
+              <div className="p-3 bg-[#F8F9FC] rounded-xl border border-[#E7E9F0]">
                 <span className="text-[#475569] block text-xs uppercase font-bold">
                   Nhà cung cấp
                 </span>
-                <span className="font-semibold text-[#161827]">
+                <span className="font-semibold text-[#202333]">
                   {holidayProvider || "Calendarific"}
                 </span>
               </div>
-              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
+              <div className="p-3 bg-[#F8F9FC] rounded-xl border border-[#E7E9F0]">
                 <span className="text-[#475569] block text-xs uppercase font-bold">
                   Mã quốc gia
                 </span>
-                <span className="font-semibold text-[#161827]">
+                <span className="font-semibold text-[#202333]">
                   {holidayCountryCode}
                 </span>
               </div>
-              <div className="p-3 bg-[#FFFBF0] rounded-xl border border-[#F2EAD3]">
+              <div className="p-3 bg-[#F8F9FC] rounded-xl border border-[#E7E9F0]">
                 <span className="text-[#475569] block text-xs uppercase font-bold">
                   Lần đồng bộ gần nhất
                 </span>
-                <span className="font-semibold text-[#161827]">
+                <span className="font-semibold text-[#202333]">
                   {settings?.last_holiday_sync_at
                     ? new Date(settings.last_holiday_sync_at).toLocaleString(
                         "vi-VN",
@@ -484,9 +484,9 @@ export default function AdminWorkCalendarPage() {
 
       {/* Card 3: Ngoại lệ lịch làm việc */}
       <Card className="p-6 space-y-4 mt-6">
-        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-4">
+        <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-4">
           <div>
-            <h3 className="text-sm font-bold text-[#161827]">
+            <h3 className="text-sm font-bold text-[#202333]">
               Ngoại Lệ Lịch Làm Việc & Ngày Lễ
             </h3>
             <p className="text-xs text-[#475569]">
@@ -508,7 +508,7 @@ export default function AdminWorkCalendarPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#F2EAD3] text-[#475569] font-bold bg-[#FFFBF0]">
+              <tr className="border-b border-[#E7E9F0] text-[#475569] font-bold bg-[#F8F9FC]">
                 <th className="p-3">Ngày</th>
                 <th className="p-3">Tên sự kiện / Ngày lễ</th>
                 <th className="p-3">Loại</th>
@@ -517,7 +517,7 @@ export default function AdminWorkCalendarPage() {
                 <th className="p-3 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F2EAD3]">
+            <tbody className="divide-y divide-[#E7E9F0]">
               {events.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-[#64748B]">
@@ -529,12 +529,12 @@ export default function AdminWorkCalendarPage() {
                 events.map((ev) => (
                   <tr
                     key={ev.id}
-                    className="hover:bg-[#FFFBF0] transition-colors"
+                    className="hover:bg-[#F8F9FC] transition-colors"
                   >
-                    <td className="p-3 font-mono font-bold text-[#161827]">
+                    <td className="p-3 font-mono font-bold text-[#202333]">
                       {ev.event_date}
                     </td>
-                    <td className="p-3 font-semibold text-[#161827]">
+                    <td className="p-3 font-semibold text-[#202333]">
                       {ev.title}
                       {ev.notes && (
                         <span className="block text-xs font-normal text-[#475569]">
@@ -562,7 +562,7 @@ export default function AdminWorkCalendarPage() {
                       <span
                         className={`text-xs font-semibold ${
                           ev.source_type === "manual"
-                            ? "text-[#3B5BDB]"
+                            ? "text-[#6044E8]"
                             : ev.source_type === "api"
                               ? "text-amber-600"
                               : "text-[#475569]"
@@ -576,7 +576,7 @@ export default function AdminWorkCalendarPage() {
                         <button
                           type="button"
                           onClick={() => openEditEventModal(ev)}
-                          className="p-1.5 text-[#475569] hover:text-[#3B5BDB] hover:bg-[#EEF2FF] rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#475569] hover:text-[#6044E8] hover:bg-[#F2EEFF] rounded-lg transition-colors cursor-pointer"
                           title="Sửa ngoại lệ"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -623,7 +623,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, eventDate: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
             />
           </div>
 
@@ -639,7 +639,7 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, title: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
             />
           </div>
 
@@ -656,7 +656,7 @@ export default function AdminWorkCalendarPage() {
                     eventType: e.target.value as any,
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
               >
                 <option value="company_holiday">
                   Nghỉ nội bộ (company_holiday)
@@ -685,7 +685,7 @@ export default function AdminWorkCalendarPage() {
                     isWorkingDay: e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
               >
                 <option value="false">
                   Nghỉ làm việc (is_working_day = false)
@@ -708,11 +708,11 @@ export default function AdminWorkCalendarPage() {
               onChange={(e) =>
                 setEventForm({ ...eventForm, notes: e.target.value })
               }
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-[#202333] outline-none focus:border-[#6044E8]"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"

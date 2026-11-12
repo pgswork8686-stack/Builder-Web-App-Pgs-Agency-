@@ -27,38 +27,38 @@ export default function EmployeeReportsPage() {
 
       <Card className="p-6 space-y-4 max-w-2xl">
         <div>
-          <label className="text-xs font-bold text-[#24304A]">
+          <label className="text-xs font-bold text-[#2E3248]">
             Công việc đã hoàn thành hôm nay
           </label>
           <textarea
             rows={3}
             disabled
             placeholder="Liệt kê các đầu việc công việc bạn đã xử lý xong..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#475569] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#475569] cursor-not-allowed"
           />
         </div>
 
         <div>
-          <label className="text-xs font-bold text-[#24304A]">
+          <label className="text-xs font-bold text-[#2E3248]">
             Khó khăn & đề xuất hỗ trợ
           </label>
           <textarea
             rows={2}
             disabled
             placeholder="Các vấn đề phát sinh cần cấp trên hoặc đồng đội hỗ trợ..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#475569] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#475569] cursor-not-allowed"
           />
         </div>
 
         <div>
-          <label className="text-xs font-bold text-[#24304A]">
+          <label className="text-xs font-bold text-[#2E3248]">
             Kế hoạch ngày mai
           </label>
           <textarea
             rows={2}
             disabled
             placeholder="Các đầu việc dự kiến hoàn thành vào ngày mai..."
-            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#475569] cursor-not-allowed"
+            className="w-full mt-1 p-3 text-xs rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#475569] cursor-not-allowed"
           />
         </div>
 

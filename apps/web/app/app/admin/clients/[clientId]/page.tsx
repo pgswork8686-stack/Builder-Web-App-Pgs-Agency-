@@ -252,8 +252,8 @@ export default function AdminClientDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin mb-3" />
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+          <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
@@ -277,20 +277,20 @@ export default function AdminClientDetailPage() {
                 <Briefcase className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-extrabold text-[#161827]">
+                <h3 className="text-lg font-extrabold text-[#202333]">
                   {company.name}
                 </h3>
-                <div className="inline-flex px-2 py-0.5 rounded bg-[#FFFBF0] border border-[#F2EAD3] font-mono text-[#3B5BDB] text-xs font-bold uppercase mt-1">
+                <div className="inline-flex px-2 py-0.5 rounded bg-[#F8F9FC] border border-[#E7E9F0] font-mono text-[#6044E8] text-xs font-bold uppercase mt-1">
                   Mã: {company.code}
                 </div>
               </div>
 
-              <div className="space-y-3 text-xs border-t border-[#F2EAD3] pt-4">
+              <div className="space-y-3 text-xs border-t border-[#E7E9F0] pt-4">
                 <div>
                   <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Mã số thuế
                   </span>
-                  <span className="font-mono text-[#161827] font-medium">
+                  <span className="font-mono text-[#202333] font-medium">
                     {company.taxCode || "—"}
                   </span>
                 </div>
@@ -298,13 +298,13 @@ export default function AdminClientDetailPage() {
                   <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Điện thoại
                   </span>
-                  <span className="text-[#161827]">{company.phone || "—"}</span>
+                  <span className="text-[#202333]">{company.phone || "—"}</span>
                 </div>
                 <div>
                   <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Email nhận tin
                   </span>
-                  <span className="text-[#161827] font-mono">
+                  <span className="text-[#202333] font-mono">
                     {company.email || "—"}
                   </span>
                 </div>
@@ -317,19 +317,19 @@ export default function AdminClientDetailPage() {
                       href={company.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#3B5BDB] hover:underline"
+                      className="text-[#6044E8] hover:underline"
                     >
                       {company.website}
                     </a>
                   ) : (
-                    <span className="text-[#161827]">—</span>
+                    <span className="text-[#202333]">—</span>
                   )}
                 </div>
                 <div>
                   <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
                     Địa chỉ trụ sở
                   </span>
-                  <span className="text-[#161827]">
+                  <span className="text-[#202333]">
                     {company.address || "—"}
                   </span>
                 </div>
@@ -350,9 +350,9 @@ export default function AdminClientDetailPage() {
           {/* Right Column: Portal Accounts Membership Association */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-[#F2EAD3] pb-3">
-                <h2 className="text-sm font-extrabold text-[#161827] flex items-center gap-2">
-                  <Key className="w-4 h-4 text-[#3B5BDB]" />
+              <div className="flex justify-between items-center border-b border-[#E7E9F0] pb-3">
+                <h2 className="text-sm font-extrabold text-[#202333] flex items-center gap-2">
+                  <Key className="w-4 h-4 text-[#6044E8]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
                 <Button
@@ -370,7 +370,7 @@ export default function AdminClientDetailPage() {
                   Chưa có tài khoản nào được liên kết với doanh nghiệp này.
                 </div>
               ) : (
-                <div className="divide-y divide-[#F2EAD3]">
+                <div className="divide-y divide-[#E7E9F0]">
                   {memberships.map((m) => (
                     <div
                       key={m.id}
@@ -378,7 +378,7 @@ export default function AdminClientDetailPage() {
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#161827]">
+                          <span className="font-bold text-[#202333]">
                             {m.fullName || "Chưa cập nhật tên"}
                           </span>
                           {m.isPrimary && (
@@ -454,7 +454,7 @@ export default function AdminClientDetailPage() {
                 required
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="">-- Chọn tài khoản client --</option>
                 {clientUsers.map((cu) => (
@@ -474,7 +474,7 @@ export default function AdminClientDetailPage() {
                 placeholder="Ví dụ: Đại diện pháp luật, Giám đốc IT..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
             </div>
 
@@ -484,17 +484,17 @@ export default function AdminClientDetailPage() {
                 id="is_primary_company"
                 checked={isPrimary}
                 onChange={(e) => setIsPrimary(e.target.checked)}
-                className="w-4 h-4 accent-[#3B5BDB] cursor-pointer"
+                className="w-4 h-4 accent-[#6044E8] cursor-pointer"
               />
               <label
                 htmlFor="is_primary_company"
-                className="text-xs font-semibold text-[#161827] cursor-pointer select-none"
+                className="text-xs font-semibold text-[#202333] cursor-pointer select-none"
               >
                 Đây là công ty chính liên kết với tài khoản này
               </label>
             </div>
 
-            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#E7E9F0] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -543,7 +543,7 @@ export default function AdminClientDetailPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248] mb-1.5">
                 Trạng thái
               </label>
               <select
@@ -551,7 +551,7 @@ export default function AdminClientDetailPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Tạm dừng</option>
@@ -596,19 +596,19 @@ export default function AdminClientDetailPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+              className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"

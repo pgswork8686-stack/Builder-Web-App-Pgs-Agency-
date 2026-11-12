@@ -183,7 +183,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       />
 
       {/* Filter / Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
           <input
@@ -191,14 +191,14 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             placeholder="Tìm mã hoặc tên dự án..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:border-[#3B5BDB]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] placeholder-[#94A3B8] outline-none focus:border-[#6044E8]"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as ProjectStatus | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2 outline-none focus:border-[#6044E8]"
         >
           <option value="">-- Mọi trạng thái --</option>
           {Object.entries(statusConfig).map(([key, value]) => (
@@ -211,7 +211,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as ProjectPriority | "")}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2 outline-none focus:border-[#6044E8]"
         >
           <option value="">-- Mọi mức ưu tiên --</option>
           {Object.entries(priorityConfig).map(([key, value]) => (
@@ -248,7 +248,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
         </div>
       ) : result.items.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen className="w-8 h-8 text-[#3B5BDB]" />}
+          icon={<FolderOpen className="w-8 h-8 text-[#6044E8]" />}
           title="Không tìm thấy dự án nào"
           description="Chưa có dự án nào phù hợp với bộ lọc hiện tại hoặc bạn chưa được gán vào dự án."
           actionLabel={mode === "admin" ? "Tạo dự án đầu tiên" : undefined}
@@ -269,15 +269,15 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             return (
               <div key={project.id} className="relative group">
                 <Link href={`${detailBase}/${project.id}`}>
-                  <Card className="p-5 hover:border-[#3B5BDB]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <Card className="p-5 hover:border-[#6044E8]/40 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-start gap-4 min-w-0 pr-12 md:pr-0">
-                      <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] border border-[#E0EAFF] text-[#3B5BDB] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-xl bg-[#F2EEFF] border border-[#E7E0FF] text-[#6044E8] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <BriefcaseBusiness className="w-5 h-5" />
                       </div>
 
                       <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                          <span className="font-mono text-xs font-bold text-[#6044E8]">
                             {project.projectCode}
                           </span>
                           <Badge variant={sConf.variant} size="sm">
@@ -288,20 +288,20 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-extrabold text-[#161827] group-hover:text-[#3B5BDB] transition-colors truncate">
+                        <h3 className="text-base font-extrabold text-[#202333] group-hover:text-[#6044E8] transition-colors truncate">
                           {project.name}
                         </h3>
 
                         <p className="text-xs text-[#475569] truncate">
                           Khách hàng:{" "}
-                          <span className="text-[#161827] font-medium">
+                          <span className="text-[#202333] font-medium">
                             {project.clientCompany?.name ?? "Chưa liên kết"}
                           </span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#F2EAD3] text-xs text-[#475569] shrink-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-none border-[#E7E9F0] text-xs text-[#475569] shrink-0">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-[#64748B]" />
                         <span>
@@ -325,7 +325,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                         </Button>
                       )}
 
-                      <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#3B5BDB] group-hover:translate-x-1 transition-all hidden md:block" />
+                      <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#6044E8] group-hover:translate-x-1 transition-all hidden md:block" />
                     </div>
                   </Card>
                 </Link>
@@ -337,7 +337,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
 
       {/* Pagination Footer */}
       {result.totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#E7E9F0] text-xs text-[#475569]">
           <span>
             Hiển thị trang {result.page} / {result.totalPages} ({result.total}{" "}
             dự án)
@@ -398,7 +398,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
             tra cứu và kiểm toán.
           </p>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"

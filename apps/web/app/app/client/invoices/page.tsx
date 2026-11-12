@@ -91,7 +91,7 @@ export default function ClientInvoicesPage() {
           </div>
         ) : invoices.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-8 h-8 text-[#3B5BDB]" />}
+            icon={<FileText className="w-8 h-8 text-[#6044E8]" />}
             title="Chưa có hóa đơn nào"
             description="Không có hóa đơn công khai nào được ghi nhận cho tài khoản của bạn."
           />
@@ -112,7 +112,7 @@ export default function ClientInvoicesPage() {
                 <TableBody>
                   {invoices.map((i) => (
                     <TableRow key={i.id}>
-                      <TableCell className="font-mono font-bold text-[#3B5BDB]">
+                      <TableCell className="font-mono font-bold text-[#6044E8]">
                         {i.invoice_number}
                       </TableCell>
                       <TableCell className="font-mono text-xs text-[#475569]">
@@ -121,7 +121,7 @@ export default function ClientInvoicesPage() {
                       <TableCell className="font-mono text-xs text-[#475569]">
                         {formatDate(i.due_date)}
                       </TableCell>
-                      <TableCell className="font-extrabold text-[#161827] text-xs">
+                      <TableCell className="font-extrabold text-[#202333] text-xs">
                         {formatCurrency(i.amount, i.currency_code)}
                       </TableCell>
                       <TableCell className="font-extrabold text-emerald-600 text-xs">
@@ -159,10 +159,10 @@ export default function ClientInvoicesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between text-xs text-[#475569] pt-4 border-t border-[#F2EAD3]">
+              <div className="flex items-center justify-between text-xs text-[#475569] pt-4 border-t border-[#E7E9F0]">
                 <span>
                   Hiển thị{" "}
-                  <span className="font-bold text-[#161827]">
+                  <span className="font-bold text-[#202333]">
                     {invoices.length}
                   </span>{" "}
                   / {total} hóa đơn
@@ -176,7 +176,7 @@ export default function ClientInvoicesPage() {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span className="font-bold text-[#161827]">
+                  <span className="font-bold text-[#202333]">
                     Trang {page} / {totalPages}
                   </span>
                   <Button

@@ -102,7 +102,7 @@ export default function FinanceDashboard({
 
   if (error) {
     return (
-      <div className="p-8 text-center rounded-2xl bg-white border border-[#F2EAD3] shadow-xs space-y-3">
+      <div className="p-8 text-center rounded-2xl bg-white border border-[#E7E9F0] shadow-xs space-y-3">
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
         <p className="text-xs text-[#475569]">{error}</p>
         <Button variant="secondary" size="sm" onClick={loadData}>
@@ -148,7 +148,7 @@ export default function FinanceDashboard({
       {/* Metrics Grid */}
       {currencies.length === 0 ? (
         <EmptyState
-          icon={<DollarSign className="w-8 h-8 text-[#3B5BDB]" />}
+          icon={<DollarSign className="w-8 h-8 text-[#6044E8]" />}
           title="Chưa có dữ liệu tài chính"
           description="Chưa có số liệu tài chính được ghi nhận trong hệ thống."
         />
@@ -173,8 +173,8 @@ export default function FinanceDashboard({
             return (
               <div key={currency} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#3B5BDB]" />
-                  <h3 className="text-sm font-bold text-[#161827]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#6044E8]" />
+                  <h3 className="text-sm font-bold text-[#202333]">
                     Đơn vị tiền tệ: {currency}
                   </h3>
                 </div>
@@ -235,9 +235,9 @@ export default function FinanceDashboard({
 
       {/* Audit Log Timeline Card */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-          <h3 className="text-base font-extrabold text-[#161827] flex items-center gap-2">
-            <History className="w-4 h-4 text-[#3B5BDB]" />
+        <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
+          <h3 className="text-base font-extrabold text-[#202333] flex items-center gap-2">
+            <History className="w-4 h-4 text-[#6044E8]" />
             Nhật ký thay đổi tài chính
           </h3>
         </div>
@@ -247,7 +247,7 @@ export default function FinanceDashboard({
             Chưa có nhật ký hoạt động nào được ghi nhận.
           </p>
         ) : (
-          <div className="divide-y divide-[#F2EAD3]">
+          <div className="divide-y divide-[#E7E9F0]">
             {auditLogs.map((log) => (
               <div
                 key={log.id}
@@ -258,13 +258,13 @@ export default function FinanceDashboard({
                     <Badge variant="blue" size="sm">
                       {statusLabel(log.entity_type)}
                     </Badge>
-                    <span className="font-bold text-[#161827]">
+                    <span className="font-bold text-[#202333]">
                       {getActionLabel(log.action)}
                     </span>
                   </div>
                   <div className="text-xs text-[#475569]">
                     Thực hiện bởi:{" "}
-                    <span className="font-bold text-[#161827]">
+                    <span className="font-bold text-[#202333]">
                       {log.actor?.full_name || log.actor?.email || "Hệ thống"}
                     </span>
                   </div>

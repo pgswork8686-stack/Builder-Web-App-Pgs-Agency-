@@ -47,14 +47,14 @@ export default function TeamLeaderTeamsPage() {
           {teams.map((t) => (
             <Card key={t.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                <span className="font-mono text-xs font-bold text-[#6044E8]">
                   {t.code}
                 </span>
                 <Badge variant={t.isActive ? "success" : "default"} size="sm">
                   {t.isActive ? "HOẠT ĐỘNG" : "TẠM DỪNG"}
                 </Badge>
               </div>
-              <h4 className="text-sm font-bold text-[#24304A]">{t.name}</h4>
+              <h4 className="text-sm font-bold text-[#2E3248]">{t.name}</h4>
               <p className="text-xs text-[#475569]">{t.description || "—"}</p>
             </Card>
           ))}

@@ -243,7 +243,7 @@ function ProjectBoardContent({
 
   const inner = (
     <div className="space-y-4">
-      <section className="grid gap-3 rounded-2xl border border-[#F2EAD3] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
+      <section className="grid gap-3 rounded-2xl border border-[#E7E9F0] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
         <label className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <input
@@ -253,7 +253,7 @@ function ProjectBoardContent({
             }
             placeholder="Tìm theo tên công việc"
             aria-label="Tìm công việc"
-            className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] py-2 pl-9 pr-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] py-2 pl-9 pr-3 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           />
         </label>
         <select
@@ -265,7 +265,7 @@ function ProjectBoardContent({
             })
           }
           aria-label="Lọc mức ưu tiên"
-          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">Mọi ưu tiên</option>
           {(["low", "medium", "high", "urgent"] as TaskPriority[]).map(
@@ -282,7 +282,7 @@ function ProjectBoardContent({
             setFilters({ ...filters, assigneeUserId: event.target.value })
           }
           aria-label="Lọc người phụ trách"
-          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">Mọi người phụ trách</option>
           {assignees.map(([id, name]) => (
@@ -300,7 +300,7 @@ function ProjectBoardContent({
             })
           }
           aria-label="Lọc trạng thái"
-          className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">Mọi trạng thái</option>
           {columns.map((column) => (
@@ -330,7 +330,7 @@ function ProjectBoardContent({
       )}
 
       {loading && !board ? (
-        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
+        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
           Đang tải Kanban…
         </div>
       ) : (
@@ -373,7 +373,7 @@ function ProjectBoardContent({
   if (embedded) return inner;
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
+    <main className="min-h-screen bg-[#F8F9FC] px-4 py-7 text-[#202333] lg:px-8">
       <div className="mx-auto max-w-[1600px] space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -418,14 +418,14 @@ function BoardColumn({
       ref={setNodeRef}
       className={`w-[310px] shrink-0 rounded-2xl border p-3.5 shadow-xs transition-colors ${
         isOver
-          ? "border-[#3B5BDB] bg-[#EEF2FF]/60"
-          : "border-[#F2EAD3] bg-[#FBF3DC]/50"
+          ? "border-[#6044E8] bg-[#F2EEFF]/60"
+          : "border-[#E7E9F0] bg-[#F4F2FD]/50"
       }`}
     >
       <div className="mb-3 flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2">
-          <h2 className="font-bold text-[#161827] text-sm">{label}</h2>
-          <span className="rounded-full bg-white border border-[#F2EAD3] px-2.5 py-0.5 text-xs font-bold text-[#3B5BDB] shadow-xs">
+          <h2 className="font-bold text-[#202333] text-sm">{label}</h2>
+          <span className="rounded-full bg-white border border-[#E7E9F0] px-2.5 py-0.5 text-xs font-bold text-[#6044E8] shadow-xs">
             {tasks.length}
           </span>
         </div>
@@ -433,7 +433,7 @@ function BoardColumn({
           <button
             type="button"
             onClick={onCreate}
-            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-xs font-bold text-[#3B5BDB] hover:bg-[#EEF2FF] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg border border-[#DCE5FF] bg-white px-2 py-1 text-xs font-bold text-[#6044E8] hover:bg-[#F2EEFF] cursor-pointer transition-colors"
           >
             <Plus className="h-3 w-3" />
             Tạo
@@ -495,7 +495,7 @@ function BoardCard({
     <article
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-xl border border-[#F2EAD3] bg-white p-3.5 shadow-xs transition-shadow hover:shadow-md ${
+      className={`rounded-xl border border-[#E7E9F0] bg-white p-3.5 shadow-xs transition-shadow hover:shadow-md ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -504,7 +504,7 @@ function BoardCard({
           <button
             type="button"
             aria-label={`Kéo để sắp xếp ${task.title}`}
-            className="mt-0.5 cursor-grab text-[#64748B] active:cursor-grabbing hover:text-[#161827]"
+            className="mt-0.5 cursor-grab text-[#64748B] active:cursor-grabbing hover:text-[#202333]"
             {...attributes}
             {...listeners}
           >
@@ -514,7 +514,7 @@ function BoardCard({
         <div className="min-w-0 flex-1">
           <Link
             href={href}
-            className="font-bold text-sm text-[#161827] hover:text-[#3B5BDB] transition-colors"
+            className="font-bold text-sm text-[#202333] hover:text-[#6044E8] transition-colors"
           >
             {task.title}
           </Link>
@@ -524,7 +524,7 @@ function BoardCard({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        <span className="rounded-full bg-[#FBF3DC] px-2 py-0.5 text-xs font-bold text-[#3B5BDB]">
+        <span className="rounded-full bg-[#F4F2FD] px-2 py-0.5 text-xs font-bold text-[#6044E8]">
           {task.priority ? task.priority.toUpperCase() : "NORMAL"}
         </span>
         <span className="text-[#64748B] text-xs font-mono">
@@ -539,7 +539,7 @@ function BoardCard({
             onStatus(task, event.target.value as BoardStatus)
           }
           aria-label={`Đổi trạng thái ${task.title}`}
-          className="mt-3 w-full rounded-lg border border-[#F2EAD3] bg-[#FFFBF0] px-2 py-1.5 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="mt-3 w-full rounded-lg border border-[#E7E9F0] bg-[#F8F9FC] px-2 py-1.5 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
         >
           {columns.map((column) => (
             <option key={column.status} value={column.status}>

@@ -46,10 +46,10 @@ export function WorkspaceHeader({
   ] as const;
 
   return (
-    <header className="space-y-4 pb-4 border-b border-[#F2EAD3]">
+    <header className="space-y-4 pb-4 border-b border-[#E7E9F0]">
       <Link
         href={base}
-        className="inline-flex items-center gap-2 text-xs font-semibold text-[#475569] hover:text-[#161827] transition-colors"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-[#475569] hover:text-[#202333] transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Tổng quan dự án</span>
@@ -58,11 +58,11 @@ export function WorkspaceHeader({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#9A7000] bg-[#FFF8E5] px-2.5 py-0.5 rounded-full border border-[#FDE68A]">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#9A7000] bg-[#F2EEFF] px-2.5 py-0.5 rounded-full border border-[#DDD5FF]">
               {projectCode ?? "PROJECT"}
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-black text-[#161827] tracking-tight sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-black text-[#202333] tracking-tight sm:text-3xl">
             {projectName ?? "Không gian thực thi dự án"}
           </h1>
         </div>
@@ -82,8 +82,8 @@ export function WorkspaceHeader({
               href={href}
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-150 select-none ${
                 isActive
-                  ? "bg-[#E7AE18] text-[#161827] shadow-xs"
-                  : "bg-white text-[#475569] hover:text-[#161827] border border-[#F2EAD3] hover:bg-[#FFF8E5]"
+                  ? "bg-[#7257F5] text-white shadow-xs"
+                  : "bg-white text-[#475569] hover:text-white border border-[#E7E9F0] hover:bg-[#F2EEFF]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />

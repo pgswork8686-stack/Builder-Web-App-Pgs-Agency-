@@ -48,7 +48,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
         >
           Trước
         </Button>
-        <span className="text-sm font-extrabold text-[#24304A]">
+        <span className="text-sm font-extrabold text-[#2E3248]">
           {monthLabel}
         </span>
         <Button
@@ -63,7 +63,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
 
       <Card className="p-4 sm:p-6">
         {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center pb-3 border-b border-[#F2EAD3]">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center pb-3 border-b border-[#E7E9F0]">
           {daysOfWeek.map((d) => (
             <span
               key={d}
@@ -95,23 +95,23 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
                 key={day}
                 className={`min-h-[60px] sm:min-h-[80px] p-1.5 sm:p-2 rounded-xl border flex flex-col gap-1 transition-colors cursor-default ${
                   todayCell
-                    ? "bg-[#EEF2FF] border-[#3B5BDB]"
-                    : "bg-[#FFFBF0] border-[#F2EAD3] hover:bg-white hover:border-[#CBD5E1]"
+                    ? "bg-[#F2EEFF] border-[#6044E8]"
+                    : "bg-[#F8F9FC] border-[#E7E9F0] hover:bg-white hover:border-[#CBD5E1]"
                 }`}
               >
                 <span
                   className={`text-xs font-bold ${
                     todayCell
-                      ? "text-[#3B5BDB]"
+                      ? "text-[#6044E8]"
                       : highlightSunday && isSunday
                         ? "text-[#7F1D1D]"
-                        : "text-[#24304A]"
+                        : "text-[#2E3248]"
                   }`}
                 >
                   {day}
                 </span>
                 {todayCell && (
-                  <span className="text-xs sm:text-xs font-bold px-1.5 py-0.5 rounded bg-[#3B5BDB] text-white w-fit truncate">
+                  <span className="text-xs sm:text-xs font-bold px-1.5 py-0.5 rounded bg-[#6044E8] text-white w-fit truncate">
                     Hôm nay
                   </span>
                 )}

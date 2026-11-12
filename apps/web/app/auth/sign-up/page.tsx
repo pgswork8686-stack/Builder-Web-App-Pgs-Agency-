@@ -104,23 +104,23 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#161827]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8F9FC] text-[#202333]">
       {/* Video Hero Left Panel (~52%) */}
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#F2EAD3] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header Mobile Logo / Text */}
           <div>
             <div className="md:hidden flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-[#3B5BDB] text-white font-bold flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#6044E8] text-white font-bold flex items-center justify-center">
                 P
               </div>
-              <span className="font-bold text-lg text-[#161827]">PGS HUB</span>
+              <span className="font-bold text-lg text-[#202333]">PGS HUB</span>
             </div>
 
-            <h2 className="text-2xl font-extrabold text-[#161827] tracking-tight">
+            <h2 className="text-2xl font-extrabold text-[#202333] tracking-tight">
               Tạo tài khoản
             </h2>
             <p className="mt-1 text-xs text-[#475569]">
@@ -149,7 +149,7 @@ export default function SignUpPage() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#FFFBF0] hover:bg-[#EEF2FF] border border-[#F2EAD3] hover:border-[#3B5BDB]/40 text-[#161827] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#F8F9FC] hover:bg-[#F2EEFF] border border-[#E7E9F0] hover:border-[#6044E8]/40 text-[#202333] font-semibold text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -176,7 +176,7 @@ export default function SignUpPage() {
 
           {/* Divider */}
           <div className="relative flex items-center justify-center my-3">
-            <div className="w-full border-t border-[#F2EAD3]" />
+            <div className="w-full border-t border-[#E7E9F0]" />
             <span className="absolute px-3 bg-white text-xs text-[#64748B] uppercase tracking-wider">
               hoặc đăng ký bằng Email
             </span>
@@ -196,7 +196,7 @@ export default function SignUpPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nguyễn Văn A"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pgsagency.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -270,7 +270,7 @@ export default function SignUpPage() {
             Đã có tài khoản?{" "}
             <Link
               href="/auth/login"
-              className="text-[#3B5BDB] font-bold hover:underline"
+              className="text-[#6044E8] font-bold hover:underline"
             >
               Đăng nhập ngay
             </Link>

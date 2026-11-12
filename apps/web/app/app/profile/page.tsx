@@ -207,7 +207,7 @@ export default function UserProfilePage() {
             size="sm"
             leftIcon={<Pencil className="w-4 h-4" />}
             onClick={handleOpenEdit}
-            className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
+            className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white font-bold"
           >
             Chỉnh sửa hồ sơ
           </Button>
@@ -222,8 +222,8 @@ export default function UserProfilePage() {
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin mb-3" />
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+          <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải thông tin hồ sơ của bạn...
           </span>
@@ -247,19 +247,19 @@ export default function UserProfilePage() {
                 src={userProfile.user.avatarUrl}
                 name={userProfile.user.fullName || userProfile.user.email}
                 size="xl"
-                className="ring-4 ring-[#EEF2FF] shadow-sm"
+                className="ring-4 ring-[#F2EEFF] shadow-sm"
               />
               <button
                 type="button"
                 onClick={handleOpenEdit}
                 title="Thay đổi ảnh đại diện"
-                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#3B5BDB] text-white hover:bg-[#2F4AB8] shadow-md transition-colors"
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#6044E8] text-white hover:bg-[#4F35C9] shadow-md transition-colors"
               >
                 <Camera className="w-3.5 h-3.5" />
               </button>
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-[#161827]">
+              <h3 className="text-base font-extrabold text-[#202333]">
                 {userProfile.user.fullName || "Chưa cập nhật tên"}
               </h3>
               <p className="text-xs text-[#475569] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
@@ -279,12 +279,12 @@ export default function UserProfilePage() {
               size="sm"
               leftIcon={<Pencil className="w-3.5 h-3.5" />}
               onClick={handleOpenEdit}
-              className="w-full text-xs font-semibold text-[#161827]"
+              className="w-full text-xs font-semibold text-[#202333]"
             >
               Chỉnh sửa thông tin
             </Button>
 
-            <div className="border-t border-[#F2EAD3] pt-4 space-y-2.5 text-left text-xs">
+            <div className="border-t border-[#E7E9F0] pt-4 space-y-2.5 text-left text-xs">
               <div className="flex justify-between items-center">
                 <span className="text-[#475569] flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5 text-[#64748B]" />
@@ -309,7 +309,7 @@ export default function UserProfilePage() {
                     <Calendar className="w-3.5 h-3.5 text-[#64748B]" />
                     Kích hoạt ngày
                   </span>
-                  <span className="font-mono text-[#161827] text-xs">
+                  <span className="font-mono text-[#202333] text-xs">
                     {new Date(
                       userProfile.account.approvedAt,
                     ).toLocaleDateString("vi-VN")}
@@ -323,9 +323,9 @@ export default function UserProfilePage() {
           <div className="md:col-span-2 space-y-6">
             {orgContext?.type === "client" ? (
               <Card className="p-6 space-y-4">
-                <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
+                <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
                   <Briefcase className="w-5 h-5 text-[#CA8A04]" />
-                  <h2 className="text-sm font-extrabold text-[#161827]">
+                  <h2 className="text-sm font-extrabold text-[#202333]">
                     Liên Kết Doanh Nghiệp Khách Hàng
                   </h2>
                 </div>
@@ -340,11 +340,11 @@ export default function UserProfilePage() {
                     {orgContext.companies.map((comp) => (
                       <div
                         key={comp.id}
-                        className="bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-sm text-[#161827]">
+                            <h4 className="font-bold text-sm text-[#202333]">
                               {comp.name}
                             </h4>
                             {comp.isPrimary && (
@@ -356,7 +356,7 @@ export default function UserProfilePage() {
                           <div className="flex items-center gap-3 text-xs text-[#475569] mt-1 font-mono">
                             <span>Mã: {comp.code}</span>
                             {comp.title && (
-                              <span className="text-[#161827] font-sans font-medium">
+                              <span className="text-[#202333] font-sans font-medium">
                                 • {comp.title}
                               </span>
                             )}
@@ -375,9 +375,9 @@ export default function UserProfilePage() {
               </Card>
             ) : (
               <Card className="p-6 space-y-6">
-                <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
-                  <Award className="w-5 h-5 text-[#3B5BDB]" />
-                  <h2 className="text-sm font-extrabold text-[#161827]">
+                <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
+                  <Award className="w-5 h-5 text-[#6044E8]" />
+                  <h2 className="text-sm font-extrabold text-[#202333]">
                     Thông Tin Hồ Sơ Nhân Sự
                   </h2>
                 </div>
@@ -389,49 +389,49 @@ export default function UserProfilePage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Mã nhân sự
                       </span>
-                      <span className="text-sm font-bold font-mono text-[#3B5BDB]">
+                      <span className="text-sm font-bold font-mono text-[#6044E8]">
                         {orgContext.employee.employeeCode}
                       </span>
                     </div>
 
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Chức danh công việc
                       </span>
-                      <span className="text-sm font-bold text-[#161827]">
+                      <span className="text-sm font-bold text-[#202333]">
                         {orgContext.employee.jobTitle || "Chưa cập nhật"}
                       </span>
                     </div>
 
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Phòng ban trực thuộc
                       </span>
-                      <span className="text-xs font-semibold text-[#161827] flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-[#202333] flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-[#475569]" />
                         {orgContext.department?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Đội nhóm trực thuộc
                       </span>
-                      <span className="text-xs font-semibold text-[#161827] flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-[#202333] flex items-center gap-1.5">
                         <Users2 className="w-3.5 h-3.5 text-[#475569]" />
                         {orgContext.team?.name || "Chưa phân bổ"}
                       </span>
                     </div>
 
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Người quản lý trực tiếp
                       </span>
-                      <span className="text-xs text-[#161827]">
+                      <span className="text-xs text-[#202333]">
                         {orgContext.manager?.fullName ? (
                           <span className="font-semibold">
                             {orgContext.manager.fullName}{" "}
@@ -445,7 +445,7 @@ export default function UserProfilePage() {
                       </span>
                     </div>
 
-                    <div className="bg-[#FFFBF0] border border-[#F2EAD3] p-3.5 rounded-xl">
+                    <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
                       <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
                         Trạng thái làm việc
                       </span>
@@ -503,14 +503,14 @@ export default function UserProfilePage() {
           />
 
           {/* Avatar Preview & Upload Options */}
-          <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] space-y-3">
+          <div className="p-4 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
             <div className="flex items-center gap-4">
               <div className="relative group shrink-0">
                 <Avatar
                   src={editAvatarUrl.trim() || undefined}
                   name={editFullName || userProfile?.user.email || "Avatar"}
                   size="xl"
-                  className="ring-2 ring-[#3B5BDB]/40 shadow-sm"
+                  className="ring-2 ring-[#6044E8]/40 shadow-sm"
                 />
                 <button
                   type="button"
@@ -524,7 +524,7 @@ export default function UserProfilePage() {
 
               <div className="flex-1 min-w-0 space-y-2">
                 <div>
-                  <label className="block text-xs font-bold text-[#161827]">
+                  <label className="block text-xs font-bold text-[#202333]">
                     Ảnh đại diện
                   </label>
                   <p className="text-xs text-[#475569]">
@@ -539,7 +539,7 @@ export default function UserProfilePage() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     leftIcon={<Upload className="w-3.5 h-3.5" />}
-                    className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white text-xs font-bold"
+                    className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white text-xs font-bold"
                   >
                     Tải ảnh từ máy tính
                   </Button>
@@ -558,7 +558,7 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-[#F2EAD3]">
+            <div className="pt-2 border-t border-[#E7E9F0]">
               <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Hoặc dán đường dẫn ảnh (URL):
               </label>
@@ -572,13 +572,13 @@ export default function UserProfilePage() {
                 disabled={editAvatarUrl.startsWith("data:")}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3.5 py-1.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#161827] focus:border-[#3B5BDB] outline-none transition-all disabled:bg-slate-100 disabled:text-[#475569]"
+                className="w-full px-3.5 py-1.5 rounded-xl border border-[#E7E9F0] bg-white text-xs text-[#202333] focus:border-[#6044E8] outline-none transition-all disabled:bg-slate-100 disabled:text-[#475569]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#161827] mb-1.5">
+            <label className="block text-xs font-bold text-[#202333] mb-1.5">
               Họ và tên đầy đủ *
             </label>
             <input
@@ -587,12 +587,12 @@ export default function UserProfilePage() {
               value={editFullName}
               onChange={(e) => setEditFullName(e.target.value)}
               placeholder="Nhập họ và tên đầy đủ..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs font-semibold text-[#202333] focus:bg-white focus:border-[#6044E8] outline-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#161827] mb-1.5">
+            <label className="block text-xs font-bold text-[#202333] mb-1.5">
               Số điện thoại
             </label>
             <input
@@ -600,11 +600,11 @@ export default function UserProfilePage() {
               value={editPhone}
               onChange={(e) => setEditPhone(e.target.value)}
               placeholder="0988xxxxxx"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] focus:bg-white focus:border-[#3B5BDB] outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#202333] focus:bg-white focus:border-[#6044E8] outline-none transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"
@@ -619,7 +619,7 @@ export default function UserProfilePage() {
               variant="primary"
               size="sm"
               isLoading={saving}
-              className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
+              className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white font-bold"
             >
               Lưu thay đổi
             </Button>

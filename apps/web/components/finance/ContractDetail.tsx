@@ -186,16 +186,16 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin" />
       </div>
     );
   }
 
   if (!contract) {
     return (
-      <div className="p-8 text-center bg-white rounded-2xl border border-[#F2EAD3] space-y-4">
+      <div className="p-8 text-center bg-white rounded-2xl border border-[#E7E9F0] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
-        <h2 className="text-base font-bold text-[#161827]">
+        <h2 className="text-base font-bold text-[#202333]">
           Không tìm thấy hợp đồng
         </h2>
         <p className="text-xs text-[#475569]">
@@ -296,12 +296,12 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
           {/* Details Overview Card */}
           <Card className="p-6 space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#F2EAD3] pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E7E9F0] pb-4">
               <div className="space-y-1">
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Tiêu đề hợp đồng
                 </span>
-                <h2 className="text-lg font-extrabold text-[#161827] leading-tight">
+                <h2 className="text-lg font-extrabold text-[#202333] leading-tight">
                   {contract.title}
                 </h2>
               </div>
@@ -313,7 +313,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Mã hợp đồng
                 </span>
-                <p className="text-sm font-mono font-bold text-[#161827]">
+                <p className="text-sm font-mono font-bold text-[#202333]">
                   {contract.contract_number}
                 </p>
               </div>
@@ -322,7 +322,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Khách hàng
                 </span>
-                <p className="text-sm text-[#161827] font-medium">
+                <p className="text-sm text-[#202333] font-medium">
                   {contract.client_company?.name || "—"}
                 </p>
               </div>
@@ -331,7 +331,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Giá trị hợp đồng
                 </span>
-                <p className="text-lg font-black text-[#3B5BDB]">
+                <p className="text-lg font-black text-[#6044E8]">
                   {formatCurrency(
                     contract.contract_value,
                     contract.currency_code,
@@ -343,32 +343,32 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Dự án liên kết
                 </span>
-                <p className="text-sm text-[#161827] font-medium">
+                <p className="text-sm text-[#202333] font-medium">
                   {contract.project?.name || "—"}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#F2EAD3] pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-[#E7E9F0] pt-6">
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#3B5BDB]" />
+                <Calendar className="w-5 h-5 text-[#6044E8]" />
                 <div className="space-y-0.5">
                   <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                     Ngày bắt đầu
                   </span>
-                  <p className="text-xs font-mono text-[#161827]">
+                  <p className="text-xs font-mono text-[#202333]">
                     {formatDate(contract.start_date)}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#3B5BDB]" />
+                <Calendar className="w-5 h-5 text-[#6044E8]" />
                 <div className="space-y-0.5">
                   <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                     Ngày kết thúc
                   </span>
-                  <p className="text-xs font-mono text-[#161827]">
+                  <p className="text-xs font-mono text-[#202333]">
                     {contract.end_date || "Không giới hạn"}
                   </p>
                 </div>
@@ -376,11 +376,11 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
             </div>
 
             {contract.notes && (
-              <div className="border-t border-[#F2EAD3] pt-6 space-y-2">
+              <div className="border-t border-[#E7E9F0] pt-6 space-y-2">
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider block">
                   Điều khoản & Ghi chú
                 </span>
-                <p className="text-xs text-[#475569] leading-relaxed bg-[#FFFBF0] p-4 rounded-xl border border-[#F2EAD3] whitespace-pre-wrap">
+                <p className="text-xs text-[#475569] leading-relaxed bg-[#F8F9FC] p-4 rounded-xl border border-[#E7E9F0] whitespace-pre-wrap">
                   {contract.notes}
                 </p>
               </div>
@@ -392,17 +392,17 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
         <div className="space-y-6">
           {/* Client Visibility Card */}
           <Card className="p-5 space-y-3">
-            <h4 className="text-xs font-bold text-[#161827] uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#202333] uppercase tracking-wider">
               Hiển thị với khách hàng
             </h4>
-            <div className="flex items-center justify-between bg-[#FFFBF0] p-3.5 rounded-xl border border-[#F2EAD3]">
+            <div className="flex items-center justify-between bg-[#F8F9FC] p-3.5 rounded-xl border border-[#E7E9F0]">
               <div className="flex items-center gap-2">
                 {contract.client_visible ? (
                   <Eye className="w-4 h-4 text-emerald-600" />
                 ) : (
                   <EyeOff className="w-4 h-4 text-[#64748B]" />
                 )}
-                <span className="text-xs font-bold text-[#161827]">
+                <span className="text-xs font-bold text-[#202333]">
                   {contract.client_visible ? "Đang hiển thị" : "Đang ẩn"}
                 </span>
               </div>
@@ -420,13 +420,13 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
           {/* Invoices List Card */}
           <Card className="p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-              <h4 className="text-xs font-bold text-[#161827] uppercase tracking-wider">
+            <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
+              <h4 className="text-xs font-bold text-[#202333] uppercase tracking-wider">
                 Hóa đơn của hợp đồng
               </h4>
               <Link
                 href={`${roleBasePath}/finance/invoices?contractId=${contract.id}`}
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#3B5BDB] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#6044E8] hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Thêm</span>
@@ -442,10 +442,10 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 {invoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] flex items-center justify-between gap-3 text-xs"
+                    className="p-3 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="space-y-0.5">
-                      <p className="font-bold text-[#161827] font-mono">
+                      <p className="font-bold text-[#202333] font-mono">
                         {inv.invoice_number}
                       </p>
                       <p className="text-xs text-[#64748B] font-mono">
@@ -453,12 +453,12 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                       </p>
                     </div>
                     <div className="text-right space-y-0.5">
-                      <p className="font-extrabold text-[#3B5BDB]">
+                      <p className="font-extrabold text-[#6044E8]">
                         {formatCurrency(inv.amount, inv.currency_code)}
                       </p>
                       <Link
                         href={`${roleBasePath}/finance/invoices/${inv.id}`}
-                        className="inline-flex items-center gap-0.5 text-xs text-[#475569] hover:text-[#161827]"
+                        className="inline-flex items-center gap-0.5 text-xs text-[#475569] hover:text-[#202333]"
                       >
                         <span>Chi tiết</span>
                         <ChevronLeft className="w-2.5 h-2.5 rotate-180" />

@@ -177,15 +177,15 @@ export default function AccountantProjectExpensesPage() {
 
       {/* KPI Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#3B5BDB]">
+        <Card className="p-4 bg-white dark:bg-[#1E293B] border-l-4 border-l-[#6044E8]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#475569]">Tổng đã duyệt</p>
-              <p className="text-xl font-bold text-[#2A3547] dark:text-white mt-1">
+              <p className="text-xl font-bold text-[#2E3248] dark:text-white mt-1">
                 {new Intl.NumberFormat("vi-VN").format(totalApproved)} đ
               </p>
             </div>
-            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#3B5BDB]">
+            <div className="p-3 bg-[#ECF2FF] rounded-lg text-[#6044E8]">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function AccountantProjectExpensesPage() {
         <select
           value={selectedProject}
           onChange={(e) => setSelectedProject(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
         >
           <option value="">Tất cả dự án</option>
           {projects.map((p) => (
@@ -238,7 +238,7 @@ export default function AccountantProjectExpensesPage() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
         >
           <option value="">Tất cả danh mục</option>
           {Object.entries(CATEGORY_MAP).map(([k, v]) => (
@@ -251,7 +251,7 @@ export default function AccountantProjectExpensesPage() {
         <select
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+          className="px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
         >
           <option value="">Tất cả trạng thái</option>
           <option value="pending">Chờ duyệt</option>
@@ -288,7 +288,7 @@ export default function AccountantProjectExpensesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã chi phí</th>
                   <th className="px-4 py-3">Tiêu đề khoản chi</th>
@@ -304,12 +304,12 @@ export default function AccountantProjectExpensesPage() {
                 {expenses.map((exp) => (
                   <tr
                     key={exp.id}
-                    className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
+                    className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#6044E8]">
                       {exp.expense_code || "CP"}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
+                    <td className="px-4 py-3 font-medium text-[#2E3248] dark:text-white">
                       {exp.title}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
@@ -319,7 +319,7 @@ export default function AccountantProjectExpensesPage() {
                       {CATEGORY_MAP[exp.expense_category] ||
                         exp.expense_category}
                     </td>
-                    <td className="px-4 py-3 text-right font-semibold text-[#2A3547] dark:text-white">
+                    <td className="px-4 py-3 text-right font-semibold text-[#2E3248] dark:text-white">
                       {new Intl.NumberFormat("vi-VN").format(
                         Number(exp.amount),
                       )}{" "}
@@ -368,7 +368,7 @@ export default function AccountantProjectExpensesPage() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155]">
-            <h3 className="text-lg font-bold text-[#2A3547] dark:text-white mb-4">
+            <h3 className="text-lg font-bold text-[#2E3248] dark:text-white mb-4">
               Tạo đề nghị chi phí dự án
             </h3>
             <form onSubmit={handleCreate} className="space-y-4">
@@ -380,7 +380,7 @@ export default function AccountantProjectExpensesPage() {
                   value={newProjectId}
                   onChange={(e) => setNewProjectId(e.target.value)}
                   required
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                 >
                   <option value="">-- Chọn dự án --</option>
                   {projects.map((p) => (
@@ -401,7 +401,7 @@ export default function AccountantProjectExpensesPage() {
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ví dụ: Mua tên miền & hosting khách hàng"
                   required
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                 />
               </div>
 
@@ -417,7 +417,7 @@ export default function AccountantProjectExpensesPage() {
                     placeholder="500000"
                     required
                     min="1000"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                   />
                 </div>
                 <div>
@@ -427,7 +427,7 @@ export default function AccountantProjectExpensesPage() {
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                   >
                     {Object.entries(CATEGORY_MAP).map(([k, v]) => (
                       <option key={k} value={k}>
@@ -447,7 +447,7 @@ export default function AccountantProjectExpensesPage() {
                   onChange={(e) => setNewNotes(e.target.value)}
                   rows={3}
                   placeholder="Diễn giải thêm về hóa đơn, chứng từ..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
                 />
               </div>
 
@@ -478,12 +478,12 @@ export default function AccountantProjectExpensesPage() {
       {reviewingExpense && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155]">
-            <h3 className="text-lg font-bold text-[#2A3547] dark:text-white mb-2">
+            <h3 className="text-lg font-bold text-[#2E3248] dark:text-white mb-2">
               Xét duyệt chi phí ({reviewingExpense.expense_code || "CP"})
             </h3>
             <p className="text-sm text-[#475569] mb-4">
               {reviewingExpense.title} —{" "}
-              <strong className="text-[#2A3547] dark:text-white">
+              <strong className="text-[#2E3248] dark:text-white">
                 {new Intl.NumberFormat("vi-VN").format(
                   Number(reviewingExpense.amount),
                 )}{" "}
@@ -500,7 +500,7 @@ export default function AccountantProjectExpensesPage() {
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={2}
                 placeholder="Nhập lý do từ chối..."
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2A3547] dark:text-white"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#EAEFF4] dark:border-[#334155] bg-transparent text-[#2E3248] dark:text-white"
               />
             </div>
 

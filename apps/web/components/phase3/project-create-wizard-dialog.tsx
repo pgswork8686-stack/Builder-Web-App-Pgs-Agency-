@@ -155,7 +155,7 @@ export function ProjectCreateWizardDialog({
       maxWidth="xl"
       title={
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-[#F2EEFF] text-[#6044E8] flex items-center justify-center">
             <FolderPlus className="w-5 h-5" />
           </div>
           <span>Tạo dự án mới</span>
@@ -165,10 +165,10 @@ export function ProjectCreateWizardDialog({
     >
       <div className="space-y-6 pt-2">
         {/* Wizard Step Indicator */}
-        <div className="grid grid-cols-3 gap-2 border-b border-[#F2EAD3] pb-4">
+        <div className="grid grid-cols-3 gap-2 border-b border-[#E7E9F0] pb-4">
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 1 ? "text-[#3B5BDB]" : "text-[#475569]"
+              step >= 1 ? "text-[#6044E8]" : "text-[#475569]"
             }`}
           >
             <div
@@ -176,8 +176,8 @@ export function ProjectCreateWizardDialog({
                 step > 1
                   ? "bg-[#13DEB9] text-white"
                   : step === 1
-                    ? "border-2 border-[#3B5BDB] bg-[#EEF2FF] text-[#3B5BDB]"
-                    : "border border-[#F2EAD3] bg-[#FFFBF0] text-[#475569]"
+                    ? "border-2 border-[#6044E8] bg-[#F2EEFF] text-[#6044E8]"
+                    : "border border-[#E7E9F0] bg-[#F8F9FC] text-[#475569]"
               }`}
             >
               {step > 1 ? <Check className="w-4 h-4" /> : "1"}
@@ -187,7 +187,7 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step >= 2 ? "text-[#3B5BDB]" : "text-[#475569]"
+              step >= 2 ? "text-[#6044E8]" : "text-[#475569]"
             }`}
           >
             <div
@@ -195,8 +195,8 @@ export function ProjectCreateWizardDialog({
                 step > 2
                   ? "bg-[#13DEB9] text-white"
                   : step === 2
-                    ? "border-2 border-[#3B5BDB] bg-[#EEF2FF] text-[#3B5BDB]"
-                    : "border border-[#F2EAD3] bg-[#FFFBF0] text-[#475569]"
+                    ? "border-2 border-[#6044E8] bg-[#F2EEFF] text-[#6044E8]"
+                    : "border border-[#E7E9F0] bg-[#F8F9FC] text-[#475569]"
               }`}
             >
               {step > 2 ? <Check className="w-4 h-4" /> : "2"}
@@ -206,14 +206,14 @@ export function ProjectCreateWizardDialog({
 
           <div
             className={`flex items-center gap-2 text-xs font-bold ${
-              step === 3 ? "text-[#3B5BDB]" : "text-[#475569]"
+              step === 3 ? "text-[#6044E8]" : "text-[#475569]"
             }`}
           >
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                 step === 3
-                  ? "border-2 border-[#3B5BDB] bg-[#EEF2FF] text-[#3B5BDB]"
-                  : "border border-[#F2EAD3] bg-[#FFFBF0] text-[#475569]"
+                  ? "border-2 border-[#6044E8] bg-[#F2EEFF] text-[#6044E8]"
+                  : "border border-[#E7E9F0] bg-[#F8F9FC] text-[#475569]"
               }`}
             >
               3
@@ -283,12 +283,12 @@ export function ProjectCreateWizardDialog({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
                 Mô tả phạm vi dự án
               </label>
               <textarea
                 rows={3}
-                className="w-full rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3.5 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+                className="w-full rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3.5 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
                 placeholder="Mô tả mục tiêu, yêu cầu nghiệm thu và phạm vi công việc..."
                 value={form.description}
                 onChange={(e) =>
@@ -370,7 +370,7 @@ export function ProjectCreateWizardDialog({
         {/* Step 3: Confirmation Summary */}
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in duration-150">
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#475569]">
                 Tóm tắt thông tin dự án
               </h4>
@@ -378,23 +378,23 @@ export function ProjectCreateWizardDialog({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-[#475569]">Mã dự án:</span>{" "}
-                  <span className="font-mono font-bold text-[#3B5BDB]">
+                  <span className="font-mono font-bold text-[#6044E8]">
                     {form.projectCode}
                   </span>
                 </div>
                 <div>
                   <span className="text-[#475569]">Khách hàng:</span>{" "}
-                  <span className="font-bold text-[#24304A]">
+                  <span className="font-bold text-[#2E3248]">
                     {selectedCompany?.name || "Chưa chọn"}
                   </span>
                 </div>
                 <div className="sm:col-span-2">
                   <span className="text-[#475569]">Tên dự án:</span>{" "}
-                  <span className="font-bold text-[#24304A]">{form.name}</span>
+                  <span className="font-bold text-[#2E3248]">{form.name}</span>
                 </div>
                 <div>
                   <span className="text-[#475569]">Quản lý (PM):</span>{" "}
-                  <span className="font-bold text-[#24304A]">
+                  <span className="font-bold text-[#2E3248]">
                     {selectedManager?.fullName ||
                       selectedManager?.email ||
                       "Chưa phân công"}
@@ -408,31 +408,31 @@ export function ProjectCreateWizardDialog({
                 </div>
                 <div>
                   <span className="text-[#475569]">Ngày bắt đầu:</span>{" "}
-                  <span className="font-medium text-[#24304A]">
+                  <span className="font-medium text-[#2E3248]">
                     {form.startDate}
                   </span>
                 </div>
                 <div>
                   <span className="text-[#475569]">Hạn chót:</span>{" "}
-                  <span className="font-medium text-[#24304A]">
+                  <span className="font-medium text-[#2E3248]">
                     {form.dueDate}
                   </span>
                 </div>
               </div>
 
               {form.description && (
-                <div className="pt-2 border-t border-[#F2EAD3]">
+                <div className="pt-2 border-t border-[#E7E9F0]">
                   <span className="text-xs text-[#475569] block mb-1">
                     Mô tả:
                   </span>
-                  <p className="text-xs text-[#24304A] bg-white p-3 rounded-xl border border-[#F2EAD3]">
+                  <p className="text-xs text-[#2E3248] bg-white p-3 rounded-xl border border-[#E7E9F0]">
                     {form.description}
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#EEF2FF] border border-[#3B5BDB]/20 text-[#3B5BDB] text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-2xl bg-[#F2EEFF] border border-[#6044E8]/20 text-[#6044E8] text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>
                 Sau khi kích hoạt, bạn có thể tạo công việc, phân công
@@ -443,7 +443,7 @@ export function ProjectCreateWizardDialog({
         )}
 
         {/* Wizard Footer Controls */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#E7E9F0]">
           {step > 1 ? (
             <Button
               type="button"

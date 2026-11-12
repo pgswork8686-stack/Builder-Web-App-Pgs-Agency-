@@ -173,22 +173,22 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#F2EAD3] bg-white text-[#475569] transition hover:border-[#3B5BDB]/30 hover:text-[#3B5BDB] hover:bg-[#FFFBF0] shadow-2xs"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E7E9F0] bg-white text-[#475569] transition hover:border-[#6044E8]/30 hover:text-[#6044E8] hover:bg-[#F8F9FC] shadow-2xs"
         aria-label="Mở thông báo"
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#3B5BDB] px-1.5 py-0.5 text-xs font-black text-white shadow-xs">
+          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#6044E8] px-1.5 py-0.5 text-xs font-black text-white shadow-xs">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="fixed inset-x-4 top-[72px] z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[22rem] overflow-hidden rounded-2xl border border-[#F2EAD3] bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-[#F2EAD3] px-4 py-3 bg-[#FFFBF0]">
+        <div className="fixed inset-x-4 top-[72px] z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[22rem] overflow-hidden rounded-2xl border border-[#E7E9F0] bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-[#E7E9F0] px-4 py-3 bg-[#F8F9FC]">
             <div>
-              <div className="text-sm font-bold text-[#161827]">Thông báo</div>
+              <div className="text-sm font-bold text-[#202333]">Thông báo</div>
               <div className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-[#475569]">
                 {connectionState === "denied" ? (
                   <WifiOff className="h-3 w-3 text-red-500" />
@@ -208,7 +208,7 @@ export function NotificationBell() {
               type="button"
               disabled={busyId === "all" || unreadCount === 0}
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#3B5BDB] hover:bg-[#EEF2FF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#E7E9F0] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#6044E8] hover:bg-[#F2EEFF] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {busyId === "all" ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -236,7 +236,7 @@ export function NotificationBell() {
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center gap-2 px-4 py-8 text-xs text-[#475569]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#3B5BDB]" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#6044E8]" />
                 Đang tải thông báo...
               </div>
             ) : items.length === 0 ? (
@@ -247,16 +247,16 @@ export function NotificationBell() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="border-b border-[#F2EAD3] px-4 py-3 last:border-b-0 hover:bg-[#FFFBF0] transition-colors"
+                  className="border-b border-[#E7E9F0] px-4 py-3 last:border-b-0 hover:bg-[#F8F9FC] transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <span
                       className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#3B5BDB]"
+                        item.readAt ? "bg-[#CBD5E1]" : "bg-[#6044E8]"
                       }`}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="line-clamp-1 text-xs font-bold text-[#161827]">
+                      <div className="line-clamp-1 text-xs font-bold text-[#202333]">
                         {item.title}
                       </div>
                       <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#475569]">
@@ -269,7 +269,7 @@ export function NotificationBell() {
                         <Link
                           href={safeActionUrl(item.actionUrl)}
                           onClick={() => void markRead(item)}
-                          className="rounded-lg bg-[#3B5BDB] px-2.5 py-1 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors"
+                          className="rounded-lg bg-[#6044E8] px-2.5 py-1 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors"
                         >
                           Mở
                         </Link>
@@ -278,7 +278,7 @@ export function NotificationBell() {
                             type="button"
                             disabled={busyId === item.id}
                             onClick={() => void markRead(item)}
-                            className="rounded-lg border border-[#F2EAD3] bg-white px-2.5 py-1 text-xs font-semibold text-[#475569] hover:text-[#161827] hover:bg-[#FBF3DC] disabled:opacity-50 transition-colors"
+                            className="rounded-lg border border-[#E7E9F0] bg-white px-2.5 py-1 text-xs font-semibold text-[#475569] hover:text-[#202333] hover:bg-[#F4F2FD] disabled:opacity-50 transition-colors"
                           >
                             {busyId === item.id ? "Đang lưu..." : "Đã đọc"}
                           </button>
@@ -293,7 +293,7 @@ export function NotificationBell() {
 
           <Link
             href="/app/notifications"
-            className="block border-t border-[#F2EAD3] bg-[#FFFBF0] px-4 py-2.5 text-center text-xs font-bold text-[#3B5BDB] hover:bg-[#EEF2FF] transition-colors"
+            className="block border-t border-[#E7E9F0] bg-[#F8F9FC] px-4 py-2.5 text-center text-xs font-bold text-[#6044E8] hover:bg-[#F2EEFF] transition-colors"
           >
             Xem trung tâm thông báo
           </Link>

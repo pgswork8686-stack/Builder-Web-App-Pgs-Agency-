@@ -244,7 +244,7 @@ export default function AdminAttendancePage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
           <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Từ ngày
@@ -256,7 +256,7 @@ export default function AdminAttendancePage() {
               setFilterFrom(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           />
         </div>
         <div>
@@ -270,7 +270,7 @@ export default function AdminAttendancePage() {
               setFilterTo(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           />
         </div>
         <div>
@@ -283,7 +283,7 @@ export default function AdminAttendancePage() {
               setFilterDept(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           >
             <option value="">Tất cả phòng ban</option>
             {departments.map((d) => (
@@ -303,7 +303,7 @@ export default function AdminAttendancePage() {
               setFilterTeam(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           >
             <option value="">Tất cả đội nhóm</option>
             {teams.map((t) => (
@@ -323,7 +323,7 @@ export default function AdminAttendancePage() {
               setFilterStatus(e.target.value);
               setPage(1);
             }}
-            className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+            className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
           >
             <option value="">Tất cả trạng thái</option>
             <option value="present">Đúng giờ</option>
@@ -337,8 +337,8 @@ export default function AdminAttendancePage() {
 
       {/* Main Table Card */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
-          <h3 className="text-base font-extrabold text-[#161827]">
+        <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
+          <h3 className="text-base font-extrabold text-[#202333]">
             Kiểm tra bảng công ({total} lượt)
           </h3>
           <span className="text-xs text-[#475569]">
@@ -354,7 +354,7 @@ export default function AdminAttendancePage() {
           </div>
         ) : records.length === 0 ? (
           <EmptyState
-            icon={<Clock className="w-8 h-8 text-[#3B5BDB]" />}
+            icon={<Clock className="w-8 h-8 text-[#6044E8]" />}
             title="Không tìm thấy bản ghi chấm công"
             description="Chưa có dữ liệu chấm công nào khớp với bộ lọc tìm kiếm."
           />
@@ -378,14 +378,14 @@ export default function AdminAttendancePage() {
                 {records.map((rec) => (
                   <TableRow key={rec.id}>
                     <TableCell>
-                      <div className="font-bold text-[#161827]">
+                      <div className="font-bold text-[#202333]">
                         {(rec.employee?.fullName ?? rec.employee?.full_name) || "Nhân viên"}
                       </div>
                       <div className="text-xs text-[#475569]">
                         {(rec.employee?.email ?? rec.employee?.work_email)}
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-[#161827]">
+                    <TableCell className="font-bold text-[#202333]">
                       {rec.attendance_date}
                     </TableCell>
                     <TableCell className="text-xs text-[#475569]">
@@ -394,7 +394,7 @@ export default function AdminAttendancePage() {
                     <TableCell className="text-xs text-[#475569]">
                       {formatVietnamTime(rec.check_out_at)}
                     </TableCell>
-                    <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
+                    <TableCell className="font-mono text-xs font-bold text-[#6044E8]">
                       {rec.work_minutes
                         ? `${(rec.work_minutes / 60).toFixed(1)}h`
                         : "—"}
@@ -420,7 +420,7 @@ export default function AdminAttendancePage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenAdjust(rec)}
-                        className="text-[#3B5BDB] hover:bg-[#EEF2FF]"
+                        className="text-[#6044E8] hover:bg-[#F2EEFF]"
                       >
                         Hiệu chỉnh
                       </Button>
@@ -434,7 +434,7 @@ export default function AdminAttendancePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#E7E9F0] text-xs text-[#475569]">
             <span>Tổng số {total} bản ghi</span>
             <div className="flex gap-2">
               <Button
@@ -484,7 +484,7 @@ export default function AdminAttendancePage() {
                   type="datetime-local"
                   value={adjustCheckIn}
                   onChange={(e) => setAdjustCheckIn(e.target.value)}
-                  className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </div>
               <div>
@@ -495,7 +495,7 @@ export default function AdminAttendancePage() {
                   type="datetime-local"
                   value={adjustCheckOut}
                   onChange={(e) => setAdjustCheckOut(e.target.value)}
-                  className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </div>
             </div>
@@ -507,7 +507,7 @@ export default function AdminAttendancePage() {
               <select
                 value={adjustStatus}
                 onChange={(e) => setAdjustStatus(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="present">Đúng giờ</option>
                 <option value="late">Đi muộn</option>
@@ -527,7 +527,7 @@ export default function AdminAttendancePage() {
                 placeholder="VD: Quên check-out khi ra về, có xác nhận của trưởng nhóm..."
                 rows={3}
                 required
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl p-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl p-3 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
             </div>
 

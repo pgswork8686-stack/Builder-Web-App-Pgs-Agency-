@@ -42,7 +42,7 @@ export function Avatar({
   return (
     <div className={`relative inline-block shrink-0 ${className}`} {...props}>
       <div
-        className={`relative flex items-center justify-center rounded-full overflow-hidden border border-[#F2EAD3] bg-[#EEF2FF] font-bold text-[#3B5BDB] select-none ${sizeStyles[size]}`}
+        className={`relative flex items-center justify-center rounded-full overflow-hidden border border-[#E7E9F0] bg-[#F2EEFF] font-bold text-[#6044E8] select-none ${sizeStyles[size]}`}
       >
         {src && !imageError ? (
           // eslint-disable-next-line @next/next/no-img-element

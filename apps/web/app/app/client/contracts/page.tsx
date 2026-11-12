@@ -83,7 +83,7 @@ export default function ClientContractsPage() {
         </div>
       ) : contracts.length === 0 ? (
         <EmptyState
-          icon={<FileText className="w-8 h-8 text-[#3B5BDB]" />}
+          icon={<FileText className="w-8 h-8 text-[#6044E8]" />}
           title="Chưa có hợp đồng nào"
           description="Không có hợp đồng nào được công khai cho tài khoản của bạn."
         />
@@ -101,7 +101,7 @@ export default function ClientContractsPage() {
                       <span className="text-xs font-mono text-[#475569] font-bold block">
                         MÃ SỐ: {c.contract_number}
                       </span>
-                      <h4 className="font-extrabold text-[#161827] text-base mt-0.5">
+                      <h4 className="font-extrabold text-[#202333] text-base mt-0.5">
                         {c.title}
                       </h4>
                     </div>
@@ -124,10 +124,10 @@ export default function ClientContractsPage() {
                   </div>
 
                   <div className="text-xs text-[#475569] flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#3B5BDB]" />
+                    <Calendar className="w-3.5 h-3.5 text-[#6044E8]" />
                     <span>
                       Hiệu lực:{" "}
-                      <span className="font-mono text-[#161827] font-semibold">
+                      <span className="font-mono text-[#202333] font-semibold">
                         {c.start_date}
                       </span>
                       {c.end_date ? ` ~ ${c.end_date}` : " (Không thời hạn)"}
@@ -135,12 +135,12 @@ export default function ClientContractsPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-[#F2EAD3] pt-4 flex justify-between items-end">
+                <div className="border-t border-[#E7E9F0] pt-4 flex justify-between items-end">
                   <div>
                     <span className="text-xs font-bold text-[#475569] uppercase block">
                       Giá trị hợp đồng
                     </span>
-                    <span className="text-lg font-black text-[#3B5BDB] block mt-0.5">
+                    <span className="text-lg font-black text-[#6044E8] block mt-0.5">
                       {formatCurrency(c.contract_value, c.currency_code)}
                     </span>
                   </div>
@@ -151,10 +151,10 @@ export default function ClientContractsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between text-xs text-[#475569] pt-4 border-t border-[#F2EAD3]">
+            <div className="flex items-center justify-between text-xs text-[#475569] pt-4 border-t border-[#E7E9F0]">
               <span>
                 Hiển thị{" "}
-                <span className="font-bold text-[#161827]">
+                <span className="font-bold text-[#202333]">
                   {contracts.length}
                 </span>{" "}
                 / {total} hợp đồng
@@ -168,7 +168,7 @@ export default function ClientContractsPage() {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <span className="font-bold text-[#161827]">
+                <span className="font-bold text-[#202333]">
                   Trang {page} / {totalPages}
                 </span>
                 <Button

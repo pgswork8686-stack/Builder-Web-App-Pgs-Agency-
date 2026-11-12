@@ -233,14 +233,14 @@ export default function AdminDepartmentsPage() {
       <Card className="p-0 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
             <span className="text-xs text-[#475569]">
               Đang tải danh sách phòng ban...
             </span>
           </div>
         ) : departments.length === 0 ? (
           <EmptyState
-            icon={<Building2 className="w-8 h-8 text-[#3B5BDB]" />}
+            icon={<Building2 className="w-8 h-8 text-[#6044E8]" />}
             title="Chưa có phòng ban nào"
             description="Bắt đầu tạo sơ đồ cơ cấu công ty bằng cách thêm phòng ban đầu tiên."
             actionLabel="Thêm phòng ban"
@@ -267,23 +267,23 @@ export default function AdminDepartmentsPage() {
               <TableBody>
                 {departments.map((dept) => (
                   <TableRow key={dept.id}>
-                    <TableCell className="font-mono font-bold text-[#3B5BDB]">
+                    <TableCell className="font-mono font-bold text-[#6044E8]">
                       {dept.departmentCode}
                     </TableCell>
-                    <TableCell className="font-mono text-xs font-semibold text-[#161827]">
+                    <TableCell className="font-mono text-xs font-semibold text-[#202333]">
                       {dept.code}
                     </TableCell>
-                    <TableCell className="font-bold text-[#161827]">
+                    <TableCell className="font-bold text-[#202333]">
                       {dept.name}
                     </TableCell>
                     <TableCell>
                       {dept.head ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#3B5BDB] flex items-center justify-center font-bold text-xs">
+                          <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#6044E8] flex items-center justify-center font-bold text-xs">
                             {dept.head.fullName.charAt(0)}
                           </div>
                           <div>
-                            <div className="font-semibold text-xs text-[#161827]">
+                            <div className="font-semibold text-xs text-[#202333]">
                               {dept.head.fullName}
                             </div>
                             <div className="text-xs text-[#475569] font-mono">
@@ -360,7 +360,7 @@ export default function AdminDepartmentsPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="VD: SEO, TECH, HR, MKT"
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs font-mono text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
             </div>
 
@@ -374,7 +374,7 @@ export default function AdminDepartmentsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="VD: Phòng Tối ưu hóa Tìm kiếm (SEO)"
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
             </div>
 
@@ -385,7 +385,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={headUserId}
                 onChange={(e) => setHeadUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="">-- Chưa bổ nhiệm --</option>
                 {employees.map((emp) => (
@@ -405,11 +405,11 @@ export default function AdminDepartmentsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Mô tả phạm vi và nhiệm vụ của phòng ban..."
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] resize-none"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] resize-none"
               />
             </div>
 
-            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#E7E9F0] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"
@@ -457,7 +457,7 @@ export default function AdminDepartmentsPage() {
                 type="text"
                 disabled
                 value={`${editingDept.departmentCode} (${editingDept.code})`}
-                className="w-full bg-[#FBF3DC] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#475569] cursor-not-allowed"
+                className="w-full bg-[#F4F2FD] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs font-mono text-[#475569] cursor-not-allowed"
               />
             </div>
 
@@ -472,7 +472,7 @@ export default function AdminDepartmentsPage() {
                 onChange={(e) =>
                   setEditingDept({ ...editingDept, name: e.target.value })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
             </div>
 
@@ -483,7 +483,7 @@ export default function AdminDepartmentsPage() {
               <select
                 value={editHeadUserId}
                 onChange={(e) => setEditHeadUserId(e.target.value)}
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="">-- Chưa bổ nhiệm (Trống) --</option>
                 {employees.map((emp) => (
@@ -507,7 +507,7 @@ export default function AdminDepartmentsPage() {
                     description: e.target.value,
                   })
                 }
-                className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] resize-none"
+                className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] resize-none"
               />
             </div>
 
@@ -522,17 +522,17 @@ export default function AdminDepartmentsPage() {
                     isActive: e.target.checked,
                   })
                 }
-                className="w-4 h-4 accent-[#3B5BDB] cursor-pointer"
+                className="w-4 h-4 accent-[#6044E8] cursor-pointer"
               />
               <label
                 htmlFor="edit_is_active"
-                className="text-xs font-semibold text-[#161827] cursor-pointer select-none"
+                className="text-xs font-semibold text-[#202333] cursor-pointer select-none"
               >
                 Phòng ban đang hoạt động
               </label>
             </div>
 
-            <div className="border-t border-[#F2EAD3] pt-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#E7E9F0] pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="secondary"

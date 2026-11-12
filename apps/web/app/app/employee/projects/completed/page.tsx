@@ -58,10 +58,10 @@ export default function EmployeeCompletedProjectsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-2">
-              <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+              <span className="font-mono text-xs font-bold text-[#6044E8]">
                 {p.projectCode}
               </span>
-              <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>
+              <h4 className="text-sm font-bold text-[#2E3248]">{p.name}</h4>
             </Card>
           ))}
         </div>

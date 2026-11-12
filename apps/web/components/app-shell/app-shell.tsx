@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { MobileSidebar } from "./mobile-sidebar";
 import { Topbar } from "./topbar";
+import { ModuleTabs } from "./module-tabs";
 import type { AccountPayload, UserPayload } from "@/lib/api/auth";
 
 export interface AppShellProps {
@@ -41,8 +42,8 @@ export function AppShell({ children, account, user }: AppShellProps) {
   };
 
   return (
-    <div className="h-screen bg-[#FFFBF0] text-[#161827] flex flex-row overflow-hidden font-sans">
-      {/* Desktop Persistent / Collapsible Sidebar - exact 250px width in Figma */}
+    <div className="h-screen bg-[#F8F9FC] text-[#202333] flex flex-row overflow-hidden font-sans">
+      {/* Thanh bên V2: 240px, thu gọn 72px */}
       <Sidebar
         account={account}
         user={user}
@@ -66,8 +67,12 @@ export function AppShell({ children, account, user }: AppShellProps) {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="max-w-7xl w-full mx-auto">{children}</div>
+        <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 lg:px-6">
+          {/* V2: vùng nội dung rộng cho bảng dữ liệu; tab module tự sinh từ role-navigation */}
+          <div className="max-w-[1680px] w-full mx-auto">
+            <ModuleTabs role={account.role} />
+            {children}
+          </div>
         </main>
       </div>
     </div>

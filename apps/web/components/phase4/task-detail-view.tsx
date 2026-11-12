@@ -137,7 +137,7 @@ function TaskDetailContent({
     mode === "admin" || project?.currentProjectRole !== "viewer";
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
+    <main className="min-h-screen bg-[#F8F9FC] px-4 py-7 text-[#202333] lg:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <WorkspaceHeader
           mode={mode}
@@ -152,7 +152,7 @@ function TaskDetailContent({
           </div>
         )}
         {loading && !task ? (
-          <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
+          <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
             Đang tải chi tiết công việc…
           </div>
         ) : !task ? (
@@ -161,13 +161,13 @@ function TaskDetailContent({
           </div>
         ) : (
           <>
-            <section className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
+            <section className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#3B5BDB]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#6044E8]">
                     Thông tin công việc
                   </p>
-                  <h2 className="mt-2 text-2xl font-black text-[#161827]">
+                  <h2 className="mt-2 text-2xl font-black text-[#202333]">
                     {task.title}
                   </h2>
                 </div>
@@ -178,7 +178,7 @@ function TaskDetailContent({
                       void updateStatus(event.target.value as TaskStatus)
                     }
                     aria-label="Đổi trạng thái công việc"
-                    className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs font-bold text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                    className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs font-bold text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                   >
                     {statuses.map((status) => (
                       <option key={status.value} value={status.value}>
@@ -187,7 +187,7 @@ function TaskDetailContent({
                     ))}
                   </select>
                 ) : (
-                  <span className="rounded-full bg-[#FBF3DC] px-3 py-1 text-xs font-bold text-[#3B5BDB]">
+                  <span className="rounded-full bg-[#F4F2FD] px-3 py-1 text-xs font-bold text-[#6044E8]">
                     {task.status}
                   </span>
                 )}
@@ -207,14 +207,14 @@ function TaskDetailContent({
             </section>
 
             <section className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
-                <h3 className="font-bold text-[#161827] text-sm">Mô tả</h3>
+              <div className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+                <h3 className="font-bold text-[#202333] text-sm">Mô tả</h3>
                 <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#475569]">
                   {task.description || "Chưa có mô tả."}
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
-                <h3 className="font-bold text-[#161827] text-sm">Thời gian</h3>
+              <div className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+                <h3 className="font-bold text-[#202333] text-sm">Thời gian</h3>
                 <dl className="mt-3 space-y-3 text-xs">
                   <Info label="Bắt đầu" value={task.start_date} />
                   <Info label="Đến hạn" value={task.due_date} />
@@ -238,8 +238,8 @@ function TaskDetailContent({
               </div>
             </section>
 
-            <section className="space-y-4 rounded-2xl border border-[#F2EAD3] bg-white p-6 shadow-xs">
-              <h3 className="font-bold text-[#161827] text-sm">Bình luận</h3>
+            <section className="space-y-4 rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+              <h3 className="font-bold text-[#202333] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
                 <p className="text-xs text-[#64748B]">Chưa có bình luận.</p>
               ) : (
@@ -247,11 +247,11 @@ function TaskDetailContent({
                   {comments.map((comment) => (
                     <article
                       key={comment.id}
-                      className="rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-4"
+                      className="rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-bold text-xs text-[#161827]">
+                          <p className="font-bold text-xs text-[#202333]">
                             {comment.author?.full_name ||
                               comment.author?.email ||
                               "Thành viên"}
@@ -272,7 +272,7 @@ function TaskDetailContent({
                                 setEditingContent(comment.content);
                               }}
                               aria-label="Sửa bình luận"
-                              className="text-[#475569] hover:text-[#161827]"
+                              className="text-[#475569] hover:text-[#202333]"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
@@ -298,13 +298,13 @@ function TaskDetailContent({
                             }
                             maxLength={10000}
                             aria-label="Nội dung chỉnh sửa"
-                            className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-white p-3 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+                            className="min-h-24 w-full rounded-xl border border-[#E7E9F0] bg-white p-3 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
                           />
                           <div className="flex justify-end gap-2">
                             <button
                               type="button"
                               onClick={() => setEditingId(null)}
-                              className="rounded-lg border border-[#F2EAD3] bg-white p-1.5 text-[#475569] hover:text-[#161827]"
+                              className="rounded-lg border border-[#E7E9F0] bg-white p-1.5 text-[#475569] hover:text-[#202333]"
                               aria-label="Hủy sửa"
                             >
                               <X className="h-4 w-4" />
@@ -312,7 +312,7 @@ function TaskDetailContent({
                             <button
                               type="button"
                               onClick={() => void saveComment(comment.id)}
-                              className="rounded-lg bg-[#3B5BDB] p-1.5 text-white hover:bg-[#3D62EE]"
+                              className="rounded-lg bg-[#6044E8] p-1.5 text-white hover:bg-[#3D62EE]"
                               aria-label="Lưu bình luận"
                             >
                               <Check className="h-4 w-4" />
@@ -320,7 +320,7 @@ function TaskDetailContent({
                           </div>
                         </div>
                       ) : (
-                        <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#161827]">
+                        <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#202333]">
                           {comment.content}
                         </p>
                       )}
@@ -334,7 +334,7 @@ function TaskDetailContent({
                     type="button"
                     disabled={commentPage <= 1}
                     onClick={() => setCommentPage((value) => value - 1)}
-                    className="rounded-lg border border-[#F2EAD3] bg-white px-3 py-1.5 disabled:opacity-40 text-[#161827]"
+                    className="rounded-lg border border-[#E7E9F0] bg-white px-3 py-1.5 disabled:opacity-40 text-[#202333]"
                   >
                     Trước
                   </button>
@@ -345,7 +345,7 @@ function TaskDetailContent({
                     type="button"
                     disabled={commentPage >= commentPages}
                     onClick={() => setCommentPage((value) => value + 1)}
-                    className="rounded-lg border border-[#F2EAD3] bg-white px-3 py-1.5 disabled:opacity-40 text-[#161827]"
+                    className="rounded-lg border border-[#E7E9F0] bg-white px-3 py-1.5 disabled:opacity-40 text-[#202333]"
                   >
                     Sau
                   </button>
@@ -360,10 +360,10 @@ function TaskDetailContent({
                     maxLength={10000}
                     placeholder="Viết bình luận…"
                     aria-label="Bình luận mới"
-                    className="min-h-24 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] p-3 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                    className="min-h-24 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] p-3 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                   />
                   <div className="flex justify-end">
-                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#3B5BDB] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-[#6044E8] px-4 py-2 text-xs font-bold text-white hover:bg-[#3D62EE] transition-colors shadow-xs">
                       <Send className="h-4 w-4" /> Gửi bình luận
                     </button>
                   </div>
@@ -372,7 +372,7 @@ function TaskDetailContent({
             </section>
 
             <section className="space-y-4">
-              <h3 className="font-bold text-[#161827] text-sm">Tệp đính kèm</h3>
+              <h3 className="font-bold text-[#202333] text-sm">Tệp đính kèm</h3>
               <FileManager
                 projectId={projectId}
                 taskId={taskId}
@@ -390,9 +390,9 @@ function TaskDetailContent({
 
 function Info({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-[#F2EAD3] pb-2">
+    <div className="flex justify-between gap-4 border-b border-[#E7E9F0] pb-2">
       <dt className="text-[#475569]">{label}</dt>
-      <dd className="break-all text-right font-semibold text-[#161827]">
+      <dd className="break-all text-right font-semibold text-[#202333]">
         {value || "—"}
       </dd>
     </div>

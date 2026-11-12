@@ -70,23 +70,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#161827] font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8F9FC] text-[#202333] font-sans">
       {/* Left Blue Hero Panel */}
       <AuthHero />
 
       {/* Right Form Panel */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#F2EAD3] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header */}
           <div>
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 rounded-xl bg-[#FFB800] text-black font-bold flex items-center justify-center">
                 P
               </div>
-              <span className="font-bold text-lg text-[#161827]">PGS Hub</span>
+              <span className="font-bold text-lg text-[#202333]">PGS Hub</span>
             </div>
 
-            <h2 className="text-2xl font-bold text-[#161827] tracking-tight">
+            <h2 className="text-2xl font-bold text-[#202333] tracking-tight">
               Đăng nhập PGS Hub
             </h2>
             <p className="mt-1.5 text-xs text-[#475569]">
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@pgsagency.vn"
-                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] focus:ring-2 focus:ring-[#6044E8]/20 text-[#202333] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-[#3B5BDB] hover:underline font-medium"
+                  className="text-xs text-[#6044E8] hover:underline font-medium"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -136,14 +136,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] focus:ring-2 focus:ring-[#3B5BDB]/20 text-[#161827] text-sm placeholder-[#94A3B8] outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] focus:ring-2 focus:ring-[#6044E8]/20 text-[#202333] text-sm placeholder-[#94A3B8] outline-none transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || oauthLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#E7AE18] hover:bg-[#CC9410] text-[#161827] font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#7257F5] hover:bg-[#6044E8] text-white font-bold text-sm transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? <span>Đang xử lý...</span> : <span>Đăng nhập</span>}
             </button>
@@ -151,7 +151,7 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="relative flex items-center justify-center my-4">
-            <div className="w-full border-t border-[#F2EAD3]" />
+            <div className="w-full border-t border-[#E7E9F0]" />
             <span className="absolute px-3 bg-white text-xs text-[#64748B]">
               Hoặc
             </span>
@@ -162,7 +162,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={oauthLoading || loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#FFFBF0] hover:bg-[#FBF3DC] border border-[#F2EAD3] text-[#1E293B] font-semibold text-xs transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#F8F9FC] hover:bg-[#F4F2FD] border border-[#E7E9F0] text-[#1E293B] font-semibold text-xs transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -192,7 +192,7 @@ export default function LoginPage() {
             Chưa có tài khoản?{" "}
             <Link
               href="/auth/sign-up"
-              className="text-[#3B5BDB] font-bold hover:underline"
+              className="text-[#6044E8] font-bold hover:underline"
             >
               Đăng ký và chờ Admin duyệt
             </Link>

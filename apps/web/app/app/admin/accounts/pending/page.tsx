@@ -191,7 +191,7 @@ export default function AdminPendingAccountsPage() {
       )}
 
       {/* Search & Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="relative w-full sm:w-80 flex items-center">
           <Search className="absolute left-3.5 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -199,13 +199,13 @@ export default function AdminPendingAccountsPage() {
             placeholder="Tìm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#202333] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#6044E8] transition-colors"
           />
         </div>
 
         <div className="text-xs text-[#475569] hidden sm:block">
           Hiển thị:{" "}
-          <span className="font-bold text-[#161827]">
+          <span className="font-bold text-[#202333]">
             {filteredUsers.length}
           </span>{" "}
           tài khoản
@@ -258,7 +258,7 @@ export default function AdminPendingAccountsPage() {
                           size="md"
                         />
                         <div>
-                          <p className="font-bold text-[#161827]">
+                          <p className="font-bold text-[#202333]">
                             {user.fullName || "Chưa đặt tên"}
                           </p>
                           <p className="text-xs text-[#475569]">{user.email}</p>
@@ -290,7 +290,7 @@ export default function AdminPendingAccountsPage() {
                         onChange={(e) =>
                           handleRoleChange(user.id, e.target.value)
                         }
-                        className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2 outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
+                        className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2 outline-none focus:bg-white focus:border-[#6044E8] transition-colors"
                       >
                         <option value="">-- Chọn vai trò --</option>
                         {ROLE_OPTIONS.map((opt) => (
@@ -352,7 +352,7 @@ export default function AdminPendingAccountsPage() {
               placeholder="VD: Không thuộc danh sách nhân sự chính thức của doanh nghiệp..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#202333] text-xs outline-none focus:bg-white focus:border-[#FF785A] transition-colors"
             />
           </div>
 

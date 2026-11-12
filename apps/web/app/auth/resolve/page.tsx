@@ -78,8 +78,8 @@ export default function AuthResolvePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFFBF0] text-[#161827] p-6">
-      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-[460px] w-full rounded-3xl border-[#F2EAD3]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FC] text-[#202333] p-6">
+      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-[460px] w-full rounded-3xl border-[#E7E9F0]">
         {errorMsg ? (
           <>
             <h3 className="text-base font-extrabold text-red-600">
@@ -102,8 +102,8 @@ export default function AuthResolvePage() {
           </>
         ) : (
           <>
-            <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
-            <h3 className="text-base font-extrabold text-[#161827]">PGS HUB</h3>
+            <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin" />
+            <h3 className="text-base font-extrabold text-[#202333]">PGS HUB</h3>
             <p className="text-xs text-[#475569]">{statusText}</p>
           </>
         )}

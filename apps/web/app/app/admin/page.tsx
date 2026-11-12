@@ -64,14 +64,14 @@ function timeOf(iso: string) {
 const STATE_DOT: Record<string, string> = {
   present: "bg-[#00D09C]",
   late: "bg-[#FF9F24]",
-  leave: "bg-[#3B5BDB]",
+  leave: "bg-[#6044E8]",
   none: "bg-[#FF785A]",
 };
 
 const TASK_STATUS: Record<string, { label: string; cls: string }> = {
-  todo: { label: "Cần làm", cls: "bg-[#EEF2FF] text-[#3B5BDB]" },
+  todo: { label: "Cần làm", cls: "bg-[#F2EEFF] text-[#6044E8]" },
   in_progress: { label: "Đang làm", cls: "bg-[#FEF3C7] text-[#92400E]" },
-  review: { label: "Chờ duyệt", cls: "bg-[#F3E8FF] text-[#7356F1]" },
+  review: { label: "Chờ duyệt", cls: "bg-[#F2EEFF] text-[#7257F5]" },
 };
 
 
@@ -127,7 +127,7 @@ export default function AdminDashboardPage() {
       {/* Greeting */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-[30px] font-bold text-[#24304A] tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-[30px] font-bold text-[#2E3248] tracking-tight leading-tight">
             {greeting(hour)}, {userName}
           </h1>
           <p className="text-sm text-[#475569] mt-1">
@@ -138,19 +138,19 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/app/admin/tasks"
-            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E7E9F0] text-xs font-bold text-[#202333] hover:bg-[#F2EEFF]"
           >
             Giao việc
           </Link>
           <Link
             href="/app/admin/projects"
-            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#F2EAD3] text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E7E9F0] text-xs font-bold text-[#202333] hover:bg-[#F2EEFF]"
           >
             Tạo dự án
           </Link>
           <Link
             href="/app/admin/accounts/pending"
-            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#F3BA2F] hover:bg-[#E7AE18] text-xs font-bold text-[#161827]"
+            className="px-4 py-2.5 min-h-11 inline-flex items-center justify-center rounded-xl bg-[#7257F5] hover:bg-[#6044E8] text-xs font-bold text-white"
           >
             Duyệt tài khoản ({pendingAcc})
           </Link>
@@ -191,7 +191,7 @@ export default function AdminDashboardPage() {
                 )}
               </span>
               <div className="min-w-0 pr-6">
-                <p className="text-sm font-bold text-[#161827]">
+                <p className="text-sm font-bold text-[#202333]">
                   {(data?.attention.total ?? 0) > 0
                     ? `${data?.attention.total} mục cần xử lý trong hôm nay`
                     : "Không có mục nào cần xử lý hôm nay"}
@@ -207,7 +207,7 @@ export default function AdminDashboardPage() {
                 type="button"
                 aria-label="Đóng thông báo"
                 onClick={() => setHideAttention(true)}
-                className="absolute top-3 right-3 text-[#475569] hover:text-[#161827]"
+                className="absolute top-3 right-3 text-[#475569] hover:text-[#202333]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -231,7 +231,7 @@ export default function AdminDashboardPage() {
                 )}
               </span>
               <div className="min-w-0 pr-6">
-                <p className="text-sm font-bold text-[#161827]">
+                <p className="text-sm font-bold text-[#202333]">
                   {apiHealthy === false ? "Hệ thống gặp sự cố" : "Hệ thống ổn định"}
                 </p>
                 <p className="text-xs text-[#475569] mt-1">
@@ -244,7 +244,7 @@ export default function AdminDashboardPage() {
                 type="button"
                 aria-label="Đóng thông báo"
                 onClick={() => setHideHealth(true)}
-                className="absolute top-3 right-3 text-[#475569] hover:text-[#161827]"
+                className="absolute top-3 right-3 text-[#475569] hover:text-[#202333]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -261,7 +261,7 @@ export default function AdminDashboardPage() {
           sub={`${k?.overdueProjects ?? 0} dự án trễ hạn`}
           icon={<FolderKanban className="w-4 h-4" />}
           bg="#FFFFFF"
-          border="#F2EAD3"
+          border="#E7E9F0"
         />
         <Kpi
           label="Việc quá hạn"
@@ -300,7 +300,7 @@ export default function AdminDashboardPage() {
           value={loading ? "…" : String(k?.tickets.open ?? 0)}
           sub={`${k?.tickets.waitingClient ?? 0} chờ khách phản hồi`}
           icon={<LifeBuoy className="w-4 h-4" />}
-          bg="#F3E8FF"
+          bg="#F2EEFF"
           border="#E9D5FF"
         />
       </div>
@@ -320,18 +320,18 @@ export default function AdminDashboardPage() {
           }
         >
           {data && data.attention.items.length > 0 ? (
-            <ul className="divide-y divide-[#F2EAD3]">
+            <ul className="divide-y divide-[#E7E9F0]">
               {data.attention.items.map((i) => (
                 <li key={i.key}>
                   <Link
                     href={i.href}
-                    className="flex items-center gap-3 py-3 hover:bg-[#FFFBF0] rounded-xl px-1 -mx-1"
+                    className="flex items-center gap-3 py-3 hover:bg-[#F8F9FC] rounded-xl px-1 -mx-1"
                   >
-                    <span className="w-9 h-9 rounded-xl bg-[#FFF8E5] grid place-items-center text-[#8A6400]">
+                    <span className="w-9 h-9 rounded-xl bg-[#F2EEFF] grid place-items-center text-[#5B3FD6]">
                       <ListChecks className="w-4 h-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-[#161827] truncate">
+                      <span className="block text-sm font-bold text-[#202333] truncate">
                         {i.title}
                       </span>
                       <span className="block text-xs text-[#475569] truncate">
@@ -362,25 +362,25 @@ export default function AdminDashboardPage() {
         >
           {staff && staff.total > 0 ? (
             <>
-              <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
+              <div className="h-2.5 rounded-full bg-[#F4F2FD] overflow-hidden flex">
                 <span style={{ width: `${((staff.present - staff.late) / staff.total) * 100}%` }} className="bg-[#00D09C]" />
                 <span style={{ width: `${(staff.late / staff.total) * 100}%` }} className="bg-[#FF9F24]" />
-                <span style={{ width: `${(staff.onLeave / staff.total) * 100}%` }} className="bg-[#3B5BDB]" />
+                <span style={{ width: `${(staff.onLeave / staff.total) * 100}%` }} className="bg-[#6044E8]" />
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#475569]">
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#00D09C]" />{staff.present} có mặt</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#FF9F24]" />{staff.late} đi muộn</span>
-                <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#3B5BDB]" />{staff.onLeave} nghỉ phép</span>
+                <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#6044E8]" />{staff.onLeave} nghỉ phép</span>
                 <span className="flex items-center gap-1.5"><i className="w-2 h-2 rounded-full bg-[#FF785A]" />{staff.notCheckedIn} chưa check-in</span>
               </div>
               <ul className="space-y-2 mt-1">
                 {data!.staffToday.map((s) => (
                   <li key={s.id} className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center">
+                    <span className="w-8 h-8 rounded-full bg-[#F2EEFF] text-[#6044E8] text-xs font-bold grid place-items-center">
                       {initials(s.name)}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-[#161827] truncate">{s.name}</span>
+                      <span className="block text-sm font-bold text-[#202333] truncate">{s.name}</span>
                       <span className="block text-xs text-[#475569] truncate">{s.note}</span>
                     </span>
                     <i className={`w-2 h-2 rounded-full ${STATE_DOT[s.state]}`} />
@@ -408,14 +408,14 @@ export default function AdminDashboardPage() {
                 return (
                   <li key={w.departmentId}>
                     <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="font-bold text-[#161827] truncate">{w.name}</span>
+                      <span className="font-bold text-[#202333] truncate">{w.name}</span>
                       <span className="text-[#475569] shrink-0">
                         {w.open} mở
                         {w.overdue > 0 && <b className="text-[#DC2626]"> · {w.overdue} quá hạn</b>}
                       </span>
                     </div>
-                    <div className="h-2.5 rounded-full bg-[#FBF3DC] overflow-hidden flex">
-                      <span style={{ width: `${((w.open - w.overdue) / max) * 100}%` }} className="bg-[#E7AE18]" />
+                    <div className="h-2.5 rounded-full bg-[#F4F2FD] overflow-hidden flex">
+                      <span style={{ width: `${((w.open - w.overdue) / max) * 100}%` }} className="bg-[#7257F5]" />
                       <span style={{ width: `${(w.overdue / max) * 100}%` }} className="bg-[#FF785A]" />
                     </div>
                   </li>
@@ -432,23 +432,23 @@ export default function AdminDashboardPage() {
           icon={<ListChecks className="w-4 h-4" />}
           action={
             data && (
-              <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#F2EEFF] text-[#6044E8] text-xs font-bold">
                 {data.newTasks.last24h} công việc trong 24 giờ
               </span>
             )
           }
         >
           {data && data.newTasks.items.length > 0 ? (
-            <ul className="divide-y divide-[#F2EAD3]">
+            <ul className="divide-y divide-[#E7E9F0]">
               {data.newTasks.items.map((t) => {
                 const st = TASK_STATUS[t.status] ?? TASK_STATUS.todo;
                 return (
                   <li key={t.id} className="flex items-center gap-3 py-2.5">
-                    <span className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center shrink-0">
+                    <span className="w-8 h-8 rounded-full bg-[#F2EEFF] text-[#6044E8] text-xs font-bold grid place-items-center shrink-0">
                       {initials(t.assignee)}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-[#161827] truncate">{t.title}</span>
+                      <span className="block text-sm font-bold text-[#202333] truncate">{t.title}</span>
                       <span className="block text-xs text-[#475569] truncate">
                         {t.project ?? "—"} · giao cho {t.assignee}
                       </span>
@@ -484,7 +484,7 @@ export default function AdminDashboardPage() {
                   <Link href={`/app/admin/projects/${p.id}`} className="block group">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-[#161827] truncate group-hover:text-[#8A6400]">
+                        <p className="text-sm font-bold text-[#202333] truncate group-hover:text-[#5B3FD6]">
                           <span className="font-mono text-xs text-[#475569] mr-2">{p.code}</span>
                           {p.name}
                         </p>
@@ -493,16 +493,16 @@ export default function AdminDashboardPage() {
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-[#161827]">{p.progress}%</p>
+                        <p className="text-sm font-bold text-[#202333]">{p.progress}%</p>
                         <p className={`text-xs ${p.late ? "text-[#DC2626] font-bold" : "text-[#475569]"}`}>
                           Hạn {shortDate(p.dueDate)}
                         </p>
                       </div>
                     </div>
-                    <div className="h-2 rounded-full bg-[#FBF3DC] overflow-hidden mt-2">
+                    <div className="h-2 rounded-full bg-[#F4F2FD] overflow-hidden mt-2">
                       <span
                         style={{ width: `${p.progress}%` }}
-                        className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#E7AE18]"}`}
+                        className={`block h-full ${p.late ? "bg-[#FF785A]" : "bg-[#7257F5]"}`}
                       />
                     </div>
                   </Link>
@@ -524,7 +524,7 @@ export default function AdminDashboardPage() {
               {data.activity.map((a, i) => (
                 <li key={i} className="flex gap-3 text-xs">
                   <span className="text-[#475569] font-mono w-10 shrink-0 pt-0.5">{timeOf(a.at)}</span>
-                  <span className="text-[#161827] leading-snug">{a.text}</span>
+                  <span className="text-[#202333] leading-snug">{a.text}</span>
                 </li>
               ))}
             </ul>
@@ -551,7 +551,7 @@ export default function AdminDashboardPage() {
                     <div key={m.key} className="flex-1 flex flex-col items-center justify-end h-full gap-1.5" title={fullVND(m.amount)}>
                       <span className="text-xs text-[#475569]">{m.amount ? compactVND(m.amount) : ""}</span>
                       <span
-                        className={`w-full rounded-t-lg ${last ? "bg-[#E7AE18]" : "bg-[#FDE68A]"}`}
+                        className={`w-full rounded-t-lg ${last ? "bg-[#7257F5]" : "bg-[#FDE68A]"}`}
                         style={{ height: `${Math.max(m.amount ? 6 : 2, (m.amount / maxRev) * 100)}%` }}
                       />
                       <span className="text-xs text-[#475569]">{m.label}</span>
@@ -560,15 +560,15 @@ export default function AdminDashboardPage() {
                 })}
               </div>
               <div className="grid grid-cols-3 gap-3 mt-2">
-                <div className="rounded-xl border border-[#F2EAD3] p-3">
+                <div className="rounded-xl border border-[#E7E9F0] p-3">
                   <p className="text-xs text-[#475569]">Doanh thu lũy kế</p>
-                  <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.revenue.ytd)}</p>
+                  <p className="text-sm font-bold text-[#202333] mt-1">{fullVND(data.revenue.ytd)}</p>
                 </div>
-                <div className="rounded-xl border border-[#F2EAD3] p-3">
+                <div className="rounded-xl border border-[#E7E9F0] p-3">
                   <p className="text-xs text-[#475569]">Phải thu</p>
-                  <p className="text-sm font-bold text-[#161827] mt-1">{fullVND(data.revenue.receivable)}</p>
+                  <p className="text-sm font-bold text-[#202333] mt-1">{fullVND(data.revenue.receivable)}</p>
                 </div>
-                <div className="rounded-xl border border-[#F2EAD3] p-3">
+                <div className="rounded-xl border border-[#E7E9F0] p-3">
                   <p className="text-xs text-[#475569]">Quá hạn</p>
                   <p className="text-sm font-bold text-[#DC2626] mt-1">{fullVND(data.revenue.overdue)}</p>
                 </div>
@@ -591,12 +591,12 @@ export default function AdminDashboardPage() {
                 <li key={i} className="flex items-center gap-3 text-xs">
                   <span
                     className={`shrink-0 px-2 py-0.5 rounded-md font-bold ${
-                      s.date === data.today ? "bg-[#ECFDF5] text-[#047857]" : "bg-[#FFF8E5] text-[#8A6400]"
+                      s.date === data.today ? "bg-[#ECFDF5] text-[#047857]" : "bg-[#F2EEFF] text-[#5B3FD6]"
                     }`}
                   >
                     {s.date === data.today ? "Hôm nay" : shortDate(s.date)}
                   </span>
-                  <span className="text-[#161827] truncate">{s.label}</span>
+                  <span className="text-[#202333] truncate">{s.label}</span>
                 </li>
               ))}
             </ul>

@@ -7,7 +7,7 @@ export function Card({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`rounded-2xl bg-white border border-[#F2EAD3] text-[#161827] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] transition-all ${className}`}
+      className={`rounded-2xl bg-white border border-[#E7E9F0] text-[#202333] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] transition-all ${className}`}
       {...props}
     >
       {children}
@@ -22,7 +22,7 @@ export function CardHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`p-5 sm:p-6 border-b border-[#F2EAD3] flex flex-col gap-1.5 ${className}`}
+      className={`p-5 sm:p-6 border-b border-[#E7E9F0] flex flex-col gap-1.5 ${className}`}
       {...props}
     >
       {children}
@@ -37,7 +37,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={`text-lg sm:text-xl font-extrabold text-[#161827] tracking-tight ${className}`}
+      className={`text-lg sm:text-xl font-extrabold text-[#202333] tracking-tight ${className}`}
       {...props}
     >
       {children}
@@ -79,7 +79,7 @@ export function CardFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`p-5 sm:p-6 border-t border-[#F2EAD3] flex items-center justify-between gap-4 ${className}`}
+      className={`p-5 sm:p-6 border-t border-[#E7E9F0] flex items-center justify-between gap-4 ${className}`}
       {...props}
     >
       {children}

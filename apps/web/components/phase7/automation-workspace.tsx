@@ -142,7 +142,7 @@ function statusClasses(status: AutomationExecutionStatus) {
     running: "bg-amber-400 text-black",
     success: "bg-emerald-400 text-black",
     failed: "bg-red-500 text-white",
-    skipped: "bg-[#FBF3DC] text-[#475569]",
+    skipped: "bg-[#F4F2FD] text-[#475569]",
   };
   return classes[status];
 }
@@ -307,11 +307,11 @@ export function AutomationWorkspace() {
         <aside className="space-y-6">
           <Card className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3B5BDB]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-[#161827] text-sm">
+                <h2 className="font-bold text-[#202333] text-sm">
                   Tạo quy tắc mới
                 </h2>
                 <p className="text-xs text-[#475569]">
@@ -329,7 +329,7 @@ export function AutomationWorkspace() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Ví dụ: Nhắc nhở khi giao công việc mới"
-                  className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </label>
 
@@ -342,7 +342,7 @@ export function AutomationWorkspace() {
                   onChange={(event) =>
                     setTriggerType(event.target.value as AutomationTrigger)
                   }
-                  className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 >
                   {automationTriggers.map((trigger) => (
                     <option key={trigger} value={trigger}>
@@ -359,7 +359,7 @@ export function AutomationWorkspace() {
                 <textarea
                   value={conditionsText}
                   onChange={(event) => setConditionsText(event.target.value)}
-                  className="mt-1 min-h-20 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 min-h-20 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 font-mono text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
                 <span className="mt-0.5 block text-xs text-[#64748B]">
                   So khớp payload key/value an toàn.
@@ -375,7 +375,7 @@ export function AutomationWorkspace() {
                   onChange={(event) =>
                     setRecipientMode(event.target.value as RecipientMode)
                   }
-                  className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 >
                   {recipientModes.map((mode) => (
                     <option key={mode.value} value={mode.value}>
@@ -393,7 +393,7 @@ export function AutomationWorkspace() {
                   value={actionTitle}
                   onChange={(event) => setActionTitle(event.target.value)}
                   placeholder="Để trống sẽ dùng tên mặc định"
-                  className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </label>
 
@@ -405,7 +405,7 @@ export function AutomationWorkspace() {
                   value={actionMessage}
                   onChange={(event) => setActionMessage(event.target.value)}
                   placeholder="Để trống sẽ dùng nội dung mặc định của sự kiện"
-                  className="mt-1 min-h-16 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 min-h-16 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </label>
 
@@ -417,7 +417,7 @@ export function AutomationWorkspace() {
                   value={actionUrl}
                   onChange={(event) => setActionUrl(event.target.value)}
                   placeholder="/app/tasks hoặc /app/chat"
-                  className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                  className="mt-1 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                 />
               </label>
 
@@ -437,8 +437,8 @@ export function AutomationWorkspace() {
 
           <Card className="p-5 space-y-3">
             <div className="flex items-center gap-2.5">
-              <Play className="h-4 w-4 text-[#3B5BDB]" />
-              <h2 className="font-bold text-[#161827] text-sm">
+              <Play className="h-4 w-4 text-[#6044E8]" />
+              <h2 className="font-bold text-[#202333] text-sm">
                 Chạy thử nghiệm
               </h2>
             </div>
@@ -459,12 +459,12 @@ export function AutomationWorkspace() {
                 value={manualEventKey}
                 onChange={(event) => setManualEventKey(event.target.value)}
                 placeholder="Nhập mã sự kiện (tối thiểu 8 ký tự)…"
-                className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
               <textarea
                 value={manualPayloadText}
                 onChange={(event) => setManualPayloadText(event.target.value)}
-                className="min-h-16 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 font-mono text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="min-h-16 w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 font-mono text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
               />
               <Button
                 variant="outline"
@@ -521,9 +521,9 @@ export function AutomationWorkspace() {
           ) : null}
 
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
+            <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
               <div>
-                <h2 className="font-extrabold text-[#161827] text-sm">
+                <h2 className="font-extrabold text-[#202333] text-sm">
                   Danh sách quy tắc
                 </h2>
                 <p className="text-xs text-[#475569]">
@@ -534,22 +534,22 @@ export function AutomationWorkspace() {
 
             {loading ? (
               <div className="flex items-center justify-center gap-2 p-10 text-xs text-[#475569]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#3B5BDB]" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#6044E8]" />
                 Đang tải danh sách quy tắc...
               </div>
             ) : rules.length === 0 ? (
               <EmptyState
-                icon={<Bot className="w-8 h-8 text-[#3B5BDB]" />}
+                icon={<Bot className="w-8 h-8 text-[#6044E8]" />}
                 title="Chưa có quy tắc nào"
                 description="Tạo quy tắc tự động hóa đầu tiên bằng biểu mẫu bên trái."
               />
             ) : (
-              <div className="divide-y divide-[#F2EAD3]">
+              <div className="divide-y divide-[#E7E9F0]">
                 {rules.map((rule) => (
                   <article key={rule.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="font-bold text-sm text-[#161827]">
+                        <h3 className="font-bold text-sm text-[#202333]">
                           {rule.name}
                         </h3>
                         <div className="mt-1.5 flex flex-wrap gap-2">
@@ -566,7 +566,7 @@ export function AutomationWorkspace() {
                             {rule.isEnabled ? "Đang bật" : "Đang tắt"}
                           </Badge>
                         </div>
-                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] p-3 text-xs font-mono text-[#475569]">
+                        <pre className="mt-3 max-w-full overflow-x-auto rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] p-3 text-xs font-mono text-[#475569]">
                           {JSON.stringify(
                             {
                               conditions: rule.conditions,
@@ -597,15 +597,15 @@ export function AutomationWorkspace() {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <div className="border-b border-[#F2EAD3] pb-3">
-              <h2 className="font-extrabold text-[#161827] text-sm">
+            <div className="border-b border-[#E7E9F0] pb-3">
+              <h2 className="font-extrabold text-[#202333] text-sm">
                 Lịch sử thực thi
               </h2>
               <p className="text-xs text-[#475569]">
                 Ghi nhận chi tiết kết quả chạy tự động.
               </p>
             </div>
-            <div className="divide-y divide-[#F2EAD3]">
+            <div className="divide-y divide-[#E7E9F0]">
               {executions.length === 0 ? (
                 <div className="p-8 text-center text-xs text-[#64748B]">
                   Chưa có lượt thực thi nào được ghi nhận.
@@ -618,7 +618,7 @@ export function AutomationWorkspace() {
                   >
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <div className="font-bold text-xs text-[#161827]">
+                        <div className="font-bold text-xs text-[#202333]">
                           {execution.rule?.name ?? execution.triggerType}
                         </div>
                         <div className="text-xs text-[#64748B] font-mono">

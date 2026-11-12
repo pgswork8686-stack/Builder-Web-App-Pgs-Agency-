@@ -64,23 +64,23 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#FFFBF0] text-[#161827]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8F9FC] text-[#202333]">
       {/* Video Hero Left Panel (~52%) */}
       <AuthHero />
 
       {/* Form Right Panel (~48%) */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#F2EAD3] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-8">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-8">
           <div>
             <Link
               href="/auth/login"
-              className="inline-flex items-center gap-2 text-xs font-bold text-[#475569] hover:text-[#3B5BDB] mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#475569] hover:text-[#6044E8] mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Quay lại đăng nhập</span>
             </Link>
 
-            <h2 className="text-2xl font-extrabold text-[#161827] tracking-tight">
+            <h2 className="text-2xl font-extrabold text-[#202333] tracking-tight">
               Cập nhật mật khẩu
             </h2>
             <p className="mt-1 text-xs text-[#475569]">
@@ -117,7 +117,7 @@ export default function UpdatePasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 6 ký tự"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function UpdatePasswordPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#E8DDB8] focus:bg-white focus:border-[#3B5BDB] text-[#161827] text-xs outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#DDDFEA] focus:bg-white focus:border-[#6044E8] text-[#202333] text-xs outline-none transition-colors"
                 />
               </div>
             </div>

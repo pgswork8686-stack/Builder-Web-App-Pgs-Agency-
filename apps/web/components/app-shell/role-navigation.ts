@@ -3,33 +3,33 @@ import {
   Users,
   Building2,
   FolderKanban,
-  CheckCircle2,
   ListTodo,
-  Kanban,
-  Calendar,
-  CreditCard,
-  FileText,
-  FileSpreadsheet,
-  Settings,
-  UserCheck,
-  Briefcase,
-  Layers,
-  Clock,
   CalendarDays,
-  DollarSign,
+  Wallet,
+  FileText,
+  Settings,
+  Clock,
   TrendingUp,
   Receipt,
   HelpCircle,
   FolderOpen,
-  MessageSquare,
-  Bell,
-  Cpu,
-  Shield,
+  Inbox,
+  PackageCheck,
+  BookOpen,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/api/auth";
 
+/** Một tab trong module: mỗi tab là một route thật đang có. */
+export interface NavTab {
+  title: string;
+  href: string;
+  exact?: boolean;
+}
+
 export interface NavItem {
+  /** Không còn đánh số menu (V2). Giữ trường để tương thích ngược. */
   index?: string;
   title: string;
   href: string;
@@ -37,6 +37,8 @@ export interface NavItem {
   badge?: string;
   exact?: boolean;
   activePaths?: string[];
+  /** Các view/trang con của module — hiển thị thành tab trên đầu trang, không thành mục sidebar. */
+  tabs?: NavTab[];
 }
 
 export interface NavGroup {
@@ -46,178 +48,75 @@ export interface NavGroup {
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   admin: "Quản trị viên",
-  team_leader: "Trưởng nhóm",
+  team_leader: "Trưởng phòng",
   employee: "Nhân viên",
   accountant: "Kế toán",
   client: "Khách hàng",
 };
 
 export const ROLE_HEADER_SUBTITLE: Record<AppRole, string> = {
-  admin: "Không gian Agency",
+  admin: "Quản trị toàn Agency",
   team_leader: "Không gian quản lý",
-  employee: "Nhân viên",
-  accountant: "Kế toán",
-  client: "Khách hàng",
+  employee: "Không gian làm việc",
+  accountant: "Tài chính & lương",
+  client: "Cổng khách hàng",
 };
+
+/** Module có tab: activePaths lấy từ các tab để sidebar sáng đúng khi mở trang con hoặc deep-link. */
+function mod(title: string, icon: LucideIcon, tabs: NavTab[], extra?: Partial<NavItem>): NavItem {
+  return { title, icon, href: tabs[0].href, tabs, activePaths: tabs.map((t) => t.href), ...extra };
+}
+
+const MY_WORK_TABS: NavTab[] = [
+  { title: "Chấm công", href: "/app/attendance" },
+  { title: "Nghỉ phép", href: "/app/leave" },
+];
 
 export function getNavigationForRole(role: AppRole): NavGroup[] {
   switch (role) {
     case "admin":
       return [
         {
-          groupTitle: "TỔNG QUAN",
           items: [
-            {
-              index: "01",
-              title: "Tổng quan",
-              href: "/app/admin",
-              icon: LayoutDashboard,
-              exact: true,
-            },
+            { title: "Tổng quan", href: "/app/admin", icon: LayoutDashboard, exact: true },
+            mod("Dự án & Công việc", FolderKanban, [
+              { title: "Dự án", href: "/app/admin/projects", exact: true },
+              { title: "Công việc", href: "/app/admin/tasks" },
+              { title: "Kanban", href: "/app/admin/kanban" },
+              { title: "Lịch", href: "/app/admin/calendar" },
+              { title: "Dự án hoàn thành", href: "/app/admin/projects/completed" },
+            ], { activePaths: ["/app/admin/projects", "/app/admin/tasks", "/app/admin/kanban", "/app/admin/calendar"] }),
+            { title: "Khách hàng", href: "/app/admin/clients", icon: Building2 },
+            mod("Nhân sự & Tổ chức", Users, [
+              { title: "Nhân sự", href: "/app/admin/people" },
+              { title: "Tài khoản chờ duyệt", href: "/app/admin/accounts/pending" },
+              { title: "Cơ cấu tổ chức", href: "/app/admin/organization" },
+              { title: "Phòng ban", href: "/app/admin/departments" },
+              { title: "Đội nhóm", href: "/app/admin/teams" },
+            ], { activePaths: ["/app/admin/people", "/app/admin/accounts", "/app/admin/organization", "/app/admin/departments", "/app/admin/teams"] }),
+            mod("Chấm công & Nghỉ phép", Clock, [
+              { title: "Chấm công", href: "/app/admin/attendance" },
+              { title: "Nghỉ phép", href: "/app/admin/leave" },
+              { title: "Lịch làm việc", href: "/app/admin/settings/work-calendar" },
+            ]),
+            mod("Tài chính", Wallet, [
+              { title: "Tổng quan", href: "/app/admin/finance", exact: true },
+              { title: "Hợp đồng", href: "/app/admin/finance/contracts" },
+              { title: "Hóa đơn", href: "/app/admin/finance/invoices" },
+            ], { activePaths: ["/app/admin/finance"] }),
+            { title: "Báo cáo", href: "/app/admin/reports", icon: TrendingUp },
           ],
         },
         {
-          groupTitle: "TỔ CHỨC",
+          groupTitle: "Quản trị",
           items: [
-            {
-              index: "02",
-              title: "Cơ cấu tổ chức",
-              href: "/app/admin/organization",
-              icon: Building2,
-            },
-            {
-              index: "03",
-              title: "Phòng ban",
-              href: "/app/admin/departments",
-              icon: Layers,
-            },
-            {
-              index: "04",
-              title: "Đội nhóm",
-              href: "/app/admin/teams",
-              icon: Users,
-            },
-            {
-              index: "05",
-              title: "Nhân sự",
-              href: "/app/admin/people",
-              icon: Users,
-            },
-            {
-              index: "06",
-              title: "Tài khoản chờ duyệt",
-              href: "/app/admin/accounts/pending",
-              icon: UserCheck,
-            },
-          ],
-        },
-        {
-          groupTitle: "KHÁCH HÀNG & DỰ ÁN",
-          items: [
-            {
-              index: "07",
-              title: "Khách hàng",
-              href: "/app/admin/clients",
-              icon: Briefcase,
-            },
-            {
-              index: "08",
-              title: "Dự án",
-              href: "/app/admin/projects",
-              icon: FolderKanban,
-              exact: true,
-            },
-            {
-              index: "09",
-              title: "Dịch vụ",
-              href: "/app/admin/services",
-              icon: Shield,
-            },
-            {
-              index: "10",
-              title: "Công việc",
-              href: "/app/admin/tasks",
-              icon: ListTodo,
-              activePaths: [
-                "/app/admin/tasks",
-                "/app/admin/kanban",
-                "/app/admin/calendar",
-              ],
-            },
-            {
-              index: "11",
-              title: "Tài liệu PGS",
-              href: "/app/admin/documents",
-              icon: FolderOpen,
-            },
-          ],
-        },
-        {
-          groupTitle: "NHÂN SỰ & CHẤM CÔNG",
-          items: [
-            {
-              index: "12",
-              title: "Chấm công",
-              href: "/app/admin/attendance",
-              icon: Clock,
-            },
-            {
-              index: "13",
-              title: "Nghỉ phép",
-              href: "/app/admin/leave",
-              icon: CalendarDays,
-            },
-          ],
-        },
-        {
-          groupTitle: "TÀI CHÍNH",
-          items: [
-            {
-              index: "14",
-              title: "Tài chính",
-              href: "/app/admin/finance",
-              icon: CreditCard,
-            },
-            {
-              index: "15",
-              title: "Báo cáo",
-              href: "/app/admin/reports",
-              icon: FileSpreadsheet,
-            },
-          ],
-        },
-        {
-          groupTitle: "GIAO TIẾP",
-          items: [
-            {
-              index: "16",
-              title: "Tin nhắn",
-              href: "/app/chat",
-              icon: MessageSquare,
-            },
-            {
-              index: "17",
-              title: "Thông báo",
-              href: "/app/notifications",
-              icon: Bell,
-            },
-          ],
-        },
-        {
-          groupTitle: "HỆ THỐNG",
-          items: [
-            {
-              index: "18",
-              title: "Tự động hóa",
-              href: "/app/admin/automation",
-              icon: Cpu,
-            },
-            {
-              index: "19",
-              title: "Cài đặt",
-              href: "/app/admin/settings",
-              icon: Settings,
-            },
+            { title: "Tài liệu PGS", href: "/app/admin/documents", icon: BookOpen },
+            mod("Cấu hình", Settings, [
+              { title: "Cài đặt", href: "/app/admin/settings", exact: true },
+              { title: "Dịch vụ", href: "/app/admin/services" },
+              { title: "Quy trình", href: "/app/admin/workflows" },
+              { title: "Tự động hóa", href: "/app/admin/automation" },
+            ], { activePaths: ["/app/admin/services", "/app/admin/workflows", "/app/admin/automation"] }),
           ],
         },
       ];
@@ -225,186 +124,51 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "team_leader":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
-            {
-              index: "01",
-              title: "Tổng quan",
-              href: "/app/team-leader",
-              icon: LayoutDashboard,
-              exact: true,
-            },
-            {
-              index: "02",
-              title: "Dự án của tôi",
-              href: "/app/team-leader/projects",
-              icon: FolderKanban,
-              exact: true,
-            },
-            {
-              index: "03",
-              title: "Dự án hoàn thành",
-              href: "/app/team-leader/projects/completed",
-              icon: CheckCircle2,
-            },
-            {
-              index: "04",
-              title: "Khách hàng",
-              href: "/app/team-leader/clients",
-              icon: Building2,
-            },
-            {
-              index: "05",
-              title: "Công việc",
-              href: "/app/team-leader/tasks",
-              icon: ListTodo,
-              activePaths: [
-                "/app/team-leader/tasks",
-                "/app/team-leader/kanban",
-                "/app/team-leader/calendar",
-              ],
-            },
-            {
-              index: "06",
-              title: "Đội nhóm",
-              href: "/app/team-leader/teams",
-              icon: Layers,
-            },
-            {
-              index: "07",
-              title: "Đơn cần duyệt",
-              href: "/app/team-leader/approvals",
-              icon: UserCheck,
-            },
-            {
-              index: "08",
-              title: "Tài liệu PGS",
-              href: "/app/team-leader/documents",
-              icon: FolderOpen,
-            },
-            {
-              index: "09",
-              title: "Báo cáo",
-              href: "/app/team-leader/reports",
-              icon: FileSpreadsheet,
-            },
-            {
-              index: "10",
-              title: "Chấm công",
-              href: "/app/attendance",
-              icon: Clock,
-            },
-            {
-              index: "11",
-              title: "Nghỉ phép",
-              href: "/app/leave",
-              icon: CalendarDays,
-            },
+            { title: "Hôm nay", href: "/app/team-leader", icon: LayoutDashboard, exact: true },
+            { title: "Cần xử lý", href: "/app/team-leader/approvals", icon: Inbox },
+            mod("Dự án", FolderKanban, [
+              { title: "Đang chạy", href: "/app/team-leader/projects", exact: true },
+              { title: "Hoàn thành", href: "/app/team-leader/projects/completed" },
+            ], { activePaths: ["/app/team-leader/projects"] }),
+            mod("Công việc", ListTodo, [
+              { title: "Danh sách", href: "/app/team-leader/tasks" },
+              { title: "Kanban", href: "/app/team-leader/kanban" },
+              { title: "Lịch", href: "/app/team-leader/calendar" },
+            ]),
+            mod("Đội nhóm", Users, [
+              { title: "Thành viên", href: "/app/team-leader/teams" },
+              { title: "Chấm công phòng", href: "/app/team-leader/attendance" },
+            ]),
+            { title: "Khách hàng", href: "/app/team-leader/clients", icon: Building2 },
+            mod("Tài liệu & Báo cáo", FileText, [
+              { title: "Báo cáo", href: "/app/team-leader/reports" },
+              { title: "Tài liệu PGS", href: "/app/team-leader/documents" },
+            ]),
           ],
         },
-        {
-          groupTitle: "GIAO TIẾP",
-          items: [
-            {
-              index: "12",
-              title: "Tin nhắn",
-              href: "/app/chat",
-              icon: MessageSquare,
-            },
-            {
-              index: "13",
-              title: "Thông báo",
-              href: "/app/notifications",
-              icon: Bell,
-            },
-          ],
-        },
+        { groupTitle: "Của tôi", items: [mod("Chấm công & Nghỉ phép", Clock, MY_WORK_TABS)] },
       ];
 
     case "employee":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
-            {
-              index: "01",
-              title: "Trang của tôi",
-              href: "/app/employee",
-              icon: LayoutDashboard,
-              exact: true,
-            },
-            {
-              index: "02",
-              title: "Công việc",
-              href: "/app/employee/tasks",
-              icon: ListTodo,
-            },
-            {
-              index: "03",
-              title: "Dự án tham gia",
-              href: "/app/employee/projects",
-              icon: FolderKanban,
-              exact: true,
-            },
-            {
-              index: "04",
-              title: "Dự án hoàn thành",
-              href: "/app/employee/projects/completed",
-              icon: CheckCircle2,
-            },
-            {
-              index: "05",
-              title: "Lịch",
-              href: "/app/employee/calendar",
-              icon: Calendar,
-            },
-            {
-              index: "06",
-              title: "Chấm công",
-              href: "/app/attendance",
-              icon: Clock,
-            },
-            {
-              index: "07",
-              title: "Nghỉ phép",
-              href: "/app/leave",
-              icon: CalendarDays,
-            },
-            {
-              index: "08",
-              title: "Báo cáo công việc",
-              href: "/app/employee/reports",
-              icon: FileText,
-            },
-            {
-              index: "09",
-              title: "Tài liệu PGS",
-              href: "/app/employee/documents",
-              icon: FolderOpen,
-            },
-            {
-              index: "10",
-              title: "Phiếu lương",
-              href: "/app/employee/payroll",
-              icon: DollarSign,
-            },
-          ],
-        },
-        {
-          groupTitle: "GIAO TIẾP",
-          items: [
-            {
-              index: "11",
-              title: "Tin nhắn",
-              href: "/app/chat",
-              icon: MessageSquare,
-            },
-            {
-              index: "12",
-              title: "Thông báo",
-              href: "/app/notifications",
-              icon: Bell,
-            },
+            { title: "Hôm nay", href: "/app/employee", icon: LayoutDashboard, exact: true },
+            mod("Công việc", ListTodo, [
+              { title: "Việc của tôi", href: "/app/employee/tasks" },
+              { title: "Báo cáo công việc", href: "/app/employee/reports" },
+            ]),
+            mod("Dự án", FolderKanban, [
+              { title: "Đang tham gia", href: "/app/employee/projects", exact: true },
+              { title: "Hoàn thành", href: "/app/employee/projects/completed" },
+            ], { activePaths: ["/app/employee/projects"] }),
+            mod("Chấm công & Đơn từ", Clock, [
+              ...MY_WORK_TABS,
+              { title: "Phiếu lương", href: "/app/employee/payroll" },
+            ]),
+            { title: "Lịch", href: "/app/employee/calendar", icon: CalendarDays },
+            { title: "Tài liệu", href: "/app/employee/documents", icon: BookOpen },
           ],
         },
       ];
@@ -412,186 +176,50 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     case "accountant":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
-            {
-              index: "01",
-              title: "Tổng quan tài chính",
-              href: "/app/accountant",
-              icon: LayoutDashboard,
-              exact: true,
-            },
-            {
-              index: "02",
-              title: "Khách hàng",
-              href: "/app/accountant/clients",
-              icon: Briefcase,
-            },
-            {
-              index: "03",
-              title: "Hợp đồng",
-              href: "/app/accountant/finance/contracts",
-              icon: FileText,
-            },
-            {
-              index: "04",
-              title: "Hóa đơn",
-              href: "/app/accountant/finance/invoices",
-              icon: Receipt,
-            },
-            {
-              index: "05",
-              title: "Thanh toán",
-              href: "/app/accountant/finance/payments",
-              icon: DollarSign,
-            },
-            {
-              index: "06",
-              title: "Công nợ",
-              href: "/app/accountant/finance/debts",
-              icon: TrendingUp,
-            },
-            {
-              index: "07",
-              title: "Thu chi",
-              href: "/app/accountant/finance/cashflow",
-              icon: CreditCard,
-            },
-            {
-              index: "08",
-              title: "Chi phí dự án",
-              href: "/app/accountant/finance/project-expenses",
-              icon: FolderKanban,
-            },
-            {
-              index: "09",
-              title: "Bảng lương",
-              href: "/app/accountant/payroll",
-              icon: FileSpreadsheet,
-            },
-            {
-              index: "10",
-              title: "Chứng từ",
-              href: "/app/accountant/vouchers",
-              icon: FolderOpen,
-            },
-            {
-              index: "11",
-              title: "Báo cáo",
-              href: "/app/accountant/reports",
-              icon: FileSpreadsheet,
-            },
-            {
-              index: "12",
-              title: "Chấm công",
-              href: "/app/accountant/attendance",
-              icon: Clock,
-            },
+            { title: "Tổng quan", href: "/app/accountant", icon: LayoutDashboard, exact: true },
+            mod("Khách hàng & Hợp đồng", Building2, [
+              { title: "Khách hàng", href: "/app/accountant/clients" },
+              { title: "Hợp đồng", href: "/app/accountant/finance/contracts" },
+              { title: "Hóa đơn", href: "/app/accountant/finance/invoices" },
+            ]),
+            mod("Thu tiền & Công nợ", Receipt, [
+              { title: "Thanh toán", href: "/app/accountant/finance/payments" },
+              { title: "Công nợ", href: "/app/accountant/finance/debts" },
+            ]),
+            mod("Thu chi & Chứng từ", Wallet, [
+              { title: "Thu chi", href: "/app/accountant/finance/cashflow" },
+              { title: "Chi phí dự án", href: "/app/accountant/finance/project-expenses" },
+              { title: "Chứng từ", href: "/app/accountant/vouchers" },
+            ], { activePaths: ["/app/accountant/finance/cashflow", "/app/accountant/finance/project-expenses", "/app/accountant/vouchers", "/app/accountant/finance"] }),
+            mod("Bảng công & Lương", Clock, [
+              { title: "Bảng lương", href: "/app/accountant/payroll" },
+              { title: "Chấm công nhân sự", href: "/app/accountant/attendance" },
+            ]),
+            { title: "Báo cáo", href: "/app/accountant/reports", icon: TrendingUp },
           ],
         },
-        {
-          groupTitle: "GIAO TIẾP",
-          items: [
-            {
-              index: "13",
-              title: "Tin nhắn",
-              href: "/app/chat",
-              icon: MessageSquare,
-            },
-            {
-              index: "14",
-              title: "Thông báo",
-              href: "/app/notifications",
-              icon: Bell,
-            },
-          ],
-        },
+        { groupTitle: "Của tôi", items: [mod("Chấm công & Nghỉ phép", UserRound, MY_WORK_TABS)] },
       ];
 
     case "client":
       return [
         {
-          groupTitle: "KHÔNG GIAN LÀM VIỆC",
           items: [
-            {
-              index: "01",
-              title: "Tổng quan",
-              href: "/app/client",
-              icon: LayoutDashboard,
-              exact: true,
-            },
-            {
-              index: "02",
-              title: "Dự án đang triển khai",
-              href: "/app/client/projects",
-              icon: FolderKanban,
-              exact: true,
-            },
-            {
-              index: "03",
-              title: "Dự án hoàn thành",
-              href: "/app/client/projects/completed",
-              icon: CheckCircle2,
-            },
-            {
-              index: "04",
-              title: "Sản phẩm chờ duyệt",
-              href: "/app/client/approvals",
-              icon: UserCheck,
-            },
-            {
-              index: "05",
-              title: "Tài liệu bàn giao",
-              href: "/app/client/documents",
-              icon: FolderOpen,
-            },
-            {
-              index: "06",
-              title: "Lịch họp",
-              href: "/app/client/meetings",
-              icon: Calendar,
-            },
-            {
-              index: "07",
-              title: "Hợp đồng",
-              href: "/app/client/contracts",
-              icon: FileText,
-            },
-            {
-              index: "08",
-              title: "Hóa đơn",
-              href: "/app/client/invoices",
-              icon: Receipt,
-            },
-            {
-              index: "09",
-              title: "Thanh toán",
-              href: "/app/client/payments",
-              icon: DollarSign,
-            },
-            {
-              index: "10",
-              title: "Yêu cầu hỗ trợ",
-              href: "/app/client/support",
-              icon: HelpCircle,
-            },
-          ],
-        },
-        {
-          groupTitle: "GIAO TIẾP",
-          items: [
-            {
-              index: "11",
-              title: "Tin nhắn",
-              href: "/app/chat",
-              icon: MessageSquare,
-            },
-            {
-              index: "12",
-              title: "Thông báo",
-              href: "/app/notifications",
-              icon: Bell,
-            },
+            { title: "Tổng quan", href: "/app/client", icon: LayoutDashboard, exact: true },
+            mod("Dự án", FolderKanban, [
+              { title: "Đang triển khai", href: "/app/client/projects", exact: true },
+              { title: "Hoàn thành", href: "/app/client/projects/completed" },
+              { title: "Lịch họp", href: "/app/client/meetings" },
+            ], { activePaths: ["/app/client/projects", "/app/client/meetings"] }),
+            { title: "Sản phẩm cần phản hồi", href: "/app/client/approvals", icon: PackageCheck },
+            { title: "Tài liệu bàn giao", href: "/app/client/documents", icon: FolderOpen },
+            mod("Hợp đồng & Thanh toán", Receipt, [
+              { title: "Hợp đồng", href: "/app/client/contracts" },
+              { title: "Hóa đơn", href: "/app/client/invoices" },
+              { title: "Thanh toán", href: "/app/client/payments" },
+            ]),
+            { title: "Hỗ trợ", href: "/app/client/support", icon: HelpCircle },
           ],
         },
       ];
@@ -599,4 +227,27 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
     default:
       return [];
   }
+}
+
+/** Tìm module đang mở theo pathname để hiển thị tab. Trả null nếu module không có tab. */
+export function getActiveModuleTabs(role: AppRole, pathname: string): { module: string; tabs: NavTab[] } | null {
+  for (const g of getNavigationForRole(role)) {
+    for (const it of g.items) {
+      if (!it.tabs || it.tabs.length < 2) continue;
+      const hit = it.tabs.some((t) => pathname === t.href || (!t.exact && pathname.startsWith(t.href + "/")))
+        || (it.activePaths || []).some((p) => pathname === p || pathname.startsWith(p + "/"));
+      if (hit) return { module: it.title, tabs: it.tabs };
+    }
+  }
+  return null;
+}
+
+/** Tab đang chọn: khớp dài nhất để /projects/completed không sáng tab /projects. */
+export function getActiveTabHref(tabs: NavTab[], pathname: string): string | null {
+  let best: NavTab | null = null;
+  for (const t of tabs) {
+    const ok = pathname === t.href || (!t.exact && pathname.startsWith(t.href + "/"));
+    if (ok && (!best || t.href.length > best.href.length)) best = t;
+  }
+  return best ? best.href : null;
 }

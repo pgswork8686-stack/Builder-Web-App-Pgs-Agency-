@@ -150,7 +150,7 @@ function ProjectCalendarContent({
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-[#475569]">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#3B5BDB]" /> Công
+              <span className="h-2.5 w-2.5 rounded-full bg-[#6044E8]" /> Công
               việc
             </span>
             <span className="inline-flex items-center gap-1.5 text-[#475569]">
@@ -166,24 +166,24 @@ function ProjectCalendarContent({
             </span>
           </div>
 
-          <div className="h-4 w-px bg-[#F2EAD3] hidden sm:block" />
+          <div className="h-4 w-px bg-[#E7E9F0] hidden sm:block" />
 
           <div className="flex items-center gap-3">
-            <label className="inline-flex items-center gap-1.5 text-xs text-[#161827] cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#202333] cursor-pointer">
               <input
                 type="checkbox"
                 checked={showTasks}
                 onChange={(e) => setShowTasks(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
+                className="rounded border-[#CBD5E1] text-[#6044E8] focus:ring-[#6044E8]"
               />
               <span>Công việc</span>
             </label>
-            <label className="inline-flex items-center gap-1.5 text-xs text-[#161827] cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 text-xs text-[#202333] cursor-pointer">
               <input
                 type="checkbox"
                 checked={showWorkSchedule}
                 onChange={(e) => setShowWorkSchedule(e.target.checked)}
-                className="rounded border-[#CBD5E1] text-[#3B5BDB] focus:ring-[#3B5BDB]"
+                className="rounded border-[#CBD5E1] text-[#6044E8] focus:ring-[#6044E8]"
               />
               <span>Lịch làm việc</span>
             </label>
@@ -194,7 +194,7 @@ function ProjectCalendarContent({
           <button
             type="button"
             onClick={() => setCreateDate(dateKey(new Date()))}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#3B5BDB] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#2F4AB8] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#6044E8] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#4F35C9] cursor-pointer transition-colors"
           >
             <Plus className="h-4 w-4" />
             Tạo công việc
@@ -202,23 +202,23 @@ function ProjectCalendarContent({
         )}
       </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-[#F2EAD3] bg-white p-4 shadow-xs">
+      <div className="flex items-center justify-between rounded-2xl border border-[#E7E9F0] bg-white p-4 shadow-xs">
         <button
           type="button"
           onClick={() => changeMonth(-1)}
           aria-label="Tháng trước"
-          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#475569] hover:text-[#161827] transition-colors"
+          className="rounded-xl border border-[#E7E9F0] p-2 hover:bg-[#F4F2FD] text-[#475569] hover:text-[#202333] transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <h2 className="font-bold text-[#161827] text-base">
+        <h2 className="font-bold text-[#202333] text-base">
           Tháng {month.getUTCMonth() + 1}/{month.getUTCFullYear()}
         </h2>
         <button
           type="button"
           onClick={() => changeMonth(1)}
           aria-label="Tháng sau"
-          className="rounded-xl border border-[#F2EAD3] p-2 hover:bg-[#FBF3DC] text-[#475569] hover:text-[#161827] transition-colors"
+          className="rounded-xl border border-[#E7E9F0] p-2 hover:bg-[#F4F2FD] text-[#475569] hover:text-[#202333] transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -230,12 +230,12 @@ function ProjectCalendarContent({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-[#475569]">
+        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
           Đang tải lịch công việc…
         </div>
       ) : (
-        <section className="overflow-x-auto rounded-2xl border border-[#F2EAD3] bg-white shadow-xs">
-          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#F2EAD3] bg-[#FFFBF0]">
+        <section className="overflow-x-auto rounded-2xl border border-[#E7E9F0] bg-white shadow-xs">
+          <div className="grid min-w-[900px] grid-cols-7 border-b border-[#E7E9F0] bg-[#F8F9FC]">
             {weekdayLabels.map((label) => (
               <div
                 key={label}
@@ -272,7 +272,7 @@ function ProjectCalendarContent({
                   onClick={() => {
                     if (canCreateTask) setCreateDate(key);
                   }}
-                  className={`min-h-36 border-b border-r border-[#F2EAD3] p-2 transition-colors ${cellBg} hover:bg-[#FFFBF0] ${
+                  className={`min-h-36 border-b border-r border-[#E7E9F0] p-2 transition-colors ${cellBg} hover:bg-[#F8F9FC] ${
                     canCreateTask ? "cursor-pointer" : ""
                   }`}
                   title={
@@ -284,7 +284,7 @@ function ProjectCalendarContent({
                   <div className="mb-2 flex items-start justify-between">
                     <p
                       className={`text-xs font-bold ${
-                        currentMonth ? "text-[#161827]" : "text-[#CBD5E1]"
+                        currentMonth ? "text-[#202333]" : "text-[#CBD5E1]"
                       }`}
                     >
                       {day.getUTCDate()}
@@ -321,7 +321,7 @@ function ProjectCalendarContent({
                             key={task.taskId}
                             href={`${base}/${projectId}/tasks/${task.taskId}`}
                             onClick={(event) => event.stopPropagation()}
-                            className="group block truncate rounded-lg border border-[#E0EAFF] bg-[#EEF2FF] px-2 py-1 text-xs font-semibold text-[#3B5BDB] hover:border-[#3B5BDB] transition-colors"
+                            className="group block truncate rounded-lg border border-[#E7E0FF] bg-[#F2EEFF] px-2 py-1 text-xs font-semibold text-[#6044E8] hover:border-[#6044E8] transition-colors"
                             title={task.title}
                           >
                             <div className="flex items-center justify-between gap-1">
@@ -369,7 +369,7 @@ function ProjectCalendarContent({
   if (embedded) return inner;
 
   return (
-    <main className="min-h-screen bg-[#FFFBF0] px-4 py-7 text-[#161827] lg:px-8">
+    <main className="min-h-screen bg-[#F8F9FC] px-4 py-7 text-[#202333] lg:px-8">
       <div className="mx-auto max-w-[1500px] space-y-6">
         <WorkspaceHeader
           mode={mode}

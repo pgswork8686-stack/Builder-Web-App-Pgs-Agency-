@@ -265,27 +265,27 @@ export default function EmployeeAttendancePage() {
       {/* Main Check-in Action Box */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="p-6 lg:col-span-2 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F2EAD3] pb-4 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E7E9F0] pb-4 gap-2">
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-[#161827] tracking-tight">
+              <h2 className="text-lg font-bold text-[#202333] tracking-tight">
                 Điểm danh ca làm việc
               </h2>
               <p className="text-xs text-[#475569]">
                 Văn phòng:{" "}
-                <span className="font-medium text-[#161827]">
+                <span className="font-medium text-[#202333]">
                   Tầng 2, DM 2-25, điểm TTCN làng nghề dệt lụa Vạn Phúc, Vạn
                   Phúc, Hà Đông, Hà Nội
                 </span>
               </p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] self-start sm:self-auto">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] self-start sm:self-auto">
               <MapPin
                 className={`w-4 h-4 ${
                   geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
                 }`}
               />
-              <span className="text-xs font-mono font-bold text-[#161827]">
+              <span className="text-xs font-mono font-bold text-[#202333]">
                 {geoCoords
                   ? `${geoCoords.latitude.toFixed(4)}, ${geoCoords.longitude.toFixed(4)}`
                   : geoError || "Đang lấy GPS..."}
@@ -303,7 +303,7 @@ export default function EmployeeAttendancePage() {
               placeholder="VD: Đi công tác tại cơ quan khách hàng, làm ngoài giờ..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full p-3 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
+              className="w-full p-3 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#6044E8] transition-colors"
             />
           </div>
 
@@ -336,30 +336,30 @@ export default function EmployeeAttendancePage() {
 
         {/* Quy định chấm công — lấy từ cấu hình thật của hệ thống */}
         <Card className="p-6 space-y-4">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-[#3B5BDB]">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-[#6044E8]">
             Quy định chấm công
           </h3>
           {policy ? (
             <div className="space-y-3 text-xs text-[#475569]">
-              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+              <div className="flex justify-between py-1.5 border-b border-[#E7E9F0]">
                 <span>Giờ bắt đầu làm việc:</span>
-                <span className="font-bold text-[#161827]">{policy.workdayStartTime.slice(0, 5)}</span>
+                <span className="font-bold text-[#202333]">{policy.workdayStartTime.slice(0, 5)}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+              <div className="flex justify-between py-1.5 border-b border-[#E7E9F0]">
                 <span>Giờ kết thúc làm việc:</span>
-                <span className="font-bold text-[#161827]">{policy.workdayEndTime.slice(0, 5)}</span>
+                <span className="font-bold text-[#202333]">{policy.workdayEndTime.slice(0, 5)}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+              <div className="flex justify-between py-1.5 border-b border-[#E7E9F0]">
                 <span>Chấp nhận đi muộn:</span>
-                <span className="font-bold text-[#161827]">{policy.lateGraceMinutes} phút</span>
+                <span className="font-bold text-[#202333]">{policy.lateGraceMinutes} phút</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-[#F2EAD3]">
+              <div className="flex justify-between py-1.5 border-b border-[#E7E9F0]">
                 <span>Định vị GPS:</span>
-                <span className="font-bold text-[#161827]">{policy.locationRequired ? "Bắt buộc, phải ở trong phạm vi văn phòng" : "Không bắt buộc"}</span>
+                <span className="font-bold text-[#202333]">{policy.locationRequired ? "Bắt buộc, phải ở trong phạm vi văn phòng" : "Không bắt buộc"}</span>
               </div>
               <div className="flex justify-between py-1.5">
                 <span>Ảnh xác thực:</span>
-                <span className="font-bold text-[#161827]">{policy.photoRequired ? "Bắt buộc" : "Không bắt buộc"}</span>
+                <span className="font-bold text-[#202333]">{policy.photoRequired ? "Bắt buộc" : "Không bắt buộc"}</span>
               </div>
             </div>
           ) : (
@@ -370,7 +370,7 @@ export default function EmployeeAttendancePage() {
 
       {/* History Table */}
       <div className="space-y-3">
-        <h2 className="text-base font-bold text-[#161827]">
+        <h2 className="text-base font-bold text-[#202333]">
           Lịch sử chấm công gần đây ({historyTotal} lượt)
         </h2>
 
@@ -382,7 +382,7 @@ export default function EmployeeAttendancePage() {
           </div>
         ) : history.length === 0 ? (
           <EmptyState
-            icon={<History className="w-8 h-8 text-[#3B5BDB]" />}
+            icon={<History className="w-8 h-8 text-[#6044E8]" />}
             title="Chưa có dữ liệu chấm công"
             description="Lịch sử chấm công của bạn trong tháng này sẽ xuất hiện tại đây sau khi check-in."
           />
@@ -417,7 +417,7 @@ export default function EmployeeAttendancePage() {
 
                   return (
                     <TableRow key={rec.id}>
-                      <TableCell className="font-bold text-[#161827]">
+                      <TableCell className="font-bold text-[#202333]">
                         {rec.attendance_date}
                       </TableCell>
                       <TableCell className="text-xs text-[#475569]">
@@ -426,7 +426,7 @@ export default function EmployeeAttendancePage() {
                       <TableCell className="text-xs text-[#475569]">
                         {checkOutTime}
                       </TableCell>
-                      <TableCell className="text-xs font-mono font-bold text-[#3B5BDB]">
+                      <TableCell className="text-xs font-mono font-bold text-[#6044E8]">
                         {rec.work_minutes
                           ? `${(rec.work_minutes / 60).toFixed(1)}h`
                           : "—"}

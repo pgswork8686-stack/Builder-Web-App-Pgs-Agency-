@@ -294,7 +294,7 @@ export default function AdminClientsPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#F2EAD3] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs">
         <div className="relative sm:col-span-2">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -305,7 +305,7 @@ export default function AdminClientsPage() {
               setQ(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#202333] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#6044E8] transition-colors"
           />
         </div>
 
@@ -315,7 +315,7 @@ export default function AdminClientsPage() {
             setStatus(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">-- Mọi trạng thái --</option>
           <option value="active">Đang hoạt động</option>
@@ -332,7 +332,7 @@ export default function AdminClientsPage() {
         </div>
       ) : companies.length === 0 ? (
         <EmptyState
-          icon={<Building2 className="w-8 h-8 text-[#3B5BDB]" />}
+          icon={<Building2 className="w-8 h-8 text-[#6044E8]" />}
           title="Không tìm thấy khách hàng"
           description="Chưa có dữ liệu công ty đối tác nào phù hợp."
           actionLabel="Tạo khách hàng mới"
@@ -357,13 +357,13 @@ export default function AdminClientsPage() {
             <TableBody>
               {companies.map((comp) => (
                 <TableRow key={comp.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
+                  <TableCell className="font-mono text-xs font-bold text-[#6044E8]">
                     {comp.clientCode || comp.code}
                   </TableCell>
 
                   <TableCell>
                     <div>
-                      <p className="font-bold text-[#161827]">{comp.name}</p>
+                      <p className="font-bold text-[#202333]">{comp.name}</p>
                       {comp.website && (
                         <a
                           href={
@@ -373,7 +373,7 @@ export default function AdminClientsPage() {
                           }
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs text-[#475569] hover:text-[#3B5BDB] flex items-center gap-1 mt-0.5"
+                          className="text-xs text-[#475569] hover:text-[#6044E8] flex items-center gap-1 mt-0.5"
                         >
                           <Globe className="w-3 h-3 text-blue-500" />
                           <span>
@@ -471,7 +471,7 @@ export default function AdminClientsPage() {
                         size="sm"
                         onClick={() => handleEdit(comp)}
                         title="Chỉnh sửa thông tin"
-                        className="text-[#475569] hover:text-[#161827]"
+                        className="text-[#475569] hover:text-[#202333]"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -480,7 +480,7 @@ export default function AdminClientsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          leftIcon={<Eye className="w-4 h-4 text-[#FFC400]" />}
+                          leftIcon={<Eye className="w-4 h-4 text-[#7257F5]" />}
                         >
                           Chi tiết
                         </Button>
@@ -622,19 +622,19 @@ export default function AdminClientsPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+              className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
               placeholder="Ghi chú về khách hàng, yêu cầu đặc thù..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"
@@ -681,7 +681,7 @@ export default function AdminClientsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248] mb-1.5">
                 Trạng thái
               </label>
               <select
@@ -689,7 +689,7 @@ export default function AdminClientsPage() {
                 onChange={(e) =>
                   setEditStatus(e.target.value as "active" | "inactive")
                 }
-                className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+                className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Tạm dừng</option>
@@ -755,19 +755,19 @@ export default function AdminClientsPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#24304A]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea
               rows={2}
-              className="w-full rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#24304A] text-xs p-3 outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+              className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
               placeholder="Ghi chú quan trọng..."
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"
@@ -809,7 +809,7 @@ export default function AdminClientsPage() {
             nguyên để bảo toàn lịch sử vận hành.
           </p>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="secondary"

@@ -147,7 +147,7 @@ export default function TeamLeaderApprovalsPage() {
         />
       )}
 
-      <div role="tablist" className="flex gap-1 border-b border-[#F2EAD3] overflow-x-auto">
+      <div role="tablist" className="flex gap-1 border-b border-[#E7E9F0] overflow-x-auto">
         {TABS.map((t) => {
           const active = tab === t.key;
           return (
@@ -158,13 +158,13 @@ export default function TeamLeaderApprovalsPage() {
               type="button"
               onClick={() => setTab(t.key)}
               className={`shrink-0 flex items-center gap-2 px-4 min-h-11 text-xs font-bold border-b-2 -mb-px transition-colors ${
-                active ? "text-[#3B5BDB] border-[#3B5BDB]" : "text-[#475569] border-transparent hover:text-[#161827]"
+                active ? "text-[#6044E8] border-[#6044E8]" : "text-[#475569] border-transparent hover:text-[#202333]"
               }`}
             >
               {t.icon}
               {t.label}
               {counts[t.key] > 0 && (
-                <span className="px-1.5 rounded-full bg-[#FFF8E5] text-[#8A6400] text-xs font-bold">{counts[t.key]}</span>
+                <span className="px-1.5 rounded-full bg-[#F2EEFF] text-[#5B3FD6] text-xs font-bold">{counts[t.key]}</span>
               )}
             </button>
           );
@@ -172,8 +172,8 @@ export default function TeamLeaderApprovalsPage() {
       </div>
 
       {loading ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-7 h-7 animate-spin text-[#3B5BDB] mx-auto" />
+        <div className="p-12 text-center bg-white rounded-2xl border border-[#E7E9F0]">
+          <Loader2 className="w-7 h-7 animate-spin text-[#6044E8] mx-auto" />
           <p className="mt-3 text-xs text-[#475569]">Đang tải danh sách chờ duyệt...</p>
         </div>
       ) : tab === "leave" ? (
@@ -200,8 +200,8 @@ export default function TeamLeaderApprovalsPage() {
                     <TableRow key={r.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold grid place-items-center">{initials(name)}</span>
-                          <span className="font-bold text-xs text-[#161827]">{name}</span>
+                          <span className="w-8 h-8 rounded-full bg-[#F2EEFF] text-[#6044E8] text-xs font-bold grid place-items-center">{initials(name)}</span>
+                          <span className="font-bold text-xs text-[#202333]">{name}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs text-[#475569]">{r.leave_type?.name || "Nghỉ phép"}</TableCell>
@@ -257,7 +257,7 @@ export default function TeamLeaderApprovalsPage() {
                   const busy = processingId === t.id;
                   return (
                     <TableRow key={t.id}>
-                      <TableCell className="text-xs text-[#161827] max-w-[280px]">
+                      <TableCell className="text-xs text-[#202333] max-w-[280px]">
                         <span className="block font-bold truncate">{t.title}</span>
                         {t.description && <span className="block text-[#475569] truncate">{t.description}</span>}
                       </TableCell>
@@ -301,7 +301,7 @@ export default function TeamLeaderApprovalsPage() {
                   const busy = processingId === t.id;
                   return (
                     <TableRow key={t.id}>
-                      <TableCell className="font-bold text-xs text-[#161827]">
+                      <TableCell className="font-bold text-xs text-[#202333]">
                         <a href={`/app/projects/${t.project_id}/tasks/${t.id}`} className="hover:underline">{t.title}</a>
                       </TableCell>
                       <TableCell className="text-xs text-[#475569]">{t.projectCode ?? "—"}</TableCell>

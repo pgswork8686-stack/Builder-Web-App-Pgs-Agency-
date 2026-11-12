@@ -532,7 +532,7 @@ export function ChatWorkspace() {
                 setModalTab("direct");
                 setNewChatModalOpen(true);
               }}
-              className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
+              className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white font-bold"
             >
               Cuộc trò chuyện mới
             </Button>
@@ -557,7 +557,7 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-bold text-[#161827] text-sm">
+                <h2 className="font-bold text-[#202333] text-sm">
                   Cuộc trò chuyện
                 </h2>
                 <p className="mt-0.5 text-xs text-[#475569]">
@@ -568,7 +568,7 @@ export function ChatWorkspace() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setNewChatModalOpen(true)}
-                className="text-[#3B5BDB] hover:bg-[#EEF2FF] p-1.5 h-8 rounded-lg"
+                className="text-[#6044E8] hover:bg-[#F2EEFF] p-1.5 h-8 rounded-lg"
                 title="Bắt đầu cuộc trò chuyện mới"
               >
                 <Plus className="h-4 w-4" />
@@ -584,7 +584,7 @@ export function ChatWorkspace() {
                 onChange={(e) => setConversationSearch(e.target.value)}
                 placeholder="Tìm cuộc trò chuyện..."
                 aria-label="Tìm cuộc trò chuyện"
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] transition-all"
               />
             </div>
 
@@ -606,7 +606,7 @@ export function ChatWorkspace() {
             <div className="max-h-[26rem] space-y-2 overflow-y-auto pt-1">
               {loadingList ? (
                 <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#475569]">
-                  <Loader2 className="h-4 w-4 animate-spin text-[#3B5BDB]" />
+                  <Loader2 className="h-4 w-4 animate-spin text-[#6044E8]" />
                   Đang tải...
                 </div>
               ) : filteredConversations.length === 0 ? (
@@ -623,18 +623,18 @@ export function ChatWorkspace() {
                     onClick={() => void openConversation(conversation)}
                     className={`w-full rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${
                       selected?.id === conversation.id
-                        ? "border-[#3B5BDB] bg-[#EEF2FF]"
-                        : "border-[#F2EAD3] bg-white hover:bg-[#FFFBF0]"
+                        ? "border-[#6044E8] bg-[#F2EEFF]"
+                        : "border-[#E7E9F0] bg-white hover:bg-[#F8F9FC]"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="truncate text-xs font-bold text-[#161827]">
+                        <div className="truncate text-xs font-bold text-[#202333]">
                           {conversationTitle(conversation)}
                         </div>
                         <div className="mt-0.5 text-xs uppercase tracking-wide text-[#475569] flex items-center gap-1.5">
                           {conversation.type === "project" ? (
-                            <span className="text-[#3B5BDB] font-semibold">
+                            <span className="text-[#6044E8] font-semibold">
                               ● Dự án
                             </span>
                           ) : (
@@ -645,7 +645,7 @@ export function ChatWorkspace() {
                         </div>
                       </div>
                       {conversation.hasUnread ? (
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#3B5BDB]" />
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#6044E8]" />
                       ) : null}
                     </div>
                     {conversation.lastMessageAt ? (
@@ -663,8 +663,8 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-[#3B5BDB]" />
-                <h2 className="font-bold text-[#161827] text-sm">
+                <UserPlus className="h-4 w-4 text-[#6044E8]" />
+                <h2 className="font-bold text-[#202333] text-sm">
                   Nhắn tin riêng
                 </h2>
               </div>
@@ -675,7 +675,7 @@ export function ChatWorkspace() {
                   setModalTab("direct");
                   setNewChatModalOpen(true);
                 }}
-                className="text-xs text-[#3B5BDB] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+                className="text-xs text-[#6044E8] hover:bg-[#F2EEFF] px-2 py-1 h-7"
               >
                 Xem danh sách
               </Button>
@@ -692,7 +692,7 @@ export function ChatWorkspace() {
                   setPeerUserId(val);
                   if (val) void createDirect(val);
                 }}
-                className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2.5 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] cursor-pointer"
+                className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2.5 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] cursor-pointer"
               >
                 <option value="">-- Chọn nhân sự / khách hàng --</option>
                 {contacts.map((user) => (
@@ -705,7 +705,7 @@ export function ChatWorkspace() {
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white"
+                className="w-full !bg-[#6044E8] hover:!bg-[#4F35C9] !text-white"
                 disabled={isClient}
                 onClick={() => {
                   setModalTab("direct");
@@ -722,8 +722,8 @@ export function ChatWorkspace() {
           <Card className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-[#3B5BDB]" />
-                <h2 className="font-bold text-[#161827] text-sm">
+                <FolderOpen className="h-4 w-4 text-[#6044E8]" />
+                <h2 className="font-bold text-[#202333] text-sm">
                   Mở phòng chat dự án
                 </h2>
               </div>
@@ -734,7 +734,7 @@ export function ChatWorkspace() {
                   setModalTab("project");
                   setNewChatModalOpen(true);
                 }}
-                className="text-xs text-[#3B5BDB] hover:bg-[#EEF2FF] px-2 py-1 h-7"
+                className="text-xs text-[#6044E8] hover:bg-[#F2EEFF] px-2 py-1 h-7"
               >
                 Xem dự án
               </Button>
@@ -750,7 +750,7 @@ export function ChatWorkspace() {
                   setProjectId(val);
                   if (val) void openProjectChat(val);
                 }}
-                className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2.5 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] cursor-pointer"
+                className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2.5 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] cursor-pointer"
               >
                 <option value="">-- Chọn dự án --</option>
                 {projectsList.map((proj) => (
@@ -778,13 +778,13 @@ export function ChatWorkspace() {
 
         {/* Right Column: Chat window */}
         <Card className="flex min-h-[44rem] flex-col p-0 overflow-hidden">
-          <div className="flex items-center justify-between gap-4 border-b border-[#F2EAD3] p-5">
+          <div className="flex items-center justify-between gap-4 border-b border-[#E7E9F0] p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#3B5BDB]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-bold text-[#161827] text-sm">
+                <h2 className="font-bold text-[#202333] text-sm">
                   {selected
                     ? conversationTitle(selected)
                     : "Chưa chọn cuộc trò chuyện"}
@@ -802,14 +802,14 @@ export function ChatWorkspace() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-[#CBD5E1] text-[#161827] hover:border-[#3B5BDB] hover:text-[#3B5BDB] text-xs font-semibold"
+                    className="border-[#CBD5E1] text-[#202333] hover:border-[#6044E8] hover:text-[#6044E8] text-xs font-semibold"
                     onClick={async () => {
                       if (selected.projectId) {
                         await loadProjectMembers(selected.projectId);
                       }
                       setViewingProjectMembersModal(true);
                     }}
-                    leftIcon={<Users className="w-3.5 h-3.5 text-[#3B5BDB]" />}
+                    leftIcon={<Users className="w-3.5 h-3.5 text-[#6044E8]" />}
                   >
                     Thành viên & Khách hàng
                   </Button>
@@ -850,14 +850,14 @@ export function ChatWorkspace() {
                   size="sm"
                   leftIcon={<Plus className="w-4 h-4" />}
                   onClick={() => setNewChatModalOpen(true)}
-                  className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white"
+                  className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white"
                 >
                   Tạo cuộc trò chuyện mới
                 </Button>
               </div>
             ) : loadingMessages && messages.length === 0 ? (
               <div className="flex h-full items-center justify-center gap-2 text-xs text-[#475569]">
-                <Loader2 className="h-4 w-4 animate-spin text-[#3B5BDB]" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#6044E8]" />
                 Đang tải lịch sử chat...
               </div>
             ) : (
@@ -894,13 +894,13 @@ export function ChatWorkspace() {
                         <div
                           className={`max-w-[75%] rounded-2xl p-3.5 shadow-xs ${
                             isMe
-                              ? "bg-[#3B5BDB] text-white"
-                              : "bg-[#FBF3DC] text-[#161827]"
+                              ? "bg-[#6044E8] text-white"
+                              : "bg-[#F4F2FD] text-[#202333]"
                           }`}
                         >
                           <div
                             className={`text-xs font-bold ${
-                              isMe ? "text-white/80" : "text-[#3B5BDB]"
+                              isMe ? "text-white/80" : "text-[#6044E8]"
                             }`}
                           >
                             {message.sender?.full_name ??
@@ -927,7 +927,7 @@ export function ChatWorkspace() {
           </div>
 
           <form
-            className="border-t border-[#F2EAD3] p-4 bg-[#FFFBF0]"
+            className="border-t border-[#E7E9F0] p-4 bg-[#F8F9FC]"
             onSubmit={(event) => {
               event.preventDefault();
               void sendMessage();
@@ -943,14 +943,14 @@ export function ChatWorkspace() {
                 placeholder={
                   selected ? "Nhập tin nhắn..." : "Chọn cuộc trò chuyện trước"
                 }
-                className="min-h-16 flex-1 resize-none rounded-xl border border-[#F2EAD3] bg-white px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+                className="min-h-16 flex-1 resize-none rounded-xl border border-[#E7E9F0] bg-white px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
               />
               <Button
                 type="submit"
                 variant="primary"
                 size="sm"
                 disabled={!selected || sending || !draft.trim()}
-                className="!bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
+                className="!bg-[#6044E8] hover:!bg-[#4F35C9] !text-white font-bold"
                 leftIcon={
                   sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -979,14 +979,14 @@ export function ChatWorkspace() {
       >
         <div className="space-y-4 pt-2">
           {/* Tabs */}
-          <div className="flex border-b border-[#F2EAD3]">
+          <div className="flex border-b border-[#E7E9F0]">
             <button
               type="button"
               onClick={() => setModalTab("direct")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "direct"
-                  ? "border-[#3B5BDB] text-[#3B5BDB]"
-                  : "border-transparent text-[#475569] hover:text-[#161827]"
+                  ? "border-[#6044E8] text-[#6044E8]"
+                  : "border-transparent text-[#475569] hover:text-[#202333]"
               }`}
             >
               <Users className="w-4 h-4" />
@@ -997,8 +997,8 @@ export function ChatWorkspace() {
               onClick={() => setModalTab("project")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 modalTab === "project"
-                  ? "border-[#3B5BDB] text-[#3B5BDB]"
-                  : "border-transparent text-[#475569] hover:text-[#161827]"
+                  ? "border-[#6044E8] text-[#6044E8]"
+                  : "border-transparent text-[#475569] hover:text-[#202333]"
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -1019,13 +1019,13 @@ export function ChatWorkspace() {
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     placeholder="Tìm kiếm theo tên, email, chức danh..."
                 aria-label="Tìm kiếm theo tên, email, chức danh"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] transition-all"
                   />
                 </div>
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] cursor-pointer"
+                  className="px-3 py-2 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] cursor-pointer"
                 >
                   <option value="all">Tất cả vai trò</option>
                   <option value="admin">Admin</option>
@@ -1040,7 +1040,7 @@ export function ChatWorkspace() {
               <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
                 {loadingContacts ? (
                   <div className="py-10 text-center text-xs text-[#475569] flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-[#3B5BDB]" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#6044E8]" />
                     Đang tải danh bạ...
                   </div>
                 ) : filteredContacts.length === 0 ? (
@@ -1052,7 +1052,7 @@ export function ChatWorkspace() {
                     <div
                       key={contact.id}
                       onClick={() => void createDirect(contact.id)}
-                      className="flex items-center justify-between p-3 rounded-xl border border-[#F2EAD3] bg-white hover:bg-[#EEF2FF] hover:border-[#3B5BDB]/40 cursor-pointer transition-all group"
+                      className="flex items-center justify-between p-3 rounded-xl border border-[#E7E9F0] bg-white hover:bg-[#F2EEFF] hover:border-[#6044E8]/40 cursor-pointer transition-all group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar
@@ -1062,7 +1062,7 @@ export function ChatWorkspace() {
                         />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#161827] truncate group-hover:text-[#3B5BDB]">
+                            <span className="text-xs font-bold text-[#202333] truncate group-hover:text-[#6044E8]">
                               {contact.fullName || contact.email}
                             </span>
                             {contact.employmentProfile?.jobTitle && (
@@ -1082,7 +1082,7 @@ export function ChatWorkspace() {
                         <Button
                           variant="primary"
                           size="sm"
-                          className="h-7 text-xs !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-7 text-xs !bg-[#6044E8] hover:!bg-[#4F35C9] !text-white opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           Nhắn tin
                         </Button>
@@ -1106,7 +1106,7 @@ export function ChatWorkspace() {
                   onChange={(e) => setProjectSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm dự án theo tên hoặc mã..."
                 aria-label="Tìm kiếm dự án theo tên hoặc mã"
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] transition-all"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] transition-all"
                 />
               </div>
 
@@ -1125,20 +1125,20 @@ export function ChatWorkspace() {
                     return (
                       <div
                         key={proj.id}
-                        className="rounded-2xl border border-[#F2EAD3] bg-white overflow-hidden shadow-xs transition-all hover:border-[#3B5BDB]/30"
+                        className="rounded-2xl border border-[#E7E9F0] bg-white overflow-hidden shadow-xs transition-all hover:border-[#6044E8]/30"
                       >
                         {/* Project Header Bar */}
-                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFBF0]/50">
+                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FC]/50">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#F2EEFF] text-[#6044E8] flex items-center justify-center shrink-0">
                               <FolderOpen className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-[#161827] truncate">
+                                <span className="text-xs font-bold text-[#202333] truncate">
                                   {proj.name}
                                 </span>
-                                <span className="text-xs font-mono font-bold text-[#3B5BDB] px-1.5 py-0.5 rounded bg-[#EEF2FF]">
+                                <span className="text-xs font-mono font-bold text-[#6044E8] px-1.5 py-0.5 rounded bg-[#F2EEFF]">
                                   {proj.projectCode}
                                 </span>
                               </div>
@@ -1156,7 +1156,7 @@ export function ChatWorkspace() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 text-xs font-semibold border-[#CBD5E1] hover:border-[#3B5BDB] hover:text-[#3B5BDB]"
+                              className="h-8 text-xs font-semibold border-[#CBD5E1] hover:border-[#6044E8] hover:text-[#6044E8]"
                               onClick={() => {
                                 if (isExpanded) {
                                   setExpandedProjectId(null);
@@ -1175,7 +1175,7 @@ export function ChatWorkspace() {
                             <Button
                               variant="primary"
                               size="sm"
-                              className="h-8 text-xs !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white font-bold"
+                              className="h-8 text-xs !bg-[#6044E8] hover:!bg-[#4F35C9] !text-white font-bold"
                               onClick={() => void openProjectChat(proj.id)}
                               leftIcon={
                                 <MessageCircle className="w-3.5 h-3.5" />
@@ -1188,9 +1188,9 @@ export function ChatWorkspace() {
 
                         {/* Expanded Members & Clients list for 1-on-1 Direct Chat */}
                         {isExpanded && (
-                          <div className="p-3.5 bg-white border-t border-[#F2EAD3] space-y-2">
+                          <div className="p-3.5 bg-white border-t border-[#E7E9F0] space-y-2">
                             <div className="flex items-center justify-between pb-1">
-                              <span className="text-xs font-bold text-[#161827] uppercase tracking-wide">
+                              <span className="text-xs font-bold text-[#202333] uppercase tracking-wide">
                                 Chọn người để Chat riêng (1-on-1):
                               </span>
                               <span className="text-xs text-[#475569]">
@@ -1200,7 +1200,7 @@ export function ChatWorkspace() {
 
                             {isLoadingThis ? (
                               <div className="py-4 text-center text-xs text-[#475569] flex items-center justify-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin text-[#3B5BDB]" />
+                                <Loader2 className="w-4 h-4 animate-spin text-[#6044E8]" />
                                 Đang tải danh sách thành viên...
                               </div>
                             ) : members.length === 0 ? (
@@ -1228,7 +1228,7 @@ export function ChatWorkspace() {
                                           void createDirect(profile.id);
                                         }
                                       }}
-                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] hover:bg-[#EEF2FF] hover:border-[#3B5BDB]/40 cursor-pointer transition-all group"
+                                      className="flex items-center justify-between p-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] hover:bg-[#F2EEFF] hover:border-[#6044E8]/40 cursor-pointer transition-all group"
                                     >
                                       <div className="flex items-center gap-2.5 min-w-0">
                                         <Avatar
@@ -1241,7 +1241,7 @@ export function ChatWorkspace() {
                                           size="sm"
                                         />
                                         <div className="min-w-0">
-                                          <div className="text-xs font-bold text-[#161827] truncate group-hover:text-[#3B5BDB]">
+                                          <div className="text-xs font-bold text-[#202333] truncate group-hover:text-[#6044E8]">
                                             {profile?.full_name ||
                                               profile?.email ||
                                               "Chưa đặt tên"}
@@ -1255,7 +1255,7 @@ export function ChatWorkspace() {
                                       <Button
                                         variant="primary"
                                         size="sm"
-                                        className="h-6 text-xs px-2 !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white opacity-90 group-hover:opacity-100 shrink-0"
+                                        className="h-6 text-xs px-2 !bg-[#6044E8] hover:!bg-[#4F35C9] !text-white opacity-90 group-hover:opacity-100 shrink-0"
                                       >
                                         Nhắn riêng
                                       </Button>
@@ -1274,7 +1274,7 @@ export function ChatWorkspace() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end pt-3 border-t border-[#E7E9F0]">
             <Button
               variant="secondary"
               size="sm"
@@ -1302,7 +1302,7 @@ export function ChatWorkspace() {
           {selected?.projectId &&
           loadingMembersForProject === selected.projectId ? (
             <div className="py-10 text-center text-xs text-[#475569] flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#3B5BDB]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#6044E8]" />
               Đang tải danh sách...
             </div>
           ) : selected?.projectId &&
@@ -1329,7 +1329,7 @@ export function ChatWorkspace() {
                 return (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 rounded-xl border border-[#F2EAD3] bg-white hover:bg-[#FFFBF0] transition-all"
+                    className="flex items-center justify-between p-3 rounded-xl border border-[#E7E9F0] bg-white hover:bg-[#F8F9FC] transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <Avatar
@@ -1341,7 +1341,7 @@ export function ChatWorkspace() {
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#161827] truncate">
+                          <span className="text-xs font-bold text-[#202333] truncate">
                             {profile?.full_name ||
                               profile?.email ||
                               "Chưa đặt tên"}
@@ -1365,7 +1365,7 @@ export function ChatWorkspace() {
                     <Button
                       variant="primary"
                       size="sm"
-                      className="h-7 text-xs !bg-[#3B5BDB] hover:!bg-[#2F4AB8] !text-white shrink-0 font-bold"
+                      className="h-7 text-xs !bg-[#6044E8] hover:!bg-[#4F35C9] !text-white shrink-0 font-bold"
                       onClick={() => {
                         if (profile?.id) {
                           setViewingProjectMembersModal(false);
@@ -1382,7 +1382,7 @@ export function ChatWorkspace() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-[#F2EAD3]">
+          <div className="flex justify-end pt-3 border-t border-[#E7E9F0]">
             <Button
               variant="secondary"
               size="sm"

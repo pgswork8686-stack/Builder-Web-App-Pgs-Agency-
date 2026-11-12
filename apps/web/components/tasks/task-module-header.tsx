@@ -33,7 +33,7 @@ export function TaskModuleHeader({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#161827] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#202333] tracking-tight">
               {title}
             </h1>
             {badge && (
@@ -53,7 +53,7 @@ export function TaskModuleHeader({
       </div>
 
       {/* Bottom row: View Mode Switcher Tabs */}
-      <div className="flex items-center justify-between border-b border-[#F2EAD3] pb-3">
+      <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
         <TaskViewTabs active={activeView} role={role} links={links} />
       </div>
     </div>

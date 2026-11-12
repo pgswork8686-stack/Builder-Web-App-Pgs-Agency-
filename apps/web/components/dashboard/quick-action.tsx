@@ -34,24 +34,24 @@ export function QuickActionGrid({
       {items.map((item) => (
         <Link key={item.href + item.title} href={item.href}>
           <Card
-            className={`h-full p-5 transition-all duration-150 hover:border-[#3B5BDB]/40 hover:shadow-md group flex flex-col justify-between ${
-              item.highlight ? "bg-[#EEF2FF]/40 border-[#E0EAFF]" : "bg-white"
+            className={`h-full p-5 transition-all duration-150 hover:border-[#6044E8]/40 hover:shadow-md group flex flex-col justify-between ${
+              item.highlight ? "bg-[#F2EEFF]/40 border-[#E7E0FF]" : "bg-white"
             }`}
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#3B5BDB] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-[#F2EEFF] text-[#6044E8] flex items-center justify-center group-hover:scale-105 transition-transform">
                   {item.icon}
                 </div>
                 {item.badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#3B5BDB] text-xs font-bold border border-[#E0EAFF]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#F2EEFF] text-[#6044E8] text-xs font-bold border border-[#E7E0FF]">
                     {item.badge}
                   </span>
                 )}
               </div>
 
               <div>
-                <h4 className="text-sm font-bold text-[#161827] group-hover:text-[#3B5BDB] transition-colors">
+                <h4 className="text-sm font-bold text-[#202333] group-hover:text-[#6044E8] transition-colors">
                   {item.title}
                 </h4>
                 <p className="mt-1 text-xs text-[#475569] leading-relaxed">
@@ -60,7 +60,7 @@ export function QuickActionGrid({
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#3B5BDB] opacity-90 group-hover:opacity-100 transition-opacity">
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#6044E8] opacity-90 group-hover:opacity-100 transition-opacity">
               <span>Truy cập</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>

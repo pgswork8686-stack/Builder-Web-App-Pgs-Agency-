@@ -60,7 +60,7 @@ export default function EmployeePayrollPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F9FC] dark:bg-[#161827] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
+              <thead className="bg-[#F6F9FC] dark:bg-[#202333] border-b border-[#EAEFF4] dark:border-[#334155] text-xs font-semibold text-[#475569] uppercase">
                 <tr>
                   <th className="px-4 py-3">Mã phiếu</th>
                   <th className="px-4 py-3">Kỳ lương</th>
@@ -75,17 +75,17 @@ export default function EmployeePayrollPage() {
                 {payslips.map((ps) => (
                   <tr
                     key={ps.id}
-                    className="hover:bg-[#FFFBF0] dark:hover:bg-[#1E293B]/50 transition-colors"
+                    className="hover:bg-[#F8F9FC] dark:hover:bg-[#1E293B]/50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-mono font-medium text-[#3B5BDB]">
+                    <td className="px-4 py-3 font-mono font-medium text-[#6044E8]">
                       {ps.payslip_code || "PL"}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#2A3547] dark:text-white">
+                    <td className="px-4 py-3 font-medium text-[#2E3248] dark:text-white">
                       {ps.payroll_run?.title ||
                         ps.payroll_run?.period_month ||
                         "Kỳ lương"}
                     </td>
-                    <td className="px-4 py-3 text-center text-[#2A3547] dark:text-white font-medium">
+                    <td className="px-4 py-3 text-center text-[#2E3248] dark:text-white font-medium">
                       {ps.actual_worked_days} / {ps.standard_working_days}
                     </td>
                     <td className="px-4 py-3 text-right text-[#475569]">

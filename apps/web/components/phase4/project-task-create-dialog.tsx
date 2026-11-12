@@ -194,11 +194,11 @@ export function ProjectTaskCreateDialog({
       description="Công việc được tạo trong dự án đã chọn bên dưới."
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-        <div className="rounded-xl border border-[#E0EAFF] bg-[#F8FAFF] px-3 py-2.5">
+        <div className="rounded-xl border border-[#E7E0FF] bg-[#F8FAFF] px-3 py-2.5">
           <div className="text-xs font-bold uppercase tracking-wider text-[#475569]">
             Dự án
           </div>
-          <div className="mt-1 text-xs font-bold text-[#161827]">
+          <div className="mt-1 text-xs font-bold text-[#202333]">
             {projectCode ?? "PROJECT"} · {projectName ?? "Dự án hiện tại"}
           </div>
           <div className="mt-1 text-xs text-[#475569]">
@@ -219,7 +219,7 @@ export function ProjectTaskCreateDialog({
               setForm({ ...form, title: event.target.value })
             }
             placeholder="VD: Thiết kế giao diện Homepage"
-            className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB] focus:bg-white"
+            className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8] focus:bg-white"
           />
         </div>
 
@@ -234,7 +234,7 @@ export function ProjectTaskCreateDialog({
               setForm({ ...form, description: event.target.value })
             }
             placeholder="Yêu cầu, đường dẫn tài liệu đính kèm hoặc ghi chú triển khai..."
-            className="w-full resize-none rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB] focus:bg-white"
+            className="w-full resize-none rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8] focus:bg-white"
           />
         </div>
 
@@ -251,7 +251,7 @@ export function ProjectTaskCreateDialog({
                   status: event.target.value as BoardStatus,
                 })
               }
-              className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
             >
               {statuses.map((status) => (
                 <option key={status.value} value={status.value}>
@@ -273,7 +273,7 @@ export function ProjectTaskCreateDialog({
                   priority: event.target.value as TaskPriority,
                 })
               }
-              className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
             >
               {priorities.map((priority) => (
                 <option key={priority.value} value={priority.value}>
@@ -297,7 +297,7 @@ export function ProjectTaskCreateDialog({
                 projectServiceItemId: event.target.value,
               })
             }
-            className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB] disabled:opacity-60"
+            className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8] disabled:opacity-60"
           >
             <option value="">
               {loadingOptions
@@ -323,7 +323,7 @@ export function ProjectTaskCreateDialog({
               onChange={(event) =>
                 setForm({ ...form, startDate: event.target.value })
               }
-              className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
             />
             {startDayInfo && !startDayInfo.isWorkingDay && (
               <div className="mt-1.5 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200 p-2 text-xs text-amber-800">
@@ -347,7 +347,7 @@ export function ProjectTaskCreateDialog({
               onChange={(event) =>
                 setForm({ ...form, dueDate: event.target.value })
               }
-              className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:border-[#3B5BDB]"
+              className="w-full rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] px-3 py-2 text-xs text-[#202333] outline-none focus:border-[#6044E8]"
             />
             {dueDayInfo && !dueDayInfo.isWorkingDay && (
               <div className="mt-1.5 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200 p-2 text-xs text-amber-800">
@@ -367,7 +367,7 @@ export function ProjectTaskCreateDialog({
           </div>
         )}
 
-        <div className="flex justify-end gap-3 border-t border-[#F2EAD3] pt-4">
+        <div className="flex justify-end gap-3 border-t border-[#E7E9F0] pt-4">
           <Button
             type="button"
             variant="secondary"

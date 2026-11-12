@@ -53,15 +53,15 @@ export function MobileSidebar({
       />
 
       {/* Sidebar Drawer */}
-      <div className="fixed inset-y-0 left-0 w-72 bg-white text-[#161827] flex flex-col z-10 shadow-2xl border-r border-[#F2EAD3] animate-in slide-in-from-left duration-200">
+      <div className="fixed inset-y-0 left-0 w-72 bg-white text-[#202333] flex flex-col z-10 shadow-2xl border-r border-[#E7E9F0] animate-in slide-in-from-left duration-200">
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-[#F2EAD3]">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-[#E7E9F0]">
           <Link
             href="/app"
             onClick={onClose}
             className="flex items-center gap-2.5"
           >
-            <div className="relative w-8 h-8 rounded-xl bg-[#FFF8E5] p-1 flex items-center justify-center shrink-0 overflow-hidden border border-[#FDE68A]">
+            <div className="relative w-8 h-8 rounded-xl bg-[#F2EEFF] p-1 flex items-center justify-center shrink-0 overflow-hidden border border-[#DDD5FF]">
               <Image
                 src="/brand/pgs-agency-logo-transparent.png"
                 alt="PGS Agency"
@@ -71,7 +71,7 @@ export function MobileSidebar({
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-sm tracking-tight text-[#161827]">
+              <span className="font-black text-sm tracking-tight text-[#202333]">
                 PGS Hub
               </span>
               <span className="text-xs font-semibold text-[#475569] tracking-tight truncate">
@@ -83,7 +83,7 @@ export function MobileSidebar({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-[#475569] hover:text-[#202333] hover:bg-[#F2EEFF] transition-colors cursor-pointer"
             aria-label="Đóng sidebar"
           >
             <X className="w-5 h-5" />
@@ -97,15 +97,15 @@ export function MobileSidebar({
             <Link
               href="/app/admin/accounts/pending"
               onClick={onClose}
-              className="flex items-center justify-between p-3 rounded-xl bg-[#FFF8E5] border border-[#FDE68A] text-[#161827] block"
+              className="flex items-center justify-between p-3 rounded-xl bg-[#F2EEFF] border border-[#DDD5FF] text-[#202333] block"
             >
               <div className="flex items-center gap-2.5">
-                <UserCheck className="w-4 h-4 text-[#E7AE18]" />
-                <span className="text-xs font-bold text-[#161827]">
+                <UserCheck className="w-4 h-4 text-[#7257F5]" />
+                <span className="text-xs font-bold text-[#202333]">
                   Yêu cầu tài khoản
                 </span>
               </div>
-              <span className="w-2 h-2 rounded-full bg-[#E7AE18] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#7257F5] animate-pulse" />
             </Link>
           )}
 
@@ -113,15 +113,15 @@ export function MobileSidebar({
             <Link
               href="/app/attendance"
               onClick={onClose}
-              className="flex items-center justify-between p-3 rounded-xl bg-[#FFF8E5] border border-[#FDE68A] text-[#161827] block"
+              className="flex items-center justify-between p-3 rounded-xl bg-[#F2EEFF] border border-[#DDD5FF] text-[#202333] block"
             >
               <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-[#161827] p-0.5 rounded-sm bg-[#FFC400]" />
-                <span className="text-xs font-bold text-[#161827]">
+                <Clock className="w-4 h-4 text-[#202333] p-0.5 rounded-sm bg-[#7257F5]" />
+                <span className="text-xs font-bold text-[#202333]">
                   Chấm công bắt buộc
                 </span>
               </div>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFC400] text-[#161827]">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#7257F5] text-[#202333]">
                 GPS
               </span>
             </Link>
@@ -134,38 +134,29 @@ export function MobileSidebar({
                   {group.groupTitle}
                 </div>
               )}
-              {group.items.map((item, itemIdx) => {
+              {group.items.map((item) => {
                 const active = isNavItemActive(pathname, item);
                 const Icon = item.icon;
-                const itemNum =
-                  item.index || (itemIdx + 1).toString().padStart(2, "0");
 
                 return (
                   <Link
-                    key={item.href}
+                    key={item.href + item.title}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                    className={`flex items-center gap-2.5 px-3 h-11 rounded-lg text-sm transition-colors ${
                       active
-                        ? "bg-[#FDF1C7] text-[#8A6400] font-bold border-l-[3px] border-[#E7AE18]"
-                        : "text-[#475569] hover:text-[#161827] hover:bg-[#FFF8E5]"
+                        ? "bg-[#F2EEFF] text-[#5B3FD6] font-semibold"
+                        : "text-[#475569] hover:text-[#202333] hover:bg-[#F2F4F7]"
                     }`}
                   >
-                    <span
-                      className={`text-xs font-mono font-medium ${
-                        active ? "text-[#8A6400]" : "text-[#475569]"
-                      }`}
-                    >
-                      {itemNum}
-                    </span>
                     <Icon
                       className={`w-4 h-4 shrink-0 ${
-                        active ? "text-[#E7AE18]" : "text-[#475569]"
+                        active ? "text-[#7257F5]" : "text-[#475569]"
                       }`}
                     />
                     <span className="truncate flex-1">{item.title}</span>
                     {item.badge && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#E7AE18]/20 text-[#F3BA2F] text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-full bg-[#7257F5]/20 text-[#7257F5] text-xs font-bold">
                         {item.badge}
                       </span>
                     )}
@@ -177,13 +168,13 @@ export function MobileSidebar({
         </div>
 
         {/* Footer Support & Profile */}
-        <div className="p-4 border-t border-[#F2EAD3] space-y-3 bg-white">
+        <div className="p-4 border-t border-[#E7E9F0] space-y-3 bg-white">
           <Link
             href={supportHref}
             onClick={onClose}
-            className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FFF8E5] border border-[#FDE68A] text-xs font-bold text-white hover:bg-[#E7AE18] hover:text-[#161827] transition-all block"
+            className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F2EEFF] text-sm font-semibold text-[#5B3FD6] hover:bg-[#E7E0FF] transition-all block"
           >
-            <HelpCircle className="w-4 h-4 text-[#E7AE18]" />
+            <HelpCircle className="w-4 h-4 text-[#7257F5]" />
             <span>
               {account.role === "client"
                 ? "Trung tâm hỗ trợ"
@@ -198,7 +189,7 @@ export function MobileSidebar({
           >
             <Avatar src={user?.avatarUrl} name={displayName} size="sm" />
             <div className="flex flex-col min-w-0">
-              <p className="text-xs font-bold text-[#161827] truncate">
+              <p className="text-xs font-bold text-[#202333] truncate">
                 {displayName}
               </p>
               <p className="text-xs text-[#475569] truncate">{roleLabel}</p>

@@ -360,7 +360,7 @@ export default function AdminPeopleDirectoryPage() {
       )}
 
       {/* 5-Dimension Filter Grid */}
-      <div className="p-4 rounded-2xl bg-white border border-[#F2EAD3] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
+      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
         <div className="relative sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -371,7 +371,7 @@ export default function AdminPeopleDirectoryPage() {
               setQ(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#161827] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#3B5BDB] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#202333] text-xs placeholder-[#94A3B8] outline-none focus:bg-white focus:border-[#6044E8] transition-colors"
           />
         </div>
 
@@ -381,7 +381,7 @@ export default function AdminPeopleDirectoryPage() {
             setRole(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">-- Mọi vai trò --</option>
           <option value="admin">Quản trị viên</option>
@@ -397,7 +397,7 @@ export default function AdminPeopleDirectoryPage() {
             setDepartmentId(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">-- Mọi phòng ban --</option>
           {departments.map((d) => (
@@ -413,7 +413,7 @@ export default function AdminPeopleDirectoryPage() {
             setTeamId(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">-- Mọi nhóm --</option>
           {teams.map((t) => (
@@ -429,7 +429,7 @@ export default function AdminPeopleDirectoryPage() {
             setEmploymentStatus(e.target.value);
             setPage(1);
           }}
-          className="rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#161827] px-3 py-2.5 outline-none focus:bg-white focus:border-[#3B5BDB]"
+          className="rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#202333] px-3 py-2.5 outline-none focus:bg-white focus:border-[#6044E8]"
         >
           <option value="">-- Tình trạng công tác --</option>
           <option value="active">Đang làm việc</option>
@@ -448,7 +448,7 @@ export default function AdminPeopleDirectoryPage() {
         </div>
       ) : people.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-8 h-8 text-[#3B5BDB]" />}
+          icon={<Users className="w-8 h-8 text-[#6044E8]" />}
           title="Không tìm thấy nhân sự"
           description="Không có hồ sơ nào phù hợp với các tiêu chí tìm kiếm hiện tại."
         />
@@ -495,10 +495,10 @@ export default function AdminPeopleDirectoryPage() {
                           src={person.avatarUrl}
                           name={person.fullName || person.email || "?"}
                           size="md"
-                          className="ring-1 ring-[#F2EAD3]"
+                          className="ring-1 ring-[#E7E9F0]"
                         />
                         <div>
-                          <p className="font-bold text-[#161827]">
+                          <p className="font-bold text-[#202333]">
                             {person.fullName || "Chưa cập nhật"}
                           </p>
                           <p className="text-xs text-[#475569]">
@@ -508,7 +508,7 @@ export default function AdminPeopleDirectoryPage() {
                       </div>
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
+                    <TableCell className="font-mono text-xs font-bold text-[#6044E8]">
                       {ep?.employeeCode || "—"}
                     </TableCell>
 
@@ -532,11 +532,11 @@ export default function AdminPeopleDirectoryPage() {
                     </TableCell>
 
                     <TableCell className="text-xs text-[#475569]">
-                      <p className="text-[#161827] font-medium">
+                      <p className="text-[#202333] font-medium">
                         {ep?.departmentName || "Chưa gán PB"}
                       </p>
                       {ep?.teamName && (
-                        <p className="text-xs text-[#3B5BDB]">
+                        <p className="text-xs text-[#6044E8]">
                           Team: {ep.teamName}
                         </p>
                       )}
@@ -544,7 +544,7 @@ export default function AdminPeopleDirectoryPage() {
 
                     <TableCell className="text-xs">
                       {ep?.jobTitle ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#3B5BDB] font-bold text-xs">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F2EEFF] text-[#6044E8] font-bold text-xs">
                           {ep.jobTitle}
                         </span>
                       ) : (
@@ -579,7 +579,7 @@ export default function AdminPeopleDirectoryPage() {
                           size="sm"
                           onClick={() => handleOpenEdit(person)}
                           leftIcon={
-                            <Edit2 className="w-3.5 h-3.5 text-[#3B5BDB]" />
+                            <Edit2 className="w-3.5 h-3.5 text-[#6044E8]" />
                           }
                           title="Chỉnh sửa thông tin & phân quyền"
                           aria-label="Chỉnh sửa thông tin & phân quyền"
@@ -592,7 +592,7 @@ export default function AdminPeopleDirectoryPage() {
                             size="sm"
                             onClick={() => handleOpenAssignProjects(person)}
                             leftIcon={
-                              <FolderKanban className="w-3.5 h-3.5 text-[#3B5BDB]" />
+                              <FolderKanban className="w-3.5 h-3.5 text-[#6044E8]" />
                             }
                             title="Phân bổ dự án cho nhân sự"
                           aria-label="Phân bổ dự án cho nhân sự"
@@ -621,7 +621,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3] text-xs text-[#475569]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#E7E9F0] text-xs text-[#475569]">
           <span>
             Trang {page} / {totalPages} ({total} nhân sự)
           </span>
@@ -656,15 +656,15 @@ export default function AdminPeopleDirectoryPage() {
       >
         <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
           {/* Ảnh đại diện & Preview */}
-          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3]">
+          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0]">
             <Avatar
               src={editAvatarUrl.trim() || undefined}
               name={editFullName || editingPerson?.email || "Avatar"}
               size="lg"
-              className="ring-2 ring-[#3B5BDB]/20 shrink-0"
+              className="ring-2 ring-[#6044E8]/20 shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <label className="block text-xs font-bold text-[#24304A] mb-1">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1">
                 Ảnh đại diện
               </label>
               <input
@@ -672,14 +672,14 @@ export default function AdminPeopleDirectoryPage() {
                 value={editAvatarUrl}
                 onChange={(e) => setEditAvatarUrl(e.target.value)}
                 placeholder="Dán đường dẫn ảnh (VD: https://... hoặc ảnh lưu trữ)"
-                className="w-full px-3 py-2 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#24304A] focus:border-[#3B5BDB] outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-[#E7E9F0] bg-white text-xs text-[#2E3248] focus:border-[#6044E8] outline-none"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Họ và tên *
               </label>
               <input
@@ -688,12 +688,12 @@ export default function AdminPeopleDirectoryPage() {
                 value={editFullName}
                 onChange={(e) => setEditFullName(e.target.value)}
                 placeholder="Nhập họ và tên đầy đủ"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#24304A] focus:bg-white focus:border-[#3B5BDB] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#2E3248] focus:bg-white focus:border-[#6044E8] outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Số điện thoại
               </label>
               <input
@@ -701,20 +701,20 @@ export default function AdminPeopleDirectoryPage() {
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
                 placeholder="0988xxxxxx"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs text-[#24304A] focus:bg-white focus:border-[#3B5BDB] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs text-[#2E3248] focus:bg-white focus:border-[#6044E8] outline-none"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Phân quyền vai trò hệ thống *
               </label>
               <select
                 value={editRole}
                 onChange={(e) => setEditRole(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#3B5BDB] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs font-semibold text-[#2E3248] focus:bg-white focus:border-[#6044E8] outline-none"
               >
                 <option value="admin">Quản trị viên</option>
                 <option value="team_leader">
@@ -729,13 +729,13 @@ export default function AdminPeopleDirectoryPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Trạng thái tài khoản *
               </label>
               <select
                 value={editAccountStatus}
                 onChange={(e) => setEditAccountStatus(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] focus:bg-white focus:border-[#3B5BDB] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs font-semibold text-[#2E3248] focus:bg-white focus:border-[#6044E8] outline-none"
               >
                 <option value="active">Hoạt động bình thường</option>
                 <option value="pending">Chờ phê duyệt</option>
@@ -750,15 +750,15 @@ export default function AdminPeopleDirectoryPage() {
           </div>
 
           {editRole !== "client" && (
-            <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#F2EAD3] space-y-4">
-              <h4 className="text-xs font-extrabold text-[#24304A] uppercase tracking-wider flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-[#3B5BDB]" />
+            <div className="p-4 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-4">
+              <h4 className="text-xs font-extrabold text-[#2E3248] uppercase tracking-wider flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-[#6044E8]" />
                 Thông tin hồ sơ nhân sự doanh nghiệp
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+                  <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                     Mã nhân viên
                     {Boolean(editingPerson?.employeeProfile?.employeeCode) && (
                       <span className="text-xs text-[#475569] font-normal ml-1">
@@ -774,16 +774,16 @@ export default function AdminPeopleDirectoryPage() {
                     )}
                     onChange={(e) => setEditEmployeeCode(e.target.value)}
                     placeholder="VD: NV-001"
-                    className={`w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] text-xs font-mono font-bold outline-none ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] text-xs font-mono font-bold outline-none ${
                       editingPerson?.employeeProfile?.employeeCode
-                        ? "bg-[#F2EAD3] text-[#475569] cursor-not-allowed"
-                        : "bg-white text-[#3B5BDB] focus:border-[#3B5BDB]"
+                        ? "bg-[#E7E9F0] text-[#475569] cursor-not-allowed"
+                        : "bg-white text-[#6044E8] focus:border-[#6044E8]"
                     }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+                  <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                     Chức danh / Vị trí công việc
                   </label>
                   <input
@@ -791,14 +791,14 @@ export default function AdminPeopleDirectoryPage() {
                     value={editJobTitle}
                     onChange={(e) => setEditJobTitle(e.target.value)}
                     placeholder="VD: Senior Graphic Designer"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#24304A] focus:border-[#3B5BDB] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-white text-xs text-[#2E3248] focus:border-[#6044E8] outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+                  <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                     Phòng ban
                   </label>
                   <select
@@ -807,7 +807,7 @@ export default function AdminPeopleDirectoryPage() {
                       setEditDeptId(e.target.value);
                       setEditTeamId("");
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#24304A] focus:border-[#3B5BDB] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-white text-xs text-[#2E3248] focus:border-[#6044E8] outline-none"
                   >
                     <option value="">-- Chưa gán phòng ban --</option>
                     {departments.map((d) => (
@@ -819,13 +819,13 @@ export default function AdminPeopleDirectoryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+                  <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                     Đội nhóm
                   </label>
                   <select
                     value={editTeamId}
                     onChange={(e) => setEditTeamId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-white text-xs text-[#24304A] focus:border-[#3B5BDB] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-white text-xs text-[#2E3248] focus:border-[#6044E8] outline-none"
                   >
                     <option value="">-- Chưa gán đội nhóm --</option>
                     {filteredEditTeams.map((t) => (
@@ -838,13 +838,13 @@ export default function AdminPeopleDirectoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#24304A] mb-1.5">
+                <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                   Tình trạng công tác
                 </label>
                 <select
                   value={editEmpStatus}
                   onChange={(e) => setEditEmpStatus(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#F2EAD3] bg-white text-xs font-semibold text-[#24304A] focus:border-[#3B5BDB] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E9F0] bg-white text-xs font-semibold text-[#2E3248] focus:border-[#6044E8] outline-none"
                 >
                   <option value="active">Chính thức</option>
                   <option value="probation">
@@ -859,7 +859,7 @@ export default function AdminPeopleDirectoryPage() {
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#F2EAD3]">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E7E9F0]">
             <Button
               type="button"
               variant="outline"
@@ -898,7 +898,7 @@ export default function AdminPeopleDirectoryPage() {
                 placeholder="Tìm kiếm dự án theo tên hoặc mã..."
                 value={projectSearch}
                 onChange={(e) => setProjectSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-xs text-[#24304A] focus:bg-white focus:border-[#3B5BDB] outline-none"
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs text-[#2E3248] focus:bg-white focus:border-[#6044E8] outline-none"
               />
             </div>
 
@@ -909,7 +909,7 @@ export default function AdminPeopleDirectoryPage() {
               <select
                 value={projectRole}
                 onChange={(e) => setProjectRole(e.target.value as any)}
-                className="px-3 py-2 rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] text-xs font-semibold text-[#24304A] outline-none focus:border-[#3B5BDB]"
+                className="px-3 py-2 rounded-xl border border-[#E7E9F0] bg-[#F8F9FC] text-xs font-semibold text-[#2E3248] outline-none focus:border-[#6044E8]"
               >
                 <option value="member">Thành viên</option>
                 <option value="project_manager">Quản lý dự án (PM)</option>
@@ -918,7 +918,7 @@ export default function AdminPeopleDirectoryPage() {
             </div>
           </div>
 
-          <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#F2EAD3] divide-y divide-[#F2EAD3] p-1">
+          <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#E7E9F0] divide-y divide-[#E7E9F0] p-1">
             {filteredProjects.length === 0 ? (
               <p className="p-6 text-center text-xs text-[#475569]">
                 Không có dự án nào khớp với tìm kiếm.
@@ -931,8 +931,8 @@ export default function AdminPeopleDirectoryPage() {
                     key={p.id}
                     className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
                       isSelected
-                        ? "bg-[#EEF2FF] border border-[#3B5BDB]/20"
-                        : "hover:bg-[#FFFBF0]"
+                        ? "bg-[#F2EEFF] border border-[#6044E8]/20"
+                        : "hover:bg-[#F8F9FC]"
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -940,14 +940,14 @@ export default function AdminPeopleDirectoryPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleToggleProject(p.id)}
-                        className="w-4 h-4 rounded text-[#3B5BDB] focus:ring-[#3B5BDB]"
+                        className="w-4 h-4 rounded text-[#6044E8] focus:ring-[#6044E8]"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                          <span className="font-mono text-xs font-bold text-[#6044E8]">
                             {p.projectCode}
                           </span>
-                          <span className="text-xs font-bold text-[#24304A] truncate">
+                          <span className="text-xs font-bold text-[#2E3248] truncate">
                             {p.name}
                           </span>
                         </div>
@@ -975,8 +975,8 @@ export default function AdminPeopleDirectoryPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[#F2EAD3]">
-            <span className="text-xs font-semibold text-[#3B5BDB]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#E7E9F0]">
+            <span className="text-xs font-semibold text-[#6044E8]">
               Đã chọn: {assignedProjectIds.length} dự án
             </span>
             <div className="flex items-center gap-2">

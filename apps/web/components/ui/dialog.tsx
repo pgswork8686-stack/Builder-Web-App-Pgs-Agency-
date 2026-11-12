@@ -54,12 +54,12 @@ export function Dialog({
 
       {/* Modal Dialog Box */}
       <div
-        className={`relative w-full ${maxWidthStyles[maxWidth] || "max-w-2xl"} rounded-3xl bg-white border border-[#F2EAD3] p-6 sm:p-8 text-[#24304A] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 my-auto`}
+        className={`relative w-full ${maxWidthStyles[maxWidth] || "max-w-2xl"} rounded-3xl bg-white border border-[#E7E9F0] p-6 sm:p-8 text-[#2E3248] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 my-auto`}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 rounded-xl p-2 text-[#475569] hover:text-[#24304A] hover:bg-[#FFFBF0] transition-colors cursor-pointer"
+          className="absolute right-5 top-5 rounded-xl p-2 text-[#475569] hover:text-[#2E3248] hover:bg-[#F8F9FC] transition-colors cursor-pointer"
           aria-label="Đóng dialog"
         >
           <X className="w-5 h-5" />
@@ -67,7 +67,7 @@ export function Dialog({
 
         {title && (
           <div className="mb-5 pr-8">
-            <h3 className="text-lg sm:text-xl font-bold text-[#24304A] tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold text-[#2E3248] tracking-tight">
               {title}
             </h3>
             {description && (

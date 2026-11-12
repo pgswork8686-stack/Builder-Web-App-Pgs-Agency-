@@ -126,9 +126,9 @@ export default function ProtectedAppLayout({
 
   if (checking || !account) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF0] text-[#161827]">
-        <div className="rounded-2xl border border-[#F2EAD3] bg-white p-8 text-center shadow-lg">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#E7AE18]" />
+      <div className="flex min-h-screen items-center justify-center bg-[#F8F9FC] text-[#202333]">
+        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-center shadow-lg">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#7257F5]" />
           <p className="mt-4 text-xs font-medium text-[#475569]">
             Đang kiểm tra quyền truy cập...
           </p>
@@ -141,7 +141,7 @@ export default function ProtectedAppLayout({
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
-                  className="px-3.5 py-1.5 text-xs font-bold text-[#161827] bg-[#E7AE18] hover:bg-[#CC9410] rounded-xl transition-colors cursor-pointer shadow-xs"
+                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-[#7257F5] hover:bg-[#6044E8] rounded-xl transition-colors cursor-pointer shadow-xs"
                 >
                   Thử lại
                 </button>
@@ -152,7 +152,7 @@ export default function ProtectedAppLayout({
                     await supabase.auth.signOut();
                     router.replace("/auth/login");
                   }}
-                  className="px-3.5 py-1.5 text-xs font-medium text-[#475569] hover:text-[#161827] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-medium text-[#475569] hover:text-[#202333] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
                 >
                   Đăng xuất
                 </button>
@@ -166,10 +166,10 @@ export default function ProtectedAppLayout({
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF0] p-6 text-[#161827]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F8F9FC] p-6 text-[#202333]">
         <div className="max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-500" />
-          <h1 className="mt-4 text-base font-extrabold text-[#161827]">
+          <h1 className="mt-4 text-base font-extrabold text-[#202333]">
             Không có quyền truy cập
           </h1>
           <p className="mt-2 text-xs text-[#475569]">

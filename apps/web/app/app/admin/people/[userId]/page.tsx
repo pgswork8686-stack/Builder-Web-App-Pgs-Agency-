@@ -217,8 +217,8 @@ export default function AdminPersonDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#F2EAD3]">
-          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin mb-3" />
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+          <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải dữ liệu hồ sơ nhân sự...
           </span>
@@ -238,7 +238,7 @@ export default function AdminPersonDetailPage() {
           {/* Left Column: Account Profile Meta */}
           <div className="space-y-6">
             <Card className="p-6 text-center space-y-4">
-              <div className="w-20 h-20 rounded-full bg-[#EEF2FF] border border-[#CBD5E1] mx-auto flex items-center justify-center text-[#3B5BDB] font-bold overflow-hidden shadow-xs">
+              <div className="w-20 h-20 rounded-full bg-[#F2EEFF] border border-[#CBD5E1] mx-auto flex items-center justify-center text-[#6044E8] font-bold overflow-hidden shadow-xs">
                 {person.avatarUrl ? (
                   <img
                     src={person.avatarUrl}
@@ -246,11 +246,11 @@ export default function AdminPersonDetailPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User2 className="w-8 h-8 text-[#3B5BDB]" />
+                  <User2 className="w-8 h-8 text-[#6044E8]" />
                 )}
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-[#161827]">
+                <h3 className="text-base font-extrabold text-[#202333]">
                   {person.fullName || "Chưa cập nhật tên"}
                 </h3>
                 <p className="text-xs text-[#475569] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
@@ -259,7 +259,7 @@ export default function AdminPersonDetailPage() {
                 </p>
               </div>
 
-              <div className="border-t border-[#F2EAD3] pt-4 space-y-2.5 text-left text-xs">
+              <div className="border-t border-[#E7E9F0] pt-4 space-y-2.5 text-left text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-[#475569]">Vai trò hệ thống</span>
                   <Badge variant="blue" size="sm">
@@ -294,7 +294,7 @@ export default function AdminPersonDetailPage() {
             {person.role === "client" ? (
               <Card className="p-8 text-center space-y-3">
                 <HelpCircle className="w-10 h-10 text-[#64748B] mx-auto" />
-                <h3 className="text-sm font-bold text-[#161827]">
+                <h3 className="text-sm font-bold text-[#202333]">
                   Tài khoản Khách hàng
                 </h3>
                 <p className="text-xs text-[#475569] max-w-md mx-auto leading-relaxed">
@@ -305,9 +305,9 @@ export default function AdminPersonDetailPage() {
               </Card>
             ) : (
               <Card className="p-6 space-y-6">
-                <div className="flex items-center gap-2 border-b border-[#F2EAD3] pb-3">
-                  <ShieldCheck className="w-5 h-5 text-[#3B5BDB]" />
-                  <h2 className="font-extrabold text-sm text-[#161827]">
+                <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
+                  <ShieldCheck className="w-5 h-5 text-[#6044E8]" />
+                  <h2 className="font-extrabold text-sm text-[#202333]">
                     {person.employeeProfile
                       ? "Thông Tin Hồ Sơ Nhân Sự"
                       : "Khởi Tạo Hồ Sơ Nhân Sự"}
@@ -340,7 +340,7 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) => setEmployeeCode(e.target.value)}
                         disabled={!!person.employeeProfile}
                         placeholder="Ví dụ: PGS0102"
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs font-mono text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] disabled:bg-[#FBF3DC] disabled:text-[#64748B]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs font-mono text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] disabled:bg-[#F4F2FD] disabled:text-[#64748B]"
                       />
                     </div>
 
@@ -353,7 +353,7 @@ export default function AdminPersonDetailPage() {
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
                         placeholder="Ví dụ: Chuyên viên SEO"
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                       />
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function AdminPersonDetailPage() {
                           setDepartmentId(e.target.value);
                           setTeamId("");
                         }}
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                       >
                         <option value="">-- Chưa phân bổ phòng ban --</option>
                         {departments.map((d) => (
@@ -387,7 +387,7 @@ export default function AdminPersonDetailPage() {
                       <select
                         value={teamId}
                         onChange={(e) => setTeamId(e.target.value)}
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                       >
                         <option value="">-- Chưa phân bổ đội nhóm --</option>
                         {availableTeams.map((t) => (
@@ -406,7 +406,7 @@ export default function AdminPersonDetailPage() {
                     <select
                       value={reportsToUserId}
                       onChange={(e) => setReportsToUserId(e.target.value)}
-                      className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                      className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                     >
                       <option value="">-- Không có người quản lý --</option>
                       {managers.map((m) => (
@@ -427,7 +427,7 @@ export default function AdminPersonDetailPage() {
                         onChange={(e) =>
                           setEmploymentStatus(e.target.value as any)
                         }
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                       >
                         <option value="probation">Thử việc (probation)</option>
                         <option value="active">Chính thức (active)</option>
@@ -446,7 +446,7 @@ export default function AdminPersonDetailPage() {
                         type="date"
                         value={joinedDate}
                         onChange={(e) => setJoinedDate(e.target.value)}
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8]"
                       />
                     </div>
 
@@ -459,12 +459,12 @@ export default function AdminPersonDetailPage() {
                         value={leftDate}
                         onChange={(e) => setLeftDate(e.target.value)}
                         disabled={employmentStatus !== "terminated"}
-                        className="w-full bg-[#FFFBF0] border border-[#F2EAD3] rounded-xl px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB] disabled:bg-[#FBF3DC] disabled:text-[#64748B]"
+                        className="w-full bg-[#F8F9FC] border border-[#E7E9F0] rounded-xl px-3 py-2 text-xs text-[#202333] outline-none focus:bg-white focus:border-[#6044E8] disabled:bg-[#F4F2FD] disabled:text-[#64748B]"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-[#F2EAD3] flex justify-end">
+                  <div className="pt-4 border-t border-[#E7E9F0] flex justify-end">
                     <Button
                       type="submit"
                       variant="primary"

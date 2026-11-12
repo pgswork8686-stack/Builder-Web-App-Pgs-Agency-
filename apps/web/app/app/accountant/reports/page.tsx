@@ -40,7 +40,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Doanh thu
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Theo dõi Hợp đồng
           </h4>
           <p className="text-xs text-[#475569]">
@@ -52,7 +52,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Công nợ
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Tuổi nợ & Hóa đơn
           </h4>
           <p className="text-xs text-[#475569]">
@@ -64,7 +64,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Chi phí
           </span>
-          <h4 className="text-base font-extrabold text-[#24304A]">
+          <h4 className="text-base font-extrabold text-[#2E3248]">
             Chi phí Hoạt động
           </h4>
           <p className="text-xs text-[#475569]">

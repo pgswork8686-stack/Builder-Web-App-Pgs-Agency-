@@ -64,14 +64,14 @@ export default function AdminCompletedProjectsPage() {
           {projects.map((p) => (
             <Card key={p.id} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#3B5BDB]">
+                <span className="font-mono text-xs font-bold text-[#6044E8]">
                   {p.projectCode}
                 </span>
                 <Badge variant="success" size="sm">
                   Đã hoàn thành
                 </Badge>
               </div>
-              <h4 className="text-sm font-bold text-[#24304A]">{p.name}</h4>
+              <h4 className="text-sm font-bold text-[#2E3248]">{p.name}</h4>
               <p className="text-xs text-[#475569]">
                 Khách hàng: {p.clientCompany?.name || "—"}
               </p>

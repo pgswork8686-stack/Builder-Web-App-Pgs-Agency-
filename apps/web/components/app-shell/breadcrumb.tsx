@@ -41,7 +41,7 @@ export function Breadcrumb() {
   if (segments.length <= 1) {
     return (
       <div className="flex items-center gap-2 text-xs font-semibold text-[#8E8E93]">
-        <Home className="w-3.5 h-3.5 text-[#FFC400]" />
+        <Home className="w-3.5 h-3.5 text-[#7257F5]" />
         <span>PGS Hub</span>
       </div>
     );
@@ -69,7 +69,7 @@ export function Breadcrumb() {
         href="/app"
         className="flex items-center gap-1 hover:text-white transition-colors"
       >
-        <Home className="w-3.5 h-3.5 text-[#FFC400]" />
+        <Home className="w-3.5 h-3.5 text-[#7257F5]" />
       </Link>
 
       {crumbs.slice(1).map((crumb, i) => (

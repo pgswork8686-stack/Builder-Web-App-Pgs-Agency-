@@ -71,10 +71,10 @@ export default function AccountantClientsPage() {
             <TableBody>
               {clients.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-mono text-xs font-bold text-[#3B5BDB]">
+                  <TableCell className="font-mono text-xs font-bold text-[#6044E8]">
                     {c.code}
                   </TableCell>
-                  <TableCell className="font-bold text-xs text-[#24304A]">
+                  <TableCell className="font-bold text-xs text-[#2E3248]">
                     {c.name}
                   </TableCell>
                   <TableCell className="text-xs text-[#475569] font-mono">

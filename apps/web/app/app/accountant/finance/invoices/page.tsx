@@ -9,7 +9,7 @@ export default function AccountantInvoicesPage() {
     <Suspense
       fallback={
         <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 text-[#3B5BDB] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin" />
           <span className="text-xs text-[#475569]">
             Đang tải danh sách hóa đơn...
           </span>

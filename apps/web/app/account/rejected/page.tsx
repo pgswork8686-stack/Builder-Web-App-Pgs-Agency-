@@ -36,8 +36,8 @@ export default function AccountRejectedPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] text-[#161827] p-6 relative">
-      <Card className="max-w-[460px] w-full rounded-3xl p-8 text-center space-y-6 border-[#F2EAD3]">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] text-[#202333] p-6 relative">
+      <Card className="max-w-[460px] w-full rounded-3xl p-8 text-center space-y-6 border-[#E7E9F0]">
         {/* Status Icon Header */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
           <XCircle className="w-8 h-8" />
@@ -47,7 +47,7 @@ export default function AccountRejectedPage() {
           <Badge variant="danger" size="md">
             Trạng thái: Bị từ chối
           </Badge>
-          <h2 className="text-xl font-extrabold text-[#161827] tracking-tight">
+          <h2 className="text-xl font-extrabold text-[#202333] tracking-tight">
             Tài khoản bị từ chối
           </h2>
         </div>
@@ -66,9 +66,9 @@ export default function AccountRejectedPage() {
         <div className="flex flex-col gap-3 pt-2">
           <a
             href="mailto:admin@pgsagency.com"
-            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white border border-[#CBD5E1] text-[#161827] font-bold text-xs hover:bg-[#FFFBF0] transition-colors"
+            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white border border-[#CBD5E1] text-[#202333] font-bold text-xs hover:bg-[#F8F9FC] transition-colors"
           >
-            <Mail className="w-4 h-4 text-[#3B5BDB]" />
+            <Mail className="w-4 h-4 text-[#6044E8]" />
             <span>Liên hệ Quản trị viên</span>
           </a>
 
