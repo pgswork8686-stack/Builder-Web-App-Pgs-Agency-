@@ -455,13 +455,13 @@ export function WorkflowBuilder() {
                 {editable && (
                   <div className="grid gap-3 rounded-lg border p-4">
                     <Input
-                      aria-label="Workflow Name"
+                      aria-label="Tên quy trình"
                       value={templateName}
                       disabled={interactionBusy}
                       onChange={(event) => setTemplateName(event.target.value)}
                     />
                     <textarea
-                      aria-label="Workflow Description"
+                      aria-label="Mô tả quy trình"
                       className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={templateDescription}
                       disabled={interactionBusy}
@@ -549,14 +549,14 @@ export function WorkflowBuilder() {
                     className="grid gap-2 sm:grid-cols-[1fr_150px_auto]"
                   >
                     <Input
-                      aria-label="Tên Stage"
-                      placeholder="Tên Stage"
+                      aria-label="Tên giai đoạn"
+                      placeholder="Tên giai đoạn"
                       value={stageName}
                       disabled={interactionBusy}
                       onChange={(event) => setStageName(event.target.value)}
                     />
                     <Input
-                      aria-label="SLA Stage"
+                      aria-label="Thời hạn giai đoạn (SLA)"
                       type="number"
                       min={1}
                       placeholder="SLA giờ"
@@ -596,7 +596,7 @@ export function WorkflowBuilder() {
               <CardContent className="space-y-3">
                 <div className="grid gap-2 sm:grid-cols-[1fr_auto_1fr_auto]">
                   <Select
-                    aria-label="Stage trước"
+                    aria-label="Giai đoạn trước"
                     value={predecessorStageId}
                     disabled={!editable}
                     onChange={(event) =>
@@ -743,13 +743,13 @@ function StageEditor({
           {editing ? (
             <div className="flex flex-wrap items-center gap-2">
               <Input
-                aria-label="Chỉnh tên Stage"
+                aria-label="Chỉnh tên giai đoạn"
                 value={editName}
                 disabled={busy}
                 onChange={(event) => setEditName(event.target.value)}
               />
               <Input
-                aria-label="Chỉnh SLA Stage"
+                aria-label="Chỉnh thời hạn giai đoạn"
                 className="w-28"
                 type="number"
                 min={1}
@@ -759,7 +759,7 @@ function StageEditor({
               />
               <label className="flex items-center gap-2 text-xs">
                 <input
-                  aria-label={`Stage Required ${stage.id}`}
+                  aria-label={`Giai đoạn bắt buộc ${stage.id}`}
                   type="checkbox"
                   checked={editRequired}
                   disabled={busy}
@@ -1095,7 +1095,7 @@ function MappedItemEditor({
           </label>
           <label className="flex items-center gap-2">
             <input
-              aria-label={`Mapped Approval Required ${item.id}`}
+              aria-label={`Hạng mục cần phê duyệt ${item.id}`}
               type="checkbox"
               checked={effectiveApprovalRequired}
               disabled={completionMode === "tasks_done_and_approval" || busy}

@@ -129,7 +129,6 @@ export default function FinanceDashboard({
       <SectionHeader
         title="Tổng quan Tài chính"
         description="Theo dõi tình hình hợp đồng, hóa đơn, doanh thu thực tế và nợ tồn đọng."
-        badge={currentUser?.role === "admin" ? "Quản trị viên" : "Kế toán viên"}
         action={
           <div className="flex items-center gap-3">
             <Link href={`${roleBasePath}/finance/contracts`}>
@@ -183,7 +182,7 @@ export default function FinanceDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard
                     variant="blue"
-                    title="Giá trị hợp đồng active"
+                    title="Giá trị hợp đồng hiệu lực"
                     value={formatCurrency(
                       contractData.contracted_value,
                       currency,
@@ -264,15 +263,9 @@ export default function FinanceDashboard({
                     </span>
                   </div>
                   <div className="text-xs text-[#475569]">
-                    Entity ID:{" "}
-                    <span className="font-mono text-[#161827]">
-                      {log.entity_id}
-                    </span>
-                  </div>
-                  <div className="text-xs text-[#475569]">
                     Thực hiện bởi:{" "}
                     <span className="font-bold text-[#161827]">
-                      {log.actor?.full_name || log.actor?.email || "System"}
+                      {log.actor?.full_name || log.actor?.email || "Hệ thống"}
                     </span>
                   </div>
                 </div>

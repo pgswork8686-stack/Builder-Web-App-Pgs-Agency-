@@ -582,9 +582,8 @@ export default function AdminPeopleDirectoryPage() {
                             <Edit2 className="w-3.5 h-3.5 text-[#3B5BDB]" />
                           }
                           title="Chỉnh sửa thông tin & phân quyền"
-                        >
-                          Sửa
-                        </Button>
+                          aria-label="Chỉnh sửa thông tin & phân quyền"
+                        >{null}</Button>
 
                         {/* Assign Projects */}
                         {person.role !== "client" && (
@@ -596,9 +595,8 @@ export default function AdminPeopleDirectoryPage() {
                               <FolderKanban className="w-3.5 h-3.5 text-[#3B5BDB]" />
                             }
                             title="Phân bổ dự án cho nhân sự"
-                          >
-                            Dự án
-                          </Button>
+                          aria-label="Phân bổ dự án cho nhân sự"
+                        >{null}</Button>
                         )}
 
                         {/* Delete / Terminate */}

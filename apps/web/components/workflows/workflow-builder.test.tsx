@@ -112,10 +112,10 @@ describe("WorkflowBuilder", () => {
     await selectService();
     expect(screen.getByLabelText("Tên bản nháp")).toBeDefined();
     expect(screen.getByRole("button", { name: /Tạo Draft/i })).toBeDefined();
-    expect(screen.getByLabelText("Tên Stage")).toBeDefined();
+    expect(screen.getByLabelText("Tên giai đoạn")).toBeDefined();
     expect(screen.getByRole("button", { name: /Add Stage/i })).toBeDefined();
-    expect(screen.getByLabelText("Workflow Name")).toBeDefined();
-    expect(screen.getByLabelText("Workflow Description")).toBeDefined();
+    expect(screen.getByLabelText("Tên quy trình")).toBeDefined();
+    expect(screen.getByLabelText("Mô tả quy trình")).toBeDefined();
   });
 
   it("hides Draft editing controls for a published immutable Template", async () => {
@@ -138,8 +138,8 @@ describe("WorkflowBuilder", () => {
     vi.mocked(workflowsApi.getTemplate).mockResolvedValue(published);
     render(<WorkflowBuilder />);
     await selectService();
-    expect(screen.queryByLabelText("Tên Stage")).toBeNull();
-    expect(screen.queryByLabelText("Workflow Name")).toBeNull();
+    expect(screen.queryByLabelText("Tên giai đoạn")).toBeNull();
+    expect(screen.queryByLabelText("Tên quy trình")).toBeNull();
     expect(screen.queryByRole("button", { name: /Edit Stage/i })).toBeNull();
     expect(
       screen
@@ -167,14 +167,14 @@ describe("WorkflowBuilder", () => {
 
     render(<WorkflowBuilder />);
     await selectService();
-    const nameInput = screen.getByLabelText("Workflow Name");
+    const nameInput = screen.getByLabelText("Tên quy trình");
     await waitFor(() =>
       expect((nameInput as HTMLInputElement).value).toBe("Delivery Workflow"),
     );
     fireEvent.change(nameInput, {
       target: { value: " Updated Delivery Workflow " },
     });
-    fireEvent.change(screen.getByLabelText("Workflow Description"), {
+    fireEvent.change(screen.getByLabelText("Mô tả quy trình"), {
       target: { value: " Updated description " },
     });
     fireEvent.click(
@@ -212,10 +212,10 @@ describe("WorkflowBuilder", () => {
     render(<WorkflowBuilder />);
     await selectService();
     fireEvent.click(screen.getByRole("button", { name: /Edit Stage/i }));
-    fireEvent.change(screen.getByLabelText("Chỉnh SLA Stage"), {
+    fireEvent.change(screen.getByLabelText("Chỉnh thời hạn giai đoạn"), {
       target: { value: "48" },
     });
-    fireEvent.click(screen.getByLabelText("Stage Required stage-1"));
+    fireEvent.click(screen.getByLabelText("Giai đoạn bắt buộc stage-1"));
     fireEvent.click(screen.getByRole("button", { name: /Save Stage/i }));
 
     await waitFor(() =>
@@ -304,7 +304,7 @@ describe("WorkflowBuilder", () => {
 
     render(<WorkflowBuilder />);
     await selectService();
-    fireEvent.change(screen.getByLabelText("Tên Stage"), {
+    fireEvent.change(screen.getByLabelText("Tên giai đoạn"), {
       target: { value: "Review" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Add Stage/i }));
@@ -365,7 +365,7 @@ describe("WorkflowBuilder", () => {
     });
 
     const approvalRequired = screen.getByLabelText(
-      "Mapped Approval Required mapped-1",
+      "Hạng mục cần phê duyệt mapped-1",
     ) as HTMLInputElement;
     const approvalScope = screen.getByLabelText(
       "Mapped Approval Scope mapped-1",
