@@ -77,21 +77,7 @@ export default function EmployeeAttendancePage() {
       const sum = await attendanceApi.getSummary();
       setSummary(sum);
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setGeoCoords({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          (err) => {
-            setGeoError("Không thể định vị GPS: " + err.message);
-          },
-        );
-      } else {
-        setGeoError("Trình duyệt không hỗ trợ định vị Geolocation.");
-      }
+      locate();
     } catch (err: any) {
       setFeedback({
         type: "error",
@@ -200,6 +186,27 @@ export default function EmployeeAttendancePage() {
 
   const totalPages = Math.ceil(historyTotal / pageSize);
 
+  // Lấy vị trí khi bấm/thử lại; lỗi trình duyệt chuyển thành hướng dẫn tiếng Việt.
+  function locate() {
+    setGeoError(null);
+    if (!navigator.geolocation) {
+      setGeoError("Trình duyệt này không hỗ trợ định vị. Hãy dùng Chrome hoặc Safari trên điện thoại.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => setGeoCoords({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+      (err) =>
+        setGeoError(
+          err.code === 1
+            ? "Bạn chưa cho phép truy cập vị trí. Bật quyền vị trí cho trang này rồi bấm Thử lại."
+            : err.code === 3
+              ? "Lấy vị trí quá lâu. Ra chỗ thoáng hoặc bật Wi‑Fi rồi bấm Thử lại."
+              : "Chưa xác định được vị trí. Kiểm tra GPS của thiết bị rồi bấm Thử lại.",
+        ),
+      { enableHighAccuracy: true, timeout: 15000 },
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Section Header */}
@@ -226,42 +233,6 @@ export default function EmployeeAttendancePage() {
         </div>
       )}
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          variant="green"
-          title="Ngày công ghi nhận"
-          value={`${summary?.monthly?.presentDays ?? 0} ngày`}
-          subtitle={`Tổng số lượt: ${summary?.monthly?.totalRecords ?? 0}`}
-          icon={<Calendar className="w-5 h-5" />}
-        />
-        <StatCard
-          variant="blue"
-          title="Hôm nay"
-          value={summary?.today?.checkedIn ? "Đã vào ca" : "Chưa vào ca"}
-          subtitle={
-            summary?.today?.workMinutes
-              ? `${(summary.today.workMinutes / 60).toFixed(1)} giờ làm việc`
-              : "Chuẩn: 8h/ngày"
-          }
-          icon={<Clock className="w-5 h-5" />}
-        />
-        <StatCard
-          variant="gold"
-          title="Lượt đi muộn"
-          value={`${summary?.monthly?.lateCount ?? 0} lần`}
-          subtitle="Ghi nhận trong tháng"
-          icon={<AlertTriangle className="w-5 h-5 text-amber-500" />}
-        />
-        <StatCard
-          variant="rose"
-          title="Chưa hoàn tất ca"
-          value={`${summary?.monthly?.incompleteCount ?? 0} lần`}
-          subtitle="Quên chấm công tan ca"
-          icon={<LogOut className="w-5 h-5 text-rose-500" />}
-        />
-      </div>
-
       {/* Main Check-in Action Box */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="p-6 lg:col-span-2 space-y-6">
@@ -282,13 +253,11 @@ export default function EmployeeAttendancePage() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] self-start sm:self-auto">
               <MapPin
                 className={`w-4 h-4 ${
-                  geoCoords ? "text-[#00D09C]" : "text-amber-500 animate-pulse"
+                  geoCoords ? "text-[#067647]" : "text-[#B54708]"
                 }`}
               />
-              <span className="text-xs font-mono font-bold text-[#202333]">
-                {geoCoords
-                  ? `${geoCoords.latitude.toFixed(4)}, ${geoCoords.longitude.toFixed(4)}`
-                  : geoError || "Đang lấy GPS..."}
+              <span className="text-xs text-[#202333]">
+                {geoCoords ? "Đã xác định vị trí" : geoError ? "Chưa có vị trí" : "Đang lấy vị trí…"}
               </span>
             </div>
           </div>
@@ -317,21 +286,29 @@ export default function EmployeeAttendancePage() {
               onClick={handleCheckIn}
               leftIcon={<LogIn className="w-5 h-5" />}
             >
-              VÀO CA
+              Vào ca
             </Button>
 
             <Button
               variant="secondary"
               size="lg"
-              className="w-full h-14 text-sm hover:border-amber-500/40 hover:text-amber-600"
+              className="w-full h-14 text-sm"
               disabled={actionLoading || !geoCoords}
               isLoading={actionLoading}
               onClick={handleCheckOut}
               leftIcon={<LogOut className="w-5 h-5" />}
             >
-              TAN CA
+              Tan ca
             </Button>
           </div>
+          {!geoCoords && (
+            <div role="status" className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-lg bg-[#FFFAEB] border border-[#FEDF89] px-3 py-2 text-sm text-[#B54708]">
+              <span className="flex-1">{geoError || "Đang lấy vị trí để chấm công…"}</span>
+              {geoError && (
+                <Button variant="secondary" size="sm" onClick={locate}>Thử lại</Button>
+              )}
+            </div>
+          )}
         </Card>
 
         {/* Quy định chấm công — lấy từ cấu hình thật của hệ thống */}
@@ -367,6 +344,43 @@ export default function EmployeeAttendancePage() {
           )}
         </Card>
       </div>
+
+      {/* Số liệu tháng — đặt sau khối chấm công (thao tác chính lên đầu, nhất là trên điện thoại) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard
+          variant="default"
+          title="Ngày công ghi nhận"
+          value={`${summary?.monthly?.presentDays ?? 0} ngày`}
+          subtitle={`Tổng số lượt: ${summary?.monthly?.totalRecords ?? 0}`}
+          icon={<Calendar className="w-5 h-5" />}
+        />
+        <StatCard
+          variant="default"
+          title="Hôm nay"
+          value={summary?.today?.checkedIn ? "Đã vào ca" : "Chưa vào ca"}
+          subtitle={
+            summary?.today?.workMinutes
+              ? `${(summary.today.workMinutes / 60).toFixed(1)} giờ làm việc`
+              : "Chuẩn: 8h/ngày"
+          }
+          icon={<Clock className="w-5 h-5" />}
+        />
+        <StatCard
+          variant={(summary?.monthly?.lateCount ?? 0) > 0 ? "gold" : "default"}
+          title="Lượt đi muộn"
+          value={`${summary?.monthly?.lateCount ?? 0} lần`}
+          subtitle="Ghi nhận trong tháng"
+          icon={<AlertTriangle className="w-5 h-5" />}
+        />
+        <StatCard
+          variant={(summary?.monthly?.incompleteCount ?? 0) > 0 ? "rose" : "default"}
+          title="Chưa hoàn tất ca"
+          value={`${summary?.monthly?.incompleteCount ?? 0} lần`}
+          subtitle="Quên chấm công tan ca"
+          icon={<LogOut className="w-5 h-5" />}
+        />
+      </div>
+
 
       {/* History Table */}
       <div className="space-y-3">
