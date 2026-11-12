@@ -1,5 +1,7 @@
 "use client";
 
+import { viError } from "@/lib/labels";
+
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Loader2, ShieldAlert } from "lucide-react";
@@ -109,11 +111,7 @@ export default function ProtectedAppLayout({
         }
       } catch (err) {
         if (disposed) return;
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Không xác thực được phiên đăng nhập.",
-        );
+        setError(viError(err, "Không xác thực được phiên đăng nhập."));
       } finally {
         if (!disposed) setChecking(false);
       }

@@ -16,3 +16,16 @@ export function statusLabel(v?: string | null): string {
   const k = v.toLowerCase();
   return L[k] ?? v.replace(/_/g, " ");
 }
+
+/** Lỗi kỹ thuật (tiếng Anh từ trình duyệt/API) → câu tiếng Việt người dùng hiểu được. */
+export function viError(err: unknown, fallback = "Đã xảy ra lỗi. Vui lòng thử lại."): string {
+  const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+  if (!msg) return fallback;
+  if (/failed to fetch|networkerror|load failed|network request failed/i.test(msg))
+    return "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.";
+  if (/invalid or expired|jwt|token|unauthori[sz]ed|missing or invalid authorization/i.test(msg))
+    return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+  if (/forbidden|access denied/i.test(msg)) return "Bạn không có quyền thực hiện thao tác này.";
+  if (/internal server error/i.test(msg)) return "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.";
+  return msg;
+}

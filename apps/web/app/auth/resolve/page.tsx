@@ -1,5 +1,7 @@
 "use client";
 
+import { viError } from "@/lib/labels";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -68,7 +70,7 @@ export default function AuthResolvePage() {
         setErrorMsg("Trạng thái tài khoản không xác định.");
       } catch (err: any) {
         console.error("Resolve error:", err);
-        setErrorMsg(err.message || "Lỗi kết nối tới máy chủ xác thực.");
+        setErrorMsg(viError(err, "Lỗi kết nối tới máy chủ xác thực."));
       }
     };
 

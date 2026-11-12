@@ -442,7 +442,7 @@ export class PeopleService {
     const base = client
       .from('employee_profiles')
       .select(
-        'user_id, employee_code, job_title, employment_status, joined_date, profile:profiles(email, full_name, avatar_url, role)',
+        'user_id, employee_code, job_title, employment_status, joined_date, profile:profiles!employee_profiles_user_id_fkey(email, full_name, avatar_url, role)',
       );
     const { data: members, error: membersError } =
       teamIds.length > 0

@@ -52,7 +52,7 @@ export class TeamLeaderDashboardService {
 
     const [names, tasks, attendance, leaveToday, pendingLeave, clients] = await Promise.all([
       memberIds.length ? this.safe('names', sb.from('profiles').select('id,full_name').in('id', memberIds)) : Promise.resolve([] as Row[]),
-      projectIds.length ? this.safe('tasks', sb.from('tasks').select('id,task_code,title,status,due_date,assignee_user_id,project_id').in('project_id', projectIds).limit(10000)) : Promise.resolve([] as Row[]),
+      projectIds.length ? this.safe('tasks', sb.from('tasks').select('id,task_code,title,status,due_date,assignee_user_id,project_id,approval_status').in('project_id', projectIds).limit(10000)) : Promise.resolve([] as Row[]),
       memberIds.length ? this.safe('attendance', sb.from('attendance_records').select('user_id,check_in_at,late_minutes,check_out_at').eq('attendance_date', today).in('user_id', memberIds)) : Promise.resolve([] as Row[]),
       memberIds.length ? this.safe('leaveToday', sb.from('leave_requests').select('user_id,start_date,end_date').eq('status', 'approved').lte('start_date', today).gte('end_date', today).in('user_id', memberIds)) : Promise.resolve([] as Row[]),
       memberIds.length ? this.safe('pendingLeave', sb.from('leave_requests').select('id,user_id,start_date,end_date').eq('status', 'pending').in('user_id', memberIds).limit(100)) : Promise.resolve([] as Row[]),
@@ -61,7 +61,9 @@ export class TeamLeaderDashboardService {
 
     const nameOf = new Map<string, string>(names.map((n) => [n.id, n.full_name]));
     const clientName = new Map<string, string>(clients.map((c) => [c.id, c.name]));
-    const open = tasks.filter((t) => OPEN.includes(t.status));
+    // Đề xuất chưa duyệt không tính là việc đang mở; hiển thị riêng ở mục cần duyệt.
+    const proposals = tasks.filter((t) => t.approval_status === 'pending');
+    const open = tasks.filter((t) => OPEN.includes(t.status) && (t.approval_status ?? 'approved') === 'approved');
     const overdue = open.filter((t) => t.due_date && t.due_date < today);
     const review = tasks.filter((t) => t.status === 'review');
     const active = projects.filter((p) => p.status === 'active');
@@ -108,6 +110,7 @@ export class TeamLeaderDashboardService {
     }
 
     const attention = [
+      { key: 'proposals', title: 'Công việc nhân viên đề xuất', detail: proposals.slice(0, 3).map((t) => t.title).join(', ') || '—', count: proposals.length, href: '/app/team-leader/approvals' },
       { key: 'review', title: 'Kết quả công việc chờ duyệt', detail: review.slice(0, 4).map((t) => t.task_code ?? t.title).join(', ') || '—', count: review.length, href: '/app/team-leader/approvals' },
       { key: 'leave', title: 'Đơn nghỉ phép của đội', detail: pendingLeave.slice(0, 3).map((l) => nameOf.get(l.user_id) ?? '—').join(', ') || '—', count: pendingLeave.length, href: '/app/team-leader/approvals' },
       { key: 'overdue', title: 'Công việc quá hạn', detail: overdue.slice(0, 3).map((t) => t.task_code ?? t.title).join(', ') || '—', count: overdue.length, href: '/app/team-leader/tasks' },
@@ -122,7 +125,7 @@ export class TeamLeaderDashboardService {
         openTasks: open.length,
         overdueTasks: overdue.length,
         overdueAssignees: new Set(overdue.map((t) => t.assignee_user_id).filter(Boolean)).size,
-        pendingReview: review.length + pendingLeave.length,
+        pendingReview: review.length + pendingLeave.length + proposals.length,
         pendingLeave: pendingLeave.length,
         members: memberIds.length,
         presentToday: present,

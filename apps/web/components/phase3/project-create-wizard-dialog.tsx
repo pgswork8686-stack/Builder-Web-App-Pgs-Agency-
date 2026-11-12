@@ -330,7 +330,7 @@ export function ProjectCreateWizardDialog({
               >
                 <option value="low">Thấp</option>
                 <option value="medium">Bình thường</option>
-                <option value="high">Cao (High)</option>
+                <option value="high">Cao</option>
                 <option value="urgent">Khẩn cấp</option>
               </Select>
             </div>
@@ -403,7 +403,7 @@ export function ProjectCreateWizardDialog({
                 <div>
                   <span className="text-[#475569]">Ưu tiên:</span>{" "}
                   <Badge variant="blue" size="sm">
-                    {form.priority.toUpperCase()}
+                    {({ low: "Thấp", medium: "Bình thường", high: "Cao", urgent: "Khẩn cấp" } as Record<string, string>)[form.priority]}
                   </Badge>
                 </div>
                 <div>
