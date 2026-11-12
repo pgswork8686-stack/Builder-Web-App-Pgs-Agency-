@@ -31,7 +31,7 @@ export default function TeamLeaderCompletedProjectsPage() {
     <div className="space-y-6">
       <SectionHeader
         title="Dự án Hoàn thành"
-        description="Các dự án phụ trách đã hoàn thành nghiệm thu và bàn giao cho đối tác."
+        description="Các dự án phụ trách đã hoàn thành và bàn giao cho khách hàng."
         badge={`${projects.length} Dự án`}
         action={
           <Link href="/app/team-leader/projects">
@@ -51,7 +51,7 @@ export default function TeamLeaderCompletedProjectsPage() {
           <EmptyState
             icon={<CheckCircle2 className="w-10 h-10 text-[#13DEB9]" />}
             title="Chưa có dự án nào hoàn thành"
-            description="Khi dự án hoàn tất tất cả hạng mục và nghiệm thu, dự án sẽ hiển thị tại đây."
+            description="Khi dự án hoàn tất tất cả hạng mục, dự án sẽ hiển thị tại đây."
           />
         </Card>
       ) : (

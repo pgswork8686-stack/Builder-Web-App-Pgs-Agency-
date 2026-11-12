@@ -118,7 +118,7 @@ export default function TeamLeaderApprovalsPage() {
     return runTask(t, () => tasksApi.reviewProposal(t.project_id, t.id, { action: "reject", note: note.trim() || null }), `Đã từ chối công việc "${t.title}".`);
   };
   const acceptResult = (t: ProjectTask) =>
-    runTask(t, () => tasksApi.update(t.project_id, t.id, { status: "done" }), `Đã nghiệm thu "${t.title}".`);
+    runTask(t, () => tasksApi.update(t.project_id, t.id, { status: "done" }), `Đã duyệt nội bộ "${t.title}".`);
   const returnResult = (t: ProjectTask) =>
     runTask(t, () => tasksApi.update(t.project_id, t.id, { status: "in_progress" }), `Đã trả lại "${t.title}" để chỉnh sửa.`);
 
@@ -134,7 +134,7 @@ export default function TeamLeaderApprovalsPage() {
     <div className="space-y-6">
       <SectionHeader
         title="Đơn Cần Duyệt"
-        description="Duyệt đơn nghỉ phép, công việc nhân viên đề xuất và nghiệm thu kết quả công việc."
+        description="Duyệt đơn nghỉ phép, công việc nhân viên đề xuất và duyệt nội bộ kết quả công việc."
         badge={`${total} đơn`}
         badgeVariant="gold"
       />
@@ -310,7 +310,7 @@ export default function TeamLeaderApprovalsPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <button type="button" disabled={busy} onClick={() => acceptResult(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-xs font-bold hover:brightness-95 disabled:opacity-50">
-                            {busy ? "Đang xử lý…" : "Nghiệm thu"}
+                            {busy ? "Đang xử lý…" : "Duyệt nội bộ"}
                           </button>
                           <button type="button" disabled={busy} onClick={() => returnResult(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold hover:brightness-95 disabled:opacity-50">
                             Yêu cầu sửa

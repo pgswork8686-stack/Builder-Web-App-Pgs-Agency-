@@ -462,7 +462,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 onClick={() => setCompleteOpen(true)}
                 leftIcon={<CheckCircle2 className="w-4 h-4" />}
               >
-                Nghiệm thu
+                Hoàn thành dự án
               </Button>
             )}
 
@@ -683,9 +683,9 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                 <span className="text-[#202333]">{project.dueDate || "—"}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-[#475569]">Ngày nghiệm thu:</span>
+                <span className="text-[#475569]">Ngày hoàn thành:</span>
                 <span className="text-[#00B788] font-semibold">
-                  {project.completedAt || "Chưa nghiệm thu"}
+                  {project.completedAt || "Chưa hoàn thành"}
                 </span>
               </div>
             </CardContent>

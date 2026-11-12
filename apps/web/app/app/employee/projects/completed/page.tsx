@@ -51,7 +51,7 @@ export default function EmployeeCompletedProjectsPage() {
           <EmptyState
             icon={<CheckCircle2 className="w-10 h-10 text-[#13DEB9]" />}
             title="Chưa có dự án hoàn thành nào"
-            description="Các dự án đã nghiệm thu thành công sẽ được hiển thị tại đây."
+            description="Các dự án đã hoàn thành sẽ được hiển thị tại đây."
           />
         </Card>
       ) : (

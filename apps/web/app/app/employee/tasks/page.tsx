@@ -24,7 +24,7 @@ type Row = ProjectTask & { projectName: string };
 const STATUS: Record<string, { label: string; cls: string }> = {
   todo: { label: "Cần làm", cls: "bg-[#F4F2FD] border-[#DDDFEA] text-[#475569]" },
   in_progress: { label: "Đang làm", cls: "bg-[#F2EEFF] border-[#E7E0FF] text-[#6044E8]" },
-  review: { label: "Chờ nghiệm thu", cls: "bg-[#F2EEFF] border-[#E9D5FF] text-[#6D28D9]" },
+  review: { label: "Chờ duyệt nội bộ", cls: "bg-[#F2EEFF] border-[#E9D5FF] text-[#6D28D9]" },
   done: { label: "Hoàn thành", cls: "bg-[#E6FBF5] border-[#A7F3D0] text-[#047857]" },
   cancelled: { label: "Đã hủy", cls: "bg-[#FEE2E2] border-[#FECACA] text-[#B91C1C]" },
 };
@@ -36,7 +36,7 @@ const FILTERS: { key: string; label: string }[] = [
   { key: "all", label: "Tất cả" },
   { key: "todo", label: "Cần làm" },
   { key: "in_progress", label: "Đang làm" },
-  { key: "review", label: "Chờ nghiệm thu" },
+  { key: "review", label: "Chờ duyệt nội bộ" },
   { key: "pending", label: "Đề xuất chờ duyệt" },
   { key: "done", label: "Hoàn thành" },
 ];
@@ -115,7 +115,7 @@ export default function EmployeeTasksPage() {
       setTasks((prev) => prev.map((x) => (x.id === t.id ? { ...x, status: next.to } : x)));
       setNotice(
         next.to === "review"
-          ? `Đã nộp kết quả "${t.title}". Trưởng phòng sẽ nghiệm thu.`
+          ? `Đã nộp kết quả "${t.title}". Trưởng phòng sẽ duyệt nội bộ.`
           : `Đã bắt đầu "${t.title}".`,
       );
     } catch (e) {

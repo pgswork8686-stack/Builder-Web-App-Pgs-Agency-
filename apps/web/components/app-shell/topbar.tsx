@@ -105,7 +105,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     if (pathname.includes("/chat")) return "Tin nhắn Nội bộ";
     if (pathname.includes("/notifications")) return "Trung tâm Thông báo";
     if (pathname.includes("/settings")) return "Cài đặt Hệ thống";
-    if (pathname.includes("/approvals")) return "Phê duyệt & Nghiệm thu";
+    if (pathname.includes("/approvals")) return "Cần xử lý";
     if (pathname.includes("/support")) return "Yêu cầu Hỗ trợ";
 
     return "PGS Hub";

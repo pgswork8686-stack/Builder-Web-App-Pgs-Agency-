@@ -71,7 +71,7 @@ export function ProjectLifecycleDialogs({
         isOpen={completeOpen}
         onClose={onCloseComplete}
         maxWidth="sm"
-        title="Nghiệm thu & Hoàn thành dự án"
+        title="Hoàn thành dự án"
         description="Xác nhận dự án đã hoàn tất tất cả hạng mục công việc và sẵn sàng bàn giao."
       >
         <div className="space-y-4 pt-2">

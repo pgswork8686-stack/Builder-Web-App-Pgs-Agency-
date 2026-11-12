@@ -36,7 +36,7 @@ export default function AdminCompletedProjectsPage() {
     <div className="space-y-6">
       <SectionHeader
         title="Dự án Hoàn thành"
-        description="Lưu trữ và tra cứu hồ sơ các dự án đã nghiệm thu và bàn giao thành công."
+        description="Lưu trữ và tra cứu hồ sơ các dự án đã hoàn thành và bàn giao."
         badge={`${projects.length} Dự án`}
         action={
           <Link href="/app/admin/projects">
@@ -56,7 +56,7 @@ export default function AdminCompletedProjectsPage() {
           <EmptyState
             icon={<CheckCircle2 className="w-10 h-10 text-[#13DEB9]" />}
             title="Chưa có dự án nào hoàn thành"
-            description="Khi một dự án chuyển sang trạng thái Nghiệm thu / Hoàn tất, dự án sẽ được lưu trữ tại đây."
+            description="Khi một dự án chuyển sang trạng thái Hoàn thành, dự án sẽ được lưu trữ tại đây."
           />
         </Card>
       ) : (
