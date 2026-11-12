@@ -172,10 +172,10 @@ export function ChatWorkspace() {
 
   const connectionLabel = useMemo(() => {
     const labels: Record<ConnectionState, string> = {
-      connecting: "Đang kết nối chat realtime",
-      connected: "Realtime chat đã kết nối",
+      connecting: "Đang kết nối tin nhắn trực tiếp",
+      connected: "Tin nhắn trực tiếp đã kết nối",
       reconnecting: "Đang kết nối lại — khi quay lại sẽ tải mới",
-      denied: "Không có quyền realtime",
+      denied: "Tin nhắn trực tiếp đang tắt, tải lại trang để xem mới",
     };
     return labels[connectionState];
   }, [connectionState]);

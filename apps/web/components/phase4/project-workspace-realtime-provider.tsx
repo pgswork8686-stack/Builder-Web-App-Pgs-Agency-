@@ -116,11 +116,11 @@ export function useProjectWorkspaceRealtime() {
 export function RealtimeStatus() {
   const { connectionState } = useProjectWorkspaceRealtime();
   const labels: Record<ConnectionState, string> = {
-    connecting: "Đang kết nối realtime",
-    connected: "Realtime đã kết nối",
+    connecting: "Đang kết nối cập nhật trực tiếp",
+    connected: "Cập nhật trực tiếp đang bật",
     reconnecting: "Đang kết nối lại — dữ liệu sẽ được làm mới",
-    denied: "Không có quyền realtime",
-    offline: "Realtime chưa hoạt động",
+    denied: "Cập nhật trực tiếp đang tắt, tải lại trang để xem mới",
+    offline: "Cập nhật trực tiếp chưa hoạt động",
   };
   const color =
     connectionState === "connected"
