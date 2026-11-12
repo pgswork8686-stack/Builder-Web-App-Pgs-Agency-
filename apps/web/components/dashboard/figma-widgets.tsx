@@ -34,11 +34,11 @@ export function Widget({
 }) {
   return (
     <section
-      className={`bg-white rounded-xl border border-[#E7E9F0] p-5 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(114,87,245,0.10)] ${className}`}
+      className={`bg-white rounded-xl border border-[#E7E9F0] p-4 flex flex-col gap-3 ${className}`}
     >
       <header className="flex items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#202333]">
-          <span className="text-[#475569]">{icon}</span>
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-[#202333]">
+          <span className="text-[#94A3B8]">{icon}</span>
           {title}
         </h2>
         {action}
@@ -60,7 +60,7 @@ export function SeeAll({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 min-h-11 sm:min-h-0 text-xs font-bold text-[#5B3FD6] hover:text-[#202333]"
+      className="inline-flex items-center gap-1 min-h-11 sm:min-h-0 text-sm font-medium text-[#5B3FD6] hover:underline"
     >
       {label}
       <ChevronRight className="w-3.5 h-3.5" />
@@ -83,25 +83,18 @@ export function Kpi({
   bg: string;
   border: string;
 }) {
-  // Chỉ tô màu khi có nghĩa (quá hạn, cần duyệt); các ô còn lại trung tính.
-  const meaningful = ["#FEE2E2", "#FEF9C3"].includes(bg.toUpperCase());
+  // V2: ô luôn nền trắng; màu chỉ ở con số khi có nghĩa (đỏ = quá hạn/lỗi, cam = cần duyệt).
+  const key = bg.toUpperCase();
+  const tone = key === "#FEE2E2" ? "text-[#B42318]" : key === "#FEF9C3" ? "text-[#B54708]" : "text-[#202333]";
+  void border;
   return (
-    <div
-      className="rounded-xl p-5 flex flex-col gap-3 border transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(22,24,39,0.08)]"
-      style={{ background: meaningful ? bg : "#FFFFFF", borderColor: meaningful ? border : "#E7E9F0" }}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-bold text-[#475569] leading-tight">
-          {label}
-        </span>
-        <span className="w-9 h-9 rounded-xl bg-white/80 grid place-items-center text-[#202333] shrink-0">
-          {icon}
-        </span>
+    <div className="rounded-xl border border-[#E7E9F0] bg-white px-4 py-3 flex flex-col gap-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-[#64748B] leading-tight">{label}</span>
+        <span className="text-[#94A3B8] shrink-0 [&>svg]:w-4 [&>svg]:h-4">{icon}</span>
       </div>
-      <div className="text-[30px] leading-none font-bold text-[#202333]">
-        {value}
-      </div>
-      <div className="text-xs text-[#475569]">{sub}</div>
+      <div className={`text-2xl font-semibold tabular-nums leading-tight ${tone}`}>{value}</div>
+      <div className="text-xs text-[#64748B] truncate">{sub}</div>
     </div>
   );
 }
