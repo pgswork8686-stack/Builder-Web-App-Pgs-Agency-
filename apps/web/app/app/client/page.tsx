@@ -99,7 +99,7 @@ export default function ClientDashboardPage() {
         <Kpi label="Chờ bạn phê duyệt" value={n(k?.pendingApprovals)} sub="sản phẩm / hạng mục" icon={<UserCheck className="w-4 h-4" />} bg="#FEF9C3" border="#FEF08A" />
         <Kpi label="Chưa thanh toán" value={loading ? "…" : compactVND(k?.unpaidAmount ?? 0)} sub={`${k?.unpaidInvoices ?? 0} hóa đơn${k?.nextDue ? ` · hạn ${shortDate(k.nextDue)}` : ""}`} icon={<ReceiptText className="w-4 h-4" />} bg="#FEE2E2" border="#FECACA" />
         <Kpi label="Phiếu hỗ trợ mở" value={n(k?.openTickets)} sub="đang được xử lý" icon={<CircleHelp className="w-4 h-4" />} bg="#F3E8FF" border="#E9D5FF" />
-        <Kpi label="Dự án hoàn thành" value={loading ? "…" : `${k?.completedProjects ?? 0}/${k?.totalProjects ?? 0}`} sub="tính từ trạng thái thật" icon={<CircleCheck className="w-4 h-4" />} bg="#E6FBF5" border="#A7F3D0" />
+        <Kpi label="Dự án hoàn thành" value={loading ? "…" : `${k?.completedProjects ?? 0}/${k?.totalProjects ?? 0}`} sub="đã bàn giao" icon={<CircleCheck className="w-4 h-4" />} bg="#E6FBF5" border="#A7F3D0" />
       </div>
 
       <Widget

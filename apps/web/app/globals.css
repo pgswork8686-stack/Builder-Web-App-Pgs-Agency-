@@ -2,6 +2,8 @@
 /* Giao diện Figma chỉ có bản sáng: biến thể dark: chỉ chạy khi có class .dark, không theo hệ điều hành. */
 @custom-variant dark (&:where(.dark, .dark *));
 :root { color-scheme: light; }
+/* Tiêu đề cột bảng luôn một dòng. */
+th { white-space: nowrap; }
 
 @layer base {
   :root {

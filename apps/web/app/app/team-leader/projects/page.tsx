@@ -85,9 +85,7 @@ export default function TeamLeaderProjectsPage() {
             >
               Khách hàng
             </Link>
-            <Button onClick={openWizard}>
-              <Plus className="w-4 h-4" /> Tạo dự án
-            </Button>
+            <Button onClick={openWizard} leftIcon={<Plus className="w-4 h-4" />}>Tạo dự án</Button>
           </div>
         }
       />

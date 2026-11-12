@@ -86,8 +86,8 @@ export default function TeamLeaderClientsPage() {
         badge={`${items.length} khách hàng`}
         badgeVariant="gold"
         action={
-          <Button onClick={() => { setForm(EMPTY); setFormError(null); setOpen(true); }}>
-            <Plus className="w-4 h-4" /> Thêm khách hàng
+          <Button onClick={() => { setForm(EMPTY); setFormError(null); setOpen(true); }} leftIcon={<Plus className="w-4 h-4" />}>
+            Thêm khách hàng
           </Button>
         }
       />

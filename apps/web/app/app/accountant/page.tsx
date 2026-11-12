@@ -182,9 +182,9 @@ export default function AccountantDashboardPage() {
                   return (
                     <tr key={i.id} className="hover:bg-[#FFFBF0]">
                       <td className="px-5 py-3.5"><Link href={`/app/accountant/finance/invoices/${i.id}`} className="font-bold text-[#3B5BDB]">{i.number}</Link></td>
-                      <td className="px-3 py-3.5 font-bold text-[#161827]">{i.client}</td>
-                      <td className="px-3 py-3.5 text-[#475569]">{fullVND(i.amount)}</td>
-                      <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full border text-xs font-bold ${st.cls}`}>{st.label}</span></td>
+                      <td className="px-3 py-3.5 font-bold text-[#161827] max-w-[220px] truncate" title={i.client}>{i.client}</td>
+                      <td className="px-3 py-3.5 text-[#475569] whitespace-nowrap">{fullVND(i.amount)}</td>
+                      <td className="px-5 py-3.5"><span className={`whitespace-nowrap px-2 py-0.5 rounded-full border text-xs font-bold ${st.cls}`}>{st.label}</span></td>
                     </tr>
                   );
                 })}

@@ -169,9 +169,7 @@ export default function EmployeeTasksPage() {
         description="Công việc được giao cho bạn theo từng dự án. Bạn có thể đề xuất thêm công việc để Trưởng phòng duyệt."
         badge={`${tasks.length} công việc`}
         action={
-          <Button onClick={openPropose} disabled={loading || projects.length === 0}>
-            <Plus className="w-4 h-4" /> Đề xuất công việc
-          </Button>
+          <Button onClick={openPropose} disabled={loading || projects.length === 0} leftIcon={<Plus className="w-4 h-4" />}>Đề xuất công việc</Button>
         }
       />
 
