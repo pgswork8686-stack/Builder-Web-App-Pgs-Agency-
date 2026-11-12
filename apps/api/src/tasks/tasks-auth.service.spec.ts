@@ -128,6 +128,41 @@ describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)'
       expect(caughtError.response?.code).toBe('PROJECT_ACCESS_DENIED');
     });
 
+    it('lets a team leader manage tasks of a project in their own department without membership', async () => {
+      const leader = makeUser({ role: 'team_leader', departmentId: 'dept-google' });
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_B, project_manager_user_id: 'someone-else', department_id: 'dept-google' }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null }));
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null }));
+
+      let caughtError: any;
+      try {
+        await service.getTask(PROJECT_B, TASK_A, leader);
+      } catch (e) {
+        caughtError = e;
+      }
+      // Qua được lớp quyền; chỉ dừng ở bước không tìm thấy việc (mock trả rỗng).
+      expect(caughtError?.response?.code).not.toBe('PROJECT_ACCESS_DENIED');
+    });
+
+    it('still denies a team leader of another department', async () => {
+      const leader = makeUser({ role: 'team_leader', departmentId: 'dept-tiktok' });
+      fromMock.mockReturnValueOnce(
+        mockQueryChain({ data: { id: PROJECT_B, project_manager_user_id: 'someone-else', department_id: 'dept-google' }, error: null }),
+      );
+      fromMock.mockReturnValueOnce(mockQueryChain({ data: null, error: null }));
+
+      let caughtError: any;
+      try {
+        await service.getTask(PROJECT_B, TASK_A, leader);
+      } catch (e) {
+        caughtError = e;
+      }
+      expect(caughtError).toBeInstanceOf(ForbiddenException);
+      expect(caughtError.response?.code).toBe('PROJECT_ACCESS_DENIED');
+    });
+
     it('throws NotFoundException when project does not exist at all', async () => {
       const employeeUser = makeUser({ role: 'employee' });
 

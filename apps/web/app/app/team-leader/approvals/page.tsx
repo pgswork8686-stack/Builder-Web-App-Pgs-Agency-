@@ -133,7 +133,7 @@ export default function TeamLeaderApprovalsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Đơn Cần Duyệt"
+        title="Cần xử lý"
         description="Duyệt đơn nghỉ phép, công việc nhân viên đề xuất và duyệt nội bộ kết quả công việc."
         badge={`${total} đơn`}
         badgeVariant="gold"

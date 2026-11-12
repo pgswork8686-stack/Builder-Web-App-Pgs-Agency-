@@ -78,10 +78,10 @@ export class TeamLeaderDashboardService {
       .map((id) => {
         const a = attBy.get(id);
         let state = 'none';
-        let note = 'chưa check-in';
+        let note = 'chưa vào ca';
         if (leaveSet.has(id)) { state = 'leave'; note = 'nghỉ phép hôm nay'; }
         else if (a?.check_in_at && (a.late_minutes ?? 0) > 0) { state = 'late'; note = `đi muộn ${a.late_minutes} phút`; }
-        else if (a?.check_in_at && a.check_out_at) { state = 'present'; note = 'đã check-out'; }
+        else if (a?.check_in_at && a.check_out_at) { state = 'present'; note = 'đã tan ca'; }
         else if (a?.check_in_at) { state = 'present'; note = 'đang làm việc'; }
         return { id, name: nameOf.get(id) ?? '—', state, note };
       })

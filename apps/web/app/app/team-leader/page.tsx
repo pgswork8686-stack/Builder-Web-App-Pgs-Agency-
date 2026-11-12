@@ -194,7 +194,7 @@ export default function TeamLeaderDashboardPage() {
                       </td>
                       <td className={`px-4 py-2.5 text-sm tabular-nums ${p.late ? "text-[#B42318] font-medium" : "text-[#475569]"}`}>{shortDate(p.dueDate)}</td>
                       <td className="px-4 py-2.5">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${p.late ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#F2EEFF] text-[#5B3FD6]"}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${p.late ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#F2EEFF] text-[#5B3FD6]"}`}>
                           <i className={`w-1.5 h-1.5 rounded-full ${p.late ? "bg-[#D92D20]" : "bg-[#7257F5]"}`} />
                           {p.late ? "Trễ hạn" : "Đang chạy"}
                         </span>

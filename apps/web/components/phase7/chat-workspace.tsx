@@ -200,15 +200,23 @@ export function ChatWorkspace() {
   const loadContactsAndProjects = useCallback(async () => {
     setLoadingContacts(true);
     try {
+      // Danh bạ theo quyền: chỉ Quản trị viên gọi danh bạ toàn công ty; Trưởng phòng dùng thành viên phòng.
+      const role = (await getMe().catch(() => null))?.account?.role;
+      const people =
+        role === "admin"
+          ? peopleApi.getPeopleDirectory({ pageSize: 100 }).then((r) => r?.items ?? [])
+          : role === "team_leader"
+            ? peopleApi.getTeamMembers().then((r) => (Array.isArray(r) ? r : []))
+            : Promise.resolve([]);
       const [peopleRes, projectsRes] = await Promise.allSettled([
-        peopleApi.getPeopleDirectory({ pageSize: 100 }),
+        people,
         projectsApi.getInternalProjects(1, 100).catch(async () => {
           return await projectsApi.getClientProjects(1, 100);
         }),
       ]);
 
-      if (peopleRes.status === "fulfilled" && peopleRes.value?.items) {
-        setContacts(peopleRes.value.items as any);
+      if (peopleRes.status === "fulfilled") {
+        setContacts(peopleRes.value as any);
       }
       if (
         projectsRes.status === "fulfilled" &&

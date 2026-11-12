@@ -136,10 +136,8 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               { title: "Kanban", href: "/app/team-leader/kanban" },
               { title: "Lịch", href: "/app/team-leader/calendar" },
             ]),
-            mod("Đội nhóm", Users, [
-              { title: "Thành viên", href: "/app/team-leader/teams" },
-              { title: "Chấm công phòng", href: "/app/team-leader/attendance" },
-            ]),
+            // /app/team-leader/attendance chỉ chuyển sang chấm công cá nhân nên không làm tab riêng.
+            { title: "Đội nhóm", href: "/app/team-leader/teams", icon: Users },
             { title: "Khách hàng", href: "/app/team-leader/clients", icon: Building2 },
             mod("Tài liệu & Báo cáo", FileText, [
               { title: "Báo cáo", href: "/app/team-leader/reports" },

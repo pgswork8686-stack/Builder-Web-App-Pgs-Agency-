@@ -146,7 +146,7 @@ export class TasksService {
   private async requireProject(projectId: string) {
     const { data, error } = await this.client
       .from('projects')
-      .select('id,project_manager_user_id')
+      .select('id,project_manager_user_id,department_id')
       .eq('id', projectId)
       .maybeSingle();
     if (error) {
@@ -190,6 +190,15 @@ export class TasksService {
       );
     }
     if (!data) {
+      // Trưởng phòng quản lý dự án của phòng được cấp dù chưa được thêm làm thành viên
+      // (cùng quy tắc với ProjectsService.assertLeaderManagesProject).
+      const leaderScope =
+        user.role === 'team_leader' &&
+        (project.project_manager_user_id === user.profileId ||
+          (!!user.departmentId && project.department_id === user.departmentId));
+      if (leaderScope) {
+        return { isAdmin: false, projectRole: 'project_manager' as const };
+      }
       throw new ForbiddenException({
         code: 'PROJECT_ACCESS_DENIED',
         message: 'Bạn không phải thành viên của dự án.',
