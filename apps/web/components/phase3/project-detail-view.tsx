@@ -502,7 +502,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         <StatCard
           title="Tiến độ công việc"
           value={`${taskProgress}%`}
-          subtitle={`${completedTasks}/${tasks.length} tasks hoàn thành`}
+          subtitle={`${completedTasks}/${tasks.length} công việc hoàn thành`}
           icon={<ListTodo className="w-5 h-5" />}
         />
         <StatCard
