@@ -53,63 +53,6 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
   };
 
   // Center title resolution matching module boundaries
-  const getCenterTitle = () => {
-    // Dashboards
-    if (pathname === "/app/admin") return "Tổng quan quản trị";
-    if (pathname === "/app/team-leader") return "Tổng quan quản lý";
-    if (pathname === "/app/employee") return "Tổng quan nhân viên";
-    if (pathname === "/app/accountant") return "Tổng quan kế toán";
-    if (pathname === "/app/client") return "Tổng quan khách hàng";
-
-    // Task & Work Modules (Admin, Team Leader, Employee)
-    if (
-      pathname.startsWith("/app/admin/tasks") ||
-      pathname.startsWith("/app/admin/kanban") ||
-      pathname.startsWith("/app/admin/calendar")
-    ) {
-      return "Công việc";
-    }
-    if (
-      pathname.startsWith("/app/team-leader/tasks") ||
-      pathname.startsWith("/app/team-leader/kanban") ||
-      pathname.startsWith("/app/team-leader/calendar")
-    ) {
-      return "Công việc";
-    }
-    if (pathname.startsWith("/app/employee/tasks")) return "Công việc";
-
-    // Specific Calendars
-    if (pathname.startsWith("/app/employee/calendar"))
-      return "Lịch Làm việc Cá nhân";
-    if (pathname.startsWith("/app/admin/settings/work-calendar"))
-      return "Lịch Làm việc Hệ thống";
-    if (pathname.startsWith("/app/client/meetings"))
-      return "Lịch Họp Khách hàng";
-
-    // Other Modules
-    if (pathname.includes("/projects")) return "Quản lý Dự án";
-    if (pathname.includes("/attendance")) return "Quản lý Chấm công";
-    if (pathname.includes("/leave")) return "Quản lý Nghỉ phép";
-    if (pathname.includes("/finance")) return "Quản lý Tài chính";
-    if (pathname.includes("/clients")) return "Quản lý Khách hàng";
-    if (
-      pathname.includes("/people") ||
-      pathname.includes("/organization") ||
-      pathname.includes("/departments") ||
-      pathname.includes("/teams")
-    ) {
-      return "Quản lý Nhân sự & Cơ cấu";
-    }
-    if (pathname.includes("/documents")) return "Thư viện Tài liệu PGS";
-    if (pathname.includes("/reports")) return "Báo cáo Tổng hợp";
-    if (pathname.includes("/chat")) return "Tin nhắn Nội bộ";
-    if (pathname.includes("/notifications")) return "Trung tâm Thông báo";
-    if (pathname.includes("/settings")) return "Cài đặt Hệ thống";
-    if (pathname.includes("/approvals")) return "Cần xử lý";
-    if (pathname.includes("/support")) return "Yêu cầu Hỗ trợ";
-
-    return "PGS Hub";
-  };
 
   const roleTitle = account.role ? ROLE_LABELS[account.role] : "Người dùng";
   const displayName =
@@ -118,7 +61,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
     roleTitle.split("(")[0].trim();
 
   return (
-    <header className="h-[78px] border-b border-[#E7E9F0] bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <header className="h-16 border-b border-[#E7E9F0] bg-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
       {/* Left side: Hamburger (mobile/tablet) */}
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -131,12 +74,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
         </button>
       </div>
 
-      {/* Center: Current Dashboard / Page Name */}
-      <div className="flex items-center justify-center">
-        <span className="font-bold text-sm text-[#202333] tracking-tight">
-          {getCenterTitle()}
-        </span>
-      </div>
+      {/* V2: không lặp tiêu đề trang ở thanh trên (tiêu đề nằm trong trang). */}
 
       {/* Right side: Chat, Notification Bell, User Menu */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
