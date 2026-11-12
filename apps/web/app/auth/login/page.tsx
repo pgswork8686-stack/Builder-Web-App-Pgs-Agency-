@@ -80,7 +80,7 @@ export default function LoginPage() {
           {/* Header */}
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-xl bg-[#FFB800] text-black font-bold flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-[#7257F5] text-white font-bold flex items-center justify-center">
                 P
               </div>
               <span className="font-bold text-lg text-[#202333]">PGS Hub</span>

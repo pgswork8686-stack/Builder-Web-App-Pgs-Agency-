@@ -34,7 +34,7 @@ export function Widget({
 }) {
   return (
     <section
-      className={`bg-white rounded-2xl border border-[#E7E9F0] p-5 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(231,174,24,0.10)] ${className}`}
+      className={`bg-white rounded-2xl border border-[#E7E9F0] p-5 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(114,87,245,0.10)] ${className}`}
     >
       <header className="flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#202333]">
