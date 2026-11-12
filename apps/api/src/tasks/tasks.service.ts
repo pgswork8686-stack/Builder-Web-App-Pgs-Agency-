@@ -634,6 +634,7 @@ export class TasksService {
       });
     }
     const approved = dto.action === 'approve';
+    // Không đổi status ở đây: trigger Kanban chỉ cho phép đổi status qua RPC sắp xếp.
     const { data, error } = await this.client
       .from('tasks')
       .update({
@@ -641,7 +642,6 @@ export class TasksService {
         approval_note: dto.note ?? null,
         approved_by: user.profileId,
         approved_at: new Date().toISOString(),
-        status: approved ? existing.status : 'cancelled',
         updated_by: user.profileId,
       })
       .eq('id', taskId)
@@ -650,7 +650,35 @@ export class TasksService {
       .select()
       .single();
     if (error) this.mapWriteError(error);
-    const row = data as Record<string, any>;
+    let row = data as Record<string, any>;
+    if (!approved) {
+      const cancelled = await this.client.rpc('phase4_update_task_atomic', {
+        p_project_id: projectId,
+        p_task_id: taskId,
+        p_actor_user_id: user.profileId,
+        p_set_parent_task: false,
+        p_parent_task_id: null,
+        p_set_title: false,
+        p_title: null,
+        p_set_description: false,
+        p_description: null,
+        p_set_status: true,
+        p_status: 'cancelled',
+        p_set_priority: false,
+        p_priority: null,
+        p_set_assignee: false,
+        p_assignee_user_id: null,
+        p_set_start_date: false,
+        p_start_date: null,
+        p_set_due_date: false,
+        p_due_date: null,
+      });
+      if (cancelled.error) this.mapWriteError(cancelled.error);
+      const next = Array.isArray(cancelled.data)
+        ? cancelled.data[0]
+        : cancelled.data;
+      if (next) row = { ...row, ...(next as Record<string, any>) };
+    }
     this.emit(projectId, taskId, 'task.updated', row.updated_at, {
       approvalStatus: row.approval_status,
     });
