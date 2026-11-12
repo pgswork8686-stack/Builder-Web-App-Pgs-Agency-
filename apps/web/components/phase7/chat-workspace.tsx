@@ -635,11 +635,11 @@ export function ChatWorkspace() {
                         <div className="mt-0.5 text-xs uppercase tracking-wide text-[#475569] flex items-center gap-1.5">
                           {conversation.type === "project" ? (
                             <span className="text-[#3B5BDB] font-semibold">
-                              ● Project
+                              ● Dự án
                             </span>
                           ) : (
                             <span className="text-emerald-600 font-semibold">
-                              ● Direct
+                              ● Tin nhắn riêng
                             </span>
                           )}
                         </div>
@@ -665,7 +665,7 @@ export function ChatWorkspace() {
               <div className="flex items-center gap-2">
                 <UserPlus className="h-4 w-4 text-[#3B5BDB]" />
                 <h2 className="font-bold text-[#161827] text-sm">
-                  Mở Direct Chat
+                  Nhắn tin riêng
                 </h2>
               </div>
               <Button
@@ -724,7 +724,7 @@ export function ChatWorkspace() {
               <div className="flex items-center gap-2">
                 <FolderOpen className="h-4 w-4 text-[#3B5BDB]" />
                 <h2 className="font-bold text-[#161827] text-sm">
-                  Mở Project Chat
+                  Mở phòng chat dự án
                 </h2>
               </div>
               <Button

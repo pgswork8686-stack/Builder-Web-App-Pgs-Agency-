@@ -330,14 +330,6 @@ export function NotificationsCenter() {
                         </span>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <Badge variant="blue" size="sm">
-                          {item.type}
-                        </Badge>
-                        {item.entityType ? (
-                          <Badge variant="default" size="sm">
-                            {item.entityType}
-                          </Badge>
-                        ) : null}
                         {item.actionUrl && (
                           <Link
                             href={safeActionUrl(item.actionUrl)}
@@ -469,7 +461,7 @@ export function NotificationsCenter() {
               >
                 <span>
                   <span className="block text-xs font-bold text-[#161827]">
-                    Email notification
+                    Thông báo qua email
                   </span>
                   <span className="text-xs text-[#475569]">
                     Placeholder preference cho email.

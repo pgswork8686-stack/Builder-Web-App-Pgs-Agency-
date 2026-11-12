@@ -39,15 +39,15 @@ type RecipientMode =
 
 const recipientModes: Array<{ value: RecipientMode; label: string }> = [
   { value: "default", label: "Người nhận mặc định từ event" },
-  { value: "assignee", label: "Assignee từ payload" },
-  { value: "requester", label: "Requester từ payload" },
+  { value: "assignee", label: "Người được giao việc" },
+  { value: "requester", label: "Người gửi yêu cầu" },
   {
     value: "project_members",
-    label: "Thành viên project từ payload.projectId",
+    label: "Thành viên của dự án liên quan",
   },
   {
     value: "client_company_members",
-    label: "Client company từ payload.clientCompanyId",
+    label: "Thành viên công ty khách hàng liên quan",
   },
   { value: "role_admin", label: "Tất cả admin active" },
   { value: "role_accountant", label: "Tất cả accountant active" },
@@ -108,7 +108,7 @@ function buildActionConfig(input: {
   if (message) actionConfig.message = message;
   if (actionUrl) {
     if (!actionUrl.startsWith("/app/")) {
-      throw new Error("Action URL phải là internal URL bắt đầu bằng /app/.");
+      throw new Error("Đường dẫn phải là trang nội bộ, bắt đầu bằng /app/.");
     }
     actionConfig.actionUrl = actionUrl;
   }
@@ -290,7 +290,7 @@ export function AutomationWorkspace() {
     <div className="space-y-6">
       <SectionHeader
         title="Trung tâm Tự động hóa"
-        description="Rule nội bộ an toàn: trigger registry cố định, action tạo notification trực tiếp trong hệ thống."
+        description="Tạo quy tắc gửi thông báo tự động khi có sự kiện trong hệ thống (giao việc, nghỉ phép, hóa đơn…)."
         action={
           <Button
             variant="secondary"
@@ -346,7 +346,7 @@ export function AutomationWorkspace() {
                 >
                   {automationTriggers.map((trigger) => (
                     <option key={trigger} value={trigger}>
-                      {triggerLabels[trigger]} · {trigger}
+                      {triggerLabels[trigger]}
                     </option>
                   ))}
                 </select>
@@ -404,7 +404,7 @@ export function AutomationWorkspace() {
                 <textarea
                   value={actionMessage}
                   onChange={(event) => setActionMessage(event.target.value)}
-                  placeholder="Để trống sẽ dùng nội dung event mặc định"
+                  placeholder="Để trống sẽ dùng nội dung mặc định của sự kiện"
                   className="mt-1 min-h-16 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 />
               </label>
@@ -458,7 +458,7 @@ export function AutomationWorkspace() {
               <input
                 value={manualEventKey}
                 onChange={(event) => setManualEventKey(event.target.value)}
-                placeholder="Nhập Event Key (>= 8 ký tự)..."
+                placeholder="Nhập mã sự kiện (tối thiểu 8 ký tự)…"
                 className="w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
               />
               <textarea

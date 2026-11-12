@@ -7,6 +7,7 @@ const L: Record<string, string> = {
   present: "Có mặt", late: "Đi muộn", absent: "Vắng mặt", leave: "Nghỉ phép", early_leave: "Về sớm", checked_in: "Đã vào ca",
   checked_out: "Đã tan ca", on_time: "Đúng giờ", missing: "Thiếu công", manual: "Thủ công", holiday: "Ngày lễ",
   admin: "Quản trị viên", team_leader: "Trưởng nhóm", employee: "Nhân viên", accountant: "Kế toán", client: "Khách hàng",
+  low: "Thấp", medium: "Trung bình", high: "Cao", urgent: "Khẩn cấp", normal: "Bình thường", archived: "Đã lưu trữ",
   todo: "Cần làm", in_progress: "Đang làm", review: "Chờ nghiệm thu", planning: "Lập kế hoạch",
   invoice: "Hóa đơn", contract: "Hợp đồng", payment: "Thanh toán", expense: "Chi phí", payroll: "Bảng lương", project: "Dự án",
 };

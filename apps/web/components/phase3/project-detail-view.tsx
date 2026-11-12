@@ -520,8 +520,8 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         <StatCard
           variant="purple"
           title="Mức ưu tiên"
-          value={project.priority ? project.priority.toUpperCase() : "NORMAL"}
-          subtitle={`Trạng thái: ${project.status}`}
+          value={statusLabel(project.priority || "normal")}
+          subtitle={`Trạng thái: ${statusLabel(project.status)}`}
           icon={<Briefcase className="w-5 h-5" />}
         />
       </div>
@@ -644,7 +644,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                   >
                     {statuses.map((s) => (
                       <option key={s} value={s}>
-                        {s.toUpperCase()}
+                        {statusLabel(s)}
                       </option>
                     ))}
                   </Select>
@@ -934,7 +934,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
                             }
                             size="sm"
                           >
-                            {t.priority}
+                            {statusLabel(t.priority)}
                           </Badge>
                         </TableCell>
                         <TableCell>
