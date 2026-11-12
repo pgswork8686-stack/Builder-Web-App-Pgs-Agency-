@@ -235,7 +235,7 @@ export function NotificationsCenter() {
       />
 
       {broadcastSuccessMsg && (
-        <div className="p-4 rounded-2xl bg-[#E6FBF5] border border-[#A7F3D0] text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in">
+        <div className="p-4 rounded-xl bg-[#E6FBF5] border border-[#A7F3D0] text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-[#00B788] shrink-0" />
             <span>{broadcastSuccessMsg}</span>
@@ -253,11 +253,11 @@ export function NotificationsCenter() {
         <Card className="p-6 space-y-4">
           <div className="flex flex-col gap-3 border-b border-[#E7E9F0] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2EEFF] text-[#6044E8]">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-extrabold text-[#202333]">
+                <h2 className="text-base font-semibold text-[#202333]">
                   Luồng thông báo của bạn
                 </h2>
                 <p className="text-xs text-[#475569]">
@@ -417,7 +417,7 @@ export function NotificationsCenter() {
 
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2EEFF] text-[#6044E8]">
                 <Settings className="h-5 w-5" />
               </div>
               <div>
@@ -504,7 +504,7 @@ export function NotificationsCenter() {
         isOpen={isBroadcastOpen}
         onClose={() => !broadcasting && setIsBroadcastOpen(false)}
         title={
-          <div className="flex items-center gap-2.5 text-lg font-black text-[#202333]">
+          <div className="flex items-center gap-2.5 text-lg font-semibold text-[#202333]">
             <Megaphone className="w-5 h-5 text-[#6044E8]" />
             Gửi thông báo đến toàn thể nhân viên
           </div>

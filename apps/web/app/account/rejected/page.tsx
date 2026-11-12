@@ -37,9 +37,9 @@ export default function AccountRejectedPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] text-[#202333] p-6 relative">
-      <Card className="max-w-[460px] w-full rounded-3xl p-8 text-center space-y-6 border-[#E7E9F0]">
+      <Card className="max-w-[460px] w-full rounded-xl p-8 text-center space-y-6 border-[#E7E9F0]">
         {/* Status Icon Header */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
+        <div className="mx-auto w-16 h-16 rounded-xl bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center text-red-600 shadow-xs">
           <XCircle className="w-8 h-8" />
         </div>
 
@@ -47,13 +47,13 @@ export default function AccountRejectedPage() {
           <Badge variant="danger" size="md">
             Trạng thái: Bị từ chối
           </Badge>
-          <h2 className="text-xl font-extrabold text-[#202333] tracking-tight">
+          <h2 className="text-xl font-semibold text-[#202333] tracking-tight">
             Tài khoản bị từ chối
           </h2>
         </div>
 
         <div className="text-left space-y-2 bg-[#FEF2F2] p-4 rounded-xl border border-[#FEE2E2]">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-700">
+          <div className="flex items-center gap-2 text-xs font-bold text-red-700">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>Lý do từ chối:</span>
           </div>

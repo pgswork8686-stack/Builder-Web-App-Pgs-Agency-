@@ -7,7 +7,7 @@ export function TableContainer({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`w-full overflow-x-auto rounded-2xl border border-[#E7E9F0] bg-white ${className}`}
+      className={`w-full overflow-x-auto rounded-xl border border-[#E7E9F0] bg-white ${className}`}
       {...props}
     >
       {children}
@@ -37,7 +37,7 @@ export function TableHead({
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={`border-b border-[#E7E9F0] bg-[#F4F2FD] text-xs font-bold uppercase tracking-wide text-[#475569] ${className}`}
+      className={`border-b border-[#E7E9F0] bg-[#FBFBFD] text-xs font-medium text-[#64748B] ${className}`}
       {...props}
     >
       {children}
@@ -64,7 +64,7 @@ export function TableRow({
 }: React.HTMLAttributes<HTMLTableRowElement>) {
   return (
     <tr
-      className={`transition-colors hover:bg-[#F8F9FC] ${className}`}
+      className={`transition-colors hover:bg-[#F8F9FC] focus-within:bg-[#F8F9FC] ${className}`}
       {...props}
     >
       {children}
@@ -78,7 +78,7 @@ export function TableHeaderCell({
   ...props
 }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <th className={`px-4 sm:px-6 py-3.5 select-none whitespace-nowrap ${className}`} {...props}>
+    <th className={`px-4 py-2.5 select-none whitespace-nowrap ${className}`} {...props}>
       {children}
     </th>
   );
@@ -92,7 +92,7 @@ export function TableCell({
   // Giá trị ngắn (tiền, ngày, mã) giữ một dòng; văn bản dài vẫn tự xuống dòng.
   const short = typeof children === "string" && children.length <= 28 ? "whitespace-nowrap" : "";
   return (
-    <td className={`px-4 sm:px-6 py-4 align-middle ${short} ${className}`} {...props}>
+    <td className={`px-4 py-3 align-middle ${short} ${className}`} {...props}>
       {children}
     </td>
   );

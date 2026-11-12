@@ -244,7 +244,7 @@ export default function AdminAttendancePage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
           <label className="block text-xs font-bold text-[#475569] uppercase mb-1">
             Từ ngày
@@ -338,7 +338,7 @@ export default function AdminAttendancePage() {
       {/* Main Table Card */}
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
-          <h3 className="text-base font-extrabold text-[#202333]">
+          <h3 className="text-base font-semibold text-[#202333]">
             Kiểm tra bảng công ({total} lượt)
           </h3>
           <span className="text-xs text-[#475569]">
@@ -477,7 +477,7 @@ export default function AdminAttendancePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+                <label className="block text-xs font-semibold text-[#475569] mb-1">
                   Giờ vào
                 </label>
                 <input
@@ -488,7 +488,7 @@ export default function AdminAttendancePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+                <label className="block text-xs font-semibold text-[#475569] mb-1">
                   Giờ ra
                 </label>
                 <input
@@ -501,7 +501,7 @@ export default function AdminAttendancePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Trạng thái chấm công
               </label>
               <select
@@ -518,7 +518,7 @@ export default function AdminAttendancePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Lý do hiệu chỉnh *
               </label>
               <textarea

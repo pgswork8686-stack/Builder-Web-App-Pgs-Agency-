@@ -185,7 +185,7 @@ export default function AdminDocumentsPage() {
       />
 
       <div className="grid lg:grid-cols-[270px_1fr] gap-6 items-start">
-        <aside className="bg-white rounded-2xl border border-[#E7E9F0] p-5">
+        <aside className="bg-white rounded-xl border border-[#E7E9F0] p-5">
           <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#202333] mb-3">
             <FolderOpen className="w-4 h-4 text-[#5B3FD6]" /> Phòng ban
           </h2>
@@ -206,7 +206,7 @@ export default function AdminDocumentsPage() {
         </aside>
         <div className="space-y-4 min-w-0">
       {/* Search & Categories Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs flex flex-wrap items-center justify-between gap-3">
         <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -246,7 +246,7 @@ export default function AdminDocumentsPage() {
 
       {/* Documents Grid / Table */}
       {loading ? (
-        <div className="p-12 text-center text-[#64748B] bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="p-12 text-center text-[#64748B] bg-white rounded-xl border border-[#E7E9F0]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#6044E8]" />
           Đang tải danh sách tài liệu...
         </div>

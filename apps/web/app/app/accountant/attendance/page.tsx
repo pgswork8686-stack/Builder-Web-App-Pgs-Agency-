@@ -336,7 +336,7 @@ export default function AccountantAttendancePage() {
       {activeTab === "company" ? (
         <>
           {/* Filters Bar */}
-          <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs space-y-3">
+          <div className="p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
                 <label className="block text-xs font-bold uppercase text-[#475569] mb-1">
@@ -437,7 +437,7 @@ export default function AccountantAttendancePage() {
           {loading ? (
             <div className="space-y-3">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+                <Skeleton key={i} className="h-16 w-full rounded-xl" />
               ))}
             </div>
           ) : records.length === 0 ? (
@@ -663,7 +663,7 @@ export default function AccountantAttendancePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
+                <label className="block text-xs font-bold text-[#2E3248]">
                   Ghi chú chấm công
                 </label>
                 <input

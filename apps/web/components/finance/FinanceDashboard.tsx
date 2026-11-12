@@ -102,7 +102,7 @@ export default function FinanceDashboard({
 
   if (error) {
     return (
-      <div className="p-8 text-center rounded-2xl bg-white border border-[#E7E9F0] shadow-xs space-y-3">
+      <div className="p-8 text-center rounded-xl bg-white border border-[#E7E9F0] shadow-xs space-y-3">
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto" />
         <p className="text-xs text-[#475569]">{error}</p>
         <Button variant="secondary" size="sm" onClick={loadData}>
@@ -236,7 +236,7 @@ export default function FinanceDashboard({
       {/* Audit Log Timeline Card */}
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
-          <h3 className="text-base font-extrabold text-[#202333] flex items-center gap-2">
+          <h3 className="text-base font-semibold text-[#202333] flex items-center gap-2">
             <History className="w-4 h-4 text-[#6044E8]" />
             Nhật ký thay đổi tài chính
           </h3>

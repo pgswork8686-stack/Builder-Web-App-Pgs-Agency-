@@ -90,7 +90,7 @@ export default function TeamLeaderProjectsPage() {
         }
       />
 
-      <div className="bg-white rounded-2xl border border-[#E7E9F0] p-4 grid gap-3 md:grid-cols-[1fr_200px_200px]">
+      <div className="bg-white rounded-xl border border-[#E7E9F0] p-4 grid gap-3 md:grid-cols-[1fr_200px_200px]">
         <div className="relative">
           <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -114,7 +114,7 @@ export default function TeamLeaderProjectsPage() {
         </Select>
       </div>
 
-      <section className="bg-white rounded-2xl border border-[#E7E9F0] p-6">
+      <section className="bg-white rounded-xl border border-[#E7E9F0] p-6">
         <h2 className="flex items-center gap-2 text-[15px] font-bold text-[#202333] mb-2">
           <FolderKanban className="w-4 h-4 text-[#5B3FD6]" /> Dự án phụ trách
         </h2>

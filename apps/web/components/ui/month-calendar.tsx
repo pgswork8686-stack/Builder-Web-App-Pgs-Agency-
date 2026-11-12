@@ -48,7 +48,7 @@ export function MonthCalendar({ highlightSunday = true }: MonthCalendarProps) {
         >
           Trước
         </Button>
-        <span className="text-sm font-extrabold text-[#2E3248]">
+        <span className="text-sm font-semibold text-[#2E3248]">
           {monthLabel}
         </span>
         <Button

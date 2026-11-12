@@ -181,10 +181,10 @@ export default function AdminLeavePage() {
       </div>
 
       {/* Filter Tabs Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs">
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-[#6044E8]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#475569]">
+          <span className="text-xs font-bold text-[#475569]">
             Lọc danh sách
           </span>
         </div>
@@ -221,7 +221,7 @@ export default function AdminLeavePage() {
         <div className="lg:col-span-8 space-y-4">
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
-              <h3 className="text-base font-extrabold text-[#202333]">
+              <h3 className="text-base font-semibold text-[#202333]">
                 Đơn cần duyệt ({total})
               </h3>
               <span className="text-xs text-[#475569]">
@@ -349,7 +349,7 @@ export default function AdminLeavePage() {
         <div className="lg:col-span-4 space-y-4">
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
-              <h3 className="text-base font-extrabold text-[#202333] flex items-center gap-2">
+              <h3 className="text-base font-semibold text-[#202333] flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#6044E8]" />
                 Lịch nghỉ phép được duyệt
               </h3>
@@ -369,7 +369,7 @@ export default function AdminLeavePage() {
                 calendarEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-3.5 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs space-y-1"
+                    className="p-3.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs space-y-1"
                   >
                     <div className="font-bold text-[#202333]">
                       {evt.fullName}
@@ -398,7 +398,7 @@ export default function AdminLeavePage() {
           description={`Nhân sự: ${selectedRequest.employee?.fullName || selectedRequest.employee?.email}`}
         >
           <div className="space-y-4 pt-2">
-            <div className="p-4 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs space-y-2">
+            <div className="p-4 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#475569]">Thời gian:</span>
                 <span className="font-bold text-[#202333]">
@@ -427,7 +427,7 @@ export default function AdminLeavePage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
+              <label className="block text-xs font-semibold text-[#475569]">
                 Ý kiến phản hồi / Nhận xét của người duyệt
               </label>
               <textarea

@@ -70,7 +70,7 @@ export default function UpdatePasswordPage() {
 
       {/* Form Right Panel (~48%) */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-8">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-8">
           <div>
             <Link
               href="/auth/login"
@@ -80,7 +80,7 @@ export default function UpdatePasswordPage() {
               <span>Quay lại đăng nhập</span>
             </Link>
 
-            <h2 className="text-2xl font-extrabold text-[#202333] tracking-tight">
+            <h2 className="text-2xl font-semibold text-[#202333] tracking-tight">
               Cập nhật mật khẩu
             </h2>
             <p className="mt-1 text-xs text-[#475569]">
@@ -106,7 +106,7 @@ export default function UpdatePasswordPage() {
           {/* Form */}
           <form onSubmit={handleUpdatePassword} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1.5">
+              <label className="block text-xs font-semibold text-[#475569] mb-1.5">
                 Mật khẩu mới
               </label>
               <div className="relative">
@@ -123,7 +123,7 @@ export default function UpdatePasswordPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1.5">
+              <label className="block text-xs font-semibold text-[#475569] mb-1.5">
                 Xác nhận mật khẩu mới
               </label>
               <div className="relative">

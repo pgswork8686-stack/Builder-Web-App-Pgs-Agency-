@@ -224,7 +224,7 @@ export function ProjectCreateWizardDialog({
 
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+          <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -283,12 +283,12 @@ export function ProjectCreateWizardDialog({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
+              <label className="block text-xs font-bold text-[#2E3248]">
                 Mô tả phạm vi dự án
               </label>
               <textarea
                 rows={3}
-                className="w-full rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3.5 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
+                className="w-full rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] text-[#2E3248] text-xs p-3.5 outline-none focus:bg-white focus:border-[#6044E8] transition-all"
                 placeholder="Mô tả mục tiêu, yêu cầu nghiệm thu và phạm vi công việc..."
                 value={form.description}
                 onChange={(e) =>
@@ -370,8 +370,8 @@ export function ProjectCreateWizardDialog({
         {/* Step 3: Confirmation Summary */}
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in duration-150">
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#475569]">
+            <div className="p-4 sm:p-5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
+              <h4 className="text-xs font-bold text-[#475569]">
                 Tóm tắt thông tin dự án
               </h4>
 
@@ -432,7 +432,7 @@ export function ProjectCreateWizardDialog({
               )}
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#F2EEFF] border border-[#6044E8]/20 text-[#6044E8] text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-xl bg-[#F2EEFF] border border-[#6044E8]/20 text-[#6044E8] text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>
                 Sau khi kích hoạt, bạn có thể tạo công việc, phân công

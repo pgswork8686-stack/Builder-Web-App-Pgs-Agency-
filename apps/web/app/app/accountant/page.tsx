@@ -88,7 +88,7 @@ export default function AccountantDashboardPage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>
+        <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
@@ -165,11 +165,11 @@ export default function AccountantDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <section className="lg:col-span-3 bg-white rounded-2xl border border-[#E7E9F0] overflow-hidden">
+        <section className="lg:col-span-3 bg-white rounded-xl border border-[#E7E9F0] overflow-hidden">
           {data && data.recentInvoices.length > 0 ? (
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F4F2FD] text-left text-xs uppercase tracking-wide text-[#475569]">
+                <tr className="bg-[#F4F2FD] text-left text-xs text-[#475569]">
                   <th className="px-5 py-3 font-bold">Hóa đơn</th>
                   <th className="px-3 py-3 font-bold">Khách hàng</th>
                   <th className="px-3 py-3 font-bold">Giá trị</th>

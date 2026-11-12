@@ -25,7 +25,7 @@ export function DeleteConfirmDialog({
   return (
     <Dialog isOpen={isOpen} onClose={onClose} maxWidth="sm">
       <div className="flex flex-col items-center text-center space-y-4 pt-2">
-        <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
           <AlertTriangle className="w-6 h-6" />
         </div>
 

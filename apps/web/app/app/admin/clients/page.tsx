@@ -294,7 +294,7 @@ export default function AdminClientsPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs">
         <div className="relative sm:col-span-2">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -622,7 +622,7 @@ export default function AdminClientsPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
+            <label className="block text-xs font-bold text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea
@@ -681,7 +681,7 @@ export default function AdminClientsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Trạng thái
               </label>
               <select
@@ -755,7 +755,7 @@ export default function AdminClientsPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
+            <label className="block text-xs font-bold text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea

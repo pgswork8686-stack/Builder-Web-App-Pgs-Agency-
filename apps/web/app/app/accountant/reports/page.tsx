@@ -25,7 +25,7 @@ export default function AccountantReportsPage() {
         }
       />
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
         <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
         <span>
           <strong>Thông tin tính năng:</strong> Chức năng kết xuất file báo cáo
@@ -40,7 +40,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Doanh thu
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Theo dõi Hợp đồng
           </h4>
           <p className="text-xs text-[#475569]">
@@ -52,7 +52,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Công nợ
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Tuổi nợ & Hóa đơn
           </h4>
           <p className="text-xs text-[#475569]">
@@ -64,7 +64,7 @@ export default function AccountantReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Chi phí
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Chi phí Hoạt động
           </h4>
           <p className="text-xs text-[#475569]">

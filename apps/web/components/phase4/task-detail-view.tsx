@@ -152,22 +152,22 @@ function TaskDetailContent({
           </div>
         )}
         {loading && !task ? (
-          <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
+          <div className="rounded-xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
             Đang tải chi tiết công việc…
           </div>
         ) : !task ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-red-600">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-red-600">
             Không tìm thấy công việc.
           </div>
         ) : (
           <>
-            <section className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+            <section className="rounded-xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#6044E8]">
+                  <p className="text-xs font-bold text-[#6044E8]">
                     Thông tin công việc
                   </p>
-                  <h2 className="mt-2 text-2xl font-black text-[#202333]">
+                  <h2 className="mt-2 text-2xl font-semibold text-[#202333]">
                     {task.title}
                   </h2>
                 </div>
@@ -207,13 +207,13 @@ function TaskDetailContent({
             </section>
 
             <section className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+              <div className="rounded-xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#202333] text-sm">Mô tả</h3>
                 <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#475569]">
                   {task.description || "Chưa có mô tả."}
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+              <div className="rounded-xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
                 <h3 className="font-bold text-[#202333] text-sm">Thời gian</h3>
                 <dl className="mt-3 space-y-3 text-xs">
                   <Info label="Bắt đầu" value={task.start_date} />
@@ -238,7 +238,7 @@ function TaskDetailContent({
               </div>
             </section>
 
-            <section className="space-y-4 rounded-2xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
+            <section className="space-y-4 rounded-xl border border-[#E7E9F0] bg-white p-6 shadow-xs">
               <h3 className="font-bold text-[#202333] text-sm">Bình luận</h3>
               {comments.length === 0 ? (
                 <p className="text-xs text-[#64748B]">Chưa có bình luận.</p>

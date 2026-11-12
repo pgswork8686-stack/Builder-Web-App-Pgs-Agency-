@@ -58,11 +58,11 @@ export function WorkspaceHeader({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#9A7000] bg-[#F2EEFF] px-2.5 py-0.5 rounded-full border border-[#DDD5FF]">
+            <span className="text-xs font-bold text-[#9A7000] bg-[#F2EEFF] px-2.5 py-0.5 rounded-full border border-[#DDD5FF]">
               {projectCode ?? "PROJECT"}
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-black text-[#202333] tracking-tight sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-semibold text-[#202333] tracking-tight sm:text-3xl">
             {projectName ?? "Không gian thực thi dự án"}
           </h1>
         </div>

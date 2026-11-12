@@ -91,13 +91,13 @@ export function StatCard({
   const valueFontSize = isLongText
     ? "text-lg sm:text-xl font-bold leading-tight"
     : isMediumText
-      ? "text-xl sm:text-2xl font-black tracking-tight"
-      : "text-2xl sm:text-3xl font-black tracking-tight";
+      ? "text-xl sm:text-2xl font-semibold tracking-tight"
+      : "text-2xl sm:text-3xl font-semibold tracking-tight";
 
   return (
     <div
       onClick={onClick}
-      className={`rounded-2xl border p-4 sm:p-5 relative overflow-hidden transition-all duration-200 flex flex-col justify-between h-full ${
+      className={`rounded-xl border p-4 sm:p-5 relative overflow-hidden transition-all duration-200 flex flex-col justify-between h-full ${
         selected.bg
       } ${
         onClick
@@ -109,7 +109,7 @@ export function StatCard({
         <div className="space-y-1 min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span
-              className={`text-xs font-bold uppercase tracking-wider ${selected.titleColor} truncate`}
+              className={`text-xs font-bold ${selected.titleColor} truncate`}
             >
               {title}
             </span>

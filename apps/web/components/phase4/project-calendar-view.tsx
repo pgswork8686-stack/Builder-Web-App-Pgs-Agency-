@@ -202,7 +202,7 @@ function ProjectCalendarContent({
         )}
       </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-[#E7E9F0] bg-white p-4 shadow-xs">
+      <div className="flex items-center justify-between rounded-xl border border-[#E7E9F0] bg-white p-4 shadow-xs">
         <button
           type="button"
           onClick={() => changeMonth(-1)}
@@ -230,11 +230,11 @@ function ProjectCalendarContent({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
+        <div className="rounded-xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
           Đang tải lịch công việc…
         </div>
       ) : (
-        <section className="overflow-x-auto rounded-2xl border border-[#E7E9F0] bg-white shadow-xs">
+        <section className="overflow-x-auto rounded-xl border border-[#E7E9F0] bg-white shadow-xs">
           <div className="grid min-w-[900px] grid-cols-7 border-b border-[#E7E9F0] bg-[#F8F9FC]">
             {weekdayLabels.map((label) => (
               <div

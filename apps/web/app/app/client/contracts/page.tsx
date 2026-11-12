@@ -101,7 +101,7 @@ export default function ClientContractsPage() {
                       <span className="text-xs font-mono text-[#475569] font-bold block">
                         MÃ SỐ: {c.contract_number}
                       </span>
-                      <h4 className="font-extrabold text-[#202333] text-base mt-0.5">
+                      <h4 className="font-semibold text-[#202333] text-base mt-0.5">
                         {c.title}
                       </h4>
                     </div>
@@ -140,7 +140,7 @@ export default function ClientContractsPage() {
                     <span className="text-xs font-bold text-[#475569] uppercase block">
                       Giá trị hợp đồng
                     </span>
-                    <span className="text-lg font-black text-[#6044E8] block mt-0.5">
+                    <span className="text-lg font-semibold text-[#6044E8] block mt-0.5">
                       {formatCurrency(c.contract_value, c.currency_code)}
                     </span>
                   </div>

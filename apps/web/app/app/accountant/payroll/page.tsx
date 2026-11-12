@@ -697,7 +697,7 @@ export default function AccountantPayrollPage() {
       {/* DETAIL MODAL WITH FULL BREAKDOWN */}
       {selectedRun && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-5xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] max-h-[90vh] flex flex-col">
+          <div className="bg-white dark:bg-[#1E293B] rounded-xl max-w-5xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-[#EAEFF4] dark:border-[#334155]">
               <div>
                 <h3 className="text-lg font-bold text-[#2E3248] dark:text-white">
@@ -825,7 +825,7 @@ export default function AccountantPayrollPage() {
       {/* REVISION MODAL */}
       {revisionModalUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-xl max-w-md w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
             <h3 className="text-base font-bold text-[#2E3248] dark:text-white">
               Cập nhật mức lương: {revisionModalUser.fullName}
             </h3>
@@ -921,7 +921,7 @@ export default function AccountantPayrollPage() {
       {/* HISTORY MODAL */}
       {historyUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-xl max-w-2xl w-full p-6 shadow-xl border border-[#EAEFF4] dark:border-[#334155] space-y-4">
             <h3 className="text-base font-bold text-[#2E3248] dark:text-white">
               Lịch sử điều chỉnh lương: {historyUser.fullName}
             </h3>

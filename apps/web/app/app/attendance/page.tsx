@@ -336,7 +336,7 @@ export default function EmployeeAttendancePage() {
 
         {/* Quy định chấm công — lấy từ cấu hình thật của hệ thống */}
         <Card className="p-6 space-y-4">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-[#6044E8]">
+          <h3 className="text-sm font-bold text-[#6044E8]">
             Quy định chấm công
           </h3>
           {policy ? (

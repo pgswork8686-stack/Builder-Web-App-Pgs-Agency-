@@ -89,13 +89,13 @@ export default function EmployeeDashboardPage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
+        <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
           {error}
         </div>
       )}
 
       {data?.alert && !hideAlert && (
-        <div className="relative rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] p-4 flex gap-3.5">
+        <div className="relative rounded-xl border border-[#FDE68A] bg-[#FFFBEB] p-4 flex gap-3.5">
           <TriangleAlert className="w-5 h-5 text-[#92400E] mt-0.5 shrink-0" />
           <div className="pr-6">
             <p className="text-sm font-bold text-[#92400E]">{data.alert.title}</p>

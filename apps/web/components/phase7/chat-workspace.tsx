@@ -632,7 +632,7 @@ export function ChatWorkspace() {
                         <div className="truncate text-xs font-bold text-[#202333]">
                           {conversationTitle(conversation)}
                         </div>
-                        <div className="mt-0.5 text-xs uppercase tracking-wide text-[#475569] flex items-center gap-1.5">
+                        <div className="mt-0.5 text-xs text-[#475569] flex items-center gap-1.5">
                           {conversation.type === "project" ? (
                             <span className="text-[#6044E8] font-semibold">
                               ● Dự án
@@ -780,7 +780,7 @@ export function ChatWorkspace() {
         <Card className="flex min-h-[44rem] flex-col p-0 overflow-hidden">
           <div className="flex items-center justify-between gap-4 border-b border-[#E7E9F0] p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2EEFF] text-[#6044E8]">
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
@@ -892,7 +892,7 @@ export function ChatWorkspace() {
                         className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[75%] rounded-2xl p-3.5 shadow-xs ${
+                          className={`max-w-[75%] rounded-xl p-3.5 shadow-xs ${
                             isMe
                               ? "bg-[#6044E8] text-white"
                               : "bg-[#F4F2FD] text-[#202333]"
@@ -1044,7 +1044,7 @@ export function ChatWorkspace() {
                     Đang tải danh bạ...
                   </div>
                 ) : filteredContacts.length === 0 ? (
-                  <div className="py-10 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-2xl">
+                  <div className="py-10 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-xl">
                     Không tìm thấy nhân sự hoặc khách hàng nào.
                   </div>
                 ) : (
@@ -1113,7 +1113,7 @@ export function ChatWorkspace() {
               {/* Project List */}
               <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
                 {filteredProjects.length === 0 ? (
-                  <div className="py-10 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-2xl">
+                  <div className="py-10 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-xl">
                     Không tìm thấy dự án nào.
                   </div>
                 ) : (
@@ -1125,7 +1125,7 @@ export function ChatWorkspace() {
                     return (
                       <div
                         key={proj.id}
-                        className="rounded-2xl border border-[#E7E9F0] bg-white overflow-hidden shadow-xs transition-all hover:border-[#6044E8]/30"
+                        className="rounded-xl border border-[#E7E9F0] bg-white overflow-hidden shadow-xs transition-all hover:border-[#6044E8]/30"
                       >
                         {/* Project Header Bar */}
                         <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FC]/50">
@@ -1190,7 +1190,7 @@ export function ChatWorkspace() {
                         {isExpanded && (
                           <div className="p-3.5 bg-white border-t border-[#E7E9F0] space-y-2">
                             <div className="flex items-center justify-between pb-1">
-                              <span className="text-xs font-bold text-[#202333] uppercase tracking-wide">
+                              <span className="text-xs font-bold text-[#202333]">
                                 Chọn người để Chat riêng (1-on-1):
                               </span>
                               <span className="text-xs text-[#475569]">
@@ -1307,7 +1307,7 @@ export function ChatWorkspace() {
             </div>
           ) : selected?.projectId &&
             (projectMembersMap[selected.projectId]?.length ?? 0) === 0 ? (
-            <div className="py-8 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-2xl">
+            <div className="py-8 text-center text-xs text-[#64748B] border border-dashed border-[#CBD5E1] rounded-xl">
               Chưa có thông tin thành viên dự án.
             </div>
           ) : (

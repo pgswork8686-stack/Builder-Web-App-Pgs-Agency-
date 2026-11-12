@@ -24,7 +24,7 @@ export default function AccountantCashflowPage() {
             </span>
             <TrendingUp className="w-4 h-4 text-[#13DEB9]" />
           </div>
-          <p className="text-2xl font-black text-[#2E3248]">0 ₫</p>
+          <p className="text-2xl font-semibold text-[#2E3248]">0 ₫</p>
         </Card>
 
         <Card className="p-6 space-y-2">
@@ -34,7 +34,7 @@ export default function AccountantCashflowPage() {
             </span>
             <TrendingDown className="w-4 h-4 text-[#FA896B]" />
           </div>
-          <p className="text-2xl font-black text-[#2E3248]">0 ₫</p>
+          <p className="text-2xl font-semibold text-[#2E3248]">0 ₫</p>
         </Card>
       </div>
 

@@ -76,7 +76,7 @@ export default function LoginPage() {
 
       {/* Right Form Panel */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header */}
           <div>
             <div className="flex items-center gap-2 mb-6">

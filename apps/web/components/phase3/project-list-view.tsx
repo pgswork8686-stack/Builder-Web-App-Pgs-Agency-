@@ -183,7 +183,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
       />
 
       {/* Filter / Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-white border border-[#E7E9F0] shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-xl bg-white border border-[#E7E9F0] shadow-xs">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
           <input
@@ -288,7 +288,7 @@ export function ProjectListView({ mode }: { mode: Mode }) {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-extrabold text-[#202333] group-hover:text-[#6044E8] transition-colors truncate">
+                        <h3 className="text-base font-semibold text-[#202333] group-hover:text-[#6044E8] transition-colors truncate">
                           {project.name}
                         </h3>
 

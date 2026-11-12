@@ -193,7 +193,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
 
   if (!contract) {
     return (
-      <div className="p-8 text-center bg-white rounded-2xl border border-[#E7E9F0] space-y-4">
+      <div className="p-8 text-center bg-white rounded-xl border border-[#E7E9F0] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
         <h2 className="text-base font-bold text-[#202333]">
           Không tìm thấy hợp đồng
@@ -301,7 +301,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Tiêu đề hợp đồng
                 </span>
-                <h2 className="text-lg font-extrabold text-[#202333] leading-tight">
+                <h2 className="text-lg font-semibold text-[#202333] leading-tight">
                   {contract.title}
                 </h2>
               </div>
@@ -331,7 +331,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                 <span className="text-xs text-[#475569] uppercase font-bold tracking-wider">
                   Giá trị hợp đồng
                 </span>
-                <p className="text-lg font-black text-[#6044E8]">
+                <p className="text-lg font-semibold text-[#6044E8]">
                   {formatCurrency(
                     contract.contract_value,
                     contract.currency_code,
@@ -392,7 +392,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
         <div className="space-y-6">
           {/* Client Visibility Card */}
           <Card className="p-5 space-y-3">
-            <h4 className="text-xs font-bold text-[#202333] uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#202333]">
               Hiển thị với khách hàng
             </h4>
             <div className="flex items-center justify-between bg-[#F8F9FC] p-3.5 rounded-xl border border-[#E7E9F0]">
@@ -421,7 +421,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
           {/* Invoices List Card */}
           <Card className="p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
-              <h4 className="text-xs font-bold text-[#202333] uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#202333]">
                 Hóa đơn của hợp đồng
               </h4>
               <Link
@@ -453,7 +453,7 @@ export default function ContractDetail({ roleBasePath }: ContractDetailProps) {
                       </p>
                     </div>
                     <div className="text-right space-y-0.5">
-                      <p className="font-extrabold text-[#6044E8]">
+                      <p className="font-semibold text-[#6044E8]">
                         {formatCurrency(inv.amount, inv.currency_code)}
                       </p>
                       <Link

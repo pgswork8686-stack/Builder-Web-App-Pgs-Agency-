@@ -172,7 +172,7 @@ export default function TeamLeaderApprovalsPage() {
       </div>
 
       {loading ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="p-12 text-center bg-white rounded-xl border border-[#E7E9F0]">
           <Loader2 className="w-7 h-7 animate-spin text-[#6044E8] mx-auto" />
           <p className="mt-3 text-xs text-[#475569]">Đang tải danh sách chờ duyệt...</p>
         </div>

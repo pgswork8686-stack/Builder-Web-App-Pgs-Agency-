@@ -174,12 +174,12 @@ export default function EmployeeTasksPage() {
       />
 
       {notice && (
-        <div role="status" className="rounded-2xl border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-sm px-4 py-3">
+        <div role="status" className="rounded-xl border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-sm px-4 py-3">
           {notice}
         </div>
       )}
       {error && (
-        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
+        <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
           {error}
         </div>
       )}
@@ -206,7 +206,7 @@ export default function EmployeeTasksPage() {
           <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Đang tải công việc…
         </p>
       ) : visible.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E7E9F0] p-6">
+        <div className="bg-white rounded-xl border border-[#E7E9F0] p-6">
           <EmptyState
             icon={<ListTodo className="w-8 h-8" />}
             title="Không có công việc nào"
@@ -225,7 +225,7 @@ export default function EmployeeTasksPage() {
             const next = !approval ? NEXT[t.status] : undefined;
             const late = !!(t.due_date && t.due_date.slice(0, 10) < new Date().toISOString().slice(0, 10) && t.status !== "done");
             return (
-              <li key={t.id} className="bg-white rounded-2xl border border-[#E7E9F0] p-5 flex flex-col gap-3">
+              <li key={t.id} className="bg-white rounded-xl border border-[#E7E9F0] p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-xs font-bold text-[#5B3FD6] truncate">{t.projectName}</span>
                   <span className={`px-2.5 py-0.5 rounded-full border text-xs font-bold ${approval ? approval.cls : st.cls}`}>

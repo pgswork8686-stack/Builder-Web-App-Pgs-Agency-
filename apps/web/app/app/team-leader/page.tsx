@@ -94,12 +94,12 @@ export default function TeamLeaderDashboardPage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
+        <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">
           {error}
         </div>
       )}
       {data && !data.departmentId && (
-        <div className="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-sm px-4 py-3">
+        <div className="rounded-xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-sm px-4 py-3">
           Tài khoản của bạn chưa được gán vào phòng ban nên chưa có số liệu đội. Liên hệ Admin để được gán.
         </div>
       )}

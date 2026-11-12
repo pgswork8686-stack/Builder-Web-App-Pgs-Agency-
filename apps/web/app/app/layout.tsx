@@ -127,7 +127,7 @@ export default function ProtectedAppLayout({
   if (checking || !account) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F8F9FC] text-[#202333]">
-        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-center shadow-lg">
+        <div className="rounded-xl border border-[#E7E9F0] bg-white p-8 text-center shadow-lg">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#7257F5]" />
           <p className="mt-4 text-xs font-medium text-[#475569]">
             Đang kiểm tra quyền truy cập...
@@ -167,9 +167,9 @@ export default function ProtectedAppLayout({
   if (!allowed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F8F9FC] p-6 text-[#202333]">
-        <div className="max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
+        <div className="max-w-md rounded-xl border border-red-200 bg-white p-8 text-center shadow-lg">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-500" />
-          <h1 className="mt-4 text-base font-extrabold text-[#202333]">
+          <h1 className="mt-4 text-base font-semibold text-[#202333]">
             Không có quyền truy cập
           </h1>
           <p className="mt-2 text-xs text-[#475569]">

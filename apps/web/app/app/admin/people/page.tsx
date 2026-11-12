@@ -327,7 +327,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Success Alert */}
       {successMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span className="font-semibold">{successMsg}</span>
@@ -344,7 +344,7 @@ export default function AdminPeopleDirectoryPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
             <span>{error}</span>
@@ -360,7 +360,7 @@ export default function AdminPeopleDirectoryPage() {
       )}
 
       {/* 5-Dimension Filter Grid */}
-      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
+      <div className="p-4 rounded-xl bg-white border border-[#E7E9F0] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 shadow-xs">
         <div className="relative sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -443,7 +443,7 @@ export default function AdminPeopleDirectoryPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}
         </div>
       ) : people.length === 0 ? (
@@ -656,7 +656,7 @@ export default function AdminPeopleDirectoryPage() {
       >
         <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
           {/* Ảnh đại diện & Preview */}
-          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0]">
+          <div className="flex items-center gap-4 p-3.5 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0]">
             <Avatar
               src={editAvatarUrl.trim() || undefined}
               name={editFullName || editingPerson?.email || "Avatar"}
@@ -750,8 +750,8 @@ export default function AdminPeopleDirectoryPage() {
           </div>
 
           {editRole !== "client" && (
-            <div className="p-4 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-4">
-              <h4 className="text-xs font-extrabold text-[#2E3248] uppercase tracking-wider flex items-center gap-2">
+            <div className="p-4 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-4">
+              <h4 className="text-xs font-semibold text-[#2E3248] flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-[#6044E8]" />
                 Thông tin hồ sơ nhân sự doanh nghiệp
               </h4>
@@ -918,7 +918,7 @@ export default function AdminPeopleDirectoryPage() {
             </div>
           </div>
 
-          <div className="max-h-72 overflow-y-auto rounded-2xl border border-[#E7E9F0] divide-y divide-[#E7E9F0] p-1">
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-[#E7E9F0] divide-y divide-[#E7E9F0] p-1">
             {filteredProjects.length === 0 ? (
               <p className="p-6 text-center text-xs text-[#475569]">
                 Không có dự án nào khớp với tìm kiếm.

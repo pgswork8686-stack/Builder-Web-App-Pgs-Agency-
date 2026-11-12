@@ -110,7 +110,7 @@ export default function SignUpPage() {
 
       {/* Form Right Panel (~48%) */}
       <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-3xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
+        <div className="w-full max-w-[460px] bg-white border border-[#E7E9F0] rounded-xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] space-y-6">
           {/* Header Mobile Logo / Text */}
           <div>
             <div className="md:hidden flex items-center gap-2 mb-6">
@@ -120,7 +120,7 @@ export default function SignUpPage() {
               <span className="font-bold text-lg text-[#202333]">PGS HUB</span>
             </div>
 
-            <h2 className="text-2xl font-extrabold text-[#202333] tracking-tight">
+            <h2 className="text-2xl font-semibold text-[#202333] tracking-tight">
               Tạo tài khoản
             </h2>
             <p className="mt-1 text-xs text-[#475569]">
@@ -177,7 +177,7 @@ export default function SignUpPage() {
           {/* Divider */}
           <div className="relative flex items-center justify-center my-3">
             <div className="w-full border-t border-[#E7E9F0]" />
-            <span className="absolute px-3 bg-white text-xs text-[#64748B] uppercase tracking-wider">
+            <span className="absolute px-3 bg-white text-xs text-[#64748B]">
               hoặc đăng ký bằng Email
             </span>
           </div>
@@ -185,7 +185,7 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSignUp} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Họ và tên
               </label>
               <div className="relative">
@@ -202,7 +202,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Email doanh nghiệp
               </label>
               <div className="relative">
@@ -219,7 +219,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Mật khẩu
               </label>
               <div className="relative">
@@ -236,7 +236,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1">
+              <label className="block text-xs font-semibold text-[#475569] mb-1">
                 Xác nhận mật khẩu
               </label>
               <div className="relative">

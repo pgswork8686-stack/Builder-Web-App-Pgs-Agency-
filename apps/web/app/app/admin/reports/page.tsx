@@ -25,7 +25,7 @@ export default function AdminReportsPage() {
         }
       />
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
         <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
         <span>
           <strong>Thông tin tính năng:</strong> Chức năng kết xuất file tổng hợp
@@ -40,7 +40,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Dự án
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Tiến độ & Hiệu suất
           </h4>
           <p className="text-xs text-[#475569]">
@@ -52,7 +52,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Tài chính
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Dòng tiền & Công nợ
           </h4>
           <p className="text-xs text-[#475569]">
@@ -64,7 +64,7 @@ export default function AdminReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Báo cáo Nhân sự
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Chấm công & Phép
           </h4>
           <p className="text-xs text-[#475569]">

@@ -15,7 +15,7 @@ export default function EmployeeReportsPage() {
         badge="Xem trước"
       />
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
         <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
         <span>
           <strong>Chưa kết nối API báo cáo hàng ngày:</strong> Phân hệ nhật ký

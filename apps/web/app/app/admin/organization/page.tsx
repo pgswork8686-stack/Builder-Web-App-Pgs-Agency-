@@ -78,12 +78,12 @@ export default function AdminOrganizationDashboard() {
               <Card className="p-6 h-full flex flex-col justify-between hover:border-[#6044E8]/40 hover:shadow-md transition-all">
                 <div className="space-y-4">
                   <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.color} shadow-xs`}
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.color} shadow-xs`}
                   >
                     <Icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-base text-[#202333] group-hover:text-[#6044E8] transition-colors">
+                    <h3 className="font-semibold text-base text-[#202333] group-hover:text-[#6044E8] transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-xs text-[#475569] mt-1 leading-relaxed">

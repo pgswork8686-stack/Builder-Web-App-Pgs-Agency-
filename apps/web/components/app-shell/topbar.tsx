@@ -178,7 +178,7 @@ export function Topbar({ account, user, onOpenMobileSidebar }: TopbarProps) {
 
           {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#E7E9F0] p-2 text-[#202333] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white border border-[#E7E9F0] p-2 text-[#202333] shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="p-3 border-b border-[#E7E9F0]">
                 <p className="text-xs font-bold text-[#202333] tracking-tight truncate">
                   {displayName}

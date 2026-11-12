@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
       {error && (
         <div
           role="alert"
-          className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3"
+          className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3"
         >
           {error}
         </div>
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {!hideAttention && (
             <div
-              className={`relative rounded-2xl border p-4 flex gap-3.5 ${
+              className={`relative rounded-xl border p-4 flex gap-3.5 ${
                 (data?.attention.total ?? 0) > 0
                   ? "bg-[#FFFBEB] border-[#FDE68A]"
                   : "bg-[#ECFDF5] border-[#A7F3D0]"
@@ -215,7 +215,7 @@ export default function AdminDashboardPage() {
           )}
           {!hideHealth && (
             <div
-              className={`relative rounded-2xl border p-4 flex gap-3.5 ${
+              className={`relative rounded-xl border p-4 flex gap-3.5 ${
                 apiHealthy === false
                   ? "bg-[#FEE2E2] border-[#FECACA]"
                   : "bg-[#ECFDF5] border-[#A7F3D0]"

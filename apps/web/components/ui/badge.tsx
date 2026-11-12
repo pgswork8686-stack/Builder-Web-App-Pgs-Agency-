@@ -28,24 +28,24 @@ export function Badge({
   };
 
   const variantStyles = {
-    default: "bg-[#F4F2FD] text-[#475569] border border-[#DDDFEA] font-bold",
+    default: "bg-[#F4F2FD] text-[#475569] border border-[#DDDFEA]" ,
     brand:
-      "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF] font-bold shadow-2xs",
-    blue: "bg-[#F2EEFF] text-[#6044E8] border border-[#E7E0FF] font-bold",
-    gold: "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF] font-bold",
+      "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF]",
+    blue: "bg-[#F2EEFF] text-[#6044E8] border border-[#E7E0FF]" ,
+    gold: "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF]" ,
     success:
-      "bg-[#E6FBF5] text-[#047857] border border-[#A7F3D0] font-bold",
+      "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]" ,
     warning:
-      "bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] font-bold",
-    danger: "bg-[#FEE2E2] text-[#B91C1C] border border-[#FECACA] font-bold",
-    purple: "bg-[#F2EEFF] text-[#7257F5] border border-[#E9D5FF] font-bold",
-    cyan: "bg-[#E0F7FE] text-[#0284C7] border border-[#BAE6FD] font-bold",
+      "bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]" ,
+    danger: "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]" ,
+    purple: "bg-[#F2EEFF] text-[#5B3FD6] border border-[#E9D5FF]" ,
+    cyan: "bg-[#E0F7FE] text-[#0284C7] border border-[#BAE6FD]" ,
     outline: "bg-white text-[#475569] border border-[#DDDFEA]",
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 rounded-full font-medium tracking-wide transition-colors select-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 rounded-full font-semibold transition-colors select-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

@@ -631,7 +631,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
 
               {mode === "admin" && (
                 <div className="pt-4 border-t border-[#E7E9F0] space-y-3">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
+                  <label className="block text-xs font-semibold text-[#475569]">
                     Chuyển nhanh trạng thái
                   </label>
                   <Select
@@ -1084,7 +1084,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         onClose={() => !creatingTask && setAddTaskOpen(false)}
         maxWidth="md"
         title={
-          <div className="flex items-center gap-2 text-base font-extrabold text-[#202333]">
+          <div className="flex items-center gap-2 text-base font-semibold text-[#202333]">
             <ListTodo className="w-5 h-5 text-[#6044E8]" />
             Tạo công việc mới
           </div>

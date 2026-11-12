@@ -178,14 +178,14 @@ export function NotificationBell() {
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#6044E8] px-1.5 py-0.5 text-xs font-black text-white shadow-xs">
+          <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#6044E8] px-1.5 py-0.5 text-xs font-semibold text-white shadow-xs">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="fixed inset-x-4 top-[72px] z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[22rem] overflow-hidden rounded-2xl border border-[#E7E9F0] bg-white shadow-xl">
+        <div className="fixed inset-x-4 top-[72px] z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[22rem] overflow-hidden rounded-xl border border-[#E7E9F0] bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-[#E7E9F0] px-4 py-3 bg-[#F8F9FC]">
             <div>
               <div className="text-sm font-bold text-[#202333]">Thông báo</div>

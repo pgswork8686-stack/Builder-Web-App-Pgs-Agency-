@@ -25,7 +25,7 @@ export default function TeamLeaderReportsPage() {
         }
       />
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs">
         <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
         <span>
           <strong>Thông tin tính năng:</strong> Chức năng kết xuất báo cáo tổng
@@ -39,7 +39,7 @@ export default function TeamLeaderReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Hiệu suất Công việc
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Tỷ lệ hoàn thành công việc
           </h4>
           <p className="text-xs text-[#475569]">
@@ -51,7 +51,7 @@ export default function TeamLeaderReportsPage() {
           <span className="text-xs font-bold text-[#475569]">
             Chấm công Đội ngũ
           </span>
-          <h4 className="text-base font-extrabold text-[#2E3248]">
+          <h4 className="text-base font-semibold text-[#2E3248]">
             Chuyên cần Thành viên
           </h4>
           <p className="text-xs text-[#475569]">

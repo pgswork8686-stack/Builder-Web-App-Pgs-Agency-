@@ -310,7 +310,7 @@ export default function ClientSupportPage() {
         <div className="md:col-span-5 space-y-6">
           <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155]">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-[#475569] uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#475569]">
                 Yêu cầu đã gửi của bạn
               </h4>
               <Button
@@ -368,7 +368,7 @@ export default function ClientSupportPage() {
 
           {/* Contact Box */}
           <Card className="p-5 border border-[#EAEFF4] dark:border-[#334155] space-y-3 bg-[#F8F9FC] dark:bg-[#202333]">
-            <h4 className="text-xs font-bold text-[#475569] uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#475569]">
               Kênh liên hệ khẩn cấp
             </h4>
             <div className="flex items-center gap-3 text-xs text-[#2E3248] dark:text-white">

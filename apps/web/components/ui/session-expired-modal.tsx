@@ -25,7 +25,7 @@ export function SessionExpiredModal({
   return (
     <Dialog isOpen={isOpen} onClose={() => {}} maxWidth="sm">
       <div className="flex flex-col items-center text-center space-y-4 pt-2">
-        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
           <ShieldAlert className="w-6 h-6" />
         </div>
 

@@ -155,7 +155,7 @@ export function FileManager({
   return (
     <section className="space-y-4">
       <div
-        className={`grid gap-3 rounded-2xl border border-[#E7E9F0] bg-white p-4 shadow-xs ${compact ? "" : "md:grid-cols-[1fr_auto]"}`}
+        className={`grid gap-3 rounded-xl border border-[#E7E9F0] bg-white p-4 shadow-xs ${compact ? "" : "md:grid-cols-[1fr_auto]"}`}
       >
         {!compact && (
           <input
@@ -210,17 +210,17 @@ export function FileManager({
         </div>
       )}
       {loading ? (
-        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-6 text-[#475569]">
+        <div className="rounded-xl border border-[#E7E9F0] bg-white p-6 text-[#475569]">
           Đang tải tệp…
         </div>
       ) : files.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#64748B]">
+        <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-xs text-[#64748B]">
           Chưa có tệp nào.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E9F0] bg-white shadow-xs">
+        <div className="overflow-x-auto rounded-xl border border-[#E7E9F0] bg-white shadow-xs">
           <table className="w-full min-w-[760px] text-left text-xs">
-            <thead className="border-b border-[#E7E9F0] text-xs uppercase tracking-wider text-[#475569] bg-[#F8F9FC]">
+            <thead className="border-b border-[#E7E9F0] text-xs text-[#475569] bg-[#F8F9FC]">
               <tr>
                 <th className="p-4">Tệp</th>
                 <th className="p-4">Kích thước</th>

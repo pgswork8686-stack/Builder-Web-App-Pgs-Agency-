@@ -93,15 +93,15 @@ export default function TeamLeaderClientsPage() {
       />
 
       {notice && (
-        <div role="status" className="rounded-2xl border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-sm px-4 py-3">{notice}</div>
+        <div role="status" className="rounded-xl border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-sm px-4 py-3">{notice}</div>
       )}
       {error && (
-        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>
+        <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>
       )}
 
       <form
         onSubmit={(e) => { e.preventDefault(); void load(q); }}
-        className="bg-white rounded-2xl border border-[#E7E9F0] p-4 flex gap-3"
+        className="bg-white rounded-xl border border-[#E7E9F0] p-4 flex gap-3"
       >
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -116,7 +116,7 @@ export default function TeamLeaderClientsPage() {
         <Button type="submit" variant="secondary">Tìm</Button>
       </form>
 
-      <section className="bg-white rounded-2xl border border-[#E7E9F0] p-6">
+      <section className="bg-white rounded-xl border border-[#E7E9F0] p-6">
         {loading ? (
           <p className="py-10 text-center text-sm text-[#475569]"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Đang tải khách hàng…</p>
         ) : items.length === 0 ? (

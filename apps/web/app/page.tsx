@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FC] text-[#202333] p-6 font-sans">
-      <Card className="flex flex-col items-center max-w-lg p-10 bg-white border-[#E7E9F0] rounded-3xl shadow-xl text-center space-y-6">
-        <div className="relative w-16 h-16 rounded-2xl bg-[#202333] p-2 flex items-center justify-center shadow-md">
+      <Card className="flex flex-col items-center max-w-lg p-10 bg-white border-[#E7E9F0] rounded-xl shadow-xl text-center space-y-6">
+        <div className="relative w-16 h-16 rounded-xl bg-[#202333] p-2 flex items-center justify-center shadow-md">
           <Image
             src="/brand/pgs-agency-logo-transparent.png"
             alt="PGS Agency"
@@ -22,7 +22,7 @@ export default function Home() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#202333]">
+          <h1 className="text-3xl font-semibold tracking-tight text-[#202333]">
             PGS HUB
           </h1>
           <p className="text-sm text-[#475569] mt-1 font-medium">

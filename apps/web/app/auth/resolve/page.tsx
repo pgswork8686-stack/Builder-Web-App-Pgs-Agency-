@@ -79,10 +79,10 @@ export default function AuthResolvePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FC] text-[#202333] p-6">
-      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-[460px] w-full rounded-3xl border-[#E7E9F0]">
+      <Card className="flex flex-col items-center gap-4 p-8 text-center max-w-[460px] w-full rounded-xl border-[#E7E9F0]">
         {errorMsg ? (
           <>
-            <h3 className="text-base font-extrabold text-red-600">
+            <h3 className="text-base font-semibold text-red-600">
               LỖI XÁC THỰC
             </h3>
             <p className="text-xs text-[#475569]">{errorMsg}</p>
@@ -103,7 +103,7 @@ export default function AuthResolvePage() {
         ) : (
           <>
             <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin" />
-            <h3 className="text-base font-extrabold text-[#202333]">PGS HUB</h3>
+            <h3 className="text-base font-semibold text-[#202333]">PGS HUB</h3>
             <p className="text-xs text-[#475569]">{statusText}</p>
           </>
         )}

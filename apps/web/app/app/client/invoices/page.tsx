@@ -121,10 +121,10 @@ export default function ClientInvoicesPage() {
                       <TableCell className="font-mono text-xs text-[#475569]">
                         {formatDate(i.due_date)}
                       </TableCell>
-                      <TableCell className="font-extrabold text-[#202333] text-xs">
+                      <TableCell className="font-semibold text-[#202333] text-xs">
                         {formatCurrency(i.amount, i.currency_code)}
                       </TableCell>
-                      <TableCell className="font-extrabold text-emerald-600 text-xs">
+                      <TableCell className="font-semibold text-emerald-600 text-xs">
                         {formatCurrency(i.paid_amount, i.currency_code)}
                       </TableCell>
                       <TableCell>

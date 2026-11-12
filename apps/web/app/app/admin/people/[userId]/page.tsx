@@ -217,14 +217,14 @@ export default function AdminPersonDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-[#E7E9F0]">
           <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải dữ liệu hồ sơ nhân sự...
           </span>
         </div>
       ) : error || !person ? (
-        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs">
             <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
             <span>{error || "Không tìm thấy tài khoản người dùng"}</span>
@@ -250,7 +250,7 @@ export default function AdminPersonDetailPage() {
                 )}
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-[#202333]">
+                <h3 className="text-base font-semibold text-[#202333]">
                   {person.fullName || "Chưa cập nhật tên"}
                 </h3>
                 <p className="text-xs text-[#475569] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
@@ -307,7 +307,7 @@ export default function AdminPersonDetailPage() {
               <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
                   <ShieldCheck className="w-5 h-5 text-[#6044E8]" />
-                  <h2 className="font-extrabold text-sm text-[#202333]">
+                  <h2 className="font-semibold text-sm text-[#202333]">
                     {person.employeeProfile
                       ? "Thông Tin Hồ Sơ Nhân Sự"
                       : "Khởi Tạo Hồ Sơ Nhân Sự"}

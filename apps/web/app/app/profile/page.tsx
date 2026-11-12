@@ -222,14 +222,14 @@ export default function UserProfilePage() {
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-[#E7E9F0]">
           <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải thông tin hồ sơ của bạn...
           </span>
         </div>
       ) : error || !userProfile ? (
-        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs">
             <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
             <span>{error || "Không thể tải hồ sơ"}</span>
@@ -259,7 +259,7 @@ export default function UserProfilePage() {
               </button>
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-[#202333]">
+              <h3 className="text-base font-semibold text-[#202333]">
                 {userProfile.user.fullName || "Chưa cập nhật tên"}
               </h3>
               <p className="text-xs text-[#475569] flex items-center justify-center gap-1.5 mt-0.5 font-mono">
@@ -325,7 +325,7 @@ export default function UserProfilePage() {
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
                   <Briefcase className="w-5 h-5 text-[#CA8A04]" />
-                  <h2 className="text-sm font-extrabold text-[#202333]">
+                  <h2 className="text-sm font-semibold text-[#202333]">
                     Liên Kết Doanh Nghiệp Khách Hàng
                   </h2>
                 </div>
@@ -377,7 +377,7 @@ export default function UserProfilePage() {
               <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-2 border-b border-[#E7E9F0] pb-3">
                   <Award className="w-5 h-5 text-[#6044E8]" />
-                  <h2 className="text-sm font-extrabold text-[#202333]">
+                  <h2 className="text-sm font-semibold text-[#202333]">
                     Thông Tin Hồ Sơ Nhân Sự
                   </h2>
                 </div>
@@ -390,7 +390,7 @@ export default function UserProfilePage() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Mã nhân sự
                       </span>
                       <span className="text-sm font-bold font-mono text-[#6044E8]">
@@ -399,7 +399,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Chức danh công việc
                       </span>
                       <span className="text-sm font-bold text-[#202333]">
@@ -408,7 +408,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Phòng ban trực thuộc
                       </span>
                       <span className="text-xs font-semibold text-[#202333] flex items-center gap-1.5">
@@ -418,7 +418,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Đội nhóm trực thuộc
                       </span>
                       <span className="text-xs font-semibold text-[#202333] flex items-center gap-1.5">
@@ -428,7 +428,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Người quản lý trực tiếp
                       </span>
                       <span className="text-xs text-[#202333]">
@@ -446,7 +446,7 @@ export default function UserProfilePage() {
                     </div>
 
                     <div className="bg-[#F8F9FC] border border-[#E7E9F0] p-3.5 rounded-xl">
-                      <span className="text-xs font-bold text-[#475569] uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-bold text-[#475569] block mb-1">
                         Trạng thái làm việc
                       </span>
                       <Badge
@@ -503,7 +503,7 @@ export default function UserProfilePage() {
           />
 
           {/* Avatar Preview & Upload Options */}
-          <div className="p-4 rounded-2xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
+          <div className="p-4 rounded-xl bg-[#F8F9FC] border border-[#E7E9F0] space-y-3">
             <div className="flex items-center gap-4">
               <div className="relative group shrink-0">
                 <Avatar

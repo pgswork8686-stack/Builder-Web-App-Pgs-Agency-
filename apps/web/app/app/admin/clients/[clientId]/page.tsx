@@ -252,14 +252,14 @@ export default function AdminClientDetailPage() {
       />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-[#E7E9F0]">
           <Loader2 className="w-8 h-8 text-[#6044E8] animate-spin mb-3" />
           <span className="text-xs text-[#475569]">
             Đang tải dữ liệu doanh nghiệp...
           </span>
         </div>
       ) : error || !company ? (
-        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between">
+        <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs">
             <AlertTriangle className="w-5 h-5 shrink-0 text-red-500" />
             <span>{error || "Không tìm thấy thông tin doanh nghiệp"}</span>
@@ -273,11 +273,11 @@ export default function AdminClientDetailPage() {
           {/* Left Column: Company Profile Detail */}
           <div className="space-y-6">
             <Card className="p-6 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
                 <Briefcase className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-extrabold text-[#202333]">
+                <h3 className="text-lg font-semibold text-[#202333]">
                   {company.name}
                 </h3>
                 <div className="inline-flex px-2 py-0.5 rounded bg-[#F8F9FC] border border-[#E7E9F0] font-mono text-[#6044E8] text-xs font-bold uppercase mt-1">
@@ -287,7 +287,7 @@ export default function AdminClientDetailPage() {
 
               <div className="space-y-3 text-xs border-t border-[#E7E9F0] pt-4">
                 <div>
-                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold">
                     Mã số thuế
                   </span>
                   <span className="font-mono text-[#202333] font-medium">
@@ -295,13 +295,13 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold">
                     Điện thoại
                   </span>
                   <span className="text-[#202333]">{company.phone || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold">
                     Email nhận tin
                   </span>
                   <span className="text-[#202333] font-mono">
@@ -309,7 +309,7 @@ export default function AdminClientDetailPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold">
                     Website
                   </span>
                   {company.website ? (
@@ -326,7 +326,7 @@ export default function AdminClientDetailPage() {
                   )}
                 </div>
                 <div>
-                  <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                  <span className="block text-[#475569] text-xs font-bold">
                     Địa chỉ trụ sở
                   </span>
                   <span className="text-[#202333]">
@@ -335,7 +335,7 @@ export default function AdminClientDetailPage() {
                 </div>
                 {company.notes && (
                   <div>
-                    <span className="block text-[#475569] text-xs font-bold uppercase tracking-wider">
+                    <span className="block text-[#475569] text-xs font-bold">
                       Ghi chú
                     </span>
                     <span className="text-xs text-[#475569]">
@@ -351,7 +351,7 @@ export default function AdminClientDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 space-y-4">
               <div className="flex justify-between items-center border-b border-[#E7E9F0] pb-3">
-                <h2 className="text-sm font-extrabold text-[#202333] flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-[#202333] flex items-center gap-2">
                   <Key className="w-4 h-4 text-[#6044E8]" />
                   Tài Khoản Portal Liên Kết ({memberships.length})
                 </h2>
@@ -543,7 +543,7 @@ export default function AdminClientDetailPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248] mb-1.5">
+              <label className="block text-xs font-bold text-[#2E3248] mb-1.5">
                 Trạng thái
               </label>
               <select
@@ -596,7 +596,7 @@ export default function AdminClientDetailPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#2E3248]">
+            <label className="block text-xs font-bold text-[#2E3248]">
               Ghi chú đối tác
             </label>
             <textarea

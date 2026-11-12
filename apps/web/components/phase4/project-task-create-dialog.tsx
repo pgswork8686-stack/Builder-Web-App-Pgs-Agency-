@@ -195,7 +195,7 @@ export function ProjectTaskCreateDialog({
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
         <div className="rounded-xl border border-[#E7E0FF] bg-[#F8FAFF] px-3 py-2.5">
-          <div className="text-xs font-bold uppercase tracking-wider text-[#475569]">
+          <div className="text-xs font-bold text-[#475569]">
             Dự án
           </div>
           <div className="mt-1 text-xs font-bold text-[#202333]">

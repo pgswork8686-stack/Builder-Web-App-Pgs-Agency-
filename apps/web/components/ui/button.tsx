@@ -32,12 +32,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      "inline-flex whitespace-nowrap items-center justify-center font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7257F5] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-xl";
+      "inline-flex whitespace-nowrap items-center justify-center font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#7257F5] disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer rounded-lg";
 
     const sizeStyles = {
-      sm: "h-11 sm:h-9 px-3 text-xs gap-1.5",
-      md: "h-11 sm:h-10 px-4 text-xs sm:text-sm gap-2",
-      lg: "h-12 px-6 text-sm sm:text-base gap-2.5",
+      sm: "h-11 sm:h-8 px-3 text-sm sm:text-xs gap-1.5",
+      md: "h-11 sm:h-9 px-3.5 text-sm gap-2",
+      lg: "h-12 sm:h-11 px-5 text-sm gap-2",
       icon: "h-11 w-11 sm:h-9 sm:w-9 p-0 shrink-0",
     };
 
@@ -50,11 +50,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-white text-[#202333] border border-[#DDDFEA] hover:bg-[#F2EEFF] hover:border-[#7257F5] active:scale-[0.98]",
       gold: "bg-[#7257F5] text-white hover:bg-[#6044E8] shadow-xs active:scale-[0.98]",
       "gold-outline":
-        "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF] hover:bg-[#FEF08A] active:scale-[0.98]",
+        "bg-[#F2EEFF] text-[#5B3FD6] border border-[#DDD5FF] hover:bg-[#E7E0FF] active:scale-[0.98]",
       ghost:
         "bg-transparent text-[#475569] hover:text-[#202333] hover:bg-[#F4F2FD] active:scale-[0.98]",
       danger:
-        "bg-[#FF785A] text-white hover:brightness-110 shadow-xs active:scale-[0.98]",
+        "bg-[#D92D20] text-white hover:bg-[#B42318] shadow-xs active:scale-[0.98]",
     };
 
     return (

@@ -27,9 +27,9 @@ export default function AccountPendingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] text-[#202333] p-6 relative">
-      <Card className="max-w-[460px] w-full rounded-3xl p-8 text-center space-y-6 border-[#E7E9F0]">
+      <Card className="max-w-[460px] w-full rounded-xl p-8 text-center space-y-6 border-[#E7E9F0]">
         {/* Status Icon Header */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
+        <div className="mx-auto w-16 h-16 rounded-xl bg-[#FEF9C3] border border-[#FDE047] flex items-center justify-center text-[#CA8A04] shadow-xs">
           <Clock className="w-8 h-8 animate-pulse" />
         </div>
 
@@ -37,7 +37,7 @@ export default function AccountPendingPage() {
           <Badge variant="gold" size="md">
             Trạng thái: Chờ duyệt
           </Badge>
-          <h2 className="text-xl font-extrabold text-[#202333] tracking-tight">
+          <h2 className="text-xl font-semibold text-[#202333] tracking-tight">
             Tài khoản đang chờ phê duyệt
           </h2>
         </div>

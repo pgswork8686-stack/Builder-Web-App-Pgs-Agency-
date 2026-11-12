@@ -191,7 +191,7 @@ export default function AdminPendingAccountsPage() {
       )}
 
       {/* Search & Filter Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#E7E9F0] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="p-4 rounded-xl bg-white border border-[#E7E9F0] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="relative w-full sm:w-80 flex items-center">
           <Search className="absolute left-3.5 w-4 h-4 text-[#64748B] pointer-events-none" />
           <input
@@ -343,7 +343,7 @@ export default function AdminPendingAccountsPage() {
       >
         <div className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
+            <label className="block text-xs font-semibold text-[#475569]">
               Lý do từ chối *
             </label>
             <textarea

@@ -52,7 +52,7 @@ export function StateBanner({
   return (
     <div
       role="alert"
-      className={`relative flex items-start gap-3.5 p-4 rounded-2xl border ${selected.bg} ${className}`}
+      className={`relative flex items-start gap-3.5 p-4 rounded-xl border ${selected.bg} ${className}`}
     >
       <div className="mt-0.5">{selected.icon}</div>
       <div className="flex-1 min-w-0 space-y-1">

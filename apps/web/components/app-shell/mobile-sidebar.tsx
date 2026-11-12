@@ -71,7 +71,7 @@ export function MobileSidebar({
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-sm tracking-tight text-[#202333]">
+              <span className="font-semibold text-sm tracking-tight text-[#202333]">
                 PGS Hub
               </span>
               <span className="text-xs font-semibold text-[#475569] tracking-tight truncate">
@@ -130,7 +130,7 @@ export function MobileSidebar({
           {navGroups.map((group, groupIdx) => (
             <div key={group.groupTitle || groupIdx} className="space-y-0.5">
               {group.groupTitle && (
-                <div className="px-3 pb-1 text-xs font-bold uppercase tracking-wider text-[#475569]">
+                <div className="px-3 pb-1 text-xs font-bold text-[#475569]">
                   {group.groupTitle}
                 </div>
               )}

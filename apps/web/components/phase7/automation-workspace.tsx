@@ -307,7 +307,7 @@ export function AutomationWorkspace() {
         <aside className="space-y-6">
           <Card className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F2EEFF] text-[#6044E8]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2EEFF] text-[#6044E8]">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
@@ -523,7 +523,7 @@ export function AutomationWorkspace() {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E7E9F0] pb-3">
               <div>
-                <h2 className="font-extrabold text-[#202333] text-sm">
+                <h2 className="font-semibold text-[#202333] text-sm">
                   Danh sách quy tắc
                 </h2>
                 <p className="text-xs text-[#475569]">
@@ -598,7 +598,7 @@ export function AutomationWorkspace() {
 
           <Card className="p-6 space-y-4">
             <div className="border-b border-[#E7E9F0] pb-3">
-              <h2 className="font-extrabold text-[#202333] text-sm">
+              <h2 className="font-semibold text-[#202333] text-sm">
                 Lịch sử thực thi
               </h2>
               <p className="text-xs text-[#475569]">

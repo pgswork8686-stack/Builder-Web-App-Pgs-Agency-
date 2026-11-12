@@ -243,7 +243,7 @@ function ProjectBoardContent({
 
   const inner = (
     <div className="space-y-4">
-      <section className="grid gap-3 rounded-2xl border border-[#E7E9F0] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
+      <section className="grid gap-3 rounded-xl border border-[#E7E9F0] bg-white p-4 shadow-xs md:grid-cols-[minmax(220px,1fr)_180px_200px_180px]">
         <label className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <input
@@ -330,7 +330,7 @@ function ProjectBoardContent({
       )}
 
       {loading && !board ? (
-        <div className="rounded-2xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
+        <div className="rounded-xl border border-[#E7E9F0] bg-white p-8 text-[#475569]">
           Đang tải Kanban…
         </div>
       ) : (
@@ -416,7 +416,7 @@ function BoardColumn({
   return (
     <section
       ref={setNodeRef}
-      className={`w-[310px] shrink-0 rounded-2xl border p-3.5 shadow-xs transition-colors ${
+      className={`w-[310px] shrink-0 rounded-xl border p-3.5 shadow-xs transition-colors ${
         isOver
           ? "border-[#6044E8] bg-[#F2EEFF]/60"
           : "border-[#E7E9F0] bg-[#F4F2FD]/50"

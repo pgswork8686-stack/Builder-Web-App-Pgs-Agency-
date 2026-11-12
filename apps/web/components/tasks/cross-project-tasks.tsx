@@ -115,7 +115,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
     <div className="space-y-6">
       <TaskModuleHeader role={role} activeView={view} title={copy.title} description={copy.description} badge={copy.badge} actions={newButton} />
 
-      <div className="bg-white rounded-2xl border border-[#E7E9F0] p-4 grid gap-3 md:grid-cols-[1fr_200px_220px]">
+      <div className="bg-white rounded-xl border border-[#E7E9F0] p-4 grid gap-3 md:grid-cols-[1fr_200px_220px]">
         <div className="relative">
           <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -139,10 +139,10 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
         </Select>
       </div>
 
-      {error && <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>}
+      {error && <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-sm px-4 py-3">{error}</div>}
 
       {loading ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-[#E7E9F0]">
+        <div className="p-12 text-center bg-white rounded-xl border border-[#E7E9F0]">
           <Loader2 className="w-7 h-7 animate-spin text-[#6044E8] mx-auto" />
           <p className="mt-3 text-xs text-[#475569]">Đang tải công việc…</p>
         </div>
@@ -152,10 +152,10 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
         visible.length === 0 ? (
           <EmptyState title="Chưa có công việc nào" description="Bấm “Giao việc mới” để tạo công việc đầu tiên cho một dự án." actionLabel="Giao việc mới" onAction={() => setPick(true)} />
         ) : (
-          <div className="bg-white rounded-2xl border border-[#E7E9F0] overflow-x-auto">
+          <div className="bg-white rounded-xl border border-[#E7E9F0] overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F4F2FD] text-left text-xs uppercase tracking-wide text-[#475569]">
+                <tr className="bg-[#F4F2FD] text-left text-xs text-[#475569]">
                   <th className="px-5 py-3 font-bold">Công việc</th>
                   <th className="px-3 py-3 font-bold">Dự án</th>
                   <th className="px-3 py-3 font-bold">Người thực hiện</th>
@@ -190,7 +190,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
           {COLUMNS.map((col) => {
             const items = visible.filter((r) => r.status === col);
             return (
-              <section key={col} className="p-4 rounded-2xl bg-white border border-[#E7E9F0] flex flex-col gap-3">
+              <section key={col} className="p-4 rounded-xl bg-white border border-[#E7E9F0] flex flex-col gap-3">
                 <header className="flex items-center justify-between pb-2 border-b border-[#E7E9F0]">
                   <span className="text-xs font-bold text-[#202333]">{STATUS[col].label}</span>
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#F4F2FD] text-[#475569]">{items.length}</span>

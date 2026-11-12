@@ -343,7 +343,7 @@ export default function EmployeeLeavePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569]">
+            <label className="block text-xs font-semibold text-[#475569]">
               Lý do xin nghỉ *
             </label>
             <textarea
