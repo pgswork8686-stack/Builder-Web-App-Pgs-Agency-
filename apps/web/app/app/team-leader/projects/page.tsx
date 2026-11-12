@@ -59,6 +59,14 @@ export default function TeamLeaderProjectsPage() {
     setWizardOpen(true);
   };
 
+  // Lối tắt "Tạo dự án" từ trang Hôm nay: /app/team-leader/projects?create=1 mở ngay hộp tạo.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("create") === "1") {
+      window.history.replaceState(null, "", window.location.pathname);
+      void openWizard();
+    }
+  }, []);
+
   const today = new Date().toISOString().slice(0, 10);
   const visible = useMemo(() => {
     const t = q.trim().toLowerCase();
