@@ -18,7 +18,7 @@ import {
   UpdateProjectServiceItemDto,
   UpdateProjectServiceDto,
 } from './dto/project.dto';
-import type { AppRole } from '../auth/auth.types';
+import type { AppRole, RequestUser } from '../auth/auth.types';
 
 type ProjectRow = Record<string, any>;
 
@@ -553,6 +553,20 @@ export class ProjectsService {
           message: 'Liên hệ khách hàng không thuộc công ty của dự án.',
         });
       }
+    }
+  }
+
+  /** Trưởng phòng chỉ quản lý thành viên ở dự án mình làm quản lý hoặc thuộc phòng ban mình. */
+  async assertLeaderManagesProject(projectId: string, user: RequestUser) {
+    const project = await this.getProjectRow(projectId);
+    const ownsProject = project.project_manager_user_id === user.profileId;
+    const sameDepartment =
+      !!user.departmentId && project.department_id === user.departmentId;
+    if (!ownsProject && !sameDepartment) {
+      throw new ForbiddenException({
+        code: 'PROJECT_SCOPE_DENIED',
+        message: 'Bạn chỉ thêm được thành viên vào dự án mình quản lý.',
+      });
     }
   }
 

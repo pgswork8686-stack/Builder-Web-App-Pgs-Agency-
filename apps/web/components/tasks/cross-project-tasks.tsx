@@ -177,7 +177,7 @@ export function CrossProjectTasks({ role, view }: { role: Role; view: "list" | "
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{r.assignee?.full_name || "Chưa giao"}</td>
                       <td className="px-3 py-3.5 text-xs text-[#475569]">{PRIORITY[r.priority] ?? r.priority}</td>
                       <td className={`px-3 py-3.5 text-xs ${late ? "text-[#B91C1C] font-bold" : "text-[#475569]"}`}>{r.due_date ? shortDate(r.due_date.slice(0, 10)) : "—"}</td>
-                      <td className="px-5 py-3.5"><Pill s={late ? "todo" : r.status} />{late && <span className="ml-1 px-2 py-0.5 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold">Quá hạn</span>}</td>
+                      <td className="px-5 py-3.5">{r.approval_status === "pending" ? <span className="px-2 py-0.5 rounded-full border border-[#FDE68A] bg-[#FEF3C7] text-[#92400E] text-xs font-bold">Chờ duyệt</span> : r.approval_status === "rejected" ? <span className="px-2 py-0.5 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold">Bị từ chối</span> : <><Pill s={late ? "todo" : r.status} />{late && <span className="ml-1 px-2 py-0.5 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold">Quá hạn</span>}</>}</td>
                     </tr>
                   );
                 })}

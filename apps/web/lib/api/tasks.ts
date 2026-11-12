@@ -28,6 +28,9 @@ export interface ProjectTask {
   created_at: string;
   updated_at: string;
   canUpdateStatus: boolean;
+  approval_status?: "approved" | "pending" | "rejected";
+  approval_note?: string | null;
+  created_by?: string | null;
 }
 
 export const tasksApi = {
@@ -40,6 +43,7 @@ export const tasksApi = {
       assigneeUserId?: string;
       parentTaskId?: string;
       projectServiceItemId?: string;
+      approvalStatus?: "approved" | "pending" | "rejected";
       page?: number;
       pageSize?: number;
     } = {},
@@ -74,6 +78,17 @@ export const tasksApi = {
       method: "POST",
       body: JSON.stringify(data),
     });
+  },
+  /** Quản lý dự án duyệt hoặc từ chối công việc do nhân viên đề xuất. */
+  reviewProposal(
+    projectId: string,
+    taskId: string,
+    data: { action: "approve" | "reject"; note?: string | null },
+  ) {
+    return request<ProjectTask>(
+      `/projects/${projectId}/tasks/${taskId}/approval`,
+      { method: "POST", body: JSON.stringify(data) },
+    );
   },
   update(
     projectId: string,

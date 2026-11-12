@@ -2,12 +2,16 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { FolderKanban, Search } from "lucide-react";
+import { FolderKanban, Plus, Search } from "lucide-react";
 import { projectsApi, type Project } from "@/lib/api/projects";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { shortDate } from "@/components/dashboard/figma-widgets";
+import { Button } from "@/components/ui/button";
+import { ProjectCreateWizardDialog } from "@/components/phase3/project-create-wizard-dialog";
+import { clientsApi } from "@/lib/api/clients";
+import { getMe } from "@/lib/api/auth";
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   active: { label: "Đang chạy", cls: "bg-[#EEF2FF] border-[#E0EAFF] text-[#3B5BDB]" },
@@ -25,14 +29,35 @@ export default function TeamLeaderProjectsPage() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([]);
+  const [me, setMe] = useState<Array<{ id: string; fullName: string | null; email: string }>>([]);
 
-  useEffect(() => {
+  const load = () =>
     projectsApi
       .getInternalProjects(1, 100)
       .then((res) => setProjects(res?.items || []))
       .catch(() => setProjects([]))
       .finally(() => setLoading(false));
+
+  useEffect(() => {
+    void load();
   }, []);
+
+  const openWizard = async () => {
+    const [cl, u] = await Promise.allSettled([
+      clientsApi.getClientCompanies({ status: "active", pageSize: 100 }),
+      getMe(),
+    ]);
+    setCompanies(cl.status === "fulfilled" ? (cl.value?.items ?? []) : []);
+    // Trưởng phòng là quản lý dự án mặc định của dự án mình tạo.
+    setMe(
+      u.status === "fulfilled" && u.value.user
+        ? [{ id: u.value.user.id, fullName: u.value.user.fullName, email: u.value.user.email ?? "" }]
+        : [],
+    );
+    setWizardOpen(true);
+  };
 
   const today = new Date().toISOString().slice(0, 10);
   const visible = useMemo(() => {
@@ -52,6 +77,19 @@ export default function TeamLeaderProjectsPage() {
         description="Danh sách các dự án đang phụ trách quản lý, phân bổ nhân sự và theo dõi tiến độ."
         badge={`${projects.length} dự án`}
         badgeVariant="gold"
+        action={
+          <div className="flex gap-2">
+            <Link
+              href="/app/team-leader/clients"
+              className="inline-flex items-center min-h-11 sm:min-h-10 px-4 rounded-xl border border-[#E8DDB8] bg-white text-xs font-bold text-[#161827] hover:bg-[#FFF8E5]"
+            >
+              Khách hàng
+            </Link>
+            <Button onClick={openWizard}>
+              <Plus className="w-4 h-4" /> Tạo dự án
+            </Button>
+          </div>
+        }
       />
 
       <div className="bg-white rounded-2xl border border-[#F2EAD3] p-4 grid gap-3 md:grid-cols-[1fr_200px_200px]">
@@ -120,6 +158,18 @@ export default function TeamLeaderProjectsPage() {
           </ul>
         )}
       </section>
+
+      <ProjectCreateWizardDialog
+        isOpen={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onSuccess={() => {
+          setWizardOpen(false);
+          setLoading(true);
+          void load();
+        }}
+        companies={companies}
+        people={me}
+      />
     </div>
   );
 }

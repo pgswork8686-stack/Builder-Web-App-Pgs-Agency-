@@ -126,14 +126,18 @@ export class ProjectsController {
   }
 
   @Post('admin/projects/:projectId/members')
-  @Roles('admin')
+  @Roles('admin', 'team_leader')
   async createMembership(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Body() body: unknown,
     @CurrentUser('profileId') actorUserId: string,
+    @CurrentUser() user: RequestUser,
   ) {
     const parsed = CreateProjectMembershipSchema.safeParse(body);
     if (!parsed.success) invalidRequest(parsed.error);
+    if (user.role === 'team_leader') {
+      await this.projectsService.assertLeaderManagesProject(projectId, user);
+    }
     return this.projectsService.createMembership(
       projectId,
       parsed.data,

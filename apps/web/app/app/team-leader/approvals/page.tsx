@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { CalendarDays, ClipboardCheck, Clock, Loader2 } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Clock, Lightbulb, Loader2 } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StateBanner } from "@/components/ui/state-banner";
@@ -19,10 +19,11 @@ import { leaveApi, type LeaveRequest } from "@/lib/api/leave";
 import { projectsApi } from "@/lib/api/projects";
 import { tasksApi, type ProjectTask } from "@/lib/api/tasks";
 
-type Tab = "leave" | "attendance" | "results";
+type Tab = "leave" | "proposals" | "attendance" | "results";
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "leave", label: "Nghỉ phép", icon: <CalendarDays className="w-4 h-4" /> },
+  { key: "proposals", label: "Công việc đề xuất", icon: <Lightbulb className="w-4 h-4" /> },
   { key: "attendance", label: "Giải trình chấm công", icon: <Clock className="w-4 h-4" /> },
   { key: "results", label: "Kết quả công việc", icon: <ClipboardCheck className="w-4 h-4" /> },
 ];
@@ -34,6 +35,7 @@ export default function TeamLeaderApprovalsPage() {
   const [tab, setTab] = useState<Tab>("leave");
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [reviewTasks, setReviewTasks] = useState<(ProjectTask & { projectCode?: string })[]>([]);
+  const [proposals, setProposals] = useState<(ProjectTask & { projectCode?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -48,11 +50,17 @@ export default function TeamLeaderApprovalsPage() {
     if (projects.status === "fulfilled") {
       const lists = await Promise.allSettled(
         (projects.value.items || []).map(async (p) => {
-          const r = await tasksApi.list(p.id, { status: "review", pageSize: 50 });
-          return (r.items || []).map((t) => ({ ...t, projectCode: p.projectCode ?? undefined }));
+          const [review, pending] = await Promise.all([
+            tasksApi.list(p.id, { status: "review", pageSize: 50 }),
+            tasksApi.list(p.id, { approvalStatus: "pending", pageSize: 50 }),
+          ]);
+          const tag = (t: ProjectTask) => ({ ...t, projectCode: p.projectCode ?? undefined });
+          return { review: (review.items || []).map(tag), pending: (pending.items || []).map(tag) };
         }),
       );
-      setReviewTasks(lists.flatMap((l) => (l.status === "fulfilled" ? l.value : [])));
+      const ok = lists.flatMap((l) => (l.status === "fulfilled" ? [l.value] : []));
+      setReviewTasks(ok.flatMap((x) => x.review));
+      setProposals(ok.flatMap((x) => x.pending));
     }
     setLoading(false);
   }, []);
@@ -81,18 +89,52 @@ export default function TeamLeaderApprovalsPage() {
     }
   };
 
+  const runTask = async (
+    t: ProjectTask,
+    action: () => Promise<unknown>,
+    message: string,
+  ) => {
+    setProcessingId(t.id);
+    setFeedback(null);
+    try {
+      await action();
+      setFeedback({ type: "success", message });
+      await load();
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Xử lý thất bại. Vui lòng thử lại.",
+      });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const approveProposal = (t: ProjectTask) =>
+    runTask(t, () => tasksApi.reviewProposal(t.project_id, t.id, { action: "approve" }), `Đã duyệt công việc "${t.title}".`);
+  const rejectProposal = (t: ProjectTask) => {
+    const note = window.prompt("Lý do từ chối (người đề xuất sẽ nhận được):", "") ?? null;
+    if (note === null) return;
+    return runTask(t, () => tasksApi.reviewProposal(t.project_id, t.id, { action: "reject", note: note.trim() || null }), `Đã từ chối công việc "${t.title}".`);
+  };
+  const acceptResult = (t: ProjectTask) =>
+    runTask(t, () => tasksApi.update(t.project_id, t.id, { status: "done" }), `Đã nghiệm thu "${t.title}".`);
+  const returnResult = (t: ProjectTask) =>
+    runTask(t, () => tasksApi.update(t.project_id, t.id, { status: "in_progress" }), `Đã trả lại "${t.title}" để chỉnh sửa.`);
+
   const counts: Record<Tab, number> = {
     leave: requests.length,
+    proposals: proposals.length,
     attendance: 0,
     results: reviewTasks.length,
   };
-  const total = counts.leave + counts.results;
+  const total = counts.leave + counts.proposals + counts.results;
 
   return (
     <div className="space-y-6">
       <SectionHeader
         title="Đơn Cần Duyệt"
-        description="Xét duyệt đơn xin nghỉ phép và giải trình từ thành viên trong nhóm."
+        description="Duyệt đơn nghỉ phép, công việc nhân viên đề xuất và nghiệm thu kết quả công việc."
         badge={`${total} đơn`}
         badgeVariant="gold"
       />
@@ -105,7 +147,7 @@ export default function TeamLeaderApprovalsPage() {
         />
       )}
 
-      <div role="tablist" className="flex gap-1 border-b border-[#F2EAD3]">
+      <div role="tablist" className="flex gap-1 border-b border-[#F2EAD3] overflow-x-auto">
         {TABS.map((t) => {
           const active = tab === t.key;
           return (
@@ -115,7 +157,7 @@ export default function TeamLeaderApprovalsPage() {
               aria-selected={active}
               type="button"
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 -mb-px transition-colors ${
+              className={`shrink-0 flex items-center gap-2 px-4 min-h-11 text-xs font-bold border-b-2 -mb-px transition-colors ${
                 active ? "text-[#3B5BDB] border-[#3B5BDB]" : "text-[#475569] border-transparent hover:text-[#161827]"
               }`}
             >
@@ -195,6 +237,50 @@ export default function TeamLeaderApprovalsPage() {
             </Table>
           </TableContainer>
         )
+      ) : tab === "proposals" ? (
+        proposals.length === 0 ? (
+          <EmptyState title="Không có công việc đề xuất nào" description="Khi nhân viên đề xuất công việc trong dự án bạn quản lý, đề xuất sẽ xuất hiện ở đây." />
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>Công việc</TableHeaderCell>
+                  <TableHeaderCell>Dự án</TableHeaderCell>
+                  <TableHeaderCell>Người đề xuất</TableHeaderCell>
+                  <TableHeaderCell>Hạn</TableHeaderCell>
+                  <TableHeaderCell>Thao tác</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {proposals.map((t) => {
+                  const busy = processingId === t.id;
+                  return (
+                    <TableRow key={t.id}>
+                      <TableCell className="text-xs text-[#161827] max-w-[280px]">
+                        <span className="block font-bold truncate">{t.title}</span>
+                        {t.description && <span className="block text-[#475569] truncate">{t.description}</span>}
+                      </TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.projectCode ?? "—"}</TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.assignee?.full_name || "—"}</TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.due_date ? dm(t.due_date) : "—"}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <button type="button" disabled={busy} onClick={() => approveProposal(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-xs font-bold hover:brightness-95 disabled:opacity-50">
+                            {busy ? "Đang xử lý…" : "Duyệt"}
+                          </button>
+                          <button type="button" disabled={busy} onClick={() => rejectProposal(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold hover:brightness-95 disabled:opacity-50">
+                            Từ chối
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )
       ) : tab === "results" ? (
         reviewTasks.length === 0 ? (
           <EmptyState title="Không có kết quả công việc nào chờ duyệt" description="Khi thành viên nộp kết quả, công việc sẽ xuất hiện ở đây." />
@@ -207,17 +293,33 @@ export default function TeamLeaderApprovalsPage() {
                   <TableHeaderCell>Dự án</TableHeaderCell>
                   <TableHeaderCell>Người thực hiện</TableHeaderCell>
                   <TableHeaderCell>Hạn</TableHeaderCell>
+                  <TableHeaderCell>Thao tác</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {reviewTasks.map((t) => (
-                  <TableRow key={t.id}>
-                    <TableCell className="font-bold text-xs text-[#161827]">{t.title}</TableCell>
-                    <TableCell className="text-xs text-[#475569]">{t.projectCode ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-[#475569]">{t.assignee?.full_name || "—"}</TableCell>
-                    <TableCell className="text-xs text-[#475569]">{t.due_date ? dm(t.due_date) : "—"}</TableCell>
-                  </TableRow>
-                ))}
+                {reviewTasks.map((t) => {
+                  const busy = processingId === t.id;
+                  return (
+                    <TableRow key={t.id}>
+                      <TableCell className="font-bold text-xs text-[#161827]">
+                        <a href={`/app/projects/${t.project_id}/tasks/${t.id}`} className="hover:underline">{t.title}</a>
+                      </TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.projectCode ?? "—"}</TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.assignee?.full_name || "—"}</TableCell>
+                      <TableCell className="text-xs text-[#475569]">{t.due_date ? dm(t.due_date) : "—"}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <button type="button" disabled={busy} onClick={() => acceptResult(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#A7F3D0] bg-[#E6FBF5] text-[#047857] text-xs font-bold hover:brightness-95 disabled:opacity-50">
+                            {busy ? "Đang xử lý…" : "Nghiệm thu"}
+                          </button>
+                          <button type="button" disabled={busy} onClick={() => returnResult(t)} className="min-h-11 sm:min-h-8 px-3 rounded-full border border-[#FECACA] bg-[#FEE2E2] text-[#B91C1C] text-xs font-bold hover:brightness-95 disabled:opacity-50">
+                            Yêu cầu sửa
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

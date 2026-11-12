@@ -171,18 +171,17 @@ describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)'
   });
 
   // =========================================================================
-  // 4. Role & Mutation Permissions (Create Task: Only Manager/Admin)
+  // 4. Role & Mutation Permissions (Create Task: Manager creates, member proposes)
   // =========================================================================
   describe('Task Creation Permissions', () => {
-    it('throws ForbiddenException(TASK_ACCESS_DENIED) when regular member (developer) tries to create task', async () => {
-      const developerUser = makeUser({ role: 'employee' });
+    it('throws ForbiddenException(TASK_ACCESS_DENIED) when a viewer tries to create task', async () => {
+      const viewerUser = makeUser({ role: 'employee' });
 
       fromMock.mockReturnValueOnce(
         mockQueryChain({ data: { id: PROJECT_A }, error: null }),
       );
-      // project_role is 'developer', not 'project_manager'
       fromMock.mockReturnValueOnce(
-        mockQueryChain({ data: { project_role: 'developer' }, error: null }),
+        mockQueryChain({ data: { project_role: 'viewer' }, error: null }),
       );
 
       let caughtError: any;
@@ -195,7 +194,7 @@ describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)'
             priority: 'medium',
             sortOrder: 0,
           },
-          developerUser,
+          viewerUser,
         );
       } catch (e) {
         caughtError = e;
@@ -203,6 +202,58 @@ describe('TasksService — Real Authorization Logic (Supabase Transport Mocked)'
 
       expect(caughtError).toBeInstanceOf(ForbiddenException);
       expect(caughtError.response?.code).toBe('TASK_ACCESS_DENIED');
+    });
+
+    it('turns a regular member task into a pending proposal assigned to themselves', async () => {
+      const developerUser = makeUser({ role: 'employee' });
+      const insertChain = mockQueryChain({
+        data: {
+          id: 'task-proposal-1',
+          project_id: PROJECT_A,
+          title: 'Proposed Task',
+          status: 'todo',
+          approval_status: 'pending',
+          assignee_user_id: developerUser.profileId,
+          updated_at: '2026-11-12T00:00:00Z',
+        },
+        error: null,
+      });
+
+      fromMock
+        .mockReturnValueOnce(mockQueryChain({ data: { id: PROJECT_A }, error: null }))
+        .mockReturnValueOnce(
+          mockQueryChain({ data: { project_role: 'developer' }, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockQueryChain({
+            data: { id: 'm1', profile: { role: 'employee', account_status: 'active' } },
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(insertChain)
+        .mockReturnValueOnce(
+          mockQueryChain({ data: { id: PROJECT_A, project_manager_user_id: null }, error: null }),
+        );
+
+      const result = await service.createTask(
+        PROJECT_A,
+        {
+          title: 'Proposed Task',
+          status: 'in_progress',
+          priority: 'medium',
+          sortOrder: 0,
+        },
+        developerUser,
+      );
+
+      expect(result).toMatchObject({ approval_status: 'pending' });
+      expect(insertChain.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          approval_status: 'pending',
+          status: 'todo',
+          assignee_user_id: developerUser.profileId,
+        }),
+      );
     });
 
     it('allows project manager to create task', async () => {

@@ -78,8 +78,18 @@ export const TaskListQuerySchema = z.object({
   assigneeUserId: z.string().uuid().optional(),
   parentTaskId: z.string().uuid().optional(),
   projectServiceItemId: z.string().uuid().optional(),
+  approvalStatus: z.enum(['approved', 'pending', 'rejected']).optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 export type TaskListQuery = z.infer<typeof TaskListQuerySchema>;
+
+export const TaskApprovalSchema = z
+  .object({
+    action: z.enum(['approve', 'reject']),
+    note: z.string().trim().max(1000).nullable().optional(),
+  })
+  .strict();
+
+export type TaskApprovalDto = z.infer<typeof TaskApprovalSchema>;

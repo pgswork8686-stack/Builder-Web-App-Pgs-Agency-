@@ -38,7 +38,7 @@ export class ClientsController {
 
   // --- ADMIN CLIENT COMPANIES ---
   @Get('admin/clients')
-  @Roles('admin')
+  @Roles('admin', 'team_leader')
   async getClientCompanies(
     @Query('q') query?: string,
     @Query('status') status?: 'active' | 'inactive',
@@ -56,7 +56,7 @@ export class ClientsController {
   }
 
   @Get('admin/clients/:clientId')
-  @Roles('admin')
+  @Roles('admin', 'team_leader')
   async getClientCompanyById(
     @Param('clientId', ParseUUIDPipe) clientId: string,
   ) {
@@ -64,7 +64,7 @@ export class ClientsController {
   }
 
   @Post('admin/clients')
-  @Roles('admin')
+  @Roles('admin', 'team_leader')
   async createClientCompany(
     @Body() body: unknown,
     @CurrentUser('authUserId') adminUserId: string,

@@ -118,8 +118,8 @@ describe("Role Navigation Structure & Indexing", () => {
     ]);
 
     const indexes = allItems.map((i) => i.index);
-    expect(indexes).toHaveLength(12);
-    for (let i = 1; i <= 12; i++) {
+    expect(indexes).toHaveLength(13);
+    for (let i = 1; i <= 13; i++) {
       const expected = i.toString().padStart(2, "0");
       expect(indexes[i - 1]).toBe(expected);
     }

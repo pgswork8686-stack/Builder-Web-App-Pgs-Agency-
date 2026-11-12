@@ -103,8 +103,14 @@ export class PeopleController {
   // --- TEAM LEADER SCOPE ---
   @Get('team/members')
   @Roles('team_leader')
-  async getTeamMembers(@CurrentUser('authUserId') leaderUserId: string) {
-    return this.peopleService.getTeamMembersForLeader(leaderUserId);
+  async getTeamMembers(
+    @CurrentUser('authUserId') leaderUserId: string,
+    @CurrentUser('departmentId') departmentId: string | null,
+  ) {
+    return this.peopleService.getTeamMembersForLeader(
+      leaderUserId,
+      departmentId,
+    );
   }
 
   // --- ADMIN DIRECTORY ---

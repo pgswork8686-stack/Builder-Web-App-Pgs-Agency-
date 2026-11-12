@@ -192,7 +192,7 @@ describe('TasksService', () => {
   it('does not infer PM mutation rights from the global team_leader role', async () => {
     client.from
       .mockReturnValueOnce(queryResult({ data: { id: PROJECT_ID } }))
-      .mockReturnValueOnce(queryResult({ data: { project_role: 'member' } }));
+      .mockReturnValueOnce(queryResult({ data: { project_role: 'viewer' } }));
 
     await expect(
       service.createTask(

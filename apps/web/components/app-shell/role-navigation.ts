@@ -249,6 +249,12 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
             },
             {
               index: "04",
+              title: "Khách hàng",
+              href: "/app/team-leader/clients",
+              icon: Building2,
+            },
+            {
+              index: "05",
               title: "Công việc",
               href: "/app/team-leader/tasks",
               icon: ListTodo,
@@ -259,37 +265,37 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
               ],
             },
             {
-              index: "05",
+              index: "06",
               title: "Đội nhóm",
               href: "/app/team-leader/teams",
               icon: Layers,
             },
             {
-              index: "06",
+              index: "07",
               title: "Đơn cần duyệt",
               href: "/app/team-leader/approvals",
               icon: UserCheck,
             },
             {
-              index: "07",
+              index: "08",
               title: "Tài liệu PGS",
               href: "/app/team-leader/documents",
               icon: FolderOpen,
             },
             {
-              index: "08",
+              index: "09",
               title: "Báo cáo",
               href: "/app/team-leader/reports",
               icon: FileSpreadsheet,
             },
             {
-              index: "09",
+              index: "10",
               title: "Chấm công",
               href: "/app/attendance",
               icon: Clock,
             },
             {
-              index: "10",
+              index: "11",
               title: "Nghỉ phép",
               href: "/app/leave",
               icon: CalendarDays,
@@ -300,13 +306,13 @@ export function getNavigationForRole(role: AppRole): NavGroup[] {
           groupTitle: "GIAO TIẾP",
           items: [
             {
-              index: "11",
+              index: "12",
               title: "Tin nhắn",
               href: "/app/chat",
               icon: MessageSquare,
             },
             {
-              index: "12",
+              index: "13",
               title: "Thông báo",
               href: "/app/notifications",
               icon: Bell,

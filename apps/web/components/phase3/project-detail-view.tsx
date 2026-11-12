@@ -182,22 +182,25 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
         setProject(projectData);
         setTasks(taskData.items);
       } else {
-        const [projectData, memberData, serviceData, taskData, peopleData] =
-          await Promise.all([
-            projectsApi.getInternalProject(projectId),
+        // Danh bạ đầy đủ chỉ Admin xem được; nội bộ dùng thành viên phòng/đội của Trưởng phòng (nếu có).
+        const projectData = await projectsApi.getInternalProject(projectId);
+        const [memberData, serviceData, taskData, peopleData] =
+          await Promise.allSettled([
             projectsApi.getMembers(projectId),
             projectsApi.getProjectServices(projectId),
             tasksApi.list(projectId, { page: 1, pageSize: 100 }),
-            peopleApi.getPeopleDirectory({ page: 1, pageSize: 100 }),
+            peopleApi.getTeamMembers(),
           ]);
         setProject(projectData);
-        setMembers(memberData);
-        setProjectServices(serviceData);
-        setTasks(taskData.items);
+        setMembers(memberData.status === "fulfilled" ? memberData.value : []);
+        setProjectServices(
+          serviceData.status === "fulfilled" ? serviceData.value : [],
+        );
+        setTasks(taskData.status === "fulfilled" ? taskData.value.items : []);
         setPeople(
-          (peopleData.items ?? []).filter(
-            (p: any) => p.role !== "client" && p.accountStatus === "active",
-          ),
+          peopleData.status === "fulfilled" && Array.isArray(peopleData.value)
+            ? peopleData.value.filter((p: any) => p.role !== "client")
+            : [],
         );
       }
     } catch (caught) {
@@ -697,7 +700,7 @@ export function ProjectDetailView({ mode }: { mode: Mode }) {
             <h3 className="text-base font-bold text-[#161827]">
               Danh sách thành viên dự án
             </h3>
-            {mode === "admin" && (
+            {(mode === "admin" || canMutateWorkflow) && (
               <Button
                 variant="primary"
                 size="sm"

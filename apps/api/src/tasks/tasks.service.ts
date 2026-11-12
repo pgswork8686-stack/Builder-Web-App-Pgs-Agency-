@@ -11,7 +11,12 @@ import { RequestUser } from '../auth/auth.types';
 import { AutomationService } from '../automation/automation.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateTaskDto, TaskListQuery, UpdateTaskDto } from './dto/task.dto';
+import {
+  CreateTaskDto,
+  TaskApprovalDto,
+  TaskListQuery,
+  UpdateTaskDto,
+} from './dto/task.dto';
 import { WorkspaceRealtimeGateway } from '../workspace/workspace-realtime.gateway';
 
 export interface CreatedTaskRow extends Record<string, unknown> {
@@ -428,6 +433,8 @@ export class TasksService {
       query = query.eq('parent_task_id', filters.parentTaskId);
     if (filters.projectServiceItemId)
       query = query.eq('project_service_item_id', filters.projectServiceItemId);
+    if (filters.approvalStatus)
+      query = query.eq('approval_status', filters.approvalStatus);
 
     const { data, count, error } = await query
       .order('sort_order', { ascending: true })
@@ -476,15 +483,18 @@ export class TasksService {
     context?: TaskCreationContext,
   ) {
     const access = await this.getAccess(projectId, user);
-    if (
-      !context &&
-      !access.isAdmin &&
-      access.projectRole !== 'project_manager'
-    ) {
+    const isManager =
+      access.isAdmin || access.projectRole === 'project_manager';
+    // Thành viên (không phải người xem) được đề xuất công việc cho chính mình, chờ quản lý dự án duyệt.
+    const isProposal = !context && !isManager;
+    if (isProposal && access.projectRole === 'viewer') {
       throw new ForbiddenException({
         code: 'TASK_ACCESS_DENIED',
-        message: 'Chỉ quản lý dự án mới có thể tạo công việc.',
+        message: 'Người xem không thể đề xuất công việc.',
       });
+    }
+    if (isProposal) {
+      dto = { ...dto, assigneeUserId: user.profileId, status: 'todo' };
     }
     if (dto.assigneeUserId) {
       await this.validateAssignee(projectId, dto.assigneeUserId);
@@ -535,11 +545,20 @@ export class TasksService {
           sort_order: dto.sortOrder,
           created_by: user.profileId,
           updated_by: user.profileId,
+          approval_status: isProposal ? 'pending' : 'approved',
         })
         .select()
         .single();
       if (result.error) this.mapWriteError(result.error);
       data = result.data as CreatedTaskRow;
+    }
+    if (isProposal) {
+      await this.notifyProposal(projectId, data, user);
+      this.emit(projectId, data.id, 'task.created', data.updated_at, {
+        status: data.status,
+        approvalStatus: 'pending',
+      });
+      return data;
     }
     if (!workflowLinkExisting) {
       this.emit(projectId, data.id, 'task.created', data.updated_at, {
@@ -563,6 +582,103 @@ export class TasksService {
     return data;
   }
 
+  private async notifyProposal(
+    projectId: string,
+    task: Record<string, any>,
+    actor: RequestUser,
+  ) {
+    try {
+      const project = await this.requireProject(projectId);
+      const managerId = (project as Record<string, any>)
+        .project_manager_user_id as string | null;
+      if (!managerId || managerId === actor.profileId) return;
+      await this.notifications?.createForUser({
+        recipientUserId: managerId,
+        type: 'task.proposed',
+        title: 'Công việc mới chờ duyệt',
+        message: `${actor.fullName ?? actor.email ?? 'Nhân sự'} đề xuất công việc: ${task.title}.`,
+        entityType: 'task',
+        entityId: task.id,
+        actionUrl: '/app/team-leader/approvals',
+        metadata: { projectId },
+        actorUserId: actor.profileId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Task proposal notification failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+    }
+  }
+
+  async reviewTaskProposal(
+    projectId: string,
+    taskId: string,
+    dto: TaskApprovalDto,
+    user: RequestUser,
+  ) {
+    const access = await this.getAccess(projectId, user);
+    if (!access.isAdmin && access.projectRole !== 'project_manager') {
+      throw new ForbiddenException({
+        code: 'TASK_ACCESS_DENIED',
+        message: 'Chỉ quản lý dự án mới duyệt được công việc đề xuất.',
+      });
+    }
+    const existing = (await this.getTaskRow(projectId, taskId)) as Record<
+      string,
+      any
+    >;
+    if (existing.approval_status !== 'pending') {
+      throw new BadRequestException({
+        code: 'TASK_NOT_PENDING',
+        message: 'Công việc này không còn ở trạng thái chờ duyệt.',
+      });
+    }
+    const approved = dto.action === 'approve';
+    const { data, error } = await this.client
+      .from('tasks')
+      .update({
+        approval_status: approved ? 'approved' : 'rejected',
+        approval_note: dto.note ?? null,
+        approved_by: user.profileId,
+        approved_at: new Date().toISOString(),
+        status: approved ? existing.status : 'cancelled',
+        updated_by: user.profileId,
+      })
+      .eq('id', taskId)
+      .eq('project_id', projectId)
+      .eq('approval_status', 'pending')
+      .select()
+      .single();
+    if (error) this.mapWriteError(error);
+    const row = data as Record<string, any>;
+    this.emit(projectId, taskId, 'task.updated', row.updated_at, {
+      approvalStatus: row.approval_status,
+    });
+    const creatorId = (existing.created_by as string | null) ?? null;
+    if (creatorId && creatorId !== user.profileId) {
+      try {
+        await this.notifications?.createForUser({
+          recipientUserId: creatorId,
+          type: approved ? 'task.proposal_approved' : 'task.proposal_rejected',
+          title: approved ? 'Công việc đã được duyệt' : 'Công việc bị từ chối',
+          message: approved
+            ? `Công việc ${row.title} đã được duyệt, bạn có thể bắt đầu.`
+            : `Công việc ${row.title} bị từ chối${dto.note ? `: ${dto.note}` : '.'}`,
+          entityType: 'task',
+          entityId: taskId,
+          actionUrl: `/app/projects/${projectId}/tasks/${taskId}`,
+          metadata: { projectId },
+          actorUserId: user.profileId,
+        });
+      } catch (err) {
+        this.logger.error(
+          `Task proposal review notification failed: ${err instanceof Error ? err.message : 'unknown error'}`,
+        );
+      }
+    }
+    return row;
+  }
+
   async updateTask(
     projectId: string,
     taskId: string,
@@ -578,6 +694,18 @@ export class TasksService {
     }
     const existing = await this.getTaskRow(projectId, taskId);
     const manager = access.isAdmin || access.projectRole === 'project_manager';
+    const approval = (existing as Record<string, any>).approval_status as
+      | string
+      | undefined;
+    if (!manager && approval && approval !== 'approved') {
+      throw new ForbiddenException({
+        code: 'TASK_NOT_APPROVED',
+        message:
+          approval === 'pending'
+            ? 'Công việc đang chờ Trưởng phòng duyệt, chưa thể cập nhật.'
+            : 'Công việc đã bị từ chối, không thể cập nhật.',
+      });
+    }
     if (!manager) {
       const fields = Object.keys(dto);
       const assigned = existing.assignee_user_id === user.profileId;

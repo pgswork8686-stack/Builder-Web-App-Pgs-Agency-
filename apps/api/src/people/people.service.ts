@@ -410,7 +410,10 @@ export class PeopleService {
 
   // --- TEAM LEADER: TEAM MEMBERS SCOPE ---
 
-  async getTeamMembersForLeader(leaderUserId: string) {
+  async getTeamMembersForLeader(
+    leaderUserId: string,
+    departmentId?: string | null,
+  ) {
     const client = this.supabaseService.getSystemClient();
 
     // Fetch teams led by this leader
@@ -431,17 +434,20 @@ export class PeopleService {
     }
 
     const teamIds = (teams || []).map((t) => t.id);
-    if (teamIds.length === 0) {
+    // Chưa lập đội: Trưởng phòng quản lý nhân sự theo phòng ban của mình.
+    if (teamIds.length === 0 && !departmentId) {
       return [];
     }
 
-    // Query profiles in those teams
-    const { data: members, error: membersError } = await client
+    const base = client
       .from('employee_profiles')
       .select(
         'user_id, employee_code, job_title, employment_status, joined_date, profile:profiles(email, full_name, avatar_url, role)',
-      )
-      .in('team_id', teamIds);
+      );
+    const { data: members, error: membersError } =
+      teamIds.length > 0
+        ? await base.in('team_id', teamIds)
+        : await base.eq('department_id', departmentId as string);
 
     if (membersError) {
       this.logger.error(

@@ -20,6 +20,7 @@ import {
   CreateTaskSchema,
   TaskListQuerySchema,
   UpdateTaskSchema,
+  TaskApprovalSchema,
 } from './dto/task.dto';
 import { TasksService } from './tasks.service';
 
@@ -68,6 +69,28 @@ export class TasksController {
     @CurrentUser() user: RequestUser,
   ) {
     return this.tasksService.getTask(projectId, taskId, user);
+  }
+
+  @Post(':taskId/approval')
+  async reviewTaskProposal(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('taskId', ParseUUIDPipe) taskId: string,
+    @Body() body: unknown,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const parsed = TaskApprovalSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_FAILED',
+        message: parsed.error.errors.map((item) => item.message).join(', '),
+      });
+    }
+    return this.tasksService.reviewTaskProposal(
+      projectId,
+      taskId,
+      parsed.data,
+      user,
+    );
   }
 
   @Patch(':taskId')
