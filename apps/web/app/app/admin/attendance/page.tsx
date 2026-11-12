@@ -379,10 +379,10 @@ export default function AdminAttendancePage() {
                   <TableRow key={rec.id}>
                     <TableCell>
                       <div className="font-bold text-[#161827]">
-                        {rec.employee?.full_name || "Nhân viên"}
+                        {(rec.employee?.fullName ?? rec.employee?.full_name) || "Nhân viên"}
                       </div>
                       <div className="text-xs text-[#475569]">
-                        {rec.employee?.work_email}
+                        {(rec.employee?.email ?? rec.employee?.work_email)}
                       </div>
                     </TableCell>
                     <TableCell className="font-bold text-[#161827]">
@@ -465,7 +465,7 @@ export default function AdminAttendancePage() {
           onClose={() => setSelectedRecord(null)}
           maxWidth="md"
           title="Hiệu chỉnh công nhân sự"
-          description={`Nhân sự: ${selectedRecord.employee?.full_name || selectedRecord.employee?.work_email}`}
+          description={`Nhân sự: ${(selectedRecord.employee?.fullName ?? selectedRecord.employee?.full_name) || (selectedRecord.employee?.email ?? selectedRecord.employee?.work_email)}`}
         >
           <form onSubmit={handleSaveAdjustment} className="space-y-4 pt-2">
             {adjustFeedback && (

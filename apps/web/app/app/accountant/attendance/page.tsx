@@ -472,16 +472,16 @@ export default function AccountantAttendancePage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#3B5BDB] font-bold text-xs flex items-center justify-center border border-[#E0E7FF]">
-                              {(emp?.full_name || emp?.work_email || "U")
+                              {((emp?.fullName ?? emp?.full_name) || (emp?.email ?? emp?.work_email) || "U")
                                 .charAt(0)
                                 .toUpperCase()}
                             </div>
                             <div>
                               <span className="block font-bold text-xs text-[#24304A]">
-                                {emp?.full_name || "Chưa có tên"}
+                                {(emp?.fullName ?? emp?.full_name) || "Chưa có tên"}
                               </span>
                               <span className="block text-xs text-[#475569] font-mono">
-                                {emp?.work_email || emp?.employee_code || "—"}
+                                {(emp?.email ?? emp?.work_email) || emp?.employee_code || "—"}
                               </span>
                             </div>
                           </div>

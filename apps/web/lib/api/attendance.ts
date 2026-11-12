@@ -5,6 +5,8 @@ export interface AttendanceRecord {
   user_id: string;
   employee?: {
     full_name?: string;
+    fullName?: string;
+    email?: string;
     work_email?: string;
     employee_code?: string;
   } | null;
