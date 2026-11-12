@@ -201,7 +201,7 @@ export default function AdminPersonDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Chi Tiết Hồ Sơ Nhân Sự"
+        title="Hồ sơ nhân sự"
         description="Quản lý hồ sơ việc làm, chức danh, phòng ban và cấp quản lý trực tiếp."
         action={
           <Link href="/app/admin/people">

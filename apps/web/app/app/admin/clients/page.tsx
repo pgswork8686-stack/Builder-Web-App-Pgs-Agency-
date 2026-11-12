@@ -271,7 +271,7 @@ export default function AdminClientsPage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Quản lý Khách hàng Doanh nghiệp"
+        title="Khách hàng"
         description="Theo dõi danh bạ công ty đối tác, kênh liên lạc (Zalo, Messenger, Facebook) và các dự án hợp tác."
         badge={`${total} Doanh nghiệp`}
         action={

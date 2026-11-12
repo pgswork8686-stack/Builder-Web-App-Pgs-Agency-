@@ -160,7 +160,7 @@ export default function AccountantProjectExpensesPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Đề nghị & Chi phí Dự án"
+        title="Chi phí dự án"
         description="Kiểm soát chi phí phát sinh, mua tài nguyên và các đề nghị hoàn ứng theo từng dự án."
         badge="Chi phí dự án"
         action={

@@ -12,7 +12,7 @@ export default function AccountantPaymentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản lý Thanh toán"
+        title="Thanh toán"
         description="Theo dõi toàn bộ lịch sử giao dịch thanh toán từ các hóa đơn dịch vụ."
         badge="Thanh toán"
         action={

@@ -10,7 +10,7 @@ export default function AdminReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Báo cáo Tổng hợp"
+        title="Báo cáo tổng hợp"
         description="Tổng quan hiệu suất công việc, chỉ số tài chính, chấm công và tình hình dự án."
         badge="Xem trước"
         action={

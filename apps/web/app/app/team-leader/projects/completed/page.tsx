@@ -30,7 +30,7 @@ export default function TeamLeaderCompletedProjectsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Dự án Hoàn thành"
+        title="Dự án hoàn thành"
         description="Các dự án phụ trách đã hoàn thành và bàn giao cho khách hàng."
         badge={`${projects.length} Dự án`}
         action={

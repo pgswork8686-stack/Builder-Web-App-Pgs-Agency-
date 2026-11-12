@@ -29,8 +29,8 @@ export function Sidebar({ account, user, collapsed, onToggleCollapse }: SidebarP
   const roleLabel = account.role ? ROLE_LABELS[account.role] : "Người dùng";
   const displayName = user?.fullName || user?.email?.split("@")[0] || roleLabel;
   const supportHref = account.role === "client" ? "/app/client/support" : "/app/notifications";
-  // Nhân viên chấm công hằng ngày → lối tắt luôn nhìn thấy (mobile-first ở /app/attendance).
-  const showCheckIn = account.role === "employee";
+  // Không thêm nút Chấm công riêng: đã có mục menu "Chấm công & Đơn từ" (tránh trùng).
+  const showCheckIn = false;
 
   return (
     <aside

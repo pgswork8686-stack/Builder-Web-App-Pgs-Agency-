@@ -23,17 +23,17 @@ export function SectionHeader({
   title,
   description,
   badge,
-  badgeVariant = "blue",
+  badgeVariant = "default",
   action,
   className = "",
 }: SectionHeaderProps) {
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E7E9F0] ${className}`}
+      className={`flex flex-col sm:flex-row sm:items-end justify-between gap-3 ${className}`}
     >
       <div className="space-y-1">
         <div className="flex items-center gap-2.5">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#202333] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#202333]">
             {title}
           </h1>
           {badge && (
@@ -43,7 +43,7 @@ export function SectionHeader({
           )}
         </div>
         {description && (
-          <p className="text-sm text-[#475569] leading-relaxed">
+          <p className="text-sm text-[#64748B]">
             {description}
           </p>
         )}

@@ -199,7 +199,7 @@ export default function UserProfilePage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Hồ Sơ Cá Nhân"
+        title="Hồ sơ cá nhân"
         description="Thông tin tài khoản, vai trò hệ thống và thông tin nhân sự / doanh nghiệp liên kết."
         action={
           <Button

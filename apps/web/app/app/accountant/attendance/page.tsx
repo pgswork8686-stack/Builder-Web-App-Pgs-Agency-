@@ -304,7 +304,7 @@ export default function AccountantAttendancePage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Quản lý Chấm công & Ngày công (Kế toán)"
+        title="Chấm công nhân sự"
         description="Đối soát dữ liệu vào ca, thời gian làm việc toàn công ty phục vụ hạch toán bảng lương."
         badge={`${total} Bản ghi chấm công`}
         action={

@@ -225,7 +225,7 @@ export default function AdminTeamsPage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Quản Lý Đội Nhóm"
+        title="Đội nhóm"
         description="Quản trị đội nhóm nghiệp vụ, phòng ban trực thuộc và phân công trưởng nhóm."
         badge={`${teams.length} Đội nhóm`}
         action={

@@ -408,7 +408,7 @@ export function ServiceCatalogView() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Quản Lý Dịch Vụ & Hạng Mục Triển Khai"
+        title="Dịch vụ"
         description="Quản trị 6 nhóm dịch vụ, 26 dịch vụ chuẩn và danh mục hạng mục triển khai mẫu."
         badge={`${categories.length} Nhóm | ${total} Dịch vụ`}
         action={

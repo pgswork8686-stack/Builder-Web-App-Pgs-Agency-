@@ -54,7 +54,7 @@ export default function AdminOrganizationDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Cơ cấu Tổ chức & Nhân sự"
+        title="Cơ cấu tổ chức"
         description="Quản trị phòng ban, đội nhóm, hồ sơ nhân sự công ty và thông tin khách hàng đối tác."
         action={
           <Link href="/app/admin">

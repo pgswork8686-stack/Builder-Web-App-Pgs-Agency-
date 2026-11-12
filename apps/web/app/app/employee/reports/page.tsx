@@ -10,7 +10,7 @@ export default function EmployeeReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Báo cáo Công việc Hàng ngày"
+        title="Báo cáo công việc"
         description="Gửi tóm tắt tiến độ, các khó khăn và kế hoạch ngày tiếp theo cho quản lý trực tiếp."
         badge="Xem trước"
       />

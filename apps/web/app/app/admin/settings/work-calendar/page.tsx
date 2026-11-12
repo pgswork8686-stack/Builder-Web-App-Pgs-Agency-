@@ -231,7 +231,7 @@ export default function AdminWorkCalendarPage() {
   return (
     <div className="space-y-6 max-w-6xl pb-16">
       <SectionHeader
-        title="Lịch Làm Việc Công Ty"
+        title="Lịch làm việc công ty"
         description="Cấu hình ngày làm việc, thứ 7 cách tuần, ngày lễ và ngoại lệ lịch áp dụng toàn hệ thống."
       />
 

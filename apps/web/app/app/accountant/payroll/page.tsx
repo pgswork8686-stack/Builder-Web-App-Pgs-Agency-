@@ -274,7 +274,7 @@ export default function AccountantPayrollPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản Lý Lương & Chấm Công PGS"
+        title="Bảng lương"
         description="Tính toán lương tự động dựa trên lịch làm việc PGS, tuân thủ chấm công, phạt muộn và thưởng chuyên cần 250.000 đ."
         badge={currentMonthStr}
         action={

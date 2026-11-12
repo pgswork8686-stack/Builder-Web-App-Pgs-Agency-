@@ -27,7 +27,7 @@ export default function ClientPaymentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Lịch sử Thanh toán & Hóa đơn"
+        title="Thanh toán"
         description="Tra cứu tiến độ giải ngân, lịch sử thanh toán các đợt theo hợp đồng dịch vụ."
         badge="Thanh toán"
         action={

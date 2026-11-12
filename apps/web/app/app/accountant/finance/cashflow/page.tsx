@@ -11,7 +11,7 @@ export default function AccountantCashflowPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Quản lý Thu Chi & Dòng tiền"
+        title="Thu chi"
         description="Theo dõi biến động dòng tiền thực tế, nguồn thu từ dịch vụ và các khoản chi hoạt động."
         badge="Dòng tiền"
       />

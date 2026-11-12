@@ -10,7 +10,7 @@ export default function EmployeeDocumentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Tài liệu & Quy trình Doanh nghiệp (PGS Library)"
+        title="Tài liệu PGS"
         description="Tra cứu tài liệu quy định công ty, hướng dẫn chế độ phúc lợi và tài liệu đào tạo nội bộ."
         badge="Tài liệu"
       />

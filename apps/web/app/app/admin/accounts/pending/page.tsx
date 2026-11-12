@@ -160,7 +160,7 @@ export default function AdminPendingAccountsPage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Duyệt & Phân quyền Tài khoản"
+        title="Tài khoản chờ duyệt"
         description="Xét duyệt danh tính nhân sự mới đăng ký và cấp quyền truy cập các phân hệ phù hợp."
         badge={`${users.length} Yêu cầu chờ`}
       />

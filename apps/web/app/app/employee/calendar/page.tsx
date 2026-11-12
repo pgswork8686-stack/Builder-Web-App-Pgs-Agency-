@@ -8,7 +8,7 @@ export default function EmployeeCalendarPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Lịch Làm việc Cá nhân"
+        title="Lịch của tôi"
         description="Lịch làm việc cá nhân, ca trực, ngày nghỉ phép và deadline các công việc được giao."
         badge="Lịch cá nhân"
       />

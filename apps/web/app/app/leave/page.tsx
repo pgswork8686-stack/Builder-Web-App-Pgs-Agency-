@@ -142,7 +142,7 @@ export default function EmployeeLeavePage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Quản lý Nghỉ phép"
+        title="Nghỉ phép"
         description="Tra cứu quỹ phép năm, tạo đơn xin nghỉ và theo dõi tiến độ phê duyệt."
         badge={`${totalRequests} Đơn đã gửi`}
         action={

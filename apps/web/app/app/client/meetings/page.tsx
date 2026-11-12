@@ -10,7 +10,7 @@ export default function ClientMeetingsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Lịch Họp & Trao đổi Dự án"
+        title="Lịch họp"
         description="Lịch trình các buổi họp nghiệm thu, demo sản phẩm và làm việc với ban dự án PGS."
         badge="Lịch họp"
       />

@@ -168,7 +168,7 @@ export default function AdminDocumentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Thư viện Tài liệu PGS"
+        title="Tài liệu PGS"
         description="Kho tài liệu biểu mẫu, hợp đồng mẫu, quy trình nội bộ và hướng dẫn vận hành — phân loại theo phòng ban."
         badge="Thư viện PGS"
         action={

@@ -11,7 +11,7 @@ export default function TeamLeaderDocumentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Tài liệu PGS & Biểu mẫu Nhóm"
+        title="Tài liệu PGS"
         description="Kho quy trình bàn giao, tài liệu hướng dẫn kỹ thuật và biểu mẫu đánh giá của agency."
         badge="Tài liệu"
         action={

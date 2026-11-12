@@ -10,7 +10,7 @@ export default function AccountantReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Báo cáo Tài chính Kế toán"
+        title="Báo cáo tài chính"
         description="Báo cáo kết quả kinh doanh, bảng cân đối kế toán và dòng tiền định kỳ."
         badge="Xem trước"
         action={

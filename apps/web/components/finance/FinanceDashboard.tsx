@@ -127,7 +127,7 @@ export default function FinanceDashboard({
     <div className="space-y-6">
       {/* Top Header */}
       <SectionHeader
-        title="Tổng quan Tài chính"
+        title="Tổng quan tài chính"
         description="Theo dõi tình hình hợp đồng, hóa đơn, doanh thu thực tế và nợ tồn đọng."
         action={
           <div className="flex items-center gap-3">

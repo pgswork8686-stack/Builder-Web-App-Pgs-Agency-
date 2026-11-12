@@ -10,7 +10,7 @@ export default function TeamLeaderReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Báo cáo Tiến độ Đội nhóm"
+        title="Báo cáo phòng"
         description="Tổng hợp năng suất, tỷ lệ hoàn thành công việc và đánh giá chất lượng dự án của nhóm."
         badge="Xem trước"
         action={

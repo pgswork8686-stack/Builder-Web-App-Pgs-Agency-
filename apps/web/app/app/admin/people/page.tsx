@@ -298,7 +298,7 @@ export default function AdminPeopleDirectoryPage() {
     <div className="space-y-6">
       {/* Section Header */}
       <SectionHeader
-        title="Danh bạ Nhân sự"
+        title="Nhân sự"
         description="Quản lý hồ sơ nhân viên, chức danh, phân quyền vai trò, dự án và tình trạng công tác toàn doanh nghiệp."
         badge={`${total} Nhân sự`}
         action={

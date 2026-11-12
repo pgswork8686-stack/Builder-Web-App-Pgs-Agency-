@@ -29,57 +29,12 @@ export function StatCard({
   className = "",
   onClick,
 }: StatCardProps) {
-  const variantStyles = {
-    default: {
-      bg: "bg-white border-[#E7E9F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]",
-      iconBg: "bg-[#F2EEFF] text-[#6044E8] border-[#E7E0FF]",
-      titleColor: "text-[#475569]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#E7E9F0]",
-    },
-    blue: {
-      bg: "bg-[#F2EEFF] border-[#E7E0FF] shadow-xs",
-      iconBg: "bg-white text-[#6044E8] shadow-xs",
-      titleColor: "text-[#6044E8]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#E7E0FF]",
-    },
-    cyan: {
-      bg: "bg-[#E0F7FE] border-[#BAE6FD] shadow-xs",
-      iconBg: "bg-white text-[#0284C7] shadow-xs",
-      titleColor: "text-[#0284C7]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#BAE6FD]",
-    },
-    gold: {
-      bg: "bg-[#FEF9C3] border-[#FEF08A] shadow-xs",
-      iconBg: "bg-white text-[#CA8A04] shadow-xs",
-      titleColor: "text-[#CA8A04]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#FEF08A]",
-    },
-    green: {
-      bg: "bg-[#E6FBF5] border-[#A7F3D0] shadow-xs",
-      iconBg: "bg-white text-[#059669] shadow-xs",
-      titleColor: "text-[#059669]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#A7F3D0]",
-    },
-    purple: {
-      bg: "bg-[#F2EEFF] border-[#E9D5FF] shadow-xs",
-      iconBg: "bg-white text-[#9333EA] shadow-xs",
-      titleColor: "text-[#9333EA]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#E9D5FF]",
-    },
-    rose: {
-      bg: "bg-[#FEE2E2] border-[#FECACA] shadow-xs",
-      iconBg: "bg-white text-[#DC2626] shadow-xs",
-      titleColor: "text-[#DC2626]",
-      valueColor: "text-[#202333]",
-      borderColor: "border-[#FECACA]",
-    },
-  };
+  // V2: mọi biến thể nền trắng; chỉ con số mang màu khi có nghĩa (không dùng thẻ màu cầu vồng).
+  const valueTone: Record<string, string> = { rose: "text-[#B42318]", gold: "text-[#B54708]", green: "text-[#067647]" };
+  const base = { bg: "bg-white border-[#E7E9F0]", iconBg: "text-[#94A3B8]", titleColor: "text-[#64748B]", borderColor: "border-[#E7E9F0]" };
+  const variantStyles: Record<string, typeof base & { valueColor: string }> = Object.fromEntries(
+    ["default", "blue", "cyan", "gold", "green", "purple", "rose"].map((k) => [k, { ...base, valueColor: valueTone[k] ?? "text-[#202333]" }]),
+  );
 
   const selected = variantStyles[variant] || variantStyles.default;
 
@@ -91,30 +46,30 @@ export function StatCard({
   const valueFontSize = isLongText
     ? "text-lg sm:text-xl font-bold leading-tight"
     : isMediumText
-      ? "text-xl sm:text-2xl font-semibold tracking-tight"
-      : "text-2xl sm:text-3xl font-semibold tracking-tight";
+      ? "text-xl font-semibold tabular-nums"
+      : "text-2xl font-semibold tabular-nums";
 
   return (
     <div
       onClick={onClick}
-      className={`rounded-xl border p-4 sm:p-5 relative overflow-hidden transition-all duration-200 flex flex-col justify-between h-full ${
+      className={`rounded-xl border px-4 py-3 relative overflow-hidden transition-colors flex flex-col justify-between h-full ${
         selected.bg
       } ${
         onClick
-          ? "cursor-pointer active:scale-[0.99] hover:shadow-md"
-          : "hover:shadow-xs"
+          ? "cursor-pointer hover:bg-[#FBFBFD]"
+          : ""
       } ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1 min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span
-              className={`text-xs font-bold ${selected.titleColor} truncate`}
+              className={`text-xs ${selected.titleColor} truncate`}
             >
               {title}
             </span>
             {badge && (
-              <Badge variant="gold" size="sm">
+              <Badge variant="default" size="sm">
                 {badge}
               </Badge>
             )}
@@ -129,7 +84,7 @@ export function StatCard({
 
         {icon && (
           <div
-            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border transition-transform group-hover:scale-105 ${selected.iconBg}`}
+            className={`shrink-0 [&>svg]:w-4 [&>svg]:h-4 ${selected.iconBg}`}
           >
             {icon}
           </div>

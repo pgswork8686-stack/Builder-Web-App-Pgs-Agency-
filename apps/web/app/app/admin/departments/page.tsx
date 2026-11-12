@@ -187,7 +187,7 @@ export default function AdminDepartmentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Cơ Cấu Phòng Ban & Trưởng Phòng"
+        title="Phòng ban"
         description="Quản trị 9 phòng ban chính thức của PGS Agency và bổ nhiệm Trưởng phòng."
         badge={`${departments.length} Phòng ban`}
         action={

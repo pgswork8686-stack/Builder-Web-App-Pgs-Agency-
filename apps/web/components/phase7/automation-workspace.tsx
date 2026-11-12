@@ -289,7 +289,7 @@ export function AutomationWorkspace() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Trung tâm Tự động hóa"
+        title="Tự động hóa"
         description="Tạo quy tắc gửi thông báo tự động khi có sự kiện trong hệ thống (giao việc, nghỉ phép, hóa đơn…)."
         action={
           <Button

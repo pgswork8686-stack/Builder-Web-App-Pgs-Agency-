@@ -528,7 +528,7 @@ export function ChatWorkspace() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Chat nội bộ & Dự án"
+        title="Tin nhắn"
         description="Trò chuyện trực tiếp giữa nhân sự và thảo luận trao đổi theo từng dự án của PGS Agency."
         action={
           <div className="flex items-center gap-2.5">

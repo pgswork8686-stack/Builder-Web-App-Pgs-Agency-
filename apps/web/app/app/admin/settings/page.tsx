@@ -171,7 +171,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Cài đặt Hệ thống"
+        title="Cài đặt hệ thống"
         description="Cấu hình thông số tổ chức, bảo mật phiên làm việc và tùy chọn thông báo toàn agency."
         badge="Đã kết nối cơ sở dữ liệu"
         badgeVariant="success"

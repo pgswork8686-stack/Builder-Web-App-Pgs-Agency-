@@ -43,7 +43,7 @@ export default function AccountantClientsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Danh sách Khách hàng & Công nợ"
+        title="Khách hàng & công nợ"
         description="Theo dõi danh bạ doanh nghiệp đối tác, mã số thuế và tình trạng tài chính hợp đồng."
         badge={`${clients.length} Doanh nghiệp`}
       />

@@ -10,7 +10,7 @@ export default function ClientDocumentsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Tài liệu Bàn giao Dự án"
+        title="Tài liệu bàn giao"
         description="Kho lưu trữ source code, tài liệu thiết kế, tài khoản và biên bản nghiệm thu hợp đồng."
         badge="Tài liệu bàn giao"
       />

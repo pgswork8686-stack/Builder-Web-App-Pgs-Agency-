@@ -30,7 +30,7 @@ export default function ClientCompletedProjectsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Dự án Hoàn thành & Bàn giao"
+        title="Dự án hoàn thành"
         description="Lịch sử các sản phẩm và dự án agency đã bàn giao nghiệm thu thành công."
         badge={`${projects.length} Dự án`}
         action={
