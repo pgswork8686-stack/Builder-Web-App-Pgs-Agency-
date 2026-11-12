@@ -11,7 +11,7 @@ export default function TeamLeaderReportsPage() {
     <div className="space-y-6">
       <SectionHeader
         title="Báo cáo Tiến độ Đội nhóm"
-        description="Tổng hợp năng suất, tỷ lệ hoàn thành tasks và đánh giá chất lượng dự án của nhóm."
+        description="Tổng hợp năng suất, tỷ lệ hoàn thành công việc và đánh giá chất lượng dự án của nhóm."
         badge="Xem trước"
         action={
           <Button
@@ -40,7 +40,7 @@ export default function TeamLeaderReportsPage() {
             Hiệu suất Công việc
           </span>
           <h4 className="text-base font-extrabold text-[#24304A]">
-            Tỷ lệ hoàn thành Tasks
+            Tỷ lệ hoàn thành công việc
           </h4>
           <p className="text-xs text-[#475569]">
             Thống kê các đầu việc đúng hạn và các task bị trễ hạn.

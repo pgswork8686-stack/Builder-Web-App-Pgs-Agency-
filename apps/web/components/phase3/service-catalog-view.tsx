@@ -968,7 +968,7 @@ export function ServiceCatalogView() {
           onClose={() => setActiveServiceForResponsibility(null)}
           maxWidth="lg"
           title={`Phụ trách dịch vụ: ${activeServiceForResponsibility.name}`}
-          description="Thiết lập phòng ban/Team chủ quản và các đơn vị phối hợp. Team chủ quản bắt buộc phải thuộc phòng ban chủ quản."
+          description="Thiết lập phòng ban/đội chủ quản và các đơn vị phối hợp. Đội chủ quản bắt buộc phải thuộc phòng ban chủ quản."
         >
           {loadingResponsibility ? (
             <div className="py-10 text-center text-xs text-[#475569]">

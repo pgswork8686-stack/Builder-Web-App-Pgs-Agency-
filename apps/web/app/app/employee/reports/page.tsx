@@ -33,7 +33,7 @@ export default function EmployeeReportsPage() {
           <textarea
             rows={3}
             disabled
-            placeholder="Liệt kê các đầu việc hoặc task bạn đã xử lý xong..."
+            placeholder="Liệt kê các đầu việc công việc bạn đã xử lý xong..."
             className="w-full mt-1 p-3 text-xs rounded-xl bg-[#FFFBF0] border border-[#F2EAD3] text-[#475569] cursor-not-allowed"
           />
         </div>

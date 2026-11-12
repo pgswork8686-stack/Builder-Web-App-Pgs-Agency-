@@ -328,7 +328,7 @@ export function AutomationWorkspace() {
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Ví dụ: Nhắc nhở khi giao task mới"
+                  placeholder="Ví dụ: Nhắc nhở khi giao công việc mới"
                   className="mt-1 w-full rounded-xl border border-[#F2EAD3] bg-[#FFFBF0] px-3 py-2 text-xs text-[#161827] outline-none focus:bg-white focus:border-[#3B5BDB]"
                 />
               </label>

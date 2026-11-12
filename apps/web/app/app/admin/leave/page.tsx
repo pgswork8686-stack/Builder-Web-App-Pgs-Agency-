@@ -137,7 +137,7 @@ export default function AdminLeavePage() {
       {/* Top Header matching Figma */}
       <SectionHeader
         title="Đơn cần duyệt"
-        description="Manager xử lý đơn của đội nhóm; Admin xử lý ngoại lệ."
+        description="Trưởng phòng xử lý đơn của đội nhóm; Admin xử lý trường hợp ngoại lệ."
         badge={`${total} Đơn`}
         action={
           <Link href="/app/admin">
