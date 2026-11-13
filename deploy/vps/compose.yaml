@@ -14,6 +14,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3000"
+      NEXT_PUBLIC_APP_URL: "https://${WEB_DOMAIN:?Set WEB_DOMAIN}"
+      NEXT_PUBLIC_API_URL: "https://${API_DOMAIN:?Set API_DOMAIN}/api/v1"
+      NEXT_PUBLIC_SUPABASE_URL: "${SUPABASE_URL:?Set SUPABASE_URL}"
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "${SUPABASE_PUBLISHABLE_KEY:?Set SUPABASE_PUBLISHABLE_KEY}"
     expose:
       - "3000"
     healthcheck:
