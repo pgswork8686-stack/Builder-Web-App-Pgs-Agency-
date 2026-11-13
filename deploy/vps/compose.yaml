@@ -1,0 +1,71 @@
+name: pgs-hub
+
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/Dockerfile.web
+      args:
+        NEXT_PUBLIC_APP_URL: "https://${WEB_DOMAIN:?Set WEB_DOMAIN}"
+        NEXT_PUBLIC_API_URL: "https://${API_DOMAIN:?Set API_DOMAIN}/api/v1"
+        NEXT_PUBLIC_SUPABASE_URL: "${SUPABASE_URL:?Set SUPABASE_URL}"
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "${SUPABASE_PUBLISHABLE_KEY:?Set SUPABASE_PUBLISHABLE_KEY}"
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/auth/login').then(r=>{if(r.status>=500)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 4
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      APP_ENV: production
+      PORT: "3001"
+      WEB_URL: "https://${WEB_DOMAIN:?Set WEB_DOMAIN}"
+      DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL}"
+      SUPABASE_URL: "${SUPABASE_URL:?Set SUPABASE_URL}"
+      SUPABASE_PUBLISHABLE_KEY: "${SUPABASE_PUBLISHABLE_KEY:?Set SUPABASE_PUBLISHABLE_KEY}"
+      SUPABASE_SECRET_KEY: "${SUPABASE_SECRET_KEY:?Set SUPABASE_SECRET_KEY}"
+      JWT_SECRET: "${JWT_SECRET:?Set JWT_SECRET}"
+      INITIAL_ADMIN_EMAIL: "${INITIAL_ADMIN_EMAIL:?Set INITIAL_ADMIN_EMAIL}"
+      TRUST_PROXY: "true"
+      THROTTLE_TTL: "60000"
+      THROTTLE_LIMIT: "120"
+    expose:
+      - "3001"
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      WEB_DOMAIN: "${WEB_DOMAIN:?Set WEB_DOMAIN}"
+      API_DOMAIN: "${API_DOMAIN:?Set API_DOMAIN}"
+      ACME_EMAIL: "${ACME_EMAIL:?Set ACME_EMAIL}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
